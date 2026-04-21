@@ -1,0 +1,64 @@
+% =============================================================================
+% STANDALONE TABLE 9 TEST DOCUMENT
+%
+% Save this entire file as test_table9.tex in your Overleaf project root
+% (NOT inside tables/, NOT renamed). Set it as the main file in Overleaf
+% (Menu -> Main document -> test_table9.tex), then click Recompile.
+%
+% This file contains your full preamble + my hand-coded Table 9 + the
+% document end, all inline. Nothing is \input{}-ed. If this compiles, then
+% the table itself is fine and the problem is somewhere in your master
+% file's structure. If this does NOT compile, the problem is in the
+% preamble or in your Overleaf TeX engine and we can bisect from there.
+% =============================================================================
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{threeparttable}
+\makeatletter
+\@ifundefined{ThreePartTable}{\newenvironment{ThreePartTable}{\begin{threeparttable}}{\end{threeparttable}}}{}
+\@ifundefined{TableNotes}{\newenvironment{TableNotes}{\begin{tablenotes}}{\end{tablenotes}}}{}
+\makeatother
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{amsmath}
+\captionsetup[table]{labelfont=bf, font=small, skip=6pt}
+
+\begin{document}
+
+\begin{table}[H]
+\small
+\centering
+\caption{Fama--French (2010) Bootstrap: Actual vs.\ Simulated $t(\hat{\alpha})$ Percentiles -- FF Subperiod}
+\label{tab:bootstrap_tails_FF}
+\begin{threeparttable}
+\begin{tabular}{rrrrl}
+\toprule
+Percentile & Actual $t(\hat{\alpha})$ & Simulated Mean & Prob.\ Luck & Interpretation \\
+\midrule
+ 1 & XXX & XXX & XX.X\% & Worse than luck (significant) \\
+ 5 & XXX & XXX & XX.X\% & Consistent with zero-skill \\
+10 & XXX & XXX & XX.X\% & Consistent with zero-skill \\
+50 & XXX & XXX & XX.X\% & Indistinguishable from luck \\
+90 & XXX & XXX & XX.X\% & Consistent with zero-skill \\
+95 & XXX & XXX & XX.X\% & Consistent with zero-skill \\
+99 & XXX & XXX & XX.X\% & Evidence of genuine skill \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item Test placeholder. If this table renders, the kableExtra-bypass approach works in your preamble.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\end{document}

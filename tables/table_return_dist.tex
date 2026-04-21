@@ -1,0 +1,29 @@
+\begin{table}[H]
+\centering
+\caption{\label{tab:return_dist}Distribution of Monthly Gross Returns: Active vs.\ Passive Funds}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{llrrrrrrrrr}
+\toprule
+Panel & Group & $N$ & Mean & VW Mean & Median & SD & $P_{10}$ & $P_{90}$ & Skewness & Ex.\ Kurtosis\\
+\midrule
+ & Active & 502,532 & 0.886 & 0.845 & 1.235 & 5.027 & -5.618 & 6.718 & -0.069 & 0.7037\\
+
+\multirow{-2}{*}{\raggedright\arraybackslash Master} & Passive & 62,985 & 0.815 & 1.010 & 1.283 & 5.136 & -6.008 & 6.736 & -0.091 & 0.6716\\
+\cmidrule{1-11}
+ & Active & 430,996 & 0.897 & 0.847 & 1.251 & 4.994 & -5.614 & 6.714 & -0.071 & 0.5999\\
+
+\multirow{-2}{*}{\raggedright\arraybackslash Incubation-Corrected} & Passive & 52,501 & 0.862 & 1.015 & 1.326 & 5.082 & -5.945 & 6.748 & -0.091 & 0.5705\\
+\cmidrule{1-11}
+ & Active & 387,872 & 0.858 & 0.761 & 1.222 & 5.099 & -5.755 & 6.793 & -0.071 & 0.6367\\
+
+\multirow{-2}{*}{\raggedright\arraybackslash Trimmed (1995--2023)} & Passive & 46,810 & 0.800 & 0.879 & 1.270 & 5.207 & -6.084 & 6.902 & -0.090 & 0.5770\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the lagged-TNA-weighted cross-sectional mean return, representing the return earned by a representative invested dollar. Skewness is Pearson's second coefficient: $(\bar{x}-\tilde{x})/s$. Excess kurtosis is the fourth standardised central moment minus 3. Unknown funds are excluded.
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
