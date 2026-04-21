@@ -6,4 +6,5 @@
 *.rds
 *.pdf
 .DS_Store
-Thumbs.db
+Thumbs.dbPUSH:PULL.rtf
+*.rtf
