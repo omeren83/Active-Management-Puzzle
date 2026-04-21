@@ -1,0 +1,415 @@
+\documentclass[12pt]{article}
+% ---- Required packages -------------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{float}          % required for [H] placement specifier
+\usepackage{threeparttable}
+% kableExtra capital-alias compatibility
+\makeatletter
+\@ifundefined{ThreePartTable}{\newenvironment{ThreePartTable}{\begin{threeparttable}}{\end{threeparttable}}}{}
+\@ifundefined{TableNotes}{\newenvironment{TableNotes}{\begin{tablenotes}}{\end{tablenotes}}}{}
+\makeatother
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{fancyhdr}
+\usepackage{eso-pic}
+% Flag-gated persistent shipout hook: fires on every page where flag is true
+\newif\iflscapenum
+\lscapenumfalse
+\AddToShipoutPictureFG{%
+  \iflscapenum
+    \AtPageLowerLeft{%
+      \put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{0.5\paperheight}){%
+        \makebox(0,0){\rotatebox{90}{\thepage}}}%
+    }%
+  \fi
+}
+\fancypagestyle{lscapeblank}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{amsmath}
+\usepackage{natbib}
+\captionsetup[table]{
+  labelfont = bf,
+  font      = small,
+  skip      = 6pt
+}
+\begin{document}
+
+% Table 1: Fund Sample Composition
+\input{tables/table_fund_counts}
+\clearpage
+
+% Table 2: Cross-Sectional Summary Statistics (main --- Incubation-Corrected panel)
+\input{tables/table_desc_stats}
+\clearpage
+
+% Table 3: Return Distribution
+\input{tables/table_return_dist}
+\clearpage
+
+% Table 4: Time Series Coverage
+\input{tables/table_coverage}
+\clearpage
+
+% Figure 1: Fund Flows
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tables/fig_fund_flows}
+    \caption{Average Monthly Proportional Fund Flows}
+    \label{fig:fund_flows}
+\end{figure}
+\clearpage
+
+% Table 5: Aggregate Alpha Performance
+\input{tables/table_perf_aggregate}
+\clearpage
+
+% Figure 2: Rolling Alphas
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tables/fig_rolling_alphas.png}
+    \caption{Time Varying Alphas Estimated by 36-month Rolling Window Regressions.
+    The series displays three visually distinct regimes whose boundaries are
+    formally identified by a \citet{Bai1998,Bai2003} structural break test;
+    see Appendix~\ref{app:subperiod} for break dates, confidence intervals, and
+    regime-mean estimates.}
+    \label{fig:rolling_alphas}
+\end{figure}
+
+% Table 6: Bootstrap Tails
+\input{tables/table_bootstrap_tails}
+
+% Table 7: pi_0 Estimate
+\input{tables/table_pi0_estimate}
+
+% Figure 3: CDF/PDF — FIXED: [H] forces placement here, between Table 7 and Table 8
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tables/fig_luck_vs_skill_combined.png}
+    \caption{CDF of the True vs Simulated Alpha Distributions}
+    \label{fig:luck_vs_skill}
+\end{figure}
+
+% Table 8: BSW Four-Way Decomposition
+\input{tables/table10b_bsw_decomposition}
+\clearpage
+
+% Table 9: Portfolio Characteristics
+\input{tables/table_port_chars}
+
+% Table 10: Aggregate Portfolio Alphas
+\input{tables/table_port_agg_alpha}
+\newpage
+
+% Table 11: Alpha and Factor Loadings by Size
+\input{tables/table_port_size_alpha}
+\newpage
+
+% Table 12: Alpha and Factor Loadings by Momentum
+\input{tables/table_port_mom_alpha}
+\newpage
+
+% Table 13: Alpha and Factor Loadings by Fee
+\input{tables/table_port_fee_alpha}
+\newpage
+
+% Table 14: Alpha Persistence Testing
+\begin{landscape}
+\lscapenumtrue
+\pagestyle{lscapeblank}%
+\input{tables/table_persistence.tex}
+\end{landscape}
+\lscapenumfalse
+\pagestyle{plain}%
+\newpage
+% =============================================================================
+% APPENDIX A: ALTERNATIVE PANEL DESCRIPTIVE STATISTICS
+% =============================================================================
+
+\clearpage
+\section*{Appendix A: Alternative Panel Descriptive Statistics}
+\addcontentsline{toc}{section}{Appendix A: Alternative Panel Descriptive Statistics}
+\label{app:alt_panels}
+\setcounter{table}{0}
+\renewcommand{\thetable}{A.\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A.\arabic{figure}}
+
+This appendix presents cross-sectional summary statistics for the two alternative
+fund-month panels constructed in the main analysis but not used as the primary
+estimation sample. The Master panel (Table~A.1) imposes no incubation correction
+and no sample-period restriction. The Trimmed panel (Table~A.2) applies the
+\citet{Evans2010} 36-month incubation correction \emph{and} restricts the sample
+to 1995--2023; this is the panel used for the panel-level regressions of
+Hypotheses H1--H4, where alignment with the available factor and sentiment
+series motivates the date cap. The Incubation-Corrected panel reported in
+Table~2 of the main text applies only the \citet{Evans2010} 36-month filter
+and retains the full December~1994--February~2026 history without artificial
+date trimming. Comparing the three variants isolates the contribution of each
+correction to the cross-sectional moments of TNA, expense ratio, turnover,
+fund age, gross returns, and the annualised gross Sharpe ratio.
+
+% Table A.1: Master Panel (No Corrections)
+\input{tables/table_desc_stats_master}
+
+% Table A.2: Trimmed Panel (Evans-Corrected, 1995--2023)
+\input{tables/table_desc_stats_trimmed}
+
+% =============================================================================
+% APPENDIX B: ALPHA BY LIPPER STYLE CLASS
+% =============================================================================
+
+\clearpage
+\section*{Appendix B: Alpha by Lipper Style Class}
+\addcontentsline{toc}{section}{Appendix B: Alpha by Lipper Style Class}
+\label{app:lipper}
+\setcounter{table}{0}
+\renewcommand{\thetable}{B.\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{B.\arabic{figure}}
+
+This appendix decomposes the aggregate net annualised \citet{Carhart1997}
+four-factor alpha reported in Table~5 by Lipper investment objective code.
+Funds are grouped by their LSEG-assigned Lipper classification and within each
+class are split into Active and Passive sub-aggregates. The breakdown documents
+the heterogeneity in average performance across investment styles and confirms
+that the aggregate negative net alpha reported in the main text is not driven
+by any single style class.
+
+% Table B.1: Net Alpha by Lipper Style Class
+\input{tables/table_perf_by_lipper}
+
+% =============================================================================
+% APPENDIX C: FAMA-FRENCH (2010) SUBPERIOD REPLICATION
+% =============================================================================
+
+\clearpage
+\section*{Appendix C: Fama--French (2010) Subperiod Replication}
+\addcontentsline{toc}{section}{Appendix C: Fama--French (2010) Subperiod Replication}
+\label{app:ff_subperiod}
+\setcounter{table}{0}
+\renewcommand{\thetable}{C.\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{C.\arabic{figure}}
+
+This appendix replicates the principal performance and skill-decomposition
+results of the main analysis on the Jan~1995--Sep~2006 subperiod, the maximum
+overlap between this study's sample (Dec~1994 onwards) and the
+Jan~1984--Sep~2006 window of \citet{FamaFrench2010}. The estimation kernels,
+factor model specification, Newey--West lag, bootstrap design ($B = 10{,}000$
+calendar-month resamples), and the \citet{Storey2002} tuning parameter
+($\lambda = 0.5$) are identical to those used in the main results, ensuring
+that any divergence between the two sets of estimates reflects sample-period
+effects rather than methodological differences.
+
+% Table C.1: Aggregate alpha by group (FF subperiod)
+\input{tables/table_perf_aggregate_FF}
+\clearpage
+
+% Table C.2: Bootstrap percentiles (FF subperiod)
+\input{tables/table_bootstrap_tails_FF}
+
+% Table C.3: pi_0 aggregate skill estimate (FF subperiod)
+\input{tables/table_pi0_estimate_FF}
+
+% Figure C.1: CDF / PDF of alpha t-statistics (FF subperiod)
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tables/fig_luck_vs_skill_combined_FF.png}
+    \caption{CDF and PDF of Active-Fund Alpha $t$-Statistics --- FF Subperiod}
+    \label{fig:luck_vs_skill_FF}
+\end{figure}
+
+% Table C.4: BSW four-way decomposition (FF subperiod)
+\input{tables/table10b_bsw_decomposition_FF}
+\clearpage
+
+% Table C.5: Aggregate Active vs Passive portfolio alphas (FF subperiod)
+\input{tables/table_port_agg_alpha_FF}
+\clearpage
+
+\noindent\textbf{Comparison with \citet{FamaFrench2010}.} The FF (2010) sample
+spans Jan~1984--Sep~2006 (270 months), of which the present subperiod covers
+only the second half (141 months). Differences in point estimates between this
+appendix and Tables~I--III of FF~(2010) should therefore not be attributed to
+methodological discrepancies but to (i) the absence of the 1984--1994 window,
+during which the cross-section of U.S. equity mutual funds exhibited a more
+favourable mean alpha than in the post-1995 era, and (ii) sample-construction
+differences---this study uses LSEG share-class data with the
+\citet{Evans2010} incubation correction, whereas FF~(2010) draw on the CRSP
+Mutual Fund Database aggregated to fund-level. The qualitative conclusions
+of FF~(2010)---that the cross-sectional distribution of $t(\hat{\alpha})$
+lies materially to the left of the bootstrap zero-skill null, that
+$\hat{\pi}_0$ is high, and that VW net alphas are negative and statistically
+significant---are expected to be reproduced; precise magnitudes need not be.
+
+% =============================================================================
+% APPENDIX D: SUB-PERIOD ANALYSIS
+% =============================================================================
+
+\clearpage
+\section*{Appendix D: Sub-Period Analysis}
+\addcontentsline{toc}{section}{Appendix D: Sub-Period Analysis}
+\label{app:subperiod}
+\setcounter{table}{0}
+\renewcommand{\thetable}{D.\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{D.\arabic{figure}}
+
+The rolling alpha series in Figure~\ref{fig:rolling_alphas} exhibits pronounced
+non-stationarity across the full December~1994--February~2026 sample. To
+partition the sample into
+economically coherent sub-periods without imposing thresholds \textit{a priori},
+we apply the multiple structural break test of \citet{Bai1998} and
+\citet{Bai2003} to the monthly cross-sectional equal-weighted mean of the
+36-month rolling \citet{Carhart1997} gross alpha for active funds --- the same
+underlying series plotted (after 12-month smoothing) in
+Figure~\ref{fig:rolling_alphas}. The test is applied to the raw, unsmoothed
+series; smoothing the input would introduce additional moving-average serial
+correlation on top of the overlap-induced autocorrelation already present in
+rolling-window estimates, overstating the precision of detected breaks.
+
+The model is a pure mean-shift specification, $y_t = \mu_i + \varepsilon_t$
+for $t$ in segment $i$, with a minimum segment length of 36 months (matching
+the rolling-window width) and up to five breaks tested. The optimal number of
+breaks is selected by the Bayesian Information Criterion (BIC). Confidence
+intervals for break dates use Newey--West heteroskedasticity- and
+autocorrelation-consistent standard errors with a data-driven lag, following
+the bandwidth rule of \citet{Andrews1991}.
+
+\subsection*{D.1 \ Structural Break Test Results}
+
+Figure~\ref{fig:breaktest} plots the smoothed active-fund rolling alpha series
+together with the Bai--Perron break-date estimates (dashed red verticals),
+95\,\% HAC confidence intervals (shaded bands), and regime-mean step function
+(solid red). Table~D.1 reports break dates, confidence intervals, and mean
+alpha per segment.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{tables/fig_breaktest.png}
+    \caption{Bai--Perron Structural Break Test: Active Fund Rolling Gross
+    Alpha. Blue line: 12-month trailing mean of the monthly cross-sectional
+    equal-weighted mean of 36-month rolling \citet{Carhart1997} gross alpha
+    (matches Figure~\ref{fig:rolling_alphas}). Solid red step: regime-mean
+    alpha per identified segment. Dashed red verticals: \citet{Bai1998,Bai2003}
+    break-date point estimates. Shaded bands: 95\,\% confidence
+    intervals using Newey--West HAC standard errors \citep{Andrews1991}.
+    BIC selects five breaks (Dec~1999, Dec~2002, Dec~2005, Nov~2011, Jan~2023)
+    defining six regimes. Breaks~1--3 are collapsed into a single pre-2006
+    regime and Break~5 is collapsed into the post-2011 regime, yielding the
+    three-period partition adopted in Section~D.2; aggregation reflects the
+    small-sample constraints of the FF bootstrap and BSW decomposition which
+    require $T\geq 60$ monthly observations \citep{BarrasScailletWermers2010}.
+    Sample: Incubation-corrected panel (Evans 2010), active funds only,
+    December~1994--February~2026.}
+    \label{fig:breaktest}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Bai--Perron Break Dates, 95\,\% HAC Confidence Intervals, and
+         Regime-Mean Gross Alpha}
+\label{tab:breaktest}
+\small
+\begin{tabular}{clccc}
+\toprule
+Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
+      & Regime Mean (\% p.a.) \\
+\midrule
+1 & Dec 1999 & Jul 1999 & May 2000 & --- \\
+2 & Dec 2002 & Oct 2002 & May 2003 & --- \\
+3 & Dec 2005 & Aug 2005 & Apr 2006 & --- \\
+4 & Nov 2011 & Jun 2011 & Feb 2012 & --- \\
+5 & Jan 2023 & Dec 2021 & Jul 2024 & --- \\
+\midrule
+\multicolumn{5}{l}{\textit{Implied six-regime partition:}} \\[3pt]
+\multicolumn{4}{l}{Period 1: Dec 1996 -- Dec 1999 \hfill (37 months)}
+    & $-0.59$ \\
+\multicolumn{4}{l}{Period 2: Jan 2000 -- Dec 2002 \hfill (36 months)}
+    & $+1.67$ \\
+\multicolumn{4}{l}{Period 3: Jan 2003 -- Dec 2005 \hfill (36 months)}
+    & $-0.80$ \\
+\multicolumn{4}{l}{Period 4: Jan 2006 -- Nov 2011 \hfill (71 months)}
+    & $+1.02$ \\
+\multicolumn{4}{l}{Period 5: Dec 2011 -- Jan 2023 \hfill (134 months)}
+    & $-1.13$ \\
+\multicolumn{4}{l}{Period 6: Feb 2023 -- Jan 2026 \hfill (36 months)}
+    & $-2.20$ \\
+\midrule
+\multicolumn{5}{l}{\textit{Three-regime partition adopted in Section~D.2:}} \\[3pt]
+\multicolumn{4}{l}{P1: Dec 1996 -- Dec 2005 \hfill (109 months)}
+    & $+0.09$ \\
+\multicolumn{4}{l}{P2: Jan 2006 -- Nov 2011 \hfill (71 months)}
+    & $+1.02$ \\
+\multicolumn{4}{l}{P3: Dec 2011 -- Jan 2026 \hfill (170 months)}
+    & $-1.36$ \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{\linewidth}
+\vspace{4pt}
+\footnotesize
+\textit{Note:} Break dates estimated via \citet{Bai1998} and \citet{Bai2003}
+with minimum segment 36 months; optimal break count (five) selected by BIC
+from the Andrews (1993) supF, Andrews and Ploberger (1994) meanF and expF
+tests (supF $= 57.33$, meanF $= 23.12$, expF $= 25.44$; all $p < 0.0001$).
+Confidence intervals use Newey--West HAC standard errors \citep{Andrews1991}
+with lag $= \lfloor 4(T/100)^{2/9} \rfloor$.
+Regime means are equal-weighted cross-sectional means of the monthly
+36-month rolling \citet{Carhart1997} gross alpha across active funds within
+each segment, annualised ($\times 12$, \%). Periods 1--3 are collapsed and
+Period~6 is pooled with Period~5 to form the three-regime partition adopted
+in Section~D.2. Each of the three adopted regimes has $T\geq 60$ monthly
+observations, meeting the minimum sample requirement for reliable
+Fama--French (2010) bootstrap and \citet{BarrasScailletWermers2010}
+decomposition. Three-regime means are duration-weighted averages of the
+corresponding six-regime means. Sub-period thresholds adopted in
+Section~D.2: \textbf{Dec~2005} and \textbf{Nov~2011}.
+\end{minipage}
+\end{table}
+
+\noindent The five-break solution selected by BIC identifies four tight,
+economically interpretable breaks (Breaks~1--4, CIs spanning at most ten
+months each) and one wider break at Jan~2023 (Break~5, CI spanning
+31 months). Breaks~1--3 partition the pre-GFC era into its components:
+the late-1990s tail (Period~1, $\bar{\alpha} = -0.59\%$), the dot-com peak
+(Period~2, $\bar{\alpha} = +1.67\%$), and the post-crash recovery phase
+(Period~3, $\bar{\alpha} = -0.80\%$). These oscillations cluster tightly
+around zero on net and each regime spans 36--37 months --- below the
+60-month minimum recommended by \citet{BarrasScailletWermers2010} for
+reliable bootstrap inference --- and are therefore collapsed into a single
+pre-2006 regime (P1) in the sub-period analysis. Break~4 (Nov~2011,
+CI: Jun~2011--Feb~2012) marks the onset of persistent alpha compression
+and produces the largest regime-mean shift in the sample
+($+1.02\%$ to $-1.13\%$). Break~5 (Jan~2023, CI: Dec~2021--Jul~2024) marks
+a further intensification of compression; its 36-month post-break segment
+is insufficient for separate bootstrap inference and is consequently pooled
+with Period~5 in the sub-period tables, though the break itself is
+retained in the figure and this table as part of the formal test output.
+Accordingly, the sub-period analysis in Section~D.2 uses \textbf{two
+thresholds}: \textbf{Dec~2005} (separating the volatile pre-GFC era from
+the clean positive-alpha era) and \textbf{Nov~2011} (marking the structural
+break in the alpha-generating process).
+
+\input{tables/table_subperiod_perf_aggregate}
+\input{tables/table_subperiod_bootstrap_tails}
+\input{tables/table_subperiod_pi0_estimate}
+\input{tables/table_subperiod_bsw_decomposition}
+\input{tables/table_subperiod_port_agg_alpha}
+
+\clearpage
+\bibliographystyle{chicago}
+\bibliography{dissertation}
+
+\end{document}

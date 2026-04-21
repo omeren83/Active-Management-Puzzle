@@ -1,0 +1,31 @@
+\begin{table}[H]
+\centering
+\caption{\label{tab:perf_aggregate}Aggregate Portfolio Alpha by Group (\%, Annualised)}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lrrrrrr}
+\toprule
+\multicolumn{3}{c}{ } & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} \\
+\cmidrule(l{3pt}r{3pt}){4-5} \cmidrule(l{3pt}r{3pt}){6-7}
+Group & $N$ & $T$ & EW & VW & EW & VW\\
+\midrule
+Active & 2,157 & 373 & -0.165 & -0.135 & -1.243$^{***}$ & -0.855$^{**}$\\
+t(coef) &  &  & (-0.37) & (-0.35) & (-2.82) & (-2.25)\\
+Passive & 301 & 373 & -0.370 & 0.173 & -0.900$^{***}$ & 0.038\\
+t(coef) &  &  & (-1.11) & (0.76) & (-2.73) & (0.17)\\
+Unknown & 734 & 373 & -3.236$^{***}$ & -2.262 & -4.823$^{***}$ & -3.359$^{**}$\\
+t(coef) &  &  & (-4.69) & (-1.41) & (-6.93) & (-2.09)\\
+\midrule
+Active + Passive & 2,458 & 373 & -0.188 & -0.069 & -1.210$^{***}$ & -0.669$^{**}$\\
+t(coef) &  &  & (-0.45) & (-0.20) & (-2.89) & (-2.01)\\
+Full Sample & 3,192 & 373 & -0.591 & -0.081 & -1.703$^{***}$ & -0.684$^{**}$\\
+t(coef) &  &  & (-1.50) & (-0.24) & (-4.38) & (-2.07)\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Annualised \citet{Carhart1997} four-factor alpha (\%) from regressing the monthly aggregate portfolio return of each group on the market, size, value, and momentum factors, following \citet{FamaFrench2010}. EW: equal-weighted portfolio (each fund alive in month $t$ contributes $1/N_t$). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net returns are computed as gross returns less one-twelfth of the static annual expense ratio each month, following \citet{BarrasScailletWermers2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $N$: unique funds contributing to the portfolio series; $T$: number of monthly observations in the regression. The Active + Passive row aggregates only the two classified groups. Sample: incubation-corrected panel (Evans 2010), no date cap.
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}

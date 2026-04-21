@@ -1,0 +1,30 @@
+\begin{table}[H]
+\centering
+\caption{Aggregate Portfolio Alpha by Group (\%, Annualised) -- Fama--French (2010) Subperiod}
+\label{tab:perf_aggregate_FF}
+\begin{threeparttable}
+\begin{tabular}{lrrrrrr}
+\toprule
+ & & & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} \\
+\cmidrule(lr){4-5} \cmidrule(lr){6-7}
+Group & $N$ & $T$ & EW & VW & EW & VW \\
+\midrule
+Active & 918 & 141 & -0.573 & -0.486 & -1.611$^{**}$ & -1.157$^{*}$ \\
+t(coef) & & & (-0.78) & (-0.69) & (-2.21) & (-1.67) \\
+Passive & 123 & 141 & -0.108 & 0.359 & -0.573 & 0.232 \\
+t(coef) & & & (-0.21) & (1.12) & (-1.09) & (0.72) \\
+Unknown & 397 & 141 & -3.642$^{***}$ & -5.706$^{***}$ & -5.587$^{***}$ & -6.967$^{***}$ \\
+t(coef) & & & (-5.32) & (-3.85) & (-8.44) & (-4.62) \\
+\midrule
+Active + Passive & 1,041 & 141 & -0.548 & -0.369 & -1.536$^{**}$ & -0.935 \\
+t(coef) & & & (-0.78) & (-0.62) & (-2.20) & (-1.58) \\
+Full Sample & 1,438 & 141 & -1.196$^{*}$ & -0.379 & -2.384$^{***}$ & -0.949 \\
+t(coef) & & & (-1.76) & (-0.63) & (-3.54) & (-1.60) \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item Annualised \citet{Carhart1997} four-factor alpha (\%) from regressing the monthly aggregate portfolio return of each group on the market, size, value, and momentum factors, following \citet{FamaFrench2010}. EW: equal-weighted portfolio (each fund alive in month $t$ contributes $1/N_t$). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net returns are computed as gross returns less one-twelfth of the static annual expense ratio each month, following \citet{BarrasScailletWermers2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $N$: unique funds contributing to the portfolio series; $T$: number of monthly observations in the regression. The Active + Passive row aggregates only the two classified groups. Sample: Jan 1995--Sep 2006 (Fama--French 2010 subperiod). The subperiod is the maximum overlap between this study's data window (Dec 1994 onwards) and the \citet{FamaFrench2010} sample (Jan 1984--Sep 2006), enabling direct comparison with their Tables I--III.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

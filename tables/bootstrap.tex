@@ -1,0 +1,59 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- Essential Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amstext} % Math support [cite: 98]
+\usepackage{geometry} % For margins
+\usepackage{booktabs} % For professional tables [cite: 34, 43, 98]
+\usepackage{caption} % For table/figure captions
+\usepackage{hyperref} % For clickable links and references
+\usepackage{setspace} % For line spacing
+
+% --- Layout Settings ---
+\geometry{margin=1in}
+\onehalfspacing
+
+\title{Technical Appendix: The Fama-French (2010) Bootstrap Methodology}
+\author{Ömer}
+\date{March 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Methodological Framework}
+The central objective of the bootstrap analysis is to separate managerial skill from statistical luck within the cross-section of mutual fund alphas[cite: 97, 98]. In a large universe of funds, extreme performance—both positive and negative—can arise solely through the distribution of luck. This methodology generates a ``zero-skill'' benchmark to serve as a yardstick for evaluating realized performance[cite: 98].
+
+\section{The Step-by-Step Bootstrap Process}
+
+\subsection{Establishing the Null Hypothesis}
+To test for luck, we first create a synthetic universe where no manager possesses forecasting talent. We calculate the realized alpha ($\hat{\alpha}_i$) for each fund $i$ using the Carhart four-factor model. We then subtract this realized alpha from the fund’s monthly return series:
+\begin{equation}
+    R_{i,t}^{Adj} = R_{i,t} - \hat{\alpha}_i
+\end{equation}
+By construction, every fund in this bootstrap universe now has a true population alpha of exactly zero[cite: 98].
+
+\subsection{Resampling and Cross-Sectional Correlation}
+We draw $T$ months with replacement from the sample period (1995--2023). Crucially, for any given bootstrap run, the \textit{same} sequence of random months is applied to every fund. This preserves the cross-sectional correlation of returns—ensuring that common market shocks affecting the industry are maintained in the simulated data.
+
+\subsection{Generating the Simulated Distribution}
+We execute 10,000 bootstrap runs. In each run, we perform the four-factor regression for every fund using the resampled data and record the $t$-statistic of the alpha ($t(\alpha)$). Within each run, funds are ranked from the 1st percentile (worst) to the 99th percentile (best) based on their $t(\alpha)$[cite: 98].
+
+\subsection{Probability of Luck}
+The probability of luck is determined by comparing the realized $t(\alpha)$ at a specific percentile to the average simulated $t(\alpha)$ at that same percentile. For a result to be considered statistically significant skill (or significant incompetence), the actual $t$-statistic must fall outside the 95\% confidence interval of the luck-only distribution[cite: 98].
+
+\section{Advanced Metrics: $\pi_0$ Estimation}
+Following \textcite{FamaFrench2010}, we estimate the proportion of the entire fund population that has a true alpha of exactly zero, denoted as $\pi_0$[cite: 82, 100]. This is calculated using the density of $p$-values in the middle of the distribution ($\lambda = 0.5$):
+\begin{equation}
+    \hat{\pi}_0 = \frac{\#\{p_i > \lambda\}}{N \times (1 - \lambda)}
+\end{equation}
+For this sample, we estimate $\hat{\pi}_0 = 76.8\%$, suggesting that roughly 77\% of the mutual fund industry possesses zero true talent[cite: 82, 99].
+
+\section{Summary of Findings}
+\begin{itemize}
+    \item \textbf{The Left Tail:} Realized performance at the 1st percentile ($t = -3.518$) is significantly worse than the simulated luck mean of $-2.368$, with only a 0.3\% probability of being luck-driven[cite: 98]. This confirms the existence of persistently incompetent managers or excessive fee structures.
+    \item \textbf{The Right Tail:} Performance at the 99th percentile ($t = 2.431$) is statistically indistinguishable from the simulated luck mean of $2.340$, as 63.4\% of zero-skill runs produced lower values[cite: 98].
+\end{itemize}
+
+\end{document}

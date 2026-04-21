@@ -1,0 +1,61 @@
+\begin{table}[H]
+\centering
+\caption{\label{tab:subperiod_perf_aggregate}Aggregate Portfolio Alpha by Group and Sub-Period (\%, Annualised)}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lrrrrrr}
+\toprule
+\multicolumn{3}{c}{ } & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} \\
+\cmidrule(l{3pt}r{3pt}){4-5} \cmidrule(l{3pt}r{3pt}){6-7}
+Group & $N$ & $T$ & EW & VW & EW & VW\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{7}{l}{\textit{Panel A: P1 (Dec 1996--Dec 2005, 109 months)}}\\
+\hspace{1em}Active & 874 & 109 & -0.071 & 0.152 & -1.120 & -0.525\\
+\hspace{1em}t(coef) &  &  & (-0.08) & (0.22) & (-1.33) & (-0.78)\\
+\hspace{1em}Passive & 119 & 109 & 0.360 & 0.544 & -0.128 & 0.381\\
+\hspace{1em}t(coef) &  &  & (0.61) & (1.44) & (-0.22) & (1.05)\\
+\hspace{1em}Unknown & 375 & 109 & -3.233$^{***}$ & -5.816$^{***}$ & -5.335$^{***}$ & -7.095$^{***}$\\
+\hspace{1em}t(coef) &  &  & (-4.14) & (-3.69) & (-7.12) & (-4.41)\\
+\midrule
+\hspace{1em}Active + Passive & 993 & 109 & -0.056 & 0.221 & -1.053 & -0.352\\
+\hspace{1em}t(coef) &  &  & (-0.07) & (0.38) & (-1.31) & (-0.62)\\
+\hspace{1em}Full Sample & 1,368 & 109 & -0.773 & 0.212 & -2.002$^{***}$ & -0.365\\
+\hspace{1em}t(coef) &  &  & (-0.99) & (0.37) & (-2.59) & (-0.65)\\
+\addlinespace[0.3em]
+\hline
+\multicolumn{7}{l}{\textit{Panel B: P2 (Jan 2006--Nov 2011, 71 months)}}\\
+\hspace{1em}Active & 1,235 & 71 & 0.631 & 0.020 & -0.465 & -0.781\\
+\hspace{1em}t(coef) &  &  & (1.03) & (0.03) & (-0.77) & (-1.29)\\
+\hspace{1em}Passive & 161 & 71 & 0.196 & 0.743$^{*}$ & -0.429 & 0.558\\
+\hspace{1em}t(coef) &  &  & (0.41) & (1.70) & (-0.93) & (1.36)\\
+\hspace{1em}Unknown & 270 & 71 & -3.317$^{***}$ & -1.088 & -4.999$^{***}$ & -2.188$^{**}$\\
+\hspace{1em}t(coef) &  &  & (-4.61) & (-1.15) & (-7.00) & (-2.36)\\
+\midrule
+\hspace{1em}Active + Passive & 1,396 & 71 & 0.584 & 0.157 & -0.460 & -0.557\\
+\hspace{1em}t(coef) &  &  & (1.02) & (0.28) & (-0.82) & (-1.01)\\
+\hspace{1em}Full Sample & 1,666 & 71 & 0.083 & 0.149 & -1.056$^{*}$ & -0.570\\
+\hspace{1em}t(coef) &  &  & (0.14) & (0.26) & (-1.82) & (-1.02)\\
+\addlinespace[0.3em]
+\hline
+\multicolumn{7}{l}{\textit{Panel C: P3 (Dec 2011--Jan 2026, 170 months)}}\\
+\hspace{1em}Active & 1,963 & 170 & -1.404$^{***}$ & -0.696$^{**}$ & -2.502$^{***}$ & -1.421$^{***}$\\
+\hspace{1em}t(coef) &  &  & (-3.37) & (-2.11) & (-6.05) & (-4.35)\\
+\hspace{1em}Passive & 249 & 170 & -1.184$^{***}$ & -0.259 & -1.723$^{***}$ & -0.351$^{**}$\\
+\hspace{1em}t(coef) &  &  & (-3.52) & (-1.45) & (-5.21) & (-1.98)\\
+\hspace{1em}Unknown & 37 & 170 & -2.451$^{**}$ & -1.893 & -3.686$^{***}$ & -2.925\\
+\hspace{1em}t(coef) &  &  & (-2.02) & (-0.85) & (-3.04) & (-1.31)\\
+\midrule
+\hspace{1em}Active + Passive & 2,212 & 170 & -1.378$^{***}$ & -0.593$^{**}$ & -2.414$^{***}$ & -1.166$^{***}$\\
+\hspace{1em}t(coef) &  &  & (-3.49) & (-2.34) & (-6.15) & (-4.65)\\
+\hspace{1em}Full Sample & 2,249 & 170 & -1.421$^{***}$ & -0.597$^{**}$ & -2.458$^{***}$ & -1.171$^{***}$\\
+\hspace{1em}t(coef) &  &  & (-3.61) & (-2.36) & (-6.30) & (-4.67)\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Annualised \citet{Carhart1997} four-factor alpha (\%) from portfolio regressions of the monthly aggregate return of each group on the market, size, value, and momentum factors, estimated separately within each sub-period, following \citet{FamaFrench2010}. EW: equal-weighted; VW: lagged-TNA-weighted $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net = gross $-$ expense/12 \citep{BarrasScailletWermers2010}. Newey-West $t$-stats (6-month lag) in parentheses; $^{*}$, $^{**}$, $^{***}$: 10\%, 5\%, 1\%. $N$: unique funds; $T$: months in the regression. Sub-period thresholds (Jan 2006, Nov 2011) from Bai-Perron test (Section D.1). Sample: Trimmed (1995--2023) Evans-corrected panel.
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
