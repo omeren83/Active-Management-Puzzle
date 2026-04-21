@@ -1,0 +1,9 @@
+.Rhistory
+.RData
+.Rproj.user/
+*.xlsx
+*.csv
+*.rds
+*.pdf
+.DS_Store
+Thumbs.db

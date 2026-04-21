@@ -1,0 +1,16 @@
+1. data import and cleaning
+2. flow calculation
+3. descriptive statistics
+4. alpha estimation
+5. aggregate alphas
+6. alpha reporting
+7. portfolio sorts
+8. structural break test
+9. FF comparison
+10. subperiod analysis
+11. build FF tables manual
+
+
+1. data import and cleaning
+2. flow calculation
+3. persistence testing
