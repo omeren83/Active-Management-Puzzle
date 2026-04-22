@@ -1,0 +1,81 @@
+
+{\setlength{\tabcolsep}{2pt}\footnotesize
+\begin{longtable}[t]{lrrrrrrrr}
+\caption{\label{tab:port_fee_alpha}Alpha and Factor Loadings by Fee Quintile (\%, Annualised)}\\
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
+\endfirsthead
+\caption[]{Alpha and Factor Loadings by Fee Quintile (\%, Annualised) \textit{(continued)}}\\
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\endlastfoot
+\addlinespace[0.3em]
+\multicolumn{9}{l}{Active --- EW}\\
+\hspace{1em}Q1 (Low Fee) & 0.444 & 0.231 & 0.317 & 0.918$^{***}$ & 0.047$^{*}$ & 0.111$^{***}$ & -0.010 & 0.981\\
+\hspace{1em}t(coef) & (0.81) & (0.62) & (0.83) & (79.29) & (1.95) & (4.80) & (-0.64) & \\
+\hspace{1em}Q2 & -0.022 & -0.161 & -0.057 & 0.921$^{***}$ & 0.126$^{***}$ & 0.124$^{***}$ & -0.012 & 0.976\\
+\hspace{1em}t(coef) & (-0.03) & (-0.37) & (-0.13) & (72.42) & (4.17) & (4.94) & (-0.73) & \\
+\hspace{1em}Q3 & 0.070 & -0.033 & -0.064 & 0.917$^{***}$ & 0.147$^{***}$ & 0.127$^{***}$ & 0.004 & 0.971\\
+\hspace{1em}t(coef) & (0.10) & (-0.07) & (-0.14) & (70.24) & (4.74) & (4.51) & (0.20) & \\
+\hspace{1em}Q4 & -0.160 & -0.045 & -0.084 & 0.919$^{***}$ & 0.321$^{***}$ & 0.136$^{***}$ & 0.005 & 0.968\\
+\hspace{1em}t(coef) & (-0.17) & (-0.09) & (-0.16) & (64.28) & (9.35) & (4.93) & (0.25) & \\
+\hspace{1em}Q5 (High Fee) & -1.164 & -1.078$^{**}$ & -1.095$^{**}$ & 0.921$^{***}$ & 0.255$^{***}$ & 0.110$^{***}$ & 0.002 & 0.974\\
+\hspace{1em}t(coef) & (-1.54) & (-2.44) & (-2.37) & (66.61) & (8.29) & (5.11) & (0.14) & \\
+\hspace{1em}Q5$-$Q1 & -1.608$^{***}$ & -1.309$^{***}$ & -1.413$^{***}$ & 0.003 & 0.208$^{***}$ & -0.001 & 0.012$^{**}$ & 0.738\\
+\hspace{1em}t(coef) & (-3.37) & (-5.64) & (-5.92) & (0.31) & (22.04) & (-0.13) & (1.98) & \\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Active --- VW}\\
+\hspace{1em}Q1 (Low Fee) & 0.219 & 0.131 & 0.041 & 0.950$^{***}$ & -0.021$^{**}$ & 0.028 & 0.011 & 0.984\\
+\hspace{1em}t(coef) & (0.59) & (0.39) & (0.12) & (112.35) & (-1.96) & (1.58) & (0.83) & \\
+\hspace{1em}Q2 & -0.538 & -0.266 & -0.254 & 0.949$^{***}$ & 0.159$^{***}$ & -0.023$^{*}$ & -0.001 & 0.982\\
+\hspace{1em}t(coef) & (-1.15) & (-0.77) & (-0.73) & (90.22) & (12.54) & (-1.69) & (-0.18) & \\
+\hspace{1em}Q3 & -1.014 & -0.811 & -0.937 & 0.921$^{***}$ & 0.213$^{***}$ & 0.042 & 0.015 & 0.928\\
+\hspace{1em}t(coef) & (-1.08) & (-1.07) & (-1.23) & (43.45) & (6.28) & (0.96) & (0.46) & \\
+\hspace{1em}Q4 & -1.308 & -0.978 & -1.143 & 0.998$^{***}$ & 0.204$^{***}$ & -0.013 & 0.020 & 0.956\\
+\hspace{1em}t(coef) & (-1.52) & (-1.19) & (-1.41) & (57.80) & (7.93) & (-0.60) & (1.01) & \\
+\hspace{1em}Q5 (High Fee) & 0.863 & 0.782 & 0.794 & 1.002$^{***}$ & 0.028 & 0.049 & -0.001 & 0.896\\
+\hspace{1em}t(coef) & (0.73) & (0.68) & (0.70) & (36.65) & (0.37) & (1.23) & (-0.05) & \\
+\hspace{1em}Q5$-$Q1 & 0.644 & 0.652 & 0.752 & 0.052$^{*}$ & 0.049 & 0.020 & -0.012 & 0.039\\
+\hspace{1em}t(coef) & (0.61) & (0.62) & (0.72) & (1.94) & (0.70) & (0.60) & (-0.46) & \\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Passive --- EW}\\
+\hspace{1em}Q1 (Low Fee) & 0.201 & -0.067 & 0.086 & 0.989$^{***}$ & -0.024 & 0.090$^{***}$ & -0.018 & 0.984\\
+\hspace{1em}t(coef) & (0.52) & (-0.19) & (0.25) & (91.12) & (-0.64) & (6.26) & (-1.42) & \\
+\hspace{1em}Q2 & -0.031 & -0.138 & -0.082 & 0.953$^{***}$ & 0.132$^{***}$ & 0.116$^{***}$ & -0.007 & 0.984\\
+\hspace{1em}t(coef) & (-0.06) & (-0.40) & (-0.25) & (82.81) & (5.47) & (7.54) & (-0.68) & \\
+\hspace{1em}Q3 & 0.433 & 0.158 & 0.259 & 0.961$^{***}$ & -0.034$^{*}$ & 0.090$^{***}$ & -0.012 & 0.985\\
+\hspace{1em}t(coef) & (0.98) & (0.49) & (0.75) & (71.25) & (-1.95) & (6.29) & (-0.96) & \\
+\hspace{1em}Q4 & -0.411 & -0.511 & -0.416 & 0.964$^{***}$ & 0.105$^{***}$ & 0.096$^{***}$ & -0.011 & 0.984\\
+\hspace{1em}t(coef) & (-0.80) & (-1.49) & (-1.17) & (88.59) & (5.54) & (6.79) & (-1.09) & \\
+\hspace{1em}Q5 (High Fee) & -1.171 & -1.210$^{*}$ & -1.285$^{*}$ & 0.763$^{***}$ & 0.090$^{***}$ & 0.070$^{***}$ & 0.009 & 0.913\\
+\hspace{1em}t(coef) & (-1.61) & (-1.78) & (-1.91) & (39.23) & (4.23) & (2.95) & (0.60) & \\
+\hspace{1em}Q5$-$Q1 & -1.371$^{**}$ & -1.143$^{*}$ & -1.370$^{**}$ & -0.225$^{***}$ & 0.114$^{***}$ & -0.020 & 0.027 & 0.479\\
+\hspace{1em}t(coef) & (-2.15) & (-1.80) & (-2.26) & (-13.93) & (3.77) & (-0.92) & (1.39) & \\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Passive --- VW}\\
+\hspace{1em}Q1 (Low Fee) & 0.189 & -0.050 & 0.060 & 0.986$^{***}$ & -0.122$^{***}$ & 0.025$^{***}$ & -0.013$^{*}$ & 0.992\\
+\hspace{1em}t(coef) & (0.62) & (-0.22) & (0.27) & (120.87) & (-7.52) & (3.20) & (-1.73) & \\
+\hspace{1em}Q2 & 0.011 & -0.226 & -0.140 & 0.973$^{***}$ & -0.057$^{***}$ & 0.062$^{***}$ & -0.010 & 0.991\\
+\hspace{1em}t(coef) & (0.03) & (-0.80) & (-0.50) & (113.51) & (-3.79) & (5.18) & (-1.24) & \\
+\hspace{1em}Q3 & 1.948$^{**}$ & 1.628$^{**}$ & 1.612$^{**}$ & 0.928$^{***}$ & -0.022 & 0.129$^{***}$ & 0.002 & 0.946\\
+\hspace{1em}t(coef) & (2.30) & (2.31) & (2.37) & (37.65) & (-0.63) & (3.95) & (0.09) & \\
+\hspace{1em}Q4 & -0.123 & -0.404 & -0.213 & 0.984$^{***}$ & -0.011 & 0.101$^{***}$ & -0.023$^{*}$ & 0.984\\
+\hspace{1em}t(coef) & (-0.28) & (-1.03) & (-0.54) & (79.39) & (-0.33) & (7.25) & (-1.79) & \\
+\hspace{1em}Q5 (High Fee) & 0.949 & 0.973 & 1.746 & 0.850$^{***}$ & -0.007 & -0.054 & -0.112$^{*}$ & 0.787\\
+\hspace{1em}t(coef) & (0.53) & (0.54) & (0.94) & (18.27) & (-0.08) & (-1.10) & (-1.92) & \\
+\hspace{1em}Q5$-$Q1 & 1.092 & 1.149 & 1.805 & -0.133$^{***}$ & 0.100 & -0.077 & -0.095$^{*}$ & 0.077\\
+\hspace{1em}t(coef) & (0.63) & (0.66) & (1.01) & (-3.14) & (1.39) & (-1.61) & (-1.71) & \\*
+\end{longtable}
+}
+{\footnotesize\noindent\textit{Note:} \citet{Carhart1997} four-factor time-series regressions on monthly portfolio returns. Alphas annualised ($\times 12$, \%). Q5$-$Q1: long-short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010); no date cap. Fee sorted once on static annual Expense Ratio; Q1 = lowest fee. Leveraged and derivative-based passive funds excluded prior to sorting (see Cleaning Step 6 in the data construction notes).}
+
+

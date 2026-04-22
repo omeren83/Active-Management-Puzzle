@@ -1,0 +1,3 @@
+NYSE or total trading volume in dollars
+NYSE or total market cap
+NYSE or total number of shares listed

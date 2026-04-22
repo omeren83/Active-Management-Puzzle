@@ -1,0 +1,30 @@
+\begin{table}[!h]
+\centering
+\caption{\label{tab:coverage}Time Series Coverage: Months of Observation per Fund}
+\centering
+\begin{threeparttable}
+\begin{tabular}[t]{lrrrrrr}
+\toprule
+Group & Funds & Min & P25 & Median & P75 & Max\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{7}{l}{Master}\\
+\hline
+\hspace{1em}Active & 2,314 & 2 & 103 & 228 & 338 & 375\\
+\hspace{1em}Passive & 386 & 3 & 96 & 196 & 304 & 375\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{Incubation-Corrected}\\
+\hline
+\hspace{1em}Active & 2,170 & 1 & 85 & 207 & 308 & 375\\
+\hspace{1em}Passive & 352 & 1 & 81 & 198 & 273 & 375\\
+\addlinespace[0.3em]
+\multicolumn{7}{l}{Trimmed (1995--2023)}\\
+\hspace{1em}Active & 2,080 & 1 & 82 & 194 & 289 & 349\\
+\hspace{1em}Passive & 346 & 1 & 65 & 176 & 247 & 349\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Distribution of monthly observation counts per fund. Unknown funds excluded.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
