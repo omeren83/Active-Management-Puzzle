@@ -408,6 +408,49 @@ break in the alpha-generating process).
 \input{tables/table_subperiod_bsw_decomposition}
 \input{tables/table_subperiod_port_agg_alpha}
 
+% =============================================================================
+% APPENDIX E: FACTOR MODEL ROBUSTNESS
+% =============================================================================
+
+\clearpage
+\section*{Appendix E: Factor Model Robustness}
+\addcontentsline{toc}{section}{Appendix E: Factor Model Robustness}
+\label{app:factor_robust}
+\setcounter{table}{0}
+\renewcommand{\thetable}{E.\arabic{table}}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{E.\arabic{figure}}
+
+This appendix re-estimates the core performance results under two alternative
+factor specifications to assess robustness of the active management puzzle to
+factor model choice. The \textit{Fama--French 6-Factor} model (FF6) augments
+the \citet{Carhart1997} four-factor baseline with the profitability factor
+(RMW) and investment factor (CMA) of \citet{FamaFrench2015}. The
+\textit{Carhart + PSL} model (C+PSL) augments the Carhart four-factor model
+with the traded liquidity factor of \citet{PastorStambaugh2003}. The
+estimation procedure --- full-period OLS with Newey--West standard errors
+(6-month lag), the \citet{FamaFrench2010} calendar-month bootstrap
+($B = 10{,}000$), and the \citet{BarrasScailletWermers2010} false-discovery
+decomposition at $\gamma^{*} = 0.20$ --- is identical across all three
+specifications. SMB is held at the \citet{FamaFrench1993} construction
+(single $2 \times 3$ size--BM sort) throughout; the two SMB definitions
+correlate above 0.97 over the sample window. The Carhart + PSL specification
+is constrained to December~1994--December~2024 by the current data release
+of the Pastor liquidity factor series; the Carhart and FF6 specifications
+use the full December~1994--February~2026 window.
+
+% Table E.1: Pooled alpha comparison
+\input{tables/table_alpha_comparison_robust}
+\clearpage
+
+% Table E.2: Bootstrap percentile comparison
+\input{tables/table_bootstrap_comparison_robust}
+\clearpage
+
+% Table E.3: BSW decomposition comparison
+\input{tables/table_bsw_comparison_robust}
+\clearpage
+
 \clearpage
 \bibliographystyle{chicago}
 \bibliography{dissertation}

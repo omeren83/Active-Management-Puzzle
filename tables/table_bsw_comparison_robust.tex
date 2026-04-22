@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\caption{BSW (2010) Decomposition Comparison at $\gamma^* = 0.20$}
+\label{tab:bsw_comparison_robust}
+\begin{threeparttable}
+\begin{tabular}{lrrrrrr}
+\toprule
+Model & $\hat{\pi}_0$ & $S^-_{\gamma^*}$ & $S^+_{\gamma^*}$ & $F_{\gamma^*}$ & $T^-_{\gamma^*}$ & $T^+_{\gamma^*}$ \\
+\midrule
+Carhart 4-Factor & 76.6\% & 28.0\% & 6.5\% & 7.7\% & 20.4\% & -1.2\% \\
+FF 6-Factor & 67.1\% & 34.0\% & 6.4\% & 6.7\% & 27.2\% & -0.3\% \\
+Carhart + PSL & 75.0\% & 27.4\% & 7.2\% & 7.5\% & 19.9\% & -0.3\% \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item Four-way decomposition of active funds into zero-alpha, genuinely unskilled, and genuinely skilled populations at significance threshold $\gamma^* = 0.20$, following \citet{BarrasScailletWermers2010}. $\hat{\pi}_0$: \citet{Storey2002} estimator of the proportion of zero-alpha funds at tuning parameter $\lambda = 0.5$. $S^-_{\gamma^*}$ ($S^+_{\gamma^*}$): observed fraction of active funds with significantly negative (positive) Newey--West $t(\hat{\alpha})$ at two-sided significance level $\gamma^*$. $F_{\gamma^*} = \hat{\pi}_0 \cdot \gamma^*/2$: expected proportion of false discoveries per tail. $T^-_{\gamma^*} = S^-_{\gamma^*} - F_{\gamma^*}$: genuinely unskilled funds. $T^+_{\gamma^*} = S^+_{\gamma^*} - F_{\gamma^*}$: genuinely skilled funds; negative values indicate right-tail significance does not exceed the false-discovery rate at this threshold. \textit{Carhart 4-Factor}: \citealt{Carhart1997} main-text baseline. \textit{FF 6-Factor}: \citealt{FamaFrench2015} five-factor plus momentum. \textit{Carhart + PSL}: Carhart plus \citet{PastorStambaugh2003} traded liquidity. Sample: Dec 1994--Feb 2026 for Carhart and FF 6-Factor; Dec 1994--Dec 2024 for Carhart + PSL.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
