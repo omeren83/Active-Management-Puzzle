@@ -38,7 +38,9 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{amsmath}
-\usepackage{natbib}
+%\usepackage{natbib}
+\usepackage[style=apa, backend=biber]{biblatex}
+\addbibresource{dissertation.bib}
 \captionsetup[table]{
   labelfont = bf,
   font      = small,
@@ -452,7 +454,8 @@ use the full December~1994--February~2026 window.
 \clearpage
 
 \clearpage
-\bibliographystyle{chicago}
-\bibliography{dissertation}
+%\bibliographystyle{chicago}
+%\bibliography{dissertation}
+\printbibliography
 
 \end{document}
