@@ -46,8 +46,8 @@
 
 # Working directory containing all .R scripts and input .xlsx files.
 # Use forward slashes on both Windows and Mac.
-WORKING_DIR <- "G:/Drive/TEZ-YENİ/data/R import"                     # PC Drive folder
-# WORKING_DIR <- "/Users/omersmba/Library/CloudStorage/GoogleDrive-omer.eren.2019@gmail.com/Drive'ım/TEZ-YENİ/data/R import"  # Mac Drive folder
+WORKING_DIR <- "G:/Drive'ım/TEZ-YENI/data/R import"                     # PC Drive folder
+# WORKING_DIR <- "/Users/omersmba/Library/CloudStorage/GoogleDrive-omer.eren.2019@gmail.com/Drive'ım/TEZ-YENI/data/R import"  # Mac Drive folder
 
 
 # Target directory for LaTeX table files (will be synced automatically from
@@ -61,8 +61,8 @@ TABLES_OUT_DIR <- "D:/TEZ/tables"                      # PC GitHub repo
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE   # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- TRUE   # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
+RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
+RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
 RUN_PHASE_E_SUBPERIODS    <- TRUE   # structural_break_test + subperiod_analysis
 RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
 RUN_PHASE_G_FACTOR_ROBUST <- FALSE  # alpha_estimation_robust + build_robust_tables
