@@ -1,13 +1,5 @@
 # =============================================================================
-# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.3
-#
-# v1.3 change vs v1.2:
-#   Bootstrap caching layer added (same pattern as alpha_estimation.R v2.7,
-#   subperiod_analysis.R v1.2, and persistence_testing.R v1.0). sim_matrix is
-#   saved to ff_comparison_bootstrap_cache.rds on first run and reloaded on
-#   subsequent runs after SHA-1 validation against bs_data, T_total, B_RUNS,
-#   MIN_OBS_BS, NW_LAG_FULL, and BOOT_SEED. Reduces repeated Phase D run time
-#   from ~30 min to ~5 sec on a warm cache.
+# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.2
 #
 # v1.2 change vs v1.1:
 #   Table 7 FF (`table_perf_aggregate_FF.tex`) switched from per-fund alpha -->
@@ -68,7 +60,6 @@ library(stringr)
 library(patchwork)
 library(knitr)
 library(kableExtra)
-library(digest)   # SHA-1 cache key (v1.3)
 
 # =============================================================================
 # 0. CONFIGURATION
@@ -86,13 +77,12 @@ B_RUNS       <- 10000L
 MIN_OBS_BS   <- 8L
 BOOT_SEED    <- 42L
 N_CORES      <- max(1L, detectCores() - 1L)
+USE_BOOT_CACHE <- TRUE
+BOOT_CACHE_DIR <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
+dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 PCTS         <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 96, 97, 98, 99)
 GAMMA_GRID   <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5
-
-# Bootstrap cache (v1.3)
-USE_BOOT_CACHE <- TRUE   # set FALSE to force recomputation
-BOOT_CACHE_DIR <- "."    # must be writable; same dir as data files
 
 cat("=== FF SUBPERIOD REPLICATION ===\n")
 cat("Sample window:", format(DATE_MIN_FF), "to", format(DATE_MAX_FF), "\n")
@@ -302,30 +292,34 @@ one_boot_run <- function(run_id, bs_data, T_total, pcts_probs, min_obs, nw_lag) 
   quantile(t_sim[!is.na(t_sim)], probs = pcts_probs, na.rm = TRUE)
 }
 
-# --- Cache validation (v1.3) ---
-cache_key  <- digest::digest(list(
-  bs_data    = bs_data,
-  T_total    = T_total,
-  B_RUNS     = B_RUNS,
-  MIN_OBS_BS = MIN_OBS_BS,
-  NW_LAG     = NW_LAG_FULL,
-  BOOT_SEED  = BOOT_SEED
+cache_key <- digest::digest(list(
+  tickers = sort(active_fp$Ticker),
+  alphas  = active_fp$alpha_ann[order(active_fp$Ticker)],
+  date_lo = DATE_MIN_FF,
+  date_hi = DATE_MAX_FF,
+  T_total = T_total,
+  B_RUNS  = B_RUNS,
+  NW_LAG  = NW_LAG_FULL,
+  MIN_OBS = MIN_OBS_BS,
+  seed    = BOOT_SEED,
+  pcts    = PCTS
 ))
-cache_file <- file.path(BOOT_CACHE_DIR, "ff_comparison_bootstrap_cache.rds")
+cache_file <- file.path(BOOT_CACHE_DIR, "ff_subperiod_bootstrap_cache.rds")
 
 cached_ok <- FALSE
 if (USE_BOOT_CACHE && file.exists(cache_file)) {
   cached <- tryCatch(readRDS(cache_file), error = function(e) NULL)
   if (!is.null(cached) && identical(cached$key, cache_key)) {
-    cat("  [cache hit] Loading bootstrap sim_matrix from", cache_file, "\n")
+    cat("  [cache hit] Loading bootstrap from", cache_file, "\n")
     sim_matrix <- cached$sim_matrix
     cached_ok  <- TRUE
   } else {
-    cat("  [cache miss] Key changed; recomputing bootstrap.\n")
+    cat("  [cache miss] Key changed; recomputing.\n")
   }
 }
 
 if (!cached_ok) {
+  cat("  Bootstrap (B =", B_RUNS, ", cores =", N_CORES, ") ...\n")
   cl <- makeCluster(N_CORES)
   clusterExport(cl, c("bs_data", "T_total", "one_boot_run", "MIN_OBS_BS", "NW_LAG_FULL"),
                 envir = environment())

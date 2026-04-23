@@ -84,7 +84,8 @@ B_RUNS           <- 10000L
 BOOT_SEED        <- 42L
 N_CORES          <- max(1L, detectCores() - 1L)
 USE_BOOT_CACHE   <- TRUE
-BOOT_CACHE_DIR   <- "."
+BOOT_CACHE_DIR   <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
+dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 
 # Cohort ranking dates -- end of year k; formation = 36m ending on the ranking
 # date, holding = 12m starting the first of the following month. Cohort 8

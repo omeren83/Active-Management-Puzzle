@@ -44,25 +44,32 @@
 # CONFIG - EDIT THESE BEFORE RUNNING
 # =============================================================================
 
-# Working directory containing all .R scripts and input .xlsx files.
+# Working directory = where DATA lives (input xlsx, cached rds, output xlsx/tex).
+# Scripts directory = where the .R files live (git-tracked repo clone).
+# These are separated so scripts can live in a Git-connected folder while data
+# continues to live in the Google Drive folder (the two are no longer required
+# to be the same location).
 # Use forward slashes on both Windows and Mac.
-WORKING_DIR <- "G:/Drive'ım/TEZ-YENI/data/R import"                     # PC Drive folder
-# WORKING_DIR <- "/Users/omersmba/Library/CloudStorage/GoogleDrive-omer.eren.2019@gmail.com/Drive'ım/TEZ-YENI/data/R import"  # Mac Drive folder
+WORKING_DIR <- "G:/Drive'ım/TEZ-YENI/data/R import"                     # PC Drive folder (data)
+# WORKING_DIR <- "/Users/omersmba/Library/CloudStorage/GoogleDrive-omer.eren.2019@gmail.com/Drive'ım/TEZ-YENI/data/R import"  # Mac Drive folder (data)
+
+ SCRIPTS_DIR <- "D:/TEZ/R scripts"                                       # PC repo clone (scripts)
+#SCRIPTS_DIR <- "~/Active-Management-Puzzle/R scripts"                   # Mac repo clone (scripts)
 
 
 # Target directory for LaTeX table files (will be synced automatically from
 # WORKING_DIR after the pipeline finishes). Should be the tables/ subfolder
 # of the GitHub repo that syncs with Overleaf.
 # Set to NA to disable auto-sync (tables will stay in WORKING_DIR only).
-TABLES_OUT_DIR <- "D:/TEZ/tables"                      # PC GitHub repo
-# TABLES_OUT_DIR <- "~/Active-Management-Puzzle/tables"  # Mac GitHub clone
+#TABLES_OUT_DIR <- "D:/TEZ/tables"                      # PC GitHub repo
+TABLES_OUT_DIR <- "~/Active-Management-Puzzle/tables"  # Mac GitHub clone
 # TABLES_OUT_DIR <- NA                                   # disable auto-sync
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE   # data_import + flow_calculation
-RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
+RUN_PHASE_B_ALPHA         <- TRUE   # alpha_estimation + aggregate_alphas
 RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
+RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
 RUN_PHASE_E_SUBPERIODS    <- TRUE   # structural_break_test + subperiod_analysis
 RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
 RUN_PHASE_G_FACTOR_ROBUST <- FALSE  # alpha_estimation_robust + build_robust_tables
@@ -77,7 +84,12 @@ STOP_ON_ERROR <- TRUE
 # =============================================================================
 
 setwd(WORKING_DIR)
+if (!dir.exists(SCRIPTS_DIR)) {
+  stop("SCRIPTS_DIR does not exist: ", SCRIPTS_DIR,
+       "\nCheck the path and the comment/uncomment toggle for your machine.")
+}
 cat("Working directory set to:", getwd(), "\n")
+cat("Scripts directory      :", normalizePath(SCRIPTS_DIR), "\n")
 if (!is.na(TABLES_OUT_DIR)) {
   cat("Tables will be synced to:", TABLES_OUT_DIR, "\n")
 }
@@ -102,7 +114,7 @@ run_script <- function(script_name, phase_label) {
   
   t0 <- Sys.time()
   ok <- tryCatch({
-    source(script_name, echo = FALSE, max.deparse.length = Inf)
+    source(file.path(SCRIPTS_DIR, script_name), echo = FALSE, max.deparse.length = Inf)
     TRUE
   }, error = function(e) {
     cat("\nERROR in", script_name, ":\n")

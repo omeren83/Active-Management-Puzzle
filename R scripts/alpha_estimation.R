@@ -1,17 +1,6 @@
 # =============================================================================
 # ALPHA ESTIMATION, ROLLING REGRESSIONS, RANK CONSTRUCTION
-# AND FAMA-FRENCH (2010) BOOTSTRAP SIMULATION (v2.7 - bootstrap cache)
-#
-# v2.7 change vs v2.6:
-#   Bootstrap caching layer added (same pattern as subperiod_analysis.R v1.2
-#   and persistence_testing.R v1.0). On first run, sim_matrix is saved to
-#   alpha_estimation_bootstrap_cache.rds in BOOT_CACHE_DIR. On subsequent runs
-#   the cache is validated against a SHA-1 digest of all bootstrap inputs
-#   (bs_data, T_total, B_RUNS, MIN_OBS_BS, NW_LAG_FULL, BOOT_SEED). A mismatch
-#   (e.g. after a panel update or parameter change) triggers recomputation and
-#   overwrites the cache automatically. Set USE_BOOT_CACHE <- FALSE to force
-#   a fresh run without reading or writing the cache. Reduces repeated run time
-#   from ~30 min to ~5 sec on a warm cache.
+# AND FAMA-FRENCH (2010) BOOTSTRAP SIMULATION (v2.6 - panel switch)
 #
 # v2.6 change vs v2.5:
 #   Source panel switched from panel_trimmed (Evans-corrected, 1995-2023 cap)
@@ -57,7 +46,6 @@ library(lubridate)
 library(writexl)
 library(parallel)
 library(zoo)
-library(digest)   # SHA-1 cache key (v2.7)
 
 # --- 0. CONFIGURATION ---
 FACTOR_MKT   <- "MKT_RF"          
@@ -78,10 +66,9 @@ MIN_OBS_BS   <- 8L
 BOOT_SEED    <- 42L               
 USE_PARALLEL <- TRUE              
 N_CORES      <- max(1L, detectCores() - 1L)
-
-# Bootstrap cache (v2.7)
-USE_BOOT_CACHE  <- TRUE   # set FALSE to force recomputation
-BOOT_CACHE_DIR  <- "."    # must be writable; same dir as data files
+USE_BOOT_CACHE <- TRUE
+BOOT_CACHE_DIR <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
+dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 
 PCTS <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 96, 97, 98, 99)
 
@@ -236,42 +223,36 @@ one_boot_run <- function(run_id, bs_data, T_total, pcts_probs, min_obs, nw_lag) 
   }, numeric(1L), USE.NAMES = FALSE)
   quantile(t_sim[!is.na(t_sim)], probs = pcts_probs, na.rm = TRUE)
 }
-# --- Cache validation (v2.7) ---
-# Key covers every input that would change the sim_matrix. A change in the
-# fund set (bs_data), calendar length (T_total), or any parameter invalidates
-# the cache automatically and triggers a fresh run.
-cache_key  <- digest::digest(list(
-  bs_data    = bs_data,
-  T_total    = T_total,
-  B_RUNS     = B_RUNS,
-  MIN_OBS_BS = MIN_OBS_BS,
-  NW_LAG     = NW_LAG_FULL,
-  BOOT_SEED  = BOOT_SEED
+cache_key <- digest::digest(list(
+  tickers = sort(active_fp$Ticker),
+  alphas  = active_fp$alpha_ann[order(active_fp$Ticker)],
+  T_total = T_total,
+  B_RUNS  = B_RUNS,
+  NW_LAG  = NW_LAG_FULL,
+  MIN_OBS = MIN_OBS_BS,
+  seed    = BOOT_SEED,
+  pcts    = PCTS
 ))
-cache_file <- file.path(BOOT_CACHE_DIR, "alpha_estimation_bootstrap_cache.rds")
+cache_file <- file.path(BOOT_CACHE_DIR, "fullperiod_bootstrap_cache.rds")
 
 cached_ok <- FALSE
 if (USE_BOOT_CACHE && file.exists(cache_file)) {
   cached <- tryCatch(readRDS(cache_file), error = function(e) NULL)
   if (!is.null(cached) && identical(cached$key, cache_key)) {
-    cat("  [cache hit] Loading bootstrap sim_matrix from", cache_file, "\n")
+    cat("  [cache hit] Loading bootstrap from", cache_file, "\n")
     sim_matrix <- cached$sim_matrix
     cached_ok  <- TRUE
   } else {
-    cat("  [cache miss] Key changed; recomputing bootstrap.\n")
+    cat("  [cache miss] Key changed; recomputing.\n")
   }
 }
 
 if (!cached_ok) {
-  cl <- makeCluster(N_CORES)
-  clusterExport(cl, c("bs_data", "T_total", "one_boot_run", "MIN_OBS_BS", "NW_LAG_FULL"))
-  clusterSetRNGStream(cl, BOOT_SEED)
+  cat("  Bootstrap (B =", B_RUNS, ", cores =", N_CORES, ") ...\n")
+  cl <- makeCluster(N_CORES); clusterExport(cl, c("bs_data", "T_total", "one_boot_run", "MIN_OBS_BS", "NW_LAG_FULL")); clusterSetRNGStream(cl, BOOT_SEED)
   boot_t0 <- Sys.time()
-  boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run,
-                            bs_data, T_total, PCTS/100, MIN_OBS_BS, NW_LAG_FULL)
-  stopCluster(cl)
-  cat("  Bootstrap wall time:",
-      round(as.numeric(difftime(Sys.time(), boot_t0, units = "secs")), 1), "sec\n")
+  boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run, bs_data, T_total, PCTS/100, MIN_OBS_BS, NW_LAG_FULL); stopCluster(cl)
+  cat("  Bootstrap wall time:", round(as.numeric(difftime(Sys.time(), boot_t0, units = "secs")), 1), "sec\n")
   sim_matrix <- do.call(rbind, boot_results)
   if (USE_BOOT_CACHE) {
     saveRDS(list(key = cache_key, sim_matrix = sim_matrix), cache_file)

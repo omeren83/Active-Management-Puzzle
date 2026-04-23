@@ -129,7 +129,8 @@ LAMBDA_STOREY <- 0.5
 # Bootstrap caching: saves ~25 minutes when re-running the script after the
 # bootstrap has already completed once. Set FALSE to force re-computation.
 USE_BOOT_CACHE <- TRUE
-BOOT_CACHE_DIR <- "."   # current working directory
+BOOT_CACHE_DIR <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
+dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 
 # =============================================================================
 # 1. HELPER FUNCTIONS  (kernels identical to alpha_estimation.R v2.5)
