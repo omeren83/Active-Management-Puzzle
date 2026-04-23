@@ -106,10 +106,10 @@ SUBPERIODS <- list(
   ),
   P3 = list(
     label   = "P3",
-    window  = "Dec 2011--Dec 2023",
-    panel   = "Panel C: P3 (Dec 2011--Dec 2023, 145 months)",
+    window  = "Dec 2011--Jan 2026",
+    panel   = "Panel C: P3 (Dec 2011--Jan 2026, 170 months)",
     date_lo = as.Date("2011-12-01"),
-    date_hi = as.Date("2023-12-31")
+    date_hi = as.Date("2026-01-31")
   )
 )
 
