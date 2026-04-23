@@ -1,0 +1,690 @@
+% =============================================================================
+% dissertation_main.tex
+% "The Active Management Puzzle"
+% PhD Dissertation — Management Department, Boğaziçi University
+%
+% Compiler    : XeLaTeX  (Overleaf: Menu → Compiler → XeLaTeX)
+% Bibliography: Biber    (Overleaf: Menu → Bibliography compiler → Biber)
+%
+% SBE compliance checklist implemented here:
+%   [x] Times New Roman 12 pt
+%   [x] Double spacing throughout
+%   [x] 1.27 cm paragraph indent; no indent on first para of chapter/section
+%   [x] Chapter headings: ALL CAPS, centred, number line 1 / title line 2
+%   [x] Sub-headings: sentence case; 2 double-spaces before, 1 after
+%   [x] Two spaces between sub-heading number and text (sep=2em)
+%   [x] ToC: "CHAPTER X: TITLE" and "APPENDIX X: TITLE" format; depth=1
+%   [x] List of Tables / List of Figures
+%   [x] Roman numerals front matter; Arabic main text
+%   [x] Title page: counted p.i, number hidden
+%   [x] Approval + Declaration: counted pp.ii-iii, numbers hidden
+%   [x] Abstract: first visible page number = iv
+%   [x] Declaration: dashes (not bullet points)
+%   [x] Dedication page placeholder (optional)
+%   [x] APA 7th edition: biblatex-apa + biber
+%   [x] Custom \citealt for no-paren citation inside parenthetical text
+%   [x] DOIs/URLs in reference list rendered as plain unlinked text
+%   [x] References heading via \chapter* (matches chapter heading format)
+%   [x] Appendix headings: "APPENDIX X" / title on separate line
+%   [x] Caption labelsep=period ("Table 1.  Title")
+%
+% Content conventions to enforce manually (cannot be automated):
+%   - No period at end of any sub-heading title
+%   - \noindent on first paragraph after every table, figure, or block quote
+%   - Each appendix must be referred to at least once in the main text
+%   - Abstract <= 250 words; single paragraph preferred
+% =============================================================================
+
+\documentclass[12pt, oneside]{report}
+
+% ---- Font: Times New Roman (requires XeLaTeX) --------------------------------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage{unicode-math}
+\setmathfont{XITS Math}       % best open-licence math companion to TNR
+
+% ---- Page geometry -----------------------------------------------------------
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% ---- Line spacing ------------------------------------------------------------
+\usepackage{setspace}
+\doublespacing
+
+% ---- Paragraph indentation ---------------------------------------------------
+% 1.27 cm per SBE. Do NOT load 'indentfirst'.
+% Suppress indent manually with \noindent where required (see comments below).
+\setlength{\parindent}{1.27cm}
+
+% ---- Bibliography: APA 7th edition ------------------------------------------
+\usepackage[style=apa, backend=biber, sorting=nyt, uniquename=false]{biblatex}
+\addbibresource{dissertation.bib}
+
+% \citealt: "Author, Year" with no surrounding parentheses.
+% Use when the citation sits inside an already-parenthetical phrase, e.g.:
+%   "(four-factor model; \citealt{Carhart1997})"
+% biblatex-apa has no built-in \citealt; this definition provides it.
+\DeclareCiteCommand{\citealt}
+  {\boolfalse{citetracker}\boolfalse{pagetracker}\usebibmacro{prenote}}
+  {\ifciteindex{\indexfield{indextitle}}{}%
+   \printnames{labelname}%
+   \setunit{\addcomma\addspace}%
+   \printfield{year}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+% ---- Chapter and section heading format: titlesec ---------------------------
+\usepackage{titlesec}
+
+% [display] shape: number on line 1, title on line 2 (SBE format).
+% Both centred, bold, 12 pt (SBE specifies no font size change).
+\titleformat{\chapter}[display]
+  {\normalfont\normalsize\bfseries\centering}
+  {\MakeUppercase{\chaptertitlename}~\thechapter}
+  {0pt}
+  {\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}   % one double-spaced line after title
+
+% Section (first-level): sentence case, left, bold.
+% Before: 2 double-spaces = 48 pt. After: 1 double-space = 24 pt.
+\titleformat{\section}
+  {\normalfont\normalsize\bfseries}
+  {\thesection}
+  {2em}{}
+\titlespacing*{\section}{0pt}{48pt}{24pt}
+
+% Subsection (second-level): same spacing.
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}
+  {2em}{}
+\titlespacing*{\subsection}{0pt}{48pt}{24pt}
+
+% ---- Table of contents -------------------------------------------------------
+\usepackage{tocloft}
+\setcounter{tocdepth}{1}             % chapters + first-level sections only
+
+% Format: "CHAPTER 1: INTRODUCTION" (SBE requirement)
+\renewcommand{\cftchappresnum}{CHAPTER~}
+\renewcommand{\cftchapaftersnum}{:}
+\setlength{\cftchapnumwidth}{7.5em}  % wide enough for "CHAPTER 10:"
+\renewcommand{\cftchapfont}{\normalfont\normalsize}
+\renewcommand{\cftchappagefont}{\normalfont\normalsize}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+
+% Note: after \appendix in the body, \cftchappresnum is changed to "APPENDIX~"
+% so appendix entries read "APPENDIX A: TITLE".
+
+% ---- Page style --------------------------------------------------------------
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+\pagestyle{plain}
+
+% ---- Tables and figures ------------------------------------------------------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{pdflscape}
+\usepackage{threeparttable}
+\usepackage{makecell}
+\usepackage{colortbl}
+
+% kableExtra compatibility aliases
+\makeatletter
+\@ifundefined{ThreePartTable}
+  {\newenvironment{ThreePartTable}{\begin{threeparttable}}{\end{threeparttable}}}{}
+\@ifundefined{TableNotes}
+  {\newenvironment{TableNotes}{\begin{tablenotes}}{\end{tablenotes}}}{}
+\makeatother
+
+% SBE caption format: "Table 1.  Title in Title Case" / "Figure 1.  Sentence case"
+\captionsetup[table]{labelsep=period,  font=normalsize, skip=6pt}
+\captionsetup[figure]{labelsep=period, font=normalsize, skip=6pt}
+
+% ---- Mathematics -------------------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% ---- Hyperref ----------------------------------------------------------------
+\usepackage[hidelinks, unicode]{hyperref}
+
+% SBE: "All URLs in the reference list must be unlinked."
+% Render DOIs and URLs as plain non-clickable text in the bibliography.
+\AtBeginBibliography{%
+  \DeclareFieldFormat{url}{\nolinkurl{#1}}%
+  \DeclareFieldFormat{doi}{\nolinkurl{https://doi.org/#1}}%
+}
+
+% ---- Miscellaneous -----------------------------------------------------------
+\usepackage[normalem]{ulem}
+\usepackage{wrapfig}
+\usepackage{eso-pic}
+\usepackage{rotating}
+
+% Landscape page-number rotation (carried over from master_output.tex)
+\newif\iflscapenum
+\lscapenumfalse
+\AddToShipoutPictureFG{%
+  \iflscapenum
+    \AtPageLowerLeft{%
+      \put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{0.5\paperheight}){%
+        \makebox(0,0){\rotatebox{90}{\thepage}}}%
+    }%
+  \fi
+}
+\fancypagestyle{lscapeblank}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+% =============================================================================
+% DOCUMENT BODY
+% =============================================================================
+\begin{document}
+
+% =============================================================================
+% FRONT MATTER
+% Pages i–iii: counted but numbers hidden (thispagestyle{empty}).
+% Page iv (Abstract): first visible page number per SBE.
+% =============================================================================
+\pagenumbering{roman}
+
+% --- Title page (p.i — counted, hidden) --------------------------------------
+% \begin{titlepage} resets the counter to 1 at \end{titlepage} in oneside mode.
+% \setcounter{page}{2} on the approval page corrects for this.
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\vspace*{1in}
+
+THE ACTIVE MANAGEMENT PUZZLE
+
+\vspace{0.5in}
+
+ÖMER [SURNAME AS REGISTERED]
+
+\vspace{0.5in}
+
+BOĞAZİÇİ UNIVERSITY
+
+\vspace{0.5in}
+
+2025
+
+\vspace{1.5in}
+
+THE ACTIVE MANAGEMENT PUZZLE
+
+\vspace{0.5in}
+
+Thesis submitted to the
+
+Institute for Graduate Studies in Social Sciences
+
+in partial fulfillment of the requirements for the degree of
+
+Doctor of Philosophy
+
+in
+
+Management
+
+by
+
+Ömer [Surname as Registered]
+
+Boğaziçi University
+
+2025
+
+\end{center}
+\end{titlepage}
+
+% --- Approval page (p.ii — counted, hidden) ----------------------------------
+\setcounter{page}{2}
+\thispagestyle{empty}
+\begin{center}
+THE ACTIVE MANAGEMENT PUZZLE
+
+\vspace{0.5in}
+
+The thesis of Ömer [Surname as Registered]
+
+has been approved by:
+
+\vspace{0.5in}
+\end{center}
+
+\noindent Prof.\ Vedat Akgiray \hfill \underline{\hspace{3in}}
+
+\noindent (Thesis Advisor)
+
+\vspace{0.5in}
+
+\noindent Prof.\ Han Özsöylev \hfill \underline{\hspace{3in}}
+
+\vspace{0.5in}
+
+\noindent Prof.\ Cenk Cevat Karahan \hfill \underline{\hspace{3in}}
+
+\vspace{0.5in}
+
+\noindent [Committee Member 4 — Title and Full Name] \hfill \underline{\hspace{3in}}
+
+\vspace{0.5in}
+
+\noindent [External Member 5 — Title and Full Name] \hfill \underline{\hspace{3in}}
+
+\noindent (External Member)
+
+\vspace{0.5in}
+
+\begin{center}
+[Month] 2025
+\end{center}
+
+\clearpage
+
+% --- Declaration of Originality (p.iii — counted, hidden) --------------------
+\thispagestyle{empty}
+\begin{center}
+DECLARATION OF ORIGINALITY
+\end{center}
+
+\noindent I, Ömer [Surname as Registered], certify that
+
+% SBE uses dash-prefixed items (not bullet points)
+\begin{itemize}
+  \renewcommand\labelitemi{--}
+  \item I am the sole author of this thesis and that I have fully acknowledged
+        and documented in my thesis all sources of ideas and words, including
+        digital resources, which have been produced or published by another
+        person or institution;
+  \item this thesis contains no material that has been submitted or accepted
+        for a degree or diploma in any other educational institution;
+  \item this is a true copy of the thesis approved by my advisor and thesis
+        committee at Boğaziçi University, including final revisions required
+        by them.
+\end{itemize}
+
+\vspace{1in}
+
+\noindent Signature \dotfill
+
+\vspace{0.3in}
+
+\noindent Date \dotfill
+
+\clearpage
+
+% --- Abstract (p.iv — FIRST VISIBLE PAGE NUMBER) -----------------------------
+\thispagestyle{plain}
+\begin{center}
+ABSTRACT
+
+\vspace{12pt}
+
+The Active Management Puzzle: [Subtitle if Any]
+
+\vspace{12pt}
+\end{center}
+
+% No author name on abstract page (SBE).
+% First paragraph not indented.
+\noindent [Abstract text — max 250 words. Single paragraph preferred.
+If a second paragraph is essential, indent it, maintaining double spacing.]
+
+\clearpage
+
+% --- Özet (p.v) ---------------------------------------------------------------
+\thispagestyle{plain}
+\begin{center}
+ÖZET
+
+\vspace{12pt}
+
+[Türkçe Tez Başlığı: Title Case, Maks.\ 15 Kelime]
+
+\vspace{12pt}
+\end{center}
+
+\noindent [Özet metni. İlk paragraf girintisiz. İngilizce abstract ile yaklaşık
+aynı uzunlukta.]
+
+\clearpage
+
+% --- Curriculum Vitae (PhD only — follows Özet per SBE) ----------------------
+\thispagestyle{plain}
+\begin{center}
+CURRICULUM VITAE
+\end{center}
+
+\noindent [CV content.]
+
+\clearpage
+
+% --- Acknowledgments (optional) ----------------------------------------------
+% Title spelling: "ACKNOWLEDGMENTS" — not "Acknowledgements" (SBE specifies).
+\thispagestyle{plain}
+\begin{center}
+ACKNOWLEDGMENTS
+\end{center}
+
+\noindent [Optional. Single page preferred. Acknowledge all organisations that
+provided financial support.]
+
+\clearpage
+
+% --- Dedication (optional) ---------------------------------------------------
+\thispagestyle{plain}
+
+\begin{center}
+\vspace*{2in}
+\textit{[Optional dedication — centre on page. Heading "DEDICATION" may be
+omitted.]}
+\end{center}
+
+\clearpage
+
+% --- Table of Contents -------------------------------------------------------
+% Chapter entries appear as "CHAPTER 1:  INTRODUCTION" per SBE.
+\tableofcontents
+\clearpage
+
+% --- List of Tables ----------------------------------------------------------
+\listoftables
+\clearpage
+
+% --- List of Figures ---------------------------------------------------------
+\listoffigures
+\clearpage
+
+% =============================================================================
+% MAIN TEXT — Arabic numerals from p.1
+% =============================================================================
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% =============================================================================
+% CHAPTER 1
+% INTRODUCTION
+% =============================================================================
+\chapter{INTRODUCTION}
+\label{ch:introduction}
+
+% SBE: first paragraph of every chapter NOT indented.
+\noindent [First paragraph of chapter.]
+
+[Subsequent paragraphs are indented.]
+
+\section{Research motivation and objectives}
+\label{sec:motivation}
+
+\noindent [First paragraph of section — not indented.]
+
+[Second and subsequent paragraphs are indented.]
+
+\section{Contributions}
+\label{sec:contributions}
+
+\section{Structure of the dissertation}
+\label{sec:structure}
+
+% =============================================================================
+% CHAPTER 2
+% LITERATURE REVIEW
+% =============================================================================
+\chapter{LITERATURE REVIEW}
+\label{ch:literature}
+
+\noindent [First paragraph.]
+
+\section{The active management puzzle: Framing}
+\label{sec:puzzle_framing}
+
+\noindent [First paragraph.]
+
+The rational null is provided by \textcite{BerkGreen2004}, who demonstrate \dots
+
+\section{Mutual fund performance: Empirical evidence}
+\label{sec:performance_evidence}
+
+\noindent [First paragraph.]
+
+\subsection{Gross vs.\ net alphas and fund-level skill}
+\label{sec:gross_net}
+
+\noindent [First paragraph of subsection.]
+
+\subsection{Bootstrap methodology}
+\label{sec:bs_lit}
+
+\noindent [First paragraph of subsection.]
+
+\section{Behavioral explanations}
+\label{sec:behavioral}
+
+\noindent [First paragraph.]
+
+\subsection{Investor sentiment and fund flows}
+
+\subsection{Lottery demand and skewness preference}
+
+\subsection{Illusion of control}
+
+\subsection{Fee elasticity and behavioural pricing}
+
+% =============================================================================
+% CHAPTER 3
+% DATA AND METHODOLOGY
+% =============================================================================
+\chapter{DATA AND METHODOLOGY}
+\label{ch:data}
+
+\noindent [First paragraph.]
+
+\section{Data sources and sample construction}
+\label{sec:data_sources}
+
+\section{Return measurement and the gross/net distinction}
+\label{sec:returns}
+
+\section{Alpha estimation: Carhart four-factor model}
+\label{sec:alpha_estimation}
+
+\section{Fund flow calculation}
+\label{sec:flow_calculation}
+
+\section{Bootstrap procedure}
+\label{sec:bootstrap}
+
+\section{False discovery rate decomposition}
+\label{sec:fdr}
+
+\section{Behavioral state variables}
+\label{sec:state_variables}
+
+% =============================================================================
+% CHAPTER 4
+% EMPIRICAL RESULTS
+% =============================================================================
+\chapter{EMPIRICAL RESULTS}
+\label{ch:results}
+
+\noindent [First paragraph.]
+
+\section{Fund sample and descriptive statistics}
+\label{sec:descriptive}
+
+\noindent [First paragraph.]
+
+% After every table/figure, the continuation paragraph must begin with
+% \noindent per SBE indentation rule.
+
+\input{tables/table_fund_counts}
+
+\noindent [Continuation paragraph.]
+
+\input{tables/table_desc_stats}
+
+\noindent [Continuation paragraph.]
+
+\section{Aggregate fund performance}
+\label{sec:aggregate_performance}
+
+\noindent [First paragraph.]
+
+\input{tables/table_return_dist}
+
+\noindent [Continuation paragraph.]
+
+\input{tables/table_portfolio_alphas}
+
+\noindent [Continuation paragraph.]
+
+\section{Luck versus skill: Bootstrap analysis}
+\label{sec:bootstrap_results}
+
+\noindent [First paragraph.]
+
+\section{False discovery decomposition}
+\label{sec:fdr_results}
+
+\noindent [First paragraph.]
+
+\section{Sub-period analysis}
+\label{sec:subperiod}
+
+\noindent [First paragraph.]
+
+\section{Performance persistence}
+\label{sec:persistence}
+
+\noindent [First paragraph.]
+
+% =============================================================================
+% CHAPTER 5
+% BEHAVIORAL HYPOTHESES AND TESTS
+% =============================================================================
+\chapter{BEHAVIORAL HYPOTHESES AND TESTS}
+\label{ch:behavioral}
+
+\noindent [First paragraph.]
+
+\section{H1: Sentiment-convexity hypothesis}
+\label{sec:H1}
+
+\section{H2: Disposition control and illusion of control}
+\label{sec:H2}
+
+\section{H3: Lottery demand and skewness preference}
+\label{sec:H3}
+
+\section{H4: Fee elasticity}
+\label{sec:H4}
+
+\section{The psychological premium framework}
+\label{sec:ppf}
+
+% =============================================================================
+% CHAPTER 6
+% CONCLUSION
+% =============================================================================
+\chapter{CONCLUSION}
+\label{ch:conclusion}
+
+\noindent [First paragraph.]
+
+\section{Summary of findings}
+\label{sec:summary}
+
+\section{Limitations and future research}
+\label{sec:limitations}
+
+% =============================================================================
+% REFERENCES
+% \chapter* produces the correct visual format (ALL CAPS, centred, two-line
+% display) without incrementing the chapter counter.
+% \addcontentsline ensures it appears in the ToC.
+% DOIs/URLs are rendered as plain unlinked text (see \AtBeginBibliography above).
+% =============================================================================
+\clearpage
+\chapter*{REFERENCES}
+\addcontentsline{toc}{chapter}{REFERENCES}
+\printbibliography[heading=none]
+
+% =============================================================================
+% APPENDICES
+% =============================================================================
+\appendix
+
+% Switch ToC prefix to "APPENDIX~" so entries read "APPENDIX A: TITLE".
+\renewcommand{\cftchappresnum}{APPENDIX~}
+\setlength{\cftchapnumwidth}{8.5em}   % wider for "APPENDIX A:"
+
+% Reformat chapter heading for appendices: "APPENDIX X" on line 1, title below.
+\titleformat{\chapter}[display]
+  {\normalfont\normalsize\bfseries\centering}
+  {APPENDIX~\thechapter}
+  {0pt}
+  {\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}
+
+% REMINDER: every appendix must be explicitly referred to in the main text.
+
+% --- Appendix A ---------------------------------------------------------------
+\chapter{DATA CLEANING AND SAMPLE CONSTRUCTION}
+\label{app:data}
+
+\noindent [First paragraph.]
+
+% --- Appendix B ---------------------------------------------------------------
+\chapter{BENCHMARK ASSIGNMENT}
+\label{app:benchmarks}
+
+\noindent [First paragraph.]
+
+% --- Appendix C ---------------------------------------------------------------
+\chapter{PORTFOLIO ALPHA TABLES}
+\label{app:portfolio_alphas}
+
+\noindent [First paragraph.]
+
+\input{tables/table_ff_comparison_gross}
+\input{tables/table_ff_comparison_net}
+
+% --- Appendix D ---------------------------------------------------------------
+\chapter{SUB-PERIOD ANALYSIS}
+\label{app:subperiod}
+
+\noindent [First paragraph.]
+
+\input{tables/table_subperiod_alphas}
+\input{tables/table_subperiod_bootstrap}
+\input{tables/table_subperiod_bsw}
+
+% --- Appendix E ---------------------------------------------------------------
+\chapter{ROBUSTNESS CHECKS}
+\label{app:robustness}
+
+\noindent [First paragraph.]
+
+\input{tables/table_alpha_comparison_robust}
+\input{tables/table_bootstrap_comparison_robust}
+\input{tables/table_bsw_comparison_robust}
+
+% --- Appendix F ---------------------------------------------------------------
+\chapter{AUXILIARY SENTIMENT VARIABLES}
+\label{app:sentiment}
+
+\noindent [First paragraph.]
+
+\end{document}
