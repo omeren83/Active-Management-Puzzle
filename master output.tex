@@ -41,6 +41,15 @@
 %\usepackage{natbib}
 \usepackage[style=apa, backend=biber]{biblatex}
 \addbibresource{dissertation.bib}
+% Custom \citealt for "Author Year" with no parentheses (used inside existing parens)
+\DeclareCiteCommand{\citealt}
+  {\boolfalse{citetracker}\boolfalse{pagetracker}\usebibmacro{prenote}}
+  {\ifciteindex{\indexfield{indextitle}}{}%
+   \printnames{labelname}%
+   \setunit{\addspace}%
+   \printfield{year}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
 \captionsetup[table]{
   labelfont = bf,
   font      = small,
@@ -83,7 +92,7 @@
     \includegraphics[width=\linewidth]{tables/fig_rolling_alphas.png}
     \caption{Time Varying Alphas Estimated by 36-month Rolling Window Regressions.
     The series displays three visually distinct regimes whose boundaries are
-    formally identified by a \citet{Bai1998,Bai2003} structural break test;
+    formally identified by a \textcite{Bai1998,Bai2003} structural break test;
     see Appendix~\ref{app:subperiod} for break dates, confidence intervals, and
     regime-mean estimates.}
     \label{fig:rolling_alphas}
@@ -152,11 +161,11 @@ This appendix presents cross-sectional summary statistics for the two alternativ
 fund-month panels constructed in the main analysis but not used as the primary
 estimation sample. The Master panel (Table~A.1) imposes no incubation correction
 and no sample-period restriction. The Trimmed panel (Table~A.2) applies the
-\citet{Evans2010} 36-month incubation correction \emph{and} restricts the sample
+\textcite{Evans2010} 36-month incubation correction \emph{and} restricts the sample
 to 1995--2023; this is the panel used for the panel-level regressions of
 Hypotheses H1--H4, where alignment with the available factor and sentiment
 series motivates the date cap. The Incubation-Corrected panel reported in
-Table~2 of the main text applies only the \citet{Evans2010} 36-month filter
+Table~2 of the main text applies only the \textcite{Evans2010} 36-month filter
 and retains the full December~1994--February~2026 history without artificial
 date trimming. Comparing the three variants isolates the contribution of each
 correction to the cross-sectional moments of TNA, expense ratio, turnover,
@@ -181,7 +190,7 @@ fund age, gross returns, and the annualised gross Sharpe ratio.
 \setcounter{figure}{0}
 \renewcommand{\thefigure}{B.\arabic{figure}}
 
-This appendix decomposes the aggregate net annualised \citet{Carhart1997}
+This appendix decomposes the aggregate net annualised \textcite{Carhart1997}
 four-factor alpha reported in Table~5 by Lipper investment objective code.
 Funds are grouped by their LSEG-assigned Lipper classification and within each
 class are split into Active and Passive sub-aggregates. The breakdown documents
@@ -208,9 +217,9 @@ by any single style class.
 This appendix replicates the principal performance and skill-decomposition
 results of the main analysis on the Jan~1995--Sep~2006 subperiod, the maximum
 overlap between this study's sample (Dec~1994 onwards) and the
-Jan~1984--Sep~2006 window of \citet{FamaFrench2010}. The estimation kernels,
+Jan~1984--Sep~2006 window of \textcite{FamaFrench2010}. The estimation kernels,
 factor model specification, Newey--West lag, bootstrap design ($B = 10{,}000$
-calendar-month resamples), and the \citet{Storey2002} tuning parameter
+calendar-month resamples), and the \textcite{Storey2002} tuning parameter
 ($\lambda = 0.5$) are identical to those used in the main results, ensuring
 that any divergence between the two sets of estimates reflects sample-period
 effects rather than methodological differences.
@@ -241,7 +250,7 @@ effects rather than methodological differences.
 \input{tables/table_port_agg_alpha_FF}
 \clearpage
 
-\noindent\textbf{Comparison with \citet{FamaFrench2010}.} The FF (2010) sample
+\noindent\textbf{Comparison with \textcite{FamaFrench2010}.} The FF (2010) sample
 spans Jan~1984--Sep~2006 (270 months), of which the present subperiod covers
 only the second half (141 months). Differences in point estimates between this
 appendix and Tables~I--III of FF~(2010) should therefore not be attributed to
@@ -249,7 +258,7 @@ methodological discrepancies but to (i) the absence of the 1984--1994 window,
 during which the cross-section of U.S. equity mutual funds exhibited a more
 favourable mean alpha than in the post-1995 era, and (ii) sample-construction
 differences---this study uses LSEG share-class data with the
-\citet{Evans2010} incubation correction, whereas FF~(2010) draw on the CRSP
+\textcite{Evans2010} incubation correction, whereas FF~(2010) draw on the CRSP
 Mutual Fund Database aggregated to fund-level. The qualitative conclusions
 of FF~(2010)---that the cross-sectional distribution of $t(\hat{\alpha})$
 lies materially to the left of the bootstrap zero-skill null, that
@@ -273,9 +282,9 @@ The rolling alpha series in Figure~\ref{fig:rolling_alphas} exhibits pronounced
 non-stationarity across the full December~1994--February~2026 sample. To
 partition the sample into
 economically coherent sub-periods without imposing thresholds \textit{a priori},
-we apply the multiple structural break test of \citet{Bai1998} and
-\citet{Bai2003} to the monthly cross-sectional equal-weighted mean of the
-36-month rolling \citet{Carhart1997} gross alpha for active funds --- the same
+we apply the multiple structural break test of \textcite{Bai1998} and
+\textcite{Bai2003} to the monthly cross-sectional equal-weighted mean of the
+36-month rolling \textcite{Carhart1997} gross alpha for active funds --- the same
 underlying series plotted (after 12-month smoothing) in
 Figure~\ref{fig:rolling_alphas}. The test is applied to the raw, unsmoothed
 series; smoothing the input would introduce additional moving-average serial
@@ -288,7 +297,7 @@ the rolling-window width) and up to five breaks tested. The optimal number of
 breaks is selected by the Bayesian Information Criterion (BIC). Confidence
 intervals for break dates use Newey--West heteroskedasticity- and
 autocorrelation-consistent standard errors with a data-driven lag, following
-the bandwidth rule of \citet{Andrews1991}.
+the bandwidth rule of \textcite{Andrews1991}.
 
 \subsection*{D.1 \ Structural Break Test Results}
 
@@ -303,17 +312,17 @@ alpha per segment.
     \includegraphics[width=\linewidth]{tables/fig_breaktest.png}
     \caption{Bai--Perron Structural Break Test: Active Fund Rolling Gross
     Alpha. Blue line: 12-month trailing mean of the monthly cross-sectional
-    equal-weighted mean of 36-month rolling \citet{Carhart1997} gross alpha
+    equal-weighted mean of 36-month rolling \textcite{Carhart1997} gross alpha
     (matches Figure~\ref{fig:rolling_alphas}). Solid red step: regime-mean
-    alpha per identified segment. Dashed red verticals: \citet{Bai1998,Bai2003}
+    alpha per identified segment. Dashed red verticals: \textcite{Bai1998,Bai2003}
     break-date point estimates. Shaded bands: 95\,\% confidence
-    intervals using Newey--West HAC standard errors \citep{Andrews1991}.
+    intervals using Newey--West HAC standard errors \parencite{Andrews1991}.
     BIC selects five breaks (Dec~1999, Dec~2002, Dec~2005, Nov~2011, Jan~2023)
     defining six regimes. Breaks~1--3 are collapsed into a single pre-2006
     regime and Break~5 is collapsed into the post-2011 regime, yielding the
     three-period partition adopted in Section~D.2; aggregation reflects the
     small-sample constraints of the FF bootstrap and BSW decomposition which
-    require $T\geq 60$ monthly observations \citep{BarrasScailletWermers2010}.
+    require $T\geq 60$ monthly observations \parencite{BarrasScailletWermers2010}.
     Sample: Incubation-corrected panel (Evans 2010), active funds only,
     December~1994--February~2026.}
     \label{fig:breaktest}
@@ -362,19 +371,19 @@ Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
 \begin{minipage}{\linewidth}
 \vspace{4pt}
 \footnotesize
-\textit{Note:} Break dates estimated via \citet{Bai1998} and \citet{Bai2003}
+\textit{Note:} Break dates estimated via \textcite{Bai1998} and \textcite{Bai2003}
 with minimum segment 36 months; optimal break count (five) selected by BIC
 from the Andrews (1993) supF, Andrews and Ploberger (1994) meanF and expF
 tests (supF $= 57.33$, meanF $= 23.12$, expF $= 25.44$; all $p < 0.0001$).
-Confidence intervals use Newey--West HAC standard errors \citep{Andrews1991}
+Confidence intervals use Newey--West HAC standard errors \parencite{Andrews1991}
 with lag $= \lfloor 4(T/100)^{2/9} \rfloor$.
 Regime means are equal-weighted cross-sectional means of the monthly
-36-month rolling \citet{Carhart1997} gross alpha across active funds within
+36-month rolling \textcite{Carhart1997} gross alpha across active funds within
 each segment, annualised ($\times 12$, \%). Periods 1--3 are collapsed and
 Period~6 is pooled with Period~5 to form the three-regime partition adopted
 in Section~D.2. Each of the three adopted regimes has $T\geq 60$ monthly
 observations, meeting the minimum sample requirement for reliable
-Fama--French (2010) bootstrap and \citet{BarrasScailletWermers2010}
+Fama--French (2010) bootstrap and \textcite{BarrasScailletWermers2010}
 decomposition. Three-regime means are duration-weighted averages of the
 corresponding six-regime means. Sub-period thresholds adopted in
 Section~D.2: \textbf{Dec~2005} and \textbf{Nov~2011}.
@@ -389,7 +398,7 @@ the late-1990s tail (Period~1, $\bar{\alpha} = -0.59\%$), the dot-com peak
 (Period~2, $\bar{\alpha} = +1.67\%$), and the post-crash recovery phase
 (Period~3, $\bar{\alpha} = -0.80\%$). These oscillations cluster tightly
 around zero on net and each regime spans 36--37 months --- below the
-60-month minimum recommended by \citet{BarrasScailletWermers2010} for
+60-month minimum recommended by \textcite{BarrasScailletWermers2010} for
 reliable bootstrap inference --- and are therefore collapsed into a single
 pre-2006 regime (P1) in the sub-period analysis. Break~4 (Nov~2011,
 CI: Jun~2011--Feb~2012) marks the onset of persistent alpha compression
@@ -426,15 +435,15 @@ break in the alpha-generating process).
 This appendix re-estimates the core performance results under two alternative
 factor specifications to assess robustness of the active management puzzle to
 factor model choice. The \textit{Fama--French 6-Factor} model (FF6) augments
-the \citet{Carhart1997} four-factor baseline with the profitability factor
-(RMW) and investment factor (CMA) of \citet{FamaFrench2015}. The
+the \textcite{Carhart1997} four-factor baseline with the profitability factor
+(RMW) and investment factor (CMA) of \textcite{FamaFrench2015}. The
 \textit{Carhart + PSL} model (C+PSL) augments the Carhart four-factor model
-with the traded liquidity factor of \citet{PastorStambaugh2003}. The
+with the traded liquidity factor of \textcite{PastorStambaugh2003}. The
 estimation procedure --- full-period OLS with Newey--West standard errors
-(6-month lag), the \citet{FamaFrench2010} calendar-month bootstrap
-($B = 10{,}000$), and the \citet{BarrasScailletWermers2010} false-discovery
+(6-month lag), the \textcite{FamaFrench2010} calendar-month bootstrap
+($B = 10{,}000$), and the \textcite{BarrasScailletWermers2010} false-discovery
 decomposition at $\gamma^{*} = 0.20$ --- is identical across all three
-specifications. SMB is held at the \citet{FamaFrench1993} construction
+specifications. SMB is held at the \textcite{FamaFrench1993} construction
 (single $2 \times 3$ size--BM sort) throughout; the two SMB definitions
 correlate above 0.97 over the sample window. The Carhart + PSL specification
 is constrained to December~1994--December~2024 by the current data release
