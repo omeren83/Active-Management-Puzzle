@@ -21,12 +21,6 @@ Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
 
 \multirow{-3}{*}{\raggedright\arraybackslash Net Return (\%, monthly)} & Full & 3,060 & 0.609 & 0.745 & 1.026 & -0.100 & 1.115\\
 \cmidrule{1-8}
- & Active & 1,899 & 0.503 & 0.508 & 0.211 & 0.300 & 0.710\\
-
- & Passive & 264 & 0.462 & 0.513 & 0.358 & 0.116 & 0.751\\
-
-\multirow{-3}{*}{\raggedright\arraybackslash Gross Sharpe Ratio (annualised)} & Full & 2,684 & 0.421 & 0.485 & 0.333 & 0.019 & 0.717\\
-\cmidrule{1-8}
  & Active & 2,071 & 4.600 & 4.712 & 2.321 & 1.619 & 7.452\\
 
  & Passive & 294 & 5.174 & 5.304 & 2.412 & 2.157 & 7.941\\
@@ -56,10 +50,16 @@ Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
  & Passive & 300 & 157.033 & 156.000 & 107.216 & 21.000 & 311.200\\
 
 \multirow{-3}{*}{\raggedright\arraybackslash Months of Coverage} & Full & 3,122 & 154.034 & 127.000 & 115.247 & 18.000 & 341.000\\
+\cmidrule{1-8}
+ & Active & 1,899 & 0.503 & 0.508 & 0.211 & 0.300 & 0.710\\
+
+ & Passive & 264 & 0.462 & 0.513 & 0.358 & 0.116 & 0.751\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Gross Sharpe Ratio (annualised)} & Full & 2,684 & 0.421 & 0.485 & 0.333 & 0.019 & 0.717\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Fund-level time-series means are computed first; cross-sectional statistics are then computed across fund-level means. $N$ is the number of funds with at least one valid observation. Expense Ratio and Turnover are point-in-time LSEG static values; Turnover is winsorised at the 1st/99th percentiles cross-sectionally. Flow is the \citet{SirriTufano1998} measure scaled by lagged TNA (\%), winsorised at 1st/99th percentiles, with December excluded. Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \citet{BarrasScailletWermers2010}. Returns and flows are in \%. Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns, $\sqrt{12}\cdot\overline{r^{g}_{i,t}-r^{f}_{t}}/\sigma(r^{g}_{i,t}-r^{f}_{t})$, computed only for funds with at least 24 monthly excess-return observations. \citet{Evans2010} 36-month incubation correction applied and sample restricted to 1995--2023. This is the panel used for panel-level regressions (H1--H4) where alignment with factor and sentiment series availability motivates the date cap.
+\item Fund-level time-series means are computed first; cross-sectional statistics are then computed across fund-level means. $N$ is the number of funds with at least one valid observation. Expense Ratio and Turnover are point-in-time LSEG static values; Turnover is winsorised at the 1st/99th percentiles cross-sectionally. Flow is the \textcite{SirriTufano1998} measure scaled by lagged TNA (\%), winsorised at 1st/99th percentiles, with December excluded. Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \textcite{BarrasScailletWermers2010}. Returns and flows are in \%. Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns, $\sqrt{12}\cdot\overline{r^{g}_{i,t}-r^{f}_{t}}/\sigma(r^{g}_{i,t}-r^{f}_{t})$, computed only for funds with at least 24 monthly excess-return observations. \textcite{Evans2010} 36-month incubation correction applied and sample restricted to 1995--2023. This is the panel used for panel-level regressions (H1--H4) where alignment with factor and sentiment series availability motivates the date cap.
 \end{tablenotes}
 \end{threeparttable}
 }
