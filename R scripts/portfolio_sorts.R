@@ -1,15 +1,5 @@
 # =============================================================================
-# PORTFOLIO SORTS ??? Size, Momentum, Fee Quintiles                          v1.4
-#
-# Changes from v1.3:
-#   - Table D1 (Table 9) presentation rework: column headers use \makecell{...}
-#     to render as two lines so the expanded names ("Expense Ratio",
-#     "Turnover", "EW Gross Return", "VW Gross Return", "EW Sharpe Ratio")
-#     fit without pushing column widths uneven. All seven numeric columns
-#     given uniform width 3.8em via column_spec(width=...), producing
-#     visually consistent column spacing across the table. The first ($Q$)
-#     column stays at 1em. Quick footnote-bugfix of v1.3 kept (fn_d1 single
-#     backslashes for longtable_note compatibility).
+# PORTFOLIO SORTS ??? Size, Momentum, Fee Quintiles                          v1.3
 #
 # Changes from v1.2:
 #   - Panel switch: source panel is now panel_incubation (Evans 2010 36-month
@@ -519,8 +509,8 @@ fn_d1 <- paste(
   "(Momentum; \\citealt{JegadeeshTitman1993}), and static annual Expense Ratio (Fee).",
   "EW: equal-weighted; VW: lagged-TNA-weighted. Returns in monthly \\%.",
   "EW Sharpe is the annualised Sharpe ratio of the quintile portfolio's",
-  "equal-weighted \\textit{gross} excess return,",
-  "$\\sqrt{12}\\cdot\\overline{r^{EW,g}_{q,t}-r^{f}_{t}}/\\sigma(r^{EW,g}_{q,t}-r^{f}_{t})$.",
+  "equal-weighted \\\\textit{gross} excess return,",
+  "$\\\\sqrt{12}\\\\cdot\\\\overline{r^{EW,g}_{q,t}-r^{f}_{t}}/\\\\sigma(r^{EW,g}_{q,t}-r^{f}_{t})$.",
   "Incubation-corrected panel (Evans 2010); no date cap."
 )
 
@@ -534,33 +524,11 @@ lt_d1 <- d1_data %>%
     longtable = TRUE,
     caption   = "Portfolio Characteristics by Sort Variable and Quintile",
     label     = "port_characteristics",
-    # Placeholder col.names: kableExtra's column-name post-processing is
-    # fragile with \makecell / linebreak() interacting with escape=FALSE
-    # (see compile attempt where \\ was converted to \newline and crashed
-    # \makecell). We use short placeholder tokens here and substitute the
-    # final two-line headers into the .tex string after kbl() has run (see
-    # the gsub() block below), which avoids all escape-layer interference.
-    col.names = c("XHDRQ", "Navg", "TNA",
-                  "XHDRExpenseRatio", "Turnover",
-                  "XHDREWGrossReturn", "XHDRVWGrossReturn",
-                  "XHDREWSharpeRatio"),
+    col.names = c("$Q$", "$N_{\\text{avg}}$", "TNA", "ER", "Turn.",
+                  "EW Gross", "VW Gross", "EW Sharpe"),
     align     = c("l", "r", "r", "r", "r", "r", "r", "r")
   ) %>%
-  kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
-  # Uniform 4.8em width on all seven numeric columns. Wider than the previous
-  # 3.8em so that the \makecell[r]{...} two-line headers ("Expense Ratio",
-  # "EW Gross Return", "VW Gross Return", "EW Sharpe") fit without their
-  # centered/right-aligned boxes overflowing and intersecting neighbours.
-  # Width budget: 1em + 7*4.8em + 8*2*3pt (reduced \tabcolsep) = 38.8em,
-  # fits inside the ~39em textwidth at 12pt baseline.
-  column_spec(1, width = "1em") %>%
-  column_spec(2, width = "4.8em", latex_valign = "m") %>%
-  column_spec(3, width = "4.8em", latex_valign = "m") %>%
-  column_spec(4, width = "4.8em", latex_valign = "m") %>%
-  column_spec(5, width = "4.8em", latex_valign = "m") %>%
-  column_spec(6, width = "4.8em", latex_valign = "m") %>%
-  column_spec(7, width = "4.8em", latex_valign = "m") %>%
-  column_spec(8, width = "4.8em", latex_valign = "m")
+  kable_styling(latex_options = c("hold_position", "repeat_header"))
 
 for (i in seq_len(nrow(pack_tab)))
   lt_d1 <- lt_d1 %>%
@@ -569,26 +537,6 @@ for (i in seq_len(nrow(pack_tab)))
             hline_before = (i > 1), hline_after = FALSE)
 
 lt_d1_str <- as.character(lt_d1)
-
-# Header post-processing. kbl() was given short placeholder column names
-# (see comment in the kbl() call above) to sidestep kableExtra's col.names
-# escape pipeline, which clobbers \\ into \newline and breaks \makecell.
-# We now substitute the final two-line display headers directly into the
-# already-generated .tex string. fixed=TRUE makes gsub treat both the
-# pattern and the replacement literally (no regex / backreference semantics),
-# so a single backslash pair in R source -> a single backslash pair in the
-# .tex output, which \makecell consumes as its intended line separator.
-header_subs <- list(
-  c("XHDRQ",              "$Q$"),
-  c("XHDRExpenseRatio",   "\\makecell[r]{Expense\\\\Ratio}"),
-  c("XHDREWGrossReturn",  "\\makecell[r]{EW Gross\\\\Return}"),
-  c("XHDRVWGrossReturn",  "\\makecell[r]{VW Gross\\\\Return}"),
-  c("XHDREWSharpeRatio",  "\\makecell[r]{EW\\\\Sharpe}"),
-  c("Navg",               "$N_{\\text{avg}}$")
-)
-for (sub in header_subs)
-  lt_d1_str <- gsub(sub[1], sub[2], lt_d1_str, fixed = TRUE)
-
 lt_d1_str <- longtable_note(lt_d1_str, fn_d1, D1_NCOLS)
 lt_d1_str <- wrap_lt_small(lt_d1_str)
 writeLines(lt_d1_str, "table_port_chars.tex")
@@ -634,7 +582,7 @@ d2_table <- bind_rows(make_d2_rows("Active"), make_d2_rows("Passive"))
 
 fn_d2 <- paste(
   "Monthly EW and VW aggregate portfolio returns regressed on CAPM,",
-  "Fama-French three-factor, and \\\\citet{Carhart1997} four-factor models.",
+  "Fama-French three-factor, and \\\\textcite{Carhart1997} four-factor models.",
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",
   "Newey-West $t$-statistics (6-month lag) in parentheses.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\% respectively.",
@@ -796,7 +744,7 @@ build_alpha_table <- function(alpha_df, sort_name, cap, lab, fn_text) {
 # Shared footnote: updated to reflect (a) beta t-stats now shown,
 # (b) RF omission for spreads, (c) significance stars.
 fn_base <- paste(
-  "\\citet{Carhart1997} four-factor time-series regressions on monthly portfolio returns.",
+  "\\textcite{Carhart1997} four-factor time-series regressions on monthly portfolio returns.",
   "Alphas annualised ($\\times 12$, \\%). Q5$-$Q1: long-short spread; the risk-free",
   "rate is omitted from the spread return because it cancels in the self-financing",
   "construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$.",

@@ -972,9 +972,9 @@ pack_tab <- data.frame(
 )
 
 fn_text <- paste(
-  "\\citet{KosowskiEtal2006} bootstrap persistence test on 36-month formation,",
+  "\\textcite{KosowskiEtal2006} bootstrap persistence test on 36-month formation,",
   "12-month holding non-overlapping cohorts, ranked by formation-period",
-  "\\citet{Carhart1997} four-factor alpha $t$-statistic (Newey-West, 3-month",
+  "\\textcite{Carhart1997} four-factor alpha $t$-statistic (Newey-West, 3-month",
   "lag) except Panel B, which ranks by raw alpha as a robustness check.",
   "Equal-weighted decile portfolios pooled across cohorts; alpha and factor",
   "loadings estimated jointly on pooled holding-period returns by OLS with",
@@ -993,7 +993,7 @@ fn_text <- paste(
   "cohorts. D1 $-$ D10 is the long-short spread.",
   "Significance stars on $\\hat{\\alpha}$ and factor loadings reflect",
   "Newey-West $t$-statistics: $^{*}$, $^{**}$, $^{***}$ at 10\\%, 5\\%, 1\\%.",
-  "Sample: Active funds in the \\citet{Evans2010}-corrected",
+  "Sample: Active funds in the \\textcite{Evans2010}-corrected",
   "panel\\_incubation, Jan 1995--Feb 2026. Panel D uses a single cohort",
   "(12 months) and should be interpreted with caution."
 )

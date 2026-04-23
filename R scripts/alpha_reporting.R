@@ -286,20 +286,20 @@ rownames(t7_display) <- NULL
 unknown_tstat_row <- 2L * which(levels(t7$Group) == "Unknown")
 
 fn_t7 <- paste(
-  "Annualised \\\\citet{Carhart1997} four-factor alpha (\\\\%) from regressing",
+  "Annualised \\\\textcite{Carhart1997} four-factor alpha (\\\\%) from regressing",
   "the monthly aggregate portfolio return of each group on the market, size,",
-  "value, and momentum factors, following \\\\citet{FamaFrench2010}.",
+  "value, and momentum factors, following \\\\textcite{FamaFrench2010}.",
   "EW: equal-weighted portfolio (each fund alive in month $t$ contributes",
   "$1/N_t$). VW: value-weighted portfolio with lagged TNA weights",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
   "Net returns are computed as gross returns less one-twelfth of the static",
-  "annual expense ratio each month, following \\\\citet{BarrasScailletWermers2010}.",
+  "annual expense ratio each month, following \\\\textcite{BarrasScailletWermers2010}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
   "$T$: number of monthly observations in the regression.",
   "The Active + Passive row aggregates only the two classified groups.",
-  "Sample: incubation-corrected panel (Evans 2010), no date cap."
+  "Sample: Trimmed (1995--2023) Evans-corrected panel."
 )
 
 latex_t7 <- t7_display %>%
@@ -380,10 +380,10 @@ lipper_spans <- t8 %>%
   mutate(lipper_escaped = vapply(lipper, escape_latex_cell, character(1)))
 
 fn_t8 <- paste(
-  "Annualised \\citet{Carhart1997} four-factor gross alpha (\\%) from",
+  "Annualised \\textcite{Carhart1997} four-factor gross alpha (\\%) from",
   "regressing the monthly aggregate portfolio gross return of each",
   "(Lipper class $\\times$ group) cell on the market, size, value, and momentum",
-  "factors, following \\citet{FamaFrench2010}. EW: equal-weighted portfolio;",
+  "factors, following \\textcite{FamaFrench2010}. EW: equal-weighted portfolio;",
   "VW: lagged-TNA-weighted portfolio. Significance stars based on Newey-West",
   "$t$-statistics (6-month lag): $^{*}$, $^{**}$, $^{***}$ denote 10\\%, 5\\%,",
   "1\\% significance. $N$: unique funds contributing to the cell's portfolio",
@@ -392,7 +392,7 @@ fn_t8 <- paste(
   "net returns because the static annual expense ratio used to derive net",
   "returns introduces a class-specific approximation error that would",
   "contaminate the style-class breakdown.",
-  "Sample: incubation-corrected panel (Evans 2010), no date cap."
+  "Sample: Trimmed (1995--2023) Evans-corrected panel."
 )
 
 latex_t8 <- t8_display %>%
@@ -453,7 +453,7 @@ p_alpha <- ggplot(alpha_ts, aes(x = date, y = alpha_ann, color = ap_group)) +
     y        = "Annualized Alpha (%)",
     x        = NULL,
     caption  = str_wrap(paste(
-      "Source: LSEG Workspace. Sample: incubation-corrected panel (Evans 2010), no date cap;",
+      "Source: LSEG Workspace. Sample: Trimmed (1995-2023) Evans-corrected panel;",
       "Unknown-classified funds excluded.",
       "Each month t, the aggregate gross return of each group is computed as the",
       "equal-weighted average of all funds alive in month t. This portfolio return",
@@ -501,14 +501,14 @@ boot_tab <- boot_summary %>%
 # Every LaTeX command \X in the footnote therefore needs \\X in the R string,
 # i.e. \\\\X in R source. Plain text, $...$, and {,} are unaffected.
 fn_t9 <- paste(
-  "Bootstrap procedure follows \\\\citet{FamaFrench2010}.",
-  "Sample: actively managed funds, incubation-corrected panel (Evans 2010), no date cap,",
+  "Bootstrap procedure follows \\\\textcite{FamaFrench2010}.",
+  "Sample: actively managed funds, Trimmed (1995--2023) Evans-corrected panel,",
   paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
   "For each fund, estimated monthly alpha is subtracted from the excess return",
   "series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled",
   "with replacement, preserving cross-sectional factor return dependence.",
-  "The \\\\citet{Carhart1997} four-factor model is re-estimated on each resampled series.",
+  "The \\\\textcite{Carhart1997} four-factor model is re-estimated on each resampled series.",
   "\\\\textit{Actual} $t(\\\\hat{\\\\alpha})$: percentile of the empirical $t$-statistic",
   "distribution across active funds.",
   "\\\\textit{Simulated Mean}: average of that percentile across all iterations.",
@@ -595,16 +595,16 @@ pi0_table <- data.frame(
 # All backslash commands doubled per the kableExtra stripping rule above.
 fn_t10 <- paste(
   "The proportion of true zero-alpha funds ($\\\\hat{\\\\pi}_0$) is estimated",
-  "following \\\\citet{Storey2002} and \\\\citet{BarrasScailletWermers2010},",
+  "following \\\\textcite{Storey2002} and \\\\textcite{BarrasScailletWermers2010},",
   "using p-values from Newey-West $t$-tests on",
-  "full-period \\\\citet{Carhart1997} four-factor alphas.",
+  "full-period \\\\textcite{Carhart1997} four-factor alphas.",
   "The estimator is $\\\\hat{\\\\pi}_0 = |\\\\{p_i > \\\\lambda\\\\}| \\\\,/\\\\, [N(1-\\\\lambda)]$,",
-  "where $\\\\lambda = 0.5$ is the standard tuning parameter following \\\\citet{Storey2002}.",
+  "where $\\\\lambda = 0.5$ is the standard tuning parameter following \\\\textcite{Storey2002}.",
   "Funds with p-values exceeding $\\\\lambda$ are unlikely to have non-zero true alpha;",
   "the density of p-values in $(\\\\lambda, 1]$ provides a conservative estimate",
   "of the zero-alpha proportion, bounded above at 1.",
   paste0("Sample: actively managed funds ($N = ", total_n, "$),"),
-  "incubation-corrected panel (Evans 2010), no date cap.",
+  "Trimmed (1995--2023) Evans-corrected panel.",
   "Passive and Unknown-classified funds are excluded.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
   "implied by this estimate is reported in Table~\\\\ref{tab:bsw_decomposition}."
@@ -683,29 +683,29 @@ bsw_display <- bsw_rep_df %>%
   select(gamma_fmt, S_neg_fmt, S_pos_fmt, F_luck_fmt, T_unskilled_fmt, T_skilled_fmt)
 
 fn_t10b <- paste(
-  "Decomposition follows \\\\citet{BarrasScailletWermers2010}, Section~II.B and Table~III.",
+  "Decomposition follows \\\\textcite{BarrasScailletWermers2010}, Section~II.B and Table~III.",
   "$S^-_\\\\gamma$ ($S^+_\\\\gamma$): observed fraction of active funds with",
   "significantly negative (positive) Newey-West $t(\\\\hat{\\\\alpha})$ at",
-  "two-sided significance level $\\\\gamma$, using full-period \\\\citet{Carhart1997}",
+  "two-sided significance level $\\\\gamma$, using full-period \\\\textcite{Carhart1997}",
   "four-factor alphas. Critical values are from the standard normal distribution,",
-  "consistent with the large-sample approximation in \\\\citet{BarrasScailletWermers2010}.",
+  "consistent with the large-sample approximation in \\\\textcite{BarrasScailletWermers2010}.",
   "$F_\\\\gamma = \\\\hat{\\\\pi}_0 \\\\cdot \\\\gamma/2$: expected proportion of false",
   "discoveries per tail arising from zero-alpha funds,",
-  paste0("where $\\\\hat{\\\\pi}_0 = ", pi0_str, "$ is the \\\\citet{Storey2002} estimate"),
+  paste0("where $\\\\hat{\\\\pi}_0 = ", pi0_str, "$ is the \\\\textcite{Storey2002} estimate"),
   "at $\\\\lambda = 0.5$ (see Table~\\\\ref{tab:pi0_estimate}).",
   "$T^-_\\\\gamma = S^-_\\\\gamma - F_\\\\gamma$: genuinely unskilled funds",
   "(significant negative alpha net of false discoveries).",
   "$T^+_\\\\gamma = S^+_\\\\gamma - F_\\\\gamma$: genuinely skilled funds",
   "(significant positive alpha net of false discoveries).",
   "The bolded row ($\\\\gamma = 0.20$) provides the population-level estimates",
-  "$\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$ following \\\\citet{BarrasScailletWermers2010}.",
+  "$\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$ following \\\\textcite{BarrasScailletWermers2010}.",
   "Negative $T^+_\\\\gamma$ entries indicate right-tail significance does not",
   "exceed the false-discovery rate at that threshold.",
   "The Storey estimator is conservative: it overestimates $\\\\hat{\\\\pi}_0$",
   "when truly skilled funds exist, so $T^+_\\\\gamma$ values are lower bounds.",
   "All quantities are percentages of the active-fund universe.",
   paste0("Sample: $N = ", total_n, "$ actively managed funds,"),
-  "incubation-corrected panel (Evans 2010), no date cap; Passive and Unknown funds excluded."
+  "Trimmed (1995--2023) Evans-corrected panel; Passive and Unknown funds excluded."
 )
 
 BSW_BOLD_ROW <- 4L   # gamma = 0.20 is the 4th row of the grid
@@ -815,7 +815,7 @@ combined_plot <- (p_cdf / p_pdf) +
       "normality; the bootstrap null in Panel A is the inferentially appropriate comparison ",
       "and accounts for cross-sectional dependence, fat tails, and finite-sample estimation ",
       "error. Percentile-level bootstrap comparisons are reported in Table 9. ",
-      "Sample: actively managed funds, incubation-corrected panel (Evans 2010), no date cap ",
+      "Sample: actively managed funds, Trimmed (1995\u20132023) Evans-corrected panel ",
       "(N = ", n_active_bs, " funds with \u226524 monthly observations)."
     )
   )

@@ -1,5 +1,13 @@
 # =============================================================================
-# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.2
+# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.3
+#
+# v1.3 change vs v1.2:
+#   Bootstrap caching layer added (same pattern as alpha_estimation.R v2.7,
+#   subperiod_analysis.R v1.2, and persistence_testing.R v1.0). sim_matrix is
+#   saved to ff_comparison_bootstrap_cache.rds on first run and reloaded on
+#   subsequent runs after SHA-1 validation against bs_data, T_total, B_RUNS,
+#   MIN_OBS_BS, NW_LAG_FULL, and BOOT_SEED. Reduces repeated Phase D run time
+#   from ~30 min to ~5 sec on a warm cache.
 #
 # v1.2 change vs v1.1:
 #   Table 7 FF (`table_perf_aggregate_FF.tex`) switched from per-fund alpha -->
@@ -60,6 +68,7 @@ library(stringr)
 library(patchwork)
 library(knitr)
 library(kableExtra)
+library(digest)   # SHA-1 cache key (v1.3)
 
 # =============================================================================
 # 0. CONFIGURATION
@@ -80,6 +89,10 @@ N_CORES      <- max(1L, detectCores() - 1L)
 PCTS         <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 96, 97, 98, 99)
 GAMMA_GRID   <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5
+
+# Bootstrap cache (v1.3)
+USE_BOOT_CACHE <- TRUE   # set FALSE to force recomputation
+BOOT_CACHE_DIR <- "."    # must be writable; same dir as data files
 
 cat("=== FF SUBPERIOD REPLICATION ===\n")
 cat("Sample window:", format(DATE_MIN_FF), "to", format(DATE_MAX_FF), "\n")
@@ -289,18 +302,46 @@ one_boot_run <- function(run_id, bs_data, T_total, pcts_probs, min_obs, nw_lag) 
   quantile(t_sim[!is.na(t_sim)], probs = pcts_probs, na.rm = TRUE)
 }
 
-cl <- makeCluster(N_CORES)
-clusterExport(cl, c("bs_data", "T_total", "one_boot_run", "MIN_OBS_BS", "NW_LAG_FULL"),
-              envir = environment())
-clusterSetRNGStream(cl, BOOT_SEED)
-boot_t0 <- Sys.time()
-boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run,
-                          bs_data, T_total, PCTS / 100, MIN_OBS_BS, NW_LAG_FULL)
-stopCluster(cl)
-cat("  Bootstrap wall time:",
-    round(as.numeric(difftime(Sys.time(), boot_t0, units = "secs")), 1), "sec\n")
+# --- Cache validation (v1.3) ---
+cache_key  <- digest::digest(list(
+  bs_data    = bs_data,
+  T_total    = T_total,
+  B_RUNS     = B_RUNS,
+  MIN_OBS_BS = MIN_OBS_BS,
+  NW_LAG     = NW_LAG_FULL,
+  BOOT_SEED  = BOOT_SEED
+))
+cache_file <- file.path(BOOT_CACHE_DIR, "ff_comparison_bootstrap_cache.rds")
 
-sim_matrix <- do.call(rbind, boot_results)
+cached_ok <- FALSE
+if (USE_BOOT_CACHE && file.exists(cache_file)) {
+  cached <- tryCatch(readRDS(cache_file), error = function(e) NULL)
+  if (!is.null(cached) && identical(cached$key, cache_key)) {
+    cat("  [cache hit] Loading bootstrap sim_matrix from", cache_file, "\n")
+    sim_matrix <- cached$sim_matrix
+    cached_ok  <- TRUE
+  } else {
+    cat("  [cache miss] Key changed; recomputing bootstrap.\n")
+  }
+}
+
+if (!cached_ok) {
+  cl <- makeCluster(N_CORES)
+  clusterExport(cl, c("bs_data", "T_total", "one_boot_run", "MIN_OBS_BS", "NW_LAG_FULL"),
+                envir = environment())
+  clusterSetRNGStream(cl, BOOT_SEED)
+  boot_t0 <- Sys.time()
+  boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run,
+                            bs_data, T_total, PCTS / 100, MIN_OBS_BS, NW_LAG_FULL)
+  stopCluster(cl)
+  cat("  Bootstrap wall time:",
+      round(as.numeric(difftime(Sys.time(), boot_t0, units = "secs")), 1), "sec\n")
+  sim_matrix <- do.call(rbind, boot_results)
+  if (USE_BOOT_CACHE) {
+    saveRDS(list(key = cache_key, sim_matrix = sim_matrix), cache_file)
+    cat("  [cached] Saved to", cache_file, "\n")
+  }
+}
 actual_pct <- as.numeric(quantile(active_fp$alpha_t_nw, PCTS / 100))
 boot_summary <- data.frame(
   percentile       = PCTS,
@@ -500,14 +541,14 @@ rownames(t7_display) <- NULL
 unknown_tstat_row_FF <- 6L
 
 fn_t7 <- paste(
-  "Annualised \\\\citet{Carhart1997} four-factor alpha (\\\\%) from regressing",
+  "Annualised \\\\textcite{Carhart1997} four-factor alpha (\\\\%) from regressing",
   "the monthly aggregate portfolio return of each group on the market, size,",
-  "value, and momentum factors, following \\\\citet{FamaFrench2010}.",
+  "value, and momentum factors, following \\\\textcite{FamaFrench2010}.",
   "EW: equal-weighted portfolio (each fund alive in month $t$ contributes",
   "$1/N_t$). VW: value-weighted portfolio with lagged TNA weights",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
   "Net returns are computed as gross returns less one-twelfth of the static",
-  "annual expense ratio each month, following \\\\citet{BarrasScailletWermers2010}.",
+  "annual expense ratio each month, following \\\\textcite{BarrasScailletWermers2010}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
@@ -588,7 +629,6 @@ latex_boot <- boot_tab %>%
   kbl(format    = "latex",
       booktabs  = TRUE,
       escape    = FALSE,
-      row.names = FALSE,
       caption   = "Fama--French (2010) Bootstrap: Actual vs.\\ Simulated $t(\\hat{\\alpha})$ Percentiles -- FF Subperiod",
       label     = "bootstrap_tails_FF",
       col.names = c("Percentile", "Actual $t(\\hat{\\alpha})$",
@@ -601,16 +641,15 @@ latex_boot <- boot_tab %>%
            escape         = FALSE,
            threeparttable = TRUE)
 
-# Strip kableExtra's \addlinespace directives which are harmless styling but
-# can occasionally interact badly with booktabs across kableExtra versions.
-# Empty replacement (not "\n") so we don't leave a blank line inside tabular.
-boot_str <- gsub("\\\\addlinespace(\\[[^]]*\\])?[ \t]*\n?", "",
-                 as.character(latex_boot))
-
+# Replace with EMPTY string, not "\n": replacing with "\n" leaves a blank line
+# inside tabular, which triggers "Misplaced \noalign" in LaTeX. Same fix needed
+# for table10b below; latent bug in alpha_reporting.R lines 370 and 575.
+boot_str <- gsub("\\\\addlinespace[^\n]*\n", "", as.character(latex_boot))
 # resize=FALSE: wrapping threeparttable in \resizebox is a fragile combo on
 # TeX Live 2024+ (Overleaf default) -- the hbox-restricted mode breaks the
 # \noalign expansion in booktabs' \bottomrule. Table 9 has 5 narrow columns
-# and fits within \linewidth without resizing.
+# and fits within \linewidth without resizing. Latent bug in alpha_reporting.R
+# v7.5/7.6 line 371 -- same fix applied there.
 writeLines(clean_latex(boot_str, resize = FALSE, small = TRUE),
            "table_bootstrap_tails_FF.tex")
 cat("Written: table_bootstrap_tails_FF.tex\n")
@@ -671,12 +710,7 @@ latex_pi0 <- pi0_table %>%
            escape         = FALSE,
            threeparttable = TRUE)
 
-# Table C.3 (pi0 estimate): resize=FALSE so the table keeps its natural width
-# and kableExtra's default \centering at the \begin{table} level is respected.
-# With resize=TRUE a \resizebox{\linewidth}{!}{...} wrap forces the narrow
-# 5-column table to stretch to full text width, which visually reads as
-# left-aligned when the column_spec widths are already modest.
-writeLines(clean_latex(latex_pi0, resize = FALSE),
+writeLines(clean_latex(latex_pi0, resize = TRUE),
            "table_pi0_estimate_FF.tex")
 cat("Written: table_pi0_estimate_FF.tex\n")
 

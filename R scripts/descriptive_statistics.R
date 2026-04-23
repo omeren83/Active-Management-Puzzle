@@ -170,7 +170,7 @@ latex_t1 <- counts_raw %>%
       "Active and Passive classifications use the \\\\textit{Actively Managed}",
       "field from LSEG static data. Unknown funds are excluded from all",
       "regression analyses. The Incubation-Corrected panel removes the first",
-      "36 months of each fund's return history following \\\\citet{Evans2010}.",
+      "36 months of each fund's return history following \\\\textcite{Evans2010}.",
       "The Trimmed panel additionally restricts the sample to 1995--2023."
     ),
     general_title  = "",
@@ -253,17 +253,17 @@ build_t2 <- function(panel, panel_label) {
   # (ETF creation/redemption events, LSEG classification contamination) that
   # inflate the mean and SD without reflecting genuine active trading activity.
   fm <- fm %>% mutate(turnover_r = winsorise(turnover_r))
-  vars <- c("gross_ret", "net_ret", "sharpe_g", "log_tna",
-            "flow", "expense_r", "turnover_r", "n_months")
+  vars <- c("gross_ret", "net_ret", "log_tna",
+            "flow", "expense_r", "turnover_r", "n_months", "sharpe_g")
   var_labels <- c(
     "Gross Return (\\%, monthly)",
     "Net Return (\\%, monthly)",
-    "Gross Sharpe Ratio (annualised)",
     "Log TNA (USD millions)",
     "Proportional Flow (\\% of TNA, monthly)",
     "Expense Ratio (\\%)",
     "Turnover (\\%)",
-    "Months of Coverage"
+    "Months of Coverage",
+    "Gross Sharpe Ratio (annualised)"
   )
   groups <- c("Active", "Passive", "Full")
   
@@ -300,9 +300,9 @@ fn_t2_base <- paste(
   "least one valid observation.",
   "Expense Ratio and Turnover are point-in-time LSEG static values; Turnover is",
   "winsorised at the 1st/99th percentiles cross-sectionally.",
-  "Flow is the \\\\citet{SirriTufano1998} measure scaled by lagged TNA (\\\\%),",
+  "Flow is the \\\\textcite{SirriTufano1998} measure scaled by lagged TNA (\\\\%),",
   "winsorised at 1st/99th percentiles, with December excluded.",
-  "Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \\\\citet{BarrasScailletWermers2010}.",
+  "Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \\\\textcite{BarrasScailletWermers2010}.",
   "Returns and flows are in \\\\%.",
   "Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns,",
   "$\\\\sqrt{12}\\\\cdot\\\\overline{r^{g}_{i,t}-r^{f}_{t}}/\\\\sigma(r^{g}_{i,t}-r^{f}_{t})$,",
@@ -312,9 +312,9 @@ fn_t2_base <- paste(
 # Table 2 (Incubation-Corrected, MAIN TEXT): base + Evans note
 fn_t2_incub <- paste(
   fn_t2_base,
-  "\\\\citet{Evans2010} correction removes the first 36 months of each fund's history.",
+  "\\\\textcite{Evans2010} correction removes the first 36 months of each fund's history.",
   "Mean returns are higher than in the Master panel because the 36-month minimum",
-  "disproportionately eliminates short-lived, poorly performing funds \\\\citep{Evans2010}.",
+  "disproportionately eliminates short-lived, poorly performing funds \\\\parencite{Evans2010}.",
   "No date trimming applied; sample runs through February 2026."
 )
 
@@ -331,7 +331,7 @@ fn_t2_master <- paste(
 # Table A.2 (Trimmed 1995-2023): base + trimmed note
 fn_t2_trimmed <- paste(
   fn_t2_base,
-  "\\\\citet{Evans2010} 36-month incubation correction applied and sample restricted",
+  "\\\\textcite{Evans2010} 36-month incubation correction applied and sample restricted",
   "to 1995--2023. This is the panel used for panel-level regressions (H1--H4) where",
   "alignment with factor and sentiment series availability motivates the date cap."
 )

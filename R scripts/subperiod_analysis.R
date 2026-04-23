@@ -621,13 +621,13 @@ perf_packs <- data.frame(
 )
 
 fn_d2 <- paste(
-  "Annualised \\\\citet{Carhart1997} four-factor alpha (\\\\%) from portfolio",
+  "Annualised \\\\textcite{Carhart1997} four-factor alpha (\\\\%) from portfolio",
   "regressions of the monthly aggregate return of each group on the market,",
   "size, value, and momentum factors, estimated separately within each",
-  "sub-period, following \\\\citet{FamaFrench2010}.",
+  "sub-period, following \\\\textcite{FamaFrench2010}.",
   "EW: equal-weighted; VW: lagged-TNA-weighted",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
-  "Net = gross $-$ expense/12 \\\\citep{BarrasScailletWermers2010}.",
+  "Net = gross $-$ expense/12 \\\\parencite{BarrasScailletWermers2010}.",
   "Newey-West $t$-stats (6-month lag) in parentheses;",
   "$^{*}$, $^{**}$, $^{***}$: 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds; $T$: months in the regression.",
@@ -709,12 +709,12 @@ n_active_bs_vec <- sapply(results, function(r)
         !is.na(r$alpha_full$alpha_t_nw)))
 
 fn_d3 <- paste(
-  "Bootstrap procedure follows \\\\citet{FamaFrench2010}, applied separately",
+  "Bootstrap procedure follows \\\\textcite{FamaFrench2010}, applied separately",
   "within each sub-period. For each fund, estimated monthly alpha is subtracted",
   "from the excess return series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months (within the",
   "sub-period window) are resampled with replacement, preserving cross-sectional",
-  "factor return dependence. The \\\\citet{Carhart1997} four-factor model is",
+  "factor return dependence. The \\\\textcite{Carhart1997} four-factor model is",
   "re-estimated on each resampled series.",
   "\\\\textit{Actual} $t(\\\\hat{\\\\alpha})$: percentile of the empirical",
   "$t$-statistic distribution across active funds in the sub-period.",
@@ -791,9 +791,9 @@ rownames(pi0_data) <- NULL
 
 fn_d4 <- paste(
   "The proportion of true zero-alpha active funds ($\\\\hat{\\\\pi}_0$) estimated",
-  "separately within each sub-period, following \\\\citet{Storey2002} and",
-  "\\\\citet{BarrasScailletWermers2010}, using $p$-values from Newey-West",
-  "$t$-tests on sub-period \\\\citet{Carhart1997} four-factor alphas.",
+  "separately within each sub-period, following \\\\textcite{Storey2002} and",
+  "\\\\textcite{BarrasScailletWermers2010}, using $p$-values from Newey-West",
+  "$t$-tests on sub-period \\\\textcite{Carhart1997} four-factor alphas.",
   "The estimator is $\\\\hat{\\\\pi}_0 = |\\\\{p_i > \\\\lambda\\\\}| \\\\,/\\\\, [N(1-\\\\lambda)]$,",
   "where $\\\\lambda = 0.5$ is the standard tuning parameter.",
   "$N$: number of active funds with $\\\\geq 24$ monthly observations within the",
@@ -860,13 +860,13 @@ bsw_packs <- data.frame(
 )
 
 fn_d5 <- paste(
-  "\\\\citet{BarrasScailletWermers2010} four-way decomposition, estimated",
+  "\\\\textcite{BarrasScailletWermers2010} four-way decomposition, estimated",
   "separately within each sub-period.",
   "$S^-_\\\\gamma$ ($S^+_\\\\gamma$): fraction of active funds with significantly",
   "negative (positive) Newey-West $t(\\\\hat{\\\\alpha})$ at two-sided level $\\\\gamma$,",
-  "using sub-period \\\\citet{Carhart1997} alphas; critical values from $N(0,1)$.",
+  "using sub-period \\\\textcite{Carhart1997} alphas; critical values from $N(0,1)$.",
   "$F_\\\\gamma = \\\\hat{\\\\pi}_0 \\\\cdot \\\\gamma/2$: expected false discoveries per tail,",
-  "with $\\\\hat{\\\\pi}_0$ the sub-period \\\\citet{Storey2002} estimator at",
+  "with $\\\\hat{\\\\pi}_0$ the sub-period \\\\textcite{Storey2002} estimator at",
   "$\\\\lambda = 0.5$ (Table~\\\\ref{tab:subperiod_pi0_estimate}).",
   "$T^\\\\pm_\\\\gamma = S^\\\\pm_\\\\gamma - F_\\\\gamma$: genuinely unskilled ($-$) or skilled ($+$).",
   "Bolded row ($\\\\gamma = 0.20$) gives population-level",
@@ -967,7 +967,7 @@ d6_packs <- data.frame(
 
 fn_d6 <- paste(
   "Monthly EW and VW aggregate portfolio returns regressed on CAPM,",
-  "Fama-French three-factor, and \\\\citet{Carhart1997} four-factor models,",
+  "Fama-French three-factor, and \\\\textcite{Carhart1997} four-factor models,",
   "estimated separately within each sub-period.",
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",
   "Newey-West $t$-statistics (6-month lag) in parentheses.",

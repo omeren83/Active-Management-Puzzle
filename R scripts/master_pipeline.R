@@ -1,30 +1,42 @@
 # =============================================================================
-# MASTER PIPELINE ORCHESTRATOR                                             v1.0
+# MASTER PIPELINE ORCHESTRATOR                                             v1.1
 #
 # Runs the full dissertation analysis pipeline in the correct sequence.
 # Each phase can be toggled ON/OFF via the CONFIG section below.
 #
+# v1.1 changes vs v1.0:
+#   - Added Phase G (factor model robustness): alpha_estimation_robust.R +
+#     build_robust_tables.R for Appendix E (FF6 and Carhart+PSL specifications).
+#   - Added TABLES_OUT_DIR config variable and automatic post-pipeline sync
+#     step that copies all table_*.tex files from WORKING_DIR (Drive folder)
+#     to TABLES_OUT_DIR (GitHub repo / Overleaf sync folder). Eliminates the
+#     manual copy-paste step previously required between the two folders.
+#
 # USAGE:
-#   1. Set your WORKING_DIR below
-#   2. Toggle phases via the RUN_* flags
-#   3. source("master_pipeline.R") from RStudio, or click "Source" in editor
+#   1. Set WORKING_DIR and TABLES_OUT_DIR below (per machine).
+#   2. Toggle phases via the RUN_* flags.
+#   3. source("master_pipeline.R") from RStudio, or click "Source" in editor.
 #
 # EXECUTION SEQUENCE:
-#   Phase A  Data construction       (session-level, REQUIRED for most phases)
-#   Phase B  Core alpha estimation   (produces alpha_*.xlsx files)
-#   Phase C  Tables & reporting      (Table 5, Figure 2, descriptive tables)
-#   Phase D  FF(2010) benchmark      (independent replication track)
-#   Phase E  Sub-period analysis     (Bai-Perron + bootstrap with cache)
-#   Phase F  Sorts & persistence     (portfolio sorts, alpha persistence)
-#   Utility  Lipper category build   (standalone, independent)
+#   Phase A  Data construction           (session-level, REQUIRED for most)
+#   Phase B  Core alpha estimation       (produces alpha_*.xlsx files)
+#   Phase C  Tables & reporting          (Table 5, Figure 2, descriptive)
+#   Phase D  FF(2010) benchmark          (independent replication track)
+#   Phase E  Sub-period analysis         (Bai-Perron + bootstrap with cache)
+#   Phase F  Sorts & persistence         (portfolio sorts, alpha persistence)
+#   Phase G  Factor robustness (NEW)     (FF6 + Carhart+PSL for Appendix E)
+#   Utility  Lipper category build       (standalone, independent)
+#   SYNC     Copy .tex files -> GitHub   (automatic at end if TABLES_OUT_DIR set)
 #
 # DEPENDENCIES BETWEEN PHASES:
-#   Phase A -> required by B, C, D, E (subperiod), F
-#   Phase B -> required by C, E (structural break reads alpha_rolling.xlsx)
+#   Phase A -> required by B, C, D, E (subperiod), F, G
+#   Phase B -> required by C, E (structural break reads alpha_rolling.xlsx),
+#              G (build_robust_tables reads Carhart baseline xlsx)
 #   Phase D -> required by build_ff_tables_manual (reads FF xlsx outputs)
 #   Phase E -> structural_break_test MUST run before subperiod_analysis
+#   Phase G -> alpha_estimation_robust MUST run before build_robust_tables
 #
-# All scripts assumed to live in the WORKING_DIR alongside data files.
+# All scripts assumed to live in WORKING_DIR alongside data files.
 # =============================================================================
 
 
@@ -34,16 +46,26 @@
 
 # Working directory containing all .R scripts and input .xlsx files.
 # Use forward slashes on both Windows and Mac.
-WORKING_DIR <- "D:/TEZ/R scripts"      # PC
-# WORKING_DIR <- "~/Active-Management-Puzzle/R scripts"   # Mac
+WORKING_DIR <- "G:/Drive/TEZ-YENİ/data/R import"                     # PC Drive folder
+# WORKING_DIR <- "/Users/omersmba/Library/CloudStorage/GoogleDrive-omer.eren.2019@gmail.com/Drive'ım/TEZ-YENİ/data/R import"  # Mac Drive folder
+
+
+# Target directory for LaTeX table files (will be synced automatically from
+# WORKING_DIR after the pipeline finishes). Should be the tables/ subfolder
+# of the GitHub repo that syncs with Overleaf.
+# Set to NA to disable auto-sync (tables will stay in WORKING_DIR only).
+TABLES_OUT_DIR <- "D:/TEZ/tables"                      # PC GitHub repo
+# TABLES_OUT_DIR <- "~/Active-Management-Puzzle/tables"  # Mac GitHub clone
+# TABLES_OUT_DIR <- NA                                   # disable auto-sync
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE   # data_import + flow_calculation
-RUN_PHASE_B_ALPHA         <- TRUE   # alpha_estimation + aggregate_alphas
+RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
 RUN_PHASE_C_REPORTING     <- TRUE   # alpha_reporting + descriptive_statistics
 RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
 RUN_PHASE_E_SUBPERIODS    <- TRUE   # structural_break_test + subperiod_analysis
 RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
+RUN_PHASE_G_FACTOR_ROBUST <- FALSE  # alpha_estimation_robust + build_robust_tables
 RUN_UTILITY_LIPPER        <- FALSE  # build_lipper_category (rarely re-run)
 
 # Stop on first error (TRUE) or keep going and report failures at end (FALSE)
@@ -55,10 +77,22 @@ STOP_ON_ERROR <- TRUE
 # =============================================================================
 
 setwd(WORKING_DIR)
-cat("Working directory set to:", getwd(), "\n\n")
+cat("Working directory set to:", getwd(), "\n")
+if (!is.na(TABLES_OUT_DIR)) {
+  cat("Tables will be synced to:", TABLES_OUT_DIR, "\n")
+}
+cat("\n")
 
 # Tracks timing and status for each script run
 pipeline_log <- list()
+
+# Snapshot of .tex files BEFORE the pipeline runs, used by the sync step at
+# end to identify which .tex files are new / modified.
+tex_snapshot_before <- {
+  files <- list.files(WORKING_DIR, pattern = "^table_.*\\.tex$", full.names = FALSE)
+  mtimes <- file.info(file.path(WORKING_DIR, files))$mtime
+  setNames(mtimes, files)
+}
 
 # Helper: source a script with timing and error handling
 run_script <- function(script_name, phase_label) {
@@ -105,9 +139,6 @@ pipeline_start <- Sys.time()
 # =============================================================================
 # PHASE A - DATA CONSTRUCTION (session-level panels)
 # =============================================================================
-# Produces: panel_master, panel_incubation, panel_trimmed (in memory)
-# Required by Phases B, C, D, E (subperiod), F
-# =============================================================================
 if (RUN_PHASE_A_DATA) {
   run_script("data_import_and_cleaning.R", "Phase A")
   run_script("flow_calculation.R",         "Phase A")
@@ -116,12 +147,6 @@ if (RUN_PHASE_A_DATA) {
 
 # =============================================================================
 # PHASE B - CORE ALPHA ESTIMATION (Excel outputs)
-# =============================================================================
-# Inputs:  panel_incubation (session), panel_trimmed (session)
-# Outputs: alpha_fullperiod.xlsx, alpha_rolling.xlsx, rank_data.xlsx,
-#          aggregate_alphas.xlsx
-# Notes:   alpha_estimation.R is the heaviest step (parallel bootstrap).
-#          Uses panel_incubation per v2.6. Runtime highly dependent on cores.
 # =============================================================================
 if (RUN_PHASE_B_ALPHA) {
   require_session_object("panel_incubation", "alpha_estimation.R")
@@ -133,10 +158,6 @@ if (RUN_PHASE_B_ALPHA) {
 # =============================================================================
 # PHASE C - TABLES & REPORTING
 # =============================================================================
-# Inputs:  alpha_fullperiod.xlsx, alpha_rolling.xlsx, aggregate_alphas.xlsx
-#          panel_incubation, panel_trimmed (session)
-# Outputs: Table 5, Figure 2 (rolling), Table 8 (Lipper), descriptive tables
-# =============================================================================
 if (RUN_PHASE_C_REPORTING) {
   run_script("alpha_reporting.R",        "Phase C")
   run_script("descriptive_statistics.R", "Phase C")
@@ -145,12 +166,6 @@ if (RUN_PHASE_C_REPORTING) {
 
 # =============================================================================
 # PHASE D - FAMA-FRENCH (2010) BENCHMARK REPLICATION
-# =============================================================================
-# Independent track: runs its own alpha estimation on panel_trimmed,
-# produces portfolio-level alphas for the FF(2010)-style replication Tables
-# (C.1, B.1). Does NOT touch Phase B outputs.
-# Outputs: alpha_fullperiod_FF.xlsx, bootstrap_results_FF.xlsx,
-#          portfolio_alphas_FF.xlsx, Tables C.1 and B.1 .tex files
 # =============================================================================
 if (RUN_PHASE_D_FF_BENCHMARK) {
   require_session_object("panel_trimmed", "FF_comparison.R")
@@ -162,11 +177,6 @@ if (RUN_PHASE_D_FF_BENCHMARK) {
 # =============================================================================
 # PHASE E - SUB-PERIOD ANALYSIS
 # =============================================================================
-# structural_break_test.R reads alpha_rolling.xlsx (Phase B output) and
-# identifies Bai-Perron breaks. Its output SUBPERIODS must be consumed by
-# subperiod_analysis.R, which re-runs the FF(2010) bootstrap within each
-# sub-period using the SHA-1 cache (~30s on hit vs ~30min cold).
-# =============================================================================
 if (RUN_PHASE_E_SUBPERIODS) {
   require_session_object("panel_incubation", "subperiod_analysis.R")
   run_script("structural_break_test.R", "Phase E")
@@ -177,10 +187,6 @@ if (RUN_PHASE_E_SUBPERIODS) {
 # =============================================================================
 # PHASE F - PORTFOLIO SORTS & PERSISTENCE
 # =============================================================================
-# portfolio_sorts.R produces decile-sorted portfolio alphas (H2/H3 tests).
-# persistence_testing.R runs alpha persistence regressions (rolling decile
-# winners vs losers); heavy bootstrap, uses SHA-1 cache.
-# =============================================================================
 if (RUN_PHASE_F_SORTS_PERSIST) {
   require_session_object("panel_incubation", "portfolio_sorts.R / persistence_testing.R")
   run_script("portfolio_sorts.R",     "Phase F")
@@ -189,11 +195,48 @@ if (RUN_PHASE_F_SORTS_PERSIST) {
 
 
 # =============================================================================
-# UTILITY - LIPPER CATEGORY BUILDER (standalone)
+# PHASE G - FACTOR MODEL ROBUSTNESS  (Appendix E)
 # =============================================================================
-# Reads lipper.xlsx and builds lipper_category_output.xlsx.
-# Independent of all other phases; only re-run when the raw Lipper mapping
-# changes.
+# alpha_estimation_robust.R (v1.1) re-estimates full-period alphas, FF(2010)
+# bootstrap, and BSW decomposition under two alternative factor specifications:
+#   FF6 : MKT_RF + SMB + HML + RMW + CMA + MOM
+#   C5  : MKT_RF + SMB + HML + MOM + PSL (Pastor-Stambaugh traded liquidity)
+# Inputs:  panel_incubation (session); Carhart baseline xlsx files from Phase B
+#          (alpha_fullperiod.xlsx, bootstrap_results.xlsx).
+# Outputs: alpha_fullperiod_{FF6,C5}.xlsx, bootstrap_results_{FF6,C5}.xlsx,
+#          robust_alpha_summary.xlsx.  build_robust_tables.R then consumes
+#          these and writes three Appendix E .tex files directly to
+#          TABLES_OUT_DIR (bypassing the sync step below).
+# Runtime: ~60-90 minutes total (2 x bootstrap cost, ~30-45 min each spec).
+# Prerequisite: RMW, CMA, PSL rows must be present in the 'factors' sheet of
+# fund_data.xlsx before running Phase A in the same session.
+# =============================================================================
+if (RUN_PHASE_G_FACTOR_ROBUST) {
+  require_session_object("panel_incubation",
+                         "alpha_estimation_robust.R")
+  # Pre-flight: Carhart baseline xlsx files must exist (Phase B must have run).
+  baseline_ok <- file.exists("alpha_fullperiod.xlsx") &&
+    file.exists("bootstrap_results.xlsx")
+  if (!baseline_ok) {
+    msg <- paste("Phase G requires Carhart baseline xlsx files",
+                 "(alpha_fullperiod.xlsx, bootstrap_results.xlsx).",
+                 "Run Phase B first.")
+    if (STOP_ON_ERROR) stop(msg) else cat("WARNING:", msg, "\n")
+  } else {
+    run_script("alpha_estimation_robust.R", "Phase G")
+    # Direct the Appendix E tables straight to TABLES_OUT_DIR so they don't
+    # need to go through the sync step (which would be a no-op for them
+    # anyway, but cleaner to avoid the round-trip).
+    if (!is.na(TABLES_OUT_DIR)) {
+      OUT_DIR <- TABLES_OUT_DIR
+    }  # else OUT_DIR falls back to "./tables_robust" default in the script
+    run_script("build_robust_tables.R", "Phase G")
+  }
+}
+
+
+# =============================================================================
+# UTILITY - LIPPER CATEGORY BUILDER (standalone)
 # =============================================================================
 if (RUN_UTILITY_LIPPER) {
   run_script("build_lipper_category.R", "Utility")
@@ -201,10 +244,65 @@ if (RUN_UTILITY_LIPPER) {
 
 
 # =============================================================================
+# SYNC - COPY NEW / MODIFIED .tex FILES TO TABLES_OUT_DIR
+# =============================================================================
+# All main-text and FF appendix .tex files are written by individual scripts
+# to WORKING_DIR (the current R working directory). This step copies every
+# table_*.tex file that is new or has been modified during this pipeline run
+# to TABLES_OUT_DIR (the GitHub repo tables/ folder, which syncs to Overleaf).
+# Robustness tables from Phase G are excluded from this step because they
+# were written directly to TABLES_OUT_DIR.
+# =============================================================================
+if (!is.na(TABLES_OUT_DIR)) {
+  cat(sprintf("\n%s\n", strrep("=", 79)))
+  cat("SYNC  Copy table_*.tex files -> TABLES_OUT_DIR\n")
+  cat(sprintf("%s\n", strrep("=", 79)))
+  
+  # Ensure target exists.
+  if (!dir.exists(TABLES_OUT_DIR)) {
+    dir.create(TABLES_OUT_DIR, recursive = TRUE, showWarnings = FALSE)
+    cat("Created target directory:", TABLES_OUT_DIR, "\n")
+  }
+  
+  # Scan WORKING_DIR for table_*.tex files now.  Compare mtimes against the
+  # pre-pipeline snapshot to find those that were created or modified.
+  tex_now <- list.files(WORKING_DIR, pattern = "^table_.*\\.tex$",
+                        full.names = FALSE)
+  to_copy <- character(0)
+  for (f in tex_now) {
+    mt_now <- file.info(file.path(WORKING_DIR, f))$mtime
+    mt_before <- tex_snapshot_before[f]
+    if (is.na(mt_before) || mt_now > mt_before) {
+      to_copy <- c(to_copy, f)
+    }
+  }
+  
+  if (length(to_copy) == 0L) {
+    cat("No new or modified table_*.tex files to sync.\n")
+  } else {
+    cat(sprintf("Syncing %d file(s) to %s:\n", length(to_copy), TABLES_OUT_DIR))
+    sync_results <- vapply(to_copy, function(f) {
+      src <- file.path(WORKING_DIR, f)
+      dst <- file.path(TABLES_OUT_DIR, f)
+      ok  <- file.copy(src, dst, overwrite = TRUE, copy.date = TRUE)
+      cat(sprintf("  %s  %s\n", if (ok) "OK" else "FAIL", f))
+      ok
+    }, logical(1))
+    n_ok <- sum(sync_results)
+    cat(sprintf("Sync complete: %d/%d file(s) copied.\n",
+                n_ok, length(sync_results)))
+  }
+} else {
+  cat("\nSYNC disabled (TABLES_OUT_DIR is NA). Copy tables manually if needed.\n")
+}
+
+
+# =============================================================================
 # PIPELINE SUMMARY
 # =============================================================================
 pipeline_end <- Sys.time()
-total_mins <- round(as.numeric(difftime(pipeline_end, pipeline_start, units = "mins")), 1)
+total_mins <- round(as.numeric(difftime(pipeline_end, pipeline_start,
+                                        units = "mins")), 1)
 
 cat(sprintf("\n\n%s\n", strrep("=", 79)))
 cat("PIPELINE SUMMARY\n")
@@ -224,7 +322,8 @@ if (length(pipeline_log) > 0) {
   
   n_failed <- sum(log_df$status == "FAILED")
   if (n_failed > 0) {
-    cat(sprintf("\nWARNING: %d script(s) failed. Review errors above.\n", n_failed))
+    cat(sprintf("\nWARNING: %d script(s) failed. Review errors above.\n",
+                n_failed))
   } else {
     cat("\nAll scripts completed successfully.\n")
   }
