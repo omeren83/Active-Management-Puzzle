@@ -1,24 +1,45 @@
 # =============================================================================
-# SUB-PERIOD ANALYSIS                                                      v1.3
+# SUB-PERIOD ANALYSIS                                                      v1.4
+#
+# v1.4 changes vs v1.3:
+#   (1) Footnote correction (Tables D.2--D.6): the hardcoded sample label
+#       "Sample: Trimmed (1995--2023) Evans-corrected panel." has been replaced
+#       with "Sample: Incubation-corrected panel (Evans 2010); no date cap." in
+#       all five Appendix D tables. The old Trimmed label was a legacy string
+#       from v1.2; it became factually inconsistent after the v1.3 panel switch
+#       to panel_incubation (Dec 1994 -- Feb 2026) and became visibly
+#       inconsistent after commit 418d8c5 extended P3 to Jan 2026, because the
+#       Panel C header then read "Dec 2011--Jan 2026, 170 months" next to a
+#       footnote claiming "1995--2023". Five strings replaced; no other
+#       behavior change; the label now matches the convention already in use
+#       in portfolio_sorts.R for Tables 11--13.
+#   (2) P3 endpoint extended from 2023-12-31 to 2026-01-31 in SUBPERIODS (this
+#       change was first landed in commit 418d8c5; retained here so the file
+#       remains internally consistent with the committed state).
+#   (3) Initial-release docstring P3 entry updated: "145 months" --> "170
+#       months". Cosmetic; tables rebuilt automatically from SUBPERIODS.
 #
 # v1.3 change vs v1.2:
 #   Panel source switched from panel_trimmed to panel_incubation (see
 #   alpha_estimation.R v2.6 for rationale). Extends coverage through February
 #   2026 instead of capping at 2023.
 #
-#   >>> ACTION REQUIRED <<<
-#   The SUBPERIODS list below (P1/P2/P3 date thresholds Jan 2006, Nov 2011) was
-#   selected from the Bai-Perron break test on the rolling alpha series built
-#   from panel_trimmed. Before re-running subperiod_analysis.R under the new
-#   panel, you must:
-#     (1) Re-run alpha_estimation.R under v2.6 (produces new alpha_rolling.xlsx
-#         from panel_incubation);
-#     (2) Re-run structural_break_test.R on the new alpha_rolling.xlsx
-#         (produces new break dates and 95% HAC CIs);
-#     (3) Update SUBPERIODS below to reflect the revised break dates.
-#   Running with stale SUBPERIODS on the new alpha series produces sub-period
-#   decompositions that are internally consistent in arithmetic but do not
-#   correspond to the structurally identified regimes.
+#   >>> STATUS: v1.3 ACTION ITEMS ALL COMPLETE (as of commit 418d8c5) <<<
+#   The three prerequisite actions flagged in v1.3 for re-running this script
+#   on the new panel have all been performed:
+#     (1) alpha_estimation.R v2.6+ produces alpha_rolling.xlsx from
+#         panel_incubation  -- DONE.
+#     (2) structural_break_test.R has been re-run on the new alpha_rolling.xlsx
+#         and results are published in Table D.1. The adopted three-regime
+#         thresholds Dec 2005 and Nov 2011 are robust to the panel switch
+#         (both breaks retained under Bai-Perron on the extended series,
+#         within HAC confidence intervals of the original estimates). The
+#         SUBPERIODS P1/P2 boundaries are therefore kept; the P3 upper bound
+#         has been extended to 2026-01-31 per (3) -- DONE.
+#     (3) SUBPERIODS$P3$date_hi updated to 2026-01-31 to align with
+#         panel_incubation's Feb 2026 endpoint -- DONE.
+#   The block below is retained as a historical record of the panel switch
+#   rationale.
 #
 # v1.2 change vs v1.1:
 #   Added bootstrap caching layer to avoid re-running the 3x10,000-iteration
@@ -52,7 +73,7 @@
 # Sub-periods (per subperiod_methodology.docx, Section 6.1):
 #   P1: Jan 1995 - Jan 2006   (132 months, volatile dot-com era)
 #   P2: Feb 2006 - Nov 2011   ( 70 months, positive-alpha era)
-#   P3: Dec 2011 - Dec 2023   (145 months, structural compression era)
+#   P3: Dec 2011 - Jan 2026   (170 months, structural compression era)
 #
 # Outputs (five LaTeX files, one per parallel):
 #   table_subperiod_perf_aggregate.tex    parallels Table 5
@@ -633,7 +654,7 @@ fn_d2 <- paste(
   "$^{*}$, $^{**}$, $^{***}$: 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds; $T$: months in the regression.",
   "Sub-period thresholds (Jan 2006, Nov 2011) from Bai-Perron test (Section D.1).",
-  "Sample: Trimmed (1995--2023) Evans-corrected panel."
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
 )
 
 latex_d2 <- perf_data %>%
@@ -727,7 +748,7 @@ fn_d3 <- paste(
   paste0("Active fund counts: P1 $N = ", n_active_bs_vec[1],
          "$; P2 $N = ", n_active_bs_vec[2],
          "$; P3 $N = ", n_active_bs_vec[3], "$."),
-  "Sample: Trimmed (1995--2023) Evans-corrected panel."
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
 )
 
 latex_d3 <- boot_data %>%
@@ -799,7 +820,7 @@ fn_d4 <- paste(
   "where $\\\\lambda = 0.5$ is the standard tuning parameter.",
   "$N$: number of active funds with $\\\\geq 24$ monthly observations within the",
   "sub-period. Passive and Unknown-classified funds are excluded.",
-  "Sample: Trimmed (1995--2023) Evans-corrected panel.",
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
   "implied by these estimates is reported in",
   "Table~\\\\ref{tab:subperiod_bsw_decomposition}."
@@ -874,7 +895,7 @@ fn_d5 <- paste(
   "$\\\\hat{\\\\pi}^-_A$, $\\\\hat{\\\\pi}^+_A$. Negative $T^+_\\\\gamma$ means right-tail",
   "significance does not exceed the false-discovery rate.",
   "Percentages of the sub-period active-fund universe.",
-  "Sample: Trimmed (1995--2023) Evans-corrected panel."
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
 )
 
 latex_d5 <- bsw_data %>%
@@ -973,7 +994,7 @@ fn_d6 <- paste(
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",
   "Newey-West $t$-statistics (6-month lag) in parentheses.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\% respectively.",
-  "Sample: Trimmed (1995--2023) Evans-corrected panel."
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
 )
 
 latex_d6 <- d6_data %>%

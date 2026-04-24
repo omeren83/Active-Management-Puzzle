@@ -1,5 +1,23 @@
 # =============================================================================
-# PERFORMANCE REPORTING: TABLES 5-10b AND FIGURES 2-3 (v8.0)
+# PERFORMANCE REPORTING: TABLES 5-10b AND FIGURES 2-3 (v8.1)
+#
+# v8.1 changes vs v8.0:
+#   Footnote correction across Tables 5, 6, 7, 8 and Figures 2, 3: the
+#   hardcoded sample label "Trimmed (1995--2023) Evans-corrected panel"
+#   has been replaced with "Incubation-corrected panel (Evans 2010); no date
+#   cap" (and syntactic variants thereof where the original was mid-sentence).
+#   The Trimmed label was a legacy string from v7.x that was not updated when
+#   aggregate_alphas.R switched its input panel from panel_trimmed to
+#   panel_incubation; the resulting tables have been computed on
+#   panel_incubation all along (hence T = 373 monthly observations in Table 5,
+#   which requires data through Feb 2026 and is impossible from the Trimmed
+#   1995-2023 panel), but carried a footnote that misdescribed the sample.
+#   Seven strings replaced across lines 302 (Table 5), 395 (Table 8 Lipper),
+#   456 (Figure 2 caption), 505 (Table 6 fn_t9), 607 (Table 7), 708 (Table 8
+#   BSW), and 818 (Figure 3 PDF/CDF caption). No behavioral change; no
+#   recomputation needed beyond a Phase C re-run to regenerate the .tex
+#   files. The label now matches the convention already in use in
+#   portfolio_sorts.R for Tables 11-13.
 #
 # v8.0 changes vs v7.8:
 #   Tables 7, 8, and Figure 2 switched from per-fund-alpha --> cross-sectional
@@ -299,7 +317,7 @@ fn_t7 <- paste(
   "$N$: unique funds contributing to the portfolio series;",
   "$T$: number of monthly observations in the regression.",
   "The Active + Passive row aggregates only the two classified groups.",
-  "Sample: Trimmed (1995--2023) Evans-corrected panel."
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
 )
 
 latex_t7 <- t7_display %>%
@@ -392,7 +410,7 @@ fn_t8 <- paste(
   "net returns because the static annual expense ratio used to derive net",
   "returns introduces a class-specific approximation error that would",
   "contaminate the style-class breakdown.",
-  "Sample: Trimmed (1995--2023) Evans-corrected panel."
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
 )
 
 latex_t8 <- t8_display %>%
@@ -453,7 +471,7 @@ p_alpha <- ggplot(alpha_ts, aes(x = date, y = alpha_ann, color = ap_group)) +
     y        = "Annualized Alpha (%)",
     x        = NULL,
     caption  = str_wrap(paste(
-      "Source: LSEG Workspace. Sample: Trimmed (1995-2023) Evans-corrected panel;",
+      "Source: LSEG Workspace. Sample: Incubation-corrected panel (Evans 2010), no date cap;",
       "Unknown-classified funds excluded.",
       "Each month t, the aggregate gross return of each group is computed as the",
       "equal-weighted average of all funds alive in month t. This portfolio return",
@@ -502,7 +520,7 @@ boot_tab <- boot_summary %>%
 # i.e. \\\\X in R source. Plain text, $...$, and {,} are unaffected.
 fn_t9 <- paste(
   "Bootstrap procedure follows \\\\textcite{FamaFrench2010}.",
-  "Sample: actively managed funds, Trimmed (1995--2023) Evans-corrected panel,",
+  "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap),",
   paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
   "For each fund, estimated monthly alpha is subtracted from the excess return",
   "series to construct a zero-alpha null return.",
@@ -604,7 +622,7 @@ fn_t10 <- paste(
   "the density of p-values in $(\\\\lambda, 1]$ provides a conservative estimate",
   "of the zero-alpha proportion, bounded above at 1.",
   paste0("Sample: actively managed funds ($N = ", total_n, "$),"),
-  "Trimmed (1995--2023) Evans-corrected panel.",
+  "Incubation-corrected (Evans 2010) panel, no date cap.",
   "Passive and Unknown-classified funds are excluded.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
   "implied by this estimate is reported in Table~\\\\ref{tab:bsw_decomposition}."
@@ -705,7 +723,7 @@ fn_t10b <- paste(
   "when truly skilled funds exist, so $T^+_\\\\gamma$ values are lower bounds.",
   "All quantities are percentages of the active-fund universe.",
   paste0("Sample: $N = ", total_n, "$ actively managed funds,"),
-  "Trimmed (1995--2023) Evans-corrected panel; Passive and Unknown funds excluded."
+  "Incubation-corrected (Evans 2010) panel, no date cap; Passive and Unknown funds excluded."
 )
 
 BSW_BOLD_ROW <- 4L   # gamma = 0.20 is the 4th row of the grid
@@ -815,7 +833,7 @@ combined_plot <- (p_cdf / p_pdf) +
       "normality; the bootstrap null in Panel A is the inferentially appropriate comparison ",
       "and accounts for cross-sectional dependence, fat tails, and finite-sample estimation ",
       "error. Percentile-level bootstrap comparisons are reported in Table 9. ",
-      "Sample: actively managed funds, Trimmed (1995\u20132023) Evans-corrected panel ",
+      "Sample: actively managed funds in the Incubation-corrected (Evans 2010) panel ",
       "(N = ", n_active_bs, " funds with \u226524 monthly observations)."
     )
   )
