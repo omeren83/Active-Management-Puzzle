@@ -149,10 +149,18 @@ longtable_note <- function(s, note, n_cols) {
            paste0(parts[-1], collapse = "\\end{longtable}") else "")
 }
 
-# Wrap a longtable in footnotesize + tighter tabcolsep.
+# Wrap a longtable in footnotesize + tighter tabcolsep for compact body text.
+# \captionsetup{font=normalsize} is injected BEFORE \begin{longtable} inside
+# the {\footnotesize} group so that the \caption{} command (which is inside
+# the longtable body) inherits normalsize (12 pt) rather than footnotesize.
+# Without this override the global captionsetup[table]{font=normalsize} is
+# defeated by the enclosing {\footnotesize} scope — visible as a 9 pt caption
+# in the compiled PDF. This fix is self-contained: no manual post-edit needed.
 wrap_lt_small <- function(s, tabcolsep = "3pt") {
-  opener <- paste0("{\\setlength{\\tabcolsep}{", tabcolsep,
-                   "}\\footnotesize\n\\begin{longtable}")
+  opener <- paste0(
+    "{\\setlength{\\tabcolsep}{", tabcolsep, "}\\footnotesize\n",
+    "\\captionsetup{font=normalsize}\\begin{longtable}"   # ← caption override
+  )
   parts_open <- strsplit(s, "\\begin{longtable}", fixed = TRUE)[[1]]
   s <- paste0(parts_open[1], opener,
               if (length(parts_open) > 1) parts_open[2] else "")
@@ -509,24 +517,28 @@ fn_d1 <- paste(
   "(Momentum; \\citealt{JegadeeshTitman1993}), and static annual Expense Ratio (Fee).",
   "EW: equal-weighted; VW: lagged-TNA-weighted. Returns in monthly \\%.",
   "EW Sharpe is the annualised Sharpe ratio of the quintile portfolio's",
-  "equal-weighted \\\\textit{gross} excess return,",
-  "$\\\\sqrt{12}\\\\cdot\\\\overline{r^{EW,g}_{q,t}-r^{f}_{t}}/\\\\sigma(r^{EW,g}_{q,t}-r^{f}_{t})$.",
+  # Single \\ in the R string → single \ in the .tex file → correct LaTeX command.
+  # Previously \\\\textit produced \\textit in the file, which LaTeX reads as
+  # a line-break (\\) followed by literal text "textit{...}" — visible artefact.
+  "equal-weighted \\textit{gross} excess return,",
+  "$\\sqrt{12}\\cdot\\overline{r^{EW,g}_{q,t}-r^{f}_{t}}/\\sigma(r^{EW,g}_{q,t}-r^{f}_{t})$.",
   "Incubation-corrected panel (Evans 2010); no date cap."
 )
 
 lt_d1 <- d1_data %>%
   select(-panel_label) %>%
   kbl(
-    format    = "latex",
-    booktabs  = TRUE,
-    linesep   = "",
-    escape    = FALSE,
-    longtable = TRUE,
-    caption   = "Portfolio Characteristics by Sort Variable and Quintile",
-    label     = "port_characteristics",
-    col.names = c("$Q$", "$N_{\\text{avg}}$", "TNA", "ER", "Turn.",
-                  "EW Gross", "VW Gross", "EW Sharpe"),
-    align     = c("l", "r", "r", "r", "r", "r", "r", "r")
+    format     = "latex",
+    booktabs   = TRUE,
+    linesep    = "",
+    escape     = FALSE,
+    longtable  = TRUE,
+    row.names  = FALSE,          # prevent bind_rows() row-key leakage
+    caption    = "Portfolio Characteristics by Sort Variable and Quintile",
+    label      = "port_characteristics",
+    col.names  = c("$Q$", "$N_{\\text{avg}}$", "TNA", "ER", "Turn.",
+                   "EW Gross", "VW Gross", "EW Sharpe"),
+    align      = c("l", "r", "r", "r", "r", "r", "r", "r")
   ) %>%
   kable_styling(latex_options = c("hold_position", "repeat_header"))
 
