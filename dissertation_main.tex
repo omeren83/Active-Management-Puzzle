@@ -67,7 +67,8 @@
 %   table_activeness_chars.tex               → Table 14
 %   table_activeness_alpha_r2.tex            → Table 15
 %   table_activeness_alpha_te.tex            → Table 16
-%   table_persistence.tex                    → Table 17
+%   table_activeness_monotonicity.tex        → Table 17
+%   table_persistence.tex                    → Table 18
 %   table_desc_stats_master.tex              → Table A.1
 %   table_desc_stats_trimmed.tex             → Table A.2
 %   table_perf_aggregate_FF.tex              → Table C.1
@@ -305,7 +306,7 @@
 \usepackage{eso-pic}
 \usepackage{rotating}
 
-% Landscape page-number rotation (for Table 17 persistence, which is wide).
+% Landscape page-number rotation (for Table 18 persistence, which is wide).
 \newif\iflscapenum
 \lscapenumfalse
 \AddToShipoutPictureFG{%
@@ -1184,6 +1185,33 @@ distinct from generic benchmark deviation---possibly factor-tilting
 unrelated to security selection, per \citet{CremersPetajisto2009}'s
 critique of TE as conflating factor exposure with security selection.]
 
+\noindent A statistically significant Q5$-$Q1 spread does not by itself
+imply that the alpha gradient is monotonically increasing or decreasing
+across all five quintiles---the pattern could be U-shaped or non-monotone
+with the endpoints dominating. Following the convention in
+\textcite{CremersPetajisto2009}, \textcite{AmihudGoyenko2013}, and
+\textcite{BerkVanBinsbergen2015}, Table~\ref{tab:activeness_monotonicity}
+reports the \textcite{PattonTimmermann2010} monotonic relation (MR)
+bootstrap test for both activeness measures and all four panel
+combinations. The test bootstraps the joint distribution of the four
+inter-quintile differences
+$\Delta_q = \alpha_q - \alpha_{q-1}$ for $q = 2, \ldots, 5$ under the
+least-favorable null configuration (each quintile's excess return series
+recentered by subtracting its full-sample Carhart alpha, imposing
+$\alpha_q = 0$ for all $q$), and tests whether the gradient is monotone
+in either direction.
+
+\input{tables/table_activeness_monotonicity}
+
+\noindent [Continuation paragraph discussing Table 17. Headline statistic
+is $p_{\downarrow}$ for the EW Net and VW Net panels: a small p-value
+indicates the alpha gradient is monotonically decreasing across the
+activeness quintiles, not merely a Q5$-$Q1 endpoint difference. Tie back
+to the \textcite{BerkGreen2004} prediction (no monotone gradient under
+competitive equilibrium) and the \textcite{AmihudGoyenko2013} prediction
+(positive gradient if idiosyncratic variation is informationally
+productive).]
+
 \section{Performance persistence}
 \label{sec:persistence}
 
@@ -1193,7 +1221,7 @@ Carhart alphas. Decile 10 (losers) shows significant persistence of
 underperformance; Decile 1 (winners) shows no statistically significant
 alpha. Consistent with Carhart (1997): persistence is in the left tail.]
 
-% Table 17 is landscape-oriented because of its wide factor-loading columns.
+% Table 18 is landscape-oriented because of its wide factor-loading columns.
 \begin{landscape}
 \lscapenumtrue
 \pagestyle{lscapeblank}%
@@ -1202,7 +1230,7 @@ alpha. Consistent with Carhart (1997): persistence is in the left tail.]
 \lscapenumfalse
 \pagestyle{plain}%
 
-\noindent [Continuation paragraph discussing Table 17.]
+\noindent [Continuation paragraph discussing Table 18.]
 
 \section{Sub-period analysis}
 \label{sec:subperiod}

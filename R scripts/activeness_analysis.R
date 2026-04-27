@@ -1,5 +1,23 @@
 # =============================================================================
-# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.0
+# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.1
+#
+# v1.1 changes vs v1.0:
+#   Adds Patton & Timmermann (2010, JFE) monotonic relation (MR) bootstrap test
+#   for both activeness measures, applied to all four panel combinations
+#   (Active EW Gross / VW Gross / EW Net / VW Net). Rationale: a significant
+#   Q5-Q1 spread does not by itself imply the alpha gradient is monotonically
+#   increasing or decreasing across all five quintiles -- the pattern could be
+#   U-shaped or non-monotone with the endpoints dominating. The MR test
+#   bootstraps the joint distribution of inter-quintile differences under the
+#   least-favorable null (all alphas equal) and tests whether the gradient is
+#   monotone in either direction. Cremers & Petajisto (2009, RFS), Amihud &
+#   Goyenko (2013, RFS), and Berk & van Binsbergen (2015, JFE) all report MR
+#   test results, so this addition aligns activeness_analysis.R with the canon.
+#   New output: table_activeness_monotonicity.tex (8 rows: 2 measures x 4 panels)
+#   and a new 'monotonicity' sheet in activeness_alphas.xlsx. Runtime addition
+#   ~30-60 seconds for B = 1000 bootstrap iterations across the 8 cells.
+#
+# v1.0 (original):
 #
 # Companion to portfolio_sorts.R. Tests whether the degree of activeness within
 # the actively managed universe is rewarded in the cross-section of factor-
@@ -36,6 +54,8 @@
 #   table_activeness_chars.tex        Characteristics by activeness quintile.
 #   table_activeness_alpha_r2.tex     Alpha by 1-R^2 quintile (4 panels).
 #   table_activeness_alpha_te.tex     Alpha by Tracking Error quintile (4 panels).
+#   table_activeness_monotonicity.tex Patton-Timmermann MR test results (1 table,
+#                                     8 rows = 2 measures x 4 panel combinations).
 #
 # Dependencies: dplyr, tidyr, readxl, writexl, lubridate, knitr, kableExtra,
 #               stringr, zoo
@@ -58,6 +78,10 @@ N_QUINT       <- 5L
 NW_LAG        <- 6L
 MIN_OBS       <- 24L     # min monthly obs for a Carhart regression
 MIN_OBS_ACT   <- 24L     # min monthly obs to assign a fund an activeness value
+
+# Patton-Timmermann (2010) MR test bootstrap settings
+MR_B          <- 1000L   # number of bootstrap iterations per panel
+MR_SEED       <- 42L     # reproducibility
 
 FILE          <- "fund_data.xlsx"
 ROLLING_FILE  <- "alpha_rolling.xlsx"
@@ -236,6 +260,131 @@ run_models <- function(ret_col, port_df, factors_df, subtract_rf = TRUE) {
     b_hml = f4$beta[4],  t_hml = f4$beta[4] / s4[4],
     b_mom = f4$beta[5],  t_mom = f4$beta[5] / s4[5],
     adj_r2 = 1 - (1 - f4$r2) * (n - 1) / (n - 5)
+  )
+}
+
+# Patton & Timmermann (2010, JFE) monotonic relation (MR) bootstrap test.
+# 
+# Tests whether the Carhart alphas are monotonic across the five quintiles.
+# Two one-sided tests (computed jointly):
+#   - p_up:  H_1 is "alphas increasing"  (alpha_q > alpha_{q-1} for all q)
+#            Test stat J_up = min_q (alpha_q - alpha_{q-1}); reject for large J_up
+#   - p_dn:  H_1 is "alphas decreasing"  (alpha_q < alpha_{q-1} for all q)
+#            Test stat J_dn = min_q (alpha_{q-1} - alpha_q); reject for large J_dn
+#
+# Bootstrap procedure follows Patton & Timmermann (2010), Section 3:
+#   1. Estimate Carhart alpha_q from each quintile's full-sample regression.
+#   2. Recenter excess returns: r_q,t* = r_q,t - alpha_q. This imposes the
+#      least-favorable null where every quintile has alpha = 0 (a single
+#      point in the "all alphas equal" null space).
+#   3. Resample calendar months with replacement, preserving cross-sectional
+#      factor dependence. In each iteration re-estimate Carhart alphas
+#      from the recentered, resampled data, recompute J_up^bs and J_dn^bs.
+#   4. p-values:  p_up = mean(J_up^bs >= J_up_obs)
+#                 p_dn = mean(J_dn^bs >= J_dn_obs)
+#
+# Returns a one-row data.frame summarising the test for the given panel.
+# Set subtract_rf = TRUE for the alpha test (standard).
+mr_test <- function(port_df, factors_df, ret_col, B = MR_B, seed = MR_SEED,
+                    subtract_rf = TRUE) {
+  qs <- 1:N_QUINT
+  
+  na_out <- data.frame(
+    n_months  = NA_integer_,
+    alpha_q1  = NA_real_, alpha_q5 = NA_real_,
+    spread    = NA_real_,
+    J_up      = NA_real_, p_up = NA_real_,
+    J_dn      = NA_real_, p_dn = NA_real_,
+    p_min     = NA_real_, B = B
+  )
+  
+  # 1. Per-quintile excess return series + full-sample Carhart alphas.
+  q_excess <- list()  # date -> excess return per quintile
+  alphas   <- numeric(N_QUINT)
+  for (q in qs) {
+    d <- port_df %>%
+      filter(quintile == q) %>%
+      select(date, ret = all_of(ret_col)) %>%
+      left_join(factors_df, by = "date") %>%
+      filter(!is.na(ret), !is.na(MKT_RF), !is.na(RF)) %>%
+      mutate(excess = if (subtract_rf) ret - RF else ret)
+    if (nrow(d) < MIN_OBS) return(na_out)
+    
+    y <- d$excess
+    X <- cbind(1, d$MKT_RF, d$SMB, d$HML, d$MOM)
+    fit <- fast_ols(y, X)
+    if (is.null(fit)) return(na_out)
+    alphas[q] <- fit$beta[1]
+    
+    q_excess[[q]] <- d %>% select(date, excess)
+  }
+  
+  # 2. Align all five quintiles on common dates and recenter excess returns
+  #    by subtracting alpha_q (imposes alpha = 0 LFC for the null).
+  common_dates <- Reduce(intersect, lapply(q_excess, function(x) as.character(x$date)))
+  common_dates <- as.Date(common_dates)
+  if (length(common_dates) < MIN_OBS) return(na_out)
+  
+  fac <- factors_df %>%
+    filter(date %in% common_dates) %>%
+    arrange(date) %>%
+    select(date, MKT_RF, SMB, HML, MOM, RF)
+  
+  ex_mat <- matrix(NA_real_, nrow = nrow(fac), ncol = N_QUINT)  # rows = dates, cols = quintiles
+  for (q in qs) {
+    qd <- q_excess[[q]] %>% filter(date %in% common_dates) %>% arrange(date)
+    ex_mat[, q] <- qd$excess - alphas[q]   # recentered to alpha = 0
+  }
+  
+  T <- nrow(fac)
+  X_full <- cbind(1, fac$MKT_RF, fac$SMB, fac$HML, fac$MOM)
+  
+  # 3. Observed test statistics (annualised, % units for table display).
+  diffs_obs <- diff(alphas) * 12 * 100  # alpha_2-alpha_1, ..., alpha_5-alpha_4
+  J_up_obs  <- min(diffs_obs)
+  J_dn_obs  <- min(-diffs_obs)
+  
+  # 4. Bootstrap loop. Inline OLS for speed (avoids fast_ols overhead).
+  set.seed(seed)
+  J_up_bs <- numeric(B)
+  J_dn_bs <- numeric(B)
+  for (b in seq_len(B)) {
+    idx     <- sample.int(T, size = T, replace = TRUE)
+    X_bs    <- X_full[idx, , drop = FALSE]
+    XtX_inv <- tryCatch(solve(crossprod(X_bs)), error = function(e) NULL)
+    if (is.null(XtX_inv)) {
+      J_up_bs[b] <- NA_real_; J_dn_bs[b] <- NA_real_; next
+    }
+    a_bs <- numeric(N_QUINT)
+    fail <- FALSE
+    for (q in qs) {
+      y_bs   <- ex_mat[idx, q]
+      beta_q <- XtX_inv %*% crossprod(X_bs, y_bs)
+      if (any(is.na(beta_q))) { fail <- TRUE; break }
+      a_bs[q] <- beta_q[1]
+    }
+    if (fail) {
+      J_up_bs[b] <- NA_real_; J_dn_bs[b] <- NA_real_; next
+    }
+    d_bs       <- diff(a_bs) * 12 * 100
+    J_up_bs[b] <- min(d_bs)
+    J_dn_bs[b] <- min(-d_bs)
+  }
+  
+  p_up <- mean(J_up_bs >= J_up_obs, na.rm = TRUE)
+  p_dn <- mean(J_dn_bs >= J_dn_obs, na.rm = TRUE)
+  
+  data.frame(
+    n_months = T,
+    alpha_q1 = alphas[1] * 12 * 100,
+    alpha_q5 = alphas[N_QUINT] * 12 * 100,
+    spread   = (alphas[N_QUINT] - alphas[1]) * 12 * 100,
+    J_up     = J_up_obs,
+    p_up     = p_up,
+    J_dn     = J_dn_obs,
+    p_dn     = p_dn,
+    p_min    = pmin(p_up, p_dn),
+    B        = B
   )
 }
 
@@ -472,6 +621,42 @@ alpha_r2 <- regress_active(port_r2, "Activeness_R2")
 alpha_te <- regress_active(port_te, "Activeness_TE")
 
 # =============================================================================
+# 7.5. PATTON-TIMMERMANN (2010) MONOTONIC RELATION TEST
+#
+# For each (sort_type x weighting x return_type) combination, run mr_test()
+# on the corresponding monthly portfolio return series. Uses subtract_rf=TRUE
+# throughout (testing alpha, not raw return spreads). B = MR_B iterations
+# bootstrap calendar months with replacement under the LFC null
+# (all alphas equal, recentered to zero).
+# =============================================================================
+cat("=== 7.5. Patton-Timmermann monotonicity tests (B =",
+    MR_B, ") ===\n")
+
+run_mr_panels <- function(port_df, sort_name) {
+  out <- list()
+  for (wt in c("EW", "VW")) {
+    for (gn in c("gross", "net")) {
+      rcol <- paste0("ret_", tolower(wt), "_", gn)
+      r    <- mr_test(port_df, factors_ts, rcol)
+      out[[paste(wt, gn)]] <- r %>%
+        mutate(sort_type   = sort_name,
+               weighting   = wt,
+               return_type = gn) %>%
+        select(sort_type, weighting, return_type, everything())
+    }
+  }
+  bind_rows(out)
+}
+
+mr_t0 <- Sys.time()
+mr_r2 <- run_mr_panels(port_r2, "Activeness_R2")
+mr_te <- run_mr_panels(port_te, "Activeness_TE")
+mr_all <- bind_rows(mr_r2, mr_te)
+cat("  MR test wall time:",
+    round(as.numeric(difftime(Sys.time(), mr_t0, units = "secs")), 1),
+    "sec across", nrow(mr_all), "panels\n")
+
+# =============================================================================
 # 8. EXCEL EXPORT
 # =============================================================================
 cat("=== 8. Excel export ===\n")
@@ -494,9 +679,10 @@ write_xlsx(
 )
 write_xlsx(
   list(
-    all = bind_rows(alpha_r2, alpha_te),
-    R2  = alpha_r2,
-    TE  = alpha_te
+    all          = bind_rows(alpha_r2, alpha_te),
+    R2           = alpha_r2,
+    TE           = alpha_te,
+    monotonicity = mr_all
   ),
   "activeness_alphas.xlsx"
 )
@@ -776,7 +962,117 @@ cat("Written: table_activeness_alpha_r2.tex\n")
 cat("Written: table_activeness_alpha_te.tex\n")
 
 # =============================================================================
-# 11. SUMMARY DIAGNOSTICS  (printed; no file output)
+# 11. MONOTONICITY TEST TABLE
+#     One compact 8-row table summarising MR test results across both
+#     activeness measures and all four panel combinations. Rendered as Tabular
+#     (not longtable) since 8 rows fits on a single page comfortably.
+# =============================================================================
+cat("=== 11. Monotonicity test table ===\n")
+
+MR_NCOLS <- 8L
+
+# Format an MR p-value with significance star.
+fmt_p <- function(p) {
+  if (is.na(p)) return("--")
+  star <- if (p <= 0.01) "$^{***}$"
+  else if (p <= 0.05) "$^{**}$"
+  else if (p <= 0.10) "$^{*}$"
+  else                ""
+  paste0(formatC(round(p, 3), format = "f", digits = 3), star)
+}
+
+# Row format: panel label | alpha_Q1 | alpha_Q5 | spread | J_up | p_up | J_dn | p_dn
+panel_short <- function(wt, gn) {
+  wtxt <- if (wt == "EW") "EW" else "VW"
+  gtxt <- if (gn == "gross") "Gross" else "Net"
+  paste0(wtxt, " ", gtxt)
+}
+
+mr_display <- mr_all %>%
+  rowwise() %>%
+  mutate(
+    Panel    = panel_short(weighting, return_type),
+    aQ1      = fmt(alpha_q1, 3),
+    aQ5      = fmt(alpha_q5, 3),
+    Spread   = fmt(spread, 3),
+    Jup_str  = fmt(J_up, 3),
+    pup_str  = fmt_p(p_up),
+    Jdn_str  = fmt(J_dn, 3),
+    pdn_str  = fmt_p(p_dn)
+  ) %>%
+  ungroup() %>%
+  select(sort_type, Panel, aQ1, aQ5, Spread,
+         Jup_str, pup_str, Jdn_str, pdn_str)
+
+mr_display_no_sort <- mr_display %>% select(-sort_type)
+
+fn_mr <- paste(
+  "\\\\textcite{PattonTimmermann2010} monotonic relation (MR) bootstrap test",
+  "for the Carhart alpha gradient across the five activeness quintiles,",
+  "separately for each activeness measure and for each weighting",
+  "$\\\\times$ return-type combination (Active funds only). Test statistics:",
+  "$J_{\\\\uparrow} = \\\\min_{q \\\\geq 2}(\\\\alpha_q - \\\\alpha_{q-1})$",
+  "for the increasing-pattern alternative,",
+  "$J_{\\\\downarrow} = \\\\min_{q \\\\geq 2}(\\\\alpha_{q-1} - \\\\alpha_q)$",
+  "for the decreasing-pattern alternative.",
+  "$p_{\\\\uparrow}$ and $p_{\\\\downarrow}$ are bootstrap p-values from",
+  paste0("$B = ", MR_B, "$"), "calendar-month resamples under the",
+  "least-favorable null configuration (each quintile's excess return series",
+  "recentered by subtracting its full-sample Carhart alpha, imposing",
+  "$\\\\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern",
+  "when the corresponding p-value is small.",
+  "$\\\\alpha_{Q1}$, $\\\\alpha_{Q5}$, and",
+  "$\\\\alpha_{Q5}-\\\\alpha_{Q1}$ are annualised Carhart alphas (\\\\%).",
+  "$J_{\\\\uparrow}$ and $J_{\\\\downarrow}$ are reported in annualised \\\\%",
+  "terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\\\\%,",
+  "5\\\\%, 1\\\\%. Implementation follows the recentering procedure of",
+  "\\\\textcite{CremersPetajisto2009} and \\\\textcite{AmihudGoyenko2013}.",
+  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+)
+
+n_panels_per_measure <- 4L
+
+mr_kable <- mr_display_no_sort %>%
+  kbl(
+    format    = "latex",
+    booktabs  = TRUE,
+    linesep   = "",
+    escape    = FALSE,
+    caption   = "Patton-Timmermann Monotonic Relation Test for Activeness Quintile Alphas",
+    label     = "activeness_monotonicity",
+    col.names = c("Panel",
+                  "$\\alpha_{Q1}$",
+                  "$\\alpha_{Q5}$",
+                  "$\\alpha_{Q5}-\\alpha_{Q1}$",
+                  "$J_{\\uparrow}$",
+                  "$p_{\\uparrow}$",
+                  "$J_{\\downarrow}$",
+                  "$p_{\\downarrow}$"),
+    align     = c("l", rep("r", 7))
+  ) %>%
+  kable_styling(latex_options = "hold_position") %>%
+  pack_rows("Panel A: $1-R^2$ Activeness", 1, n_panels_per_measure,
+            bold = FALSE, italic = FALSE,
+            hline_before = FALSE, hline_after = FALSE,
+            escape = FALSE) %>%
+  pack_rows("Panel B: Tracking Error Activeness",
+            n_panels_per_measure + 1, 2L * n_panels_per_measure,
+            bold = FALSE, italic = FALSE,
+            hline_before = TRUE, hline_after = FALSE,
+            escape = FALSE) %>%
+  footnote(
+    general        = fn_mr,
+    general_title  = "",
+    escape         = FALSE,
+    threeparttable = TRUE
+  )
+
+mr_str <- as.character(mr_kable)
+write_tex(mr_str, "table_activeness_monotonicity.tex",
+          resize = TRUE, small = FALSE)
+
+# =============================================================================
+# 12. SUMMARY DIAGNOSTICS  (printed; no file output)
 # =============================================================================
 cat("\n=== Summary diagnostics ===\n")
 
@@ -797,4 +1093,17 @@ print_quintile_diag <- function(port_df, label) {
 print_quintile_diag(port_r2, "1-R^2 Activeness Quintiles (sanity check):")
 print_quintile_diag(port_te, "Tracking Error Activeness Quintiles (sanity check):")
 
-cat("\n[SUCCESS] activeness_analysis.R v1.0 complete.\n")
+# MR test summary printout: one row per panel, both measures.
+cat("\nPatton-Timmermann MR test summary (alpha gradient):\n")
+mr_print <- mr_all %>%
+  mutate(
+    panel = paste0(weighting, " ", return_type),
+    p_up  = round(p_up, 3),
+    p_dn  = round(p_dn, 3),
+    p_min = round(p_min, 3)
+  ) %>%
+  select(sort_type, panel, alpha_q1, alpha_q5, spread, p_up, p_dn, p_min) %>%
+  mutate(across(c(alpha_q1, alpha_q5, spread), ~ round(.x, 3)))
+print(as.data.frame(mr_print), row.names = FALSE)
+
+cat("\n[SUCCESS] activeness_analysis.R v1.1 complete.\n")

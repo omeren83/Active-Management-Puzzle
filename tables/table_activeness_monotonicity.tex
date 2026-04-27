@@ -1,0 +1,31 @@
+\begin{table}[H]
+\centering
+\caption{\label{tab:activeness_monotonicity}Patton-Timmermann Monotonic Relation Test for Activeness Quintile Alphas}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lrrrrrrr}
+\toprule
+Panel & $\alpha_{Q1}$ & $\alpha_{Q5}$ & $\alpha_{Q5}-\alpha_{Q1}$ & $J_{\uparrow}$ & $p_{\uparrow}$ & $J_{\downarrow}$ & $p_{\downarrow}$\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{8}{l}{Panel A: $1-R^2$ Activeness}\\
+\hspace{1em}EW Gross & -0.628 & 0.531 & 1.160 & -0.011 & 0.077$^{*}$ & -0.744 & 0.926\\
+\hspace{1em}EW Net & -1.471 & -0.774 & 0.697 & -0.087 & 0.160 & -0.596 & 0.867\\
+\hspace{1em}VW Gross & -0.545 & 1.077 & 1.622 & -1.244 & 0.853 & -1.550 & 0.930\\
+\hspace{1em}VW Net & -1.110 & 0.254 & 1.365 & -1.450 & 0.920 & -1.737 & 0.965\\
+\addlinespace[0.3em]
+\hline
+\multicolumn{8}{l}{Panel B: Tracking Error Activeness}\\
+\hspace{1em}EW Gross & -0.643 & 0.529 & 1.172 & -0.024 & 0.083$^{*}$ & -0.828 & 0.978\\
+\hspace{1em}EW Net & -1.484 & -0.715 & 0.768 & -0.089 & 0.169 & -0.762 & 0.970\\
+\hspace{1em}VW Gross & -0.403 & 2.031 & 2.434 & -0.369 & 0.183 & -2.113 & 0.991\\
+\hspace{1em}VW Net & -0.979 & 1.188 & 2.167 & -0.332 & 0.155 & -2.042 & 0.985\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item \textcite{PattonTimmermann2010} monotonic relation (MR) bootstrap test for the Carhart alpha gradient across the five activeness quintiles, separately for each activeness measure and for each weighting $\times$ return-type combination (Active funds only). Test statistics: $J_{\uparrow} = \min_{q \geq 2}(\alpha_q - \alpha_{q-1})$ for the increasing-pattern alternative, $J_{\downarrow} = \min_{q \geq 2}(\alpha_{q-1} - \alpha_q)$ for the decreasing-pattern alternative. $p_{\uparrow}$ and $p_{\downarrow}$ are bootstrap p-values from $B = 1000$ calendar-month resamples under the least-favorable null configuration (each quintile's excess return series recentered by subtracting its full-sample Carhart alpha, imposing $\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern when the corresponding p-value is small. $\alpha_{Q1}$, $\alpha_{Q5}$, and $\alpha_{Q5}-\alpha_{Q1}$ are annualised Carhart alphas (\%). $J_{\uparrow}$ and $J_{\downarrow}$ are reported in annualised \% terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\%, 5\%, 1\%. Implementation follows the recentering procedure of \textcite{CremersPetajisto2009} and \textcite{AmihudGoyenko2013}. Sample: Incubation-corrected panel (Evans 2010); no date cap.
+\end{tablenotes}
+\end{threeparttable}
+}
+\end{table}
