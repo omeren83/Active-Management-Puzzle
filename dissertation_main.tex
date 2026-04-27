@@ -64,7 +64,10 @@
 %   table_port_size_alpha.tex                → Table 11
 %   table_port_mom_alpha.tex                 → Table 12
 %   table_port_fee_alpha.tex                 → Table 13
-%   table_persistence.tex                    → Table 14
+%   table_activeness_chars.tex               → Table 14
+%   table_activeness_alpha_r2.tex            → Table 15
+%   table_activeness_alpha_te.tex            → Table 16
+%   table_persistence.tex                    → Table 17
 %   table_desc_stats_master.tex              → Table A.1
 %   table_desc_stats_trimmed.tex             → Table A.2
 %   table_perf_aggregate_FF.tex              → Table C.1
@@ -302,7 +305,7 @@
 \usepackage{eso-pic}
 \usepackage{rotating}
 
-% Landscape page-number rotation (for Table 14 persistence, which is wide).
+% Landscape page-number rotation (for Table 17 persistence, which is wide).
 \newif\iflscapenum
 \lscapenumfalse
 \AddToShipoutPictureFG{%
@@ -1103,6 +1106,84 @@ the most recent month (momentum), and static expense ratio (fee).]
 
 \noindent [Continuation paragraph discussing Table 13.]
 
+\section{Activeness and the cross-section of fund alphas}
+\label{sec:activeness}
+
+\noindent The fee, size, and momentum quintile sorts of the previous section
+partition the actively managed universe along characteristics that prior
+literature has documented as predictors of cross-sectional alpha. None of
+those characteristics, however, addresses the question that motivates this
+dissertation directly: holding everything else constant, does \emph{being more
+active}---deviating more from systematic factor exposures or from a stated
+benchmark---produce a different alpha? This section provides that test.
+
+The cross-sectional question contrasts three priors. Under
+\textcite{BerkGreen2004}, capital flows erode net-alpha differences across
+funds in equilibrium and no monotone activeness--alpha gradient is predicted.
+\textcite{AmihudGoyenko2013} argue that the residual share of fund return
+variance not explained by systematic factors, $1-R^2$, captures
+\emph{productive} idiosyncratic risk-taking by managers with information
+advantages and is therefore a forward-looking predictor of alpha; under their
+prior the gradient should be positive. \textcite{CremersPetajisto2009},
+working with a holdings-based Active Share measure, document a positive
+activeness--alpha gradient that survives net of fees in the most active
+quintile but deteriorates sharply for closet indexers in the lowest quintile.
+The empirical question is which of these patterns the data exhibit.
+
+The dissertation reports two activeness proxies. The primary measure is the
+fund-level idiosyncratic share, $1-R^2$, computed as the time-series average
+of $1-R^2_{i,t}$ from the rolling 36-month \textcite{Carhart1997} four-factor
+regression that already produces the rolling alpha series of Figure~2 and the
+Bai--Perron structural break test of Section~\ref{sec:subperiod}. Following
+\textcite{AmihudGoyenko2013}, a higher $1-R^2$ indicates returns less
+explained by systematic factor exposures and therefore more idiosyncratic.
+The robustness measure is the annualised Tracking Error of fund gross returns
+against the fund's assigned benchmark index,
+$\mathrm{TE}_i = \sqrt{12}\cdot\mathrm{sd}(r_{i,t}^{\text{gross}}-r_{b(i),t})$,
+following the interpretation of \citet{CremersPetajisto2009}. Holdings-based
+Active Share is not computable from the LSEG subscription used in this
+dissertation; the two return-based measures are reported jointly to mitigate
+single-measure concerns.
+
+For each measure, active funds with at least 24 monthly observations are
+sorted into five quintiles by the time-series mean of the activeness measure.
+Quintile~1 contains the closet indexers (lowest activeness) and Quintile~5
+the most active funds. Equal-weighted and lagged-TNA-weighted monthly
+portfolio returns are computed for each quintile, on both gross and net of
+fees, and regressed on the Carhart four factors with Newey-West
+heteroskedasticity- and autocorrelation-consistent standard errors at a
+six-month lag. The Q5$-$Q1 self-financing spread is regressed without
+subtracting the risk-free rate, as $R_f$ cancels in the long-short
+construction. Net returns deduct one-twelfth of the static annual expense
+ratio per month, following \textcite{BarrasScailletWermers2010}.
+
+\input{tables/table_activeness_chars}
+
+\noindent [Continuation paragraph discussing Table 14: verify the sort
+produces a monotone activeness gradient and discuss cross-sectional fund
+characteristics that vary with activeness---in particular, whether high-
+activeness funds carry systematically higher or lower fees, turnover, or
+TNA.]
+
+\input{tables/table_activeness_alpha_r2}
+
+\noindent [Continuation paragraph discussing Table 15. Headline statistic
+is the Q5$-$Q1 net alpha row in Panels C and D. Tie the result back to the
+\textcite{AmihudGoyenko2013} and \textcite{BerkGreen2004} priors. If the
+Q5$-$Q1 net alpha is negative, the cross-sectional evidence aligns with
+the Section~\ref{sec:H3} test of lottery demand: investors are paying a
+premium for activeness that destroys risk-adjusted value.]
+
+\input{tables/table_activeness_alpha_te}
+
+\noindent [Continuation paragraph discussing Table 16. Compare the Tracking
+Error gradient to the $1-R^2$ gradient. If qualitatively similar, the
+activeness--alpha relationship is robust to the choice of proxy.
+Disagreement would suggest that the $1-R^2$ result reflects something
+distinct from generic benchmark deviation---possibly factor-tilting
+unrelated to security selection, per \citet{CremersPetajisto2009}'s
+critique of TE as conflating factor exposure with security selection.]
+
 \section{Performance persistence}
 \label{sec:persistence}
 
@@ -1112,7 +1193,7 @@ Carhart alphas. Decile 10 (losers) shows significant persistence of
 underperformance; Decile 1 (winners) shows no statistically significant
 alpha. Consistent with Carhart (1997): persistence is in the left tail.]
 
-% Table 14 is landscape-oriented because of its wide factor-loading columns.
+% Table 17 is landscape-oriented because of its wide factor-loading columns.
 \begin{landscape}
 \lscapenumtrue
 \pagestyle{lscapeblank}%
@@ -1121,7 +1202,7 @@ alpha. Consistent with Carhart (1997): persistence is in the left tail.]
 \lscapenumfalse
 \pagestyle{plain}%
 
-\noindent [Continuation paragraph discussing Table 14.]
+\noindent [Continuation paragraph discussing Table 17.]
 
 \section{Sub-period analysis}
 \label{sec:subperiod}

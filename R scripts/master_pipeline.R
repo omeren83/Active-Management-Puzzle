@@ -24,17 +24,19 @@
 #   Phase D  FF(2010) benchmark          (independent replication track)
 #   Phase E  Sub-period analysis         (Bai-Perron + bootstrap with cache)
 #   Phase F  Sorts & persistence         (portfolio sorts, alpha persistence)
-#   Phase G  Factor robustness (NEW)     (FF6 + Carhart+PSL for Appendix E)
+#   Phase G  Activeness & performance    (Relationship between degree of activeness and future performance)
+#   Phase H  Factor robustness (NEW)     (FF6 + Carhart+PSL for Appendix E)
 #   Utility  Lipper category build       (standalone, independent)
 #   SYNC     Copy .tex files -> GitHub   (automatic at end if TABLES_OUT_DIR set)
 #
 # DEPENDENCIES BETWEEN PHASES:
-#   Phase A -> required by B, C, D, E (subperiod), F, G
+#   Phase A -> required by B, C, D, E (subperiod), F, G, H
 #   Phase B -> required by C, E (structural break reads alpha_rolling.xlsx),
-#              G (build_robust_tables reads Carhart baseline xlsx)
+#              H (build_robust_tables reads Carhart baseline xlsx)
+#              G (Relationship between degree of activeness and future performance)
 #   Phase D -> required by build_ff_tables_manual (reads FF xlsx outputs)
 #   Phase E -> structural_break_test MUST run before subperiod_analysis
-#   Phase G -> alpha_estimation_robust MUST run before build_robust_tables
+#   Phase H -> alpha_estimation_robust MUST run before build_robust_tables
 #
 # All scripts assumed to live in WORKING_DIR alongside data files.
 # =============================================================================
@@ -50,7 +52,7 @@
 # continues to live in the Google Drive folder (the two are no longer required
 # to be the same location).
 # Use forward slashes on both Windows and Mac.
-WORKING_DIR <- "G:/Drive'ım/TEZ-YENI/data/R import"                     # PC Drive folder (data)
+WORKING_DIR <- "D:/TEZ/data"                 
 # WORKING_DIR <- "/Users/omersmba/Library/CloudStorage/GoogleDrive-omer.eren.2019@gmail.com/Drive'ım/TEZ-YENI/data/R import"  # Mac Drive folder (data)
 
  SCRIPTS_DIR <- "D:/TEZ/R scripts"                                       # PC repo clone (scripts)
@@ -61,18 +63,19 @@ WORKING_DIR <- "G:/Drive'ım/TEZ-YENI/data/R import"                     # PC Dr
 # WORKING_DIR after the pipeline finishes). Should be the tables/ subfolder
 # of the GitHub repo that syncs with Overleaf.
 # Set to NA to disable auto-sync (tables will stay in WORKING_DIR only).
-#TABLES_OUT_DIR <- "D:/TEZ/tables"                      # PC GitHub repo
-TABLES_OUT_DIR <- "~/Active-Management-Puzzle/tables"  # Mac GitHub clone
+  TABLES_OUT_DIR <- "D:/TEZ/tables"                      # PC GitHub repo
+# TABLES_OUT_DIR <- "~/Active-Management-Puzzle/tables"  # Mac GitHub clone
 # TABLES_OUT_DIR <- NA                                   # disable auto-sync
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE   # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- TRUE   # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
-RUN_PHASE_E_SUBPERIODS    <- TRUE   # structural_break_test + subperiod_analysis
-RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
-RUN_PHASE_G_FACTOR_ROBUST <- FALSE  # alpha_estimation_robust + build_robust_tables
+RUN_PHASE_C_REPORTING     <- FALSE  # alpha_reporting + descriptive_statistics
+RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
+RUN_PHASE_E_SUBPERIODS    <- FALSE   # structural_break_test + subperiod_analysis
+RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
+RUN_PHASE_G_ACTIVENESS    <- TRUE   # Relationship between degree of activeness and future performance
+RUN_PHASE_H_FACTOR_ROBUST <- FALSE  # alpha_estimation_robust + build_robust_tables
 RUN_UTILITY_LIPPER        <- FALSE  # build_lipper_category (rarely re-run)
 
 # Stop on first error (TRUE) or keep going and report failures at end (FALSE)
@@ -205,9 +208,18 @@ if (RUN_PHASE_F_SORTS_PERSIST) {
   run_script("persistence_testing.R", "Phase F")
 }
 
+# =============================================================================
+# PHASE G - ACTIVENESS & PERFORMANCE
+# =============================================================================
+if (RUN_PHASE_G_ACTIVENESS) {
+  require_session_object("panel_incubation", "activeness_analysis.R")
+  run_script("activeness_analysis.R", "Phase G")
+}
+
+
 
 # =============================================================================
-# PHASE G - FACTOR MODEL ROBUSTNESS  (Appendix E)
+# PHASE H - FACTOR MODEL ROBUSTNESS  (Appendix E)
 # =============================================================================
 # alpha_estimation_robust.R (v1.1) re-estimates full-period alphas, FF(2010)
 # bootstrap, and BSW decomposition under two alternative factor specifications:
@@ -223,26 +235,26 @@ if (RUN_PHASE_F_SORTS_PERSIST) {
 # Prerequisite: RMW, CMA, PSL rows must be present in the 'factors' sheet of
 # fund_data.xlsx before running Phase A in the same session.
 # =============================================================================
-if (RUN_PHASE_G_FACTOR_ROBUST) {
+if (RUN_PHASE_H_FACTOR_ROBUST) {
   require_session_object("panel_incubation",
                          "alpha_estimation_robust.R")
   # Pre-flight: Carhart baseline xlsx files must exist (Phase B must have run).
   baseline_ok <- file.exists("alpha_fullperiod.xlsx") &&
     file.exists("bootstrap_results.xlsx")
   if (!baseline_ok) {
-    msg <- paste("Phase G requires Carhart baseline xlsx files",
+    msg <- paste("Phase H requires Carhart baseline xlsx files",
                  "(alpha_fullperiod.xlsx, bootstrap_results.xlsx).",
                  "Run Phase B first.")
     if (STOP_ON_ERROR) stop(msg) else cat("WARNING:", msg, "\n")
   } else {
-    run_script("alpha_estimation_robust.R", "Phase G")
+    run_script("alpha_estimation_robust.R", "Phase H")
     # Direct the Appendix E tables straight to TABLES_OUT_DIR so they don't
     # need to go through the sync step (which would be a no-op for them
     # anyway, but cleaner to avoid the round-trip).
     if (!is.na(TABLES_OUT_DIR)) {
       OUT_DIR <- TABLES_OUT_DIR
     }  # else OUT_DIR falls back to "./tables_robust" default in the script
-    run_script("build_robust_tables.R", "Phase G")
+    run_script("build_robust_tables.R", "Phase H")
   }
 }
 
