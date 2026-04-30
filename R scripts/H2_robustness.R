@@ -408,7 +408,7 @@ ktab <- kbl(
   escape    = FALSE,
   linesep   = ""
 ) %>%
-  kable_styling(latex_options = "hold_position", font_size = 8) %>%
+  kable_styling(latex_options = "hold_position", font_size = 7) %>%
   add_header_above(c(" " = 1, "Baseline" = 1, "$D^{MD,Lev}$" = 1,
                      "$D^{MD,Grw}$" = 1, "$D^{MD,Det}$" = 1,
                      "$D^{\\\\text{INV-PCR}}$" = 1,
