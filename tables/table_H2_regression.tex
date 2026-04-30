@@ -1,0 +1,57 @@
+\begin{table}[H]
+\centering
+\caption{\label{tab:H2_regression}H2: Disposition / Illusion-of-Control Hypothesis. Panel regression of monthly proportional fund flows on within-Lipper-category lagged 12-month performance-rank segments interacted with margin-debt and put-call illusion-of-control regime indicators.}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lrrrrrr}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{MD,Lev}$} & \multicolumn{1}{c}{$D^{MD,Grw}$} & \multicolumn{1}{c}{$D^{MD,Det}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{$D^{MD,Det}\,|\,D^{SENT}$} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5} \cmidrule(l{3pt}r{3pt}){6-6} \cmidrule(l{3pt}r{3pt}){7-7}
+Variable & (1) & (2) & (3) & (4) & (5) & (6)\\
+\midrule
+$R^{LOW}$ & 0.0305*** & 0.0238*** & 0.0326*** & 0.0242*** & 0.0377*** & 0.0261***\\
+ & (8.07) & (4.97) & (8.10) & (5.05) & (7.29) & (4.87)\\
+$R^{MID}$ & 0.0145*** & 0.0132*** & 0.0141*** & 0.0133*** & 0.0156*** & 0.0144***\\
+ & (16.37) & (11.87) & (14.82) & (12.16) & (12.15) & (11.73)\\
+$R^{HIGH}$ & 0.0814*** & 0.0769*** & 0.0792*** & 0.0761*** & 0.0872*** & 0.0787***\\
+ & (14.43) & (10.50) & (12.59) & (10.19) & (11.76) & (9.47)\\
+State ($\lambda$) &  & -0.0037** & 0.0043*** & -0.0031** & 0.0001 & -0.0018\\
+ &  & (-2.41) & (2.63) & (-2.09) & (0.11) & (-1.23)\\
+$R^{LOW}\times$ State ($\delta_1$) &  & 0.0146** & -0.0083 & 0.0135** & 0.0001 & 0.0122*\\
+ &  & (2.00) & (-1.11) & (1.96) & (0.01) & (1.74)\\
+$R^{MID}\times$ State ($\delta_2$) &  & 0.0028* & 0.0012 & 0.0024 & -0.0010 & 0.0015\\
+ &  & (1.66) & (0.62) & (1.41) & (-0.58) & (0.85)\\
+$R^{HIGH}\times$ State ($\delta_3$) &  & 0.0095 & 0.0091 & 0.0110 & 0.0030 & 0.0089\\
+ &  & (0.99) & (0.90) & (1.10) & (0.30) & (0.86)\\
+$D^{SENT}$ &  &  &  &  &  & 0.0048***\\
+ &  &  &  &  &  & (2.67)\\
+$R^{LOW}\times D^{SENT}$ &  &  &  &  &  & -0.0047\\
+ &  &  &  &  &  & (-0.62)\\
+$R^{MID}\times D^{SENT}$ &  &  &  &  &  & -0.0031*\\
+ &  &  &  &  &  & (-1.69)\\
+$R^{HIGH}\times D^{SENT}$ &  &  &  &  &  & -0.0074\\
+ &  &  &  &  &  & (-0.68)\\
+$\log(\text{TNA})$ & -0.0042*** & -0.0042*** & -0.0043*** & -0.0042*** & -0.0058*** & -0.0043***\\
+ & (-8.57) & (-8.48) & (-8.72) & (-8.46) & (-8.48) & (-8.60)\\
+$\log(\text{Age})$ & -0.0111*** & -0.0111*** & -0.0098*** & -0.0110*** & -0.0137*** & -0.0110***\\
+ & (-7.85) & (-7.80) & (-6.69) & (-7.63) & (-6.26) & (-7.66)\\
+Return vol.\ (36m SD) & -0.0276 & -0.0279 & -0.0369 & -0.0269 & -0.1047*** & -0.0339\\
+ & (-1.09) & (-1.09) & (-1.50) & (-1.06) & (-2.78) & (-1.32)\\
+Style flow & 0.0996*** & 0.0995*** & 0.0905*** & 0.0994*** & 0.0954*** & 0.0954***\\
+ & (3.67) & (3.67) & (3.43) & (3.67) & (2.72) & (3.53)\\
+\midrule
+Fund FE & Yes & Yes & Yes & Yes & Yes & Yes\\
+Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes & Yes & Yes\\
+$N$ & 235,226 & 235,226 & 235,226 & 235,226 & 170,709 & 235,226\\
+$R^2$ (within) & 0.026 & 0.026 & 0.027 & 0.026 & 0.029 & 0.027\\
+Joint $\delta_1=\delta_2=\delta_3=0$ ($\chi^2_3$, $p$) & -- & 11.89 (0.008) & 2.26 (0.521) & 10.43 (0.015) & 0.40 (0.941) & 6.86 (0.076)\\
+Main $\delta_1<0$ ($z$, 1-sided $p$) & -- & z=+2.00 (p=0.977) & z=-1.11 (p=0.134) & z=+1.96 (p=0.975) & z=+0.01 (p=0.504) & z=+1.74 (p=0.959)\\
+Asym $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & -0.0051 (z=-0.44, p=0.670) & +0.0175 (z=+1.33, p=0.092) & -0.0025 (z=-0.21, p=0.583) & +0.0030 (z=+0.24, p=0.405) & -0.0033 (z=-0.27, p=0.605)\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns. The state variable in column (2) is $D^{MD,Lev}$ (= 1 if MD/MCAP is in the top 34%); column (3) is $D^{MD,Grw}$ (= 1 if YoY change in MD/MCAP is in the top 34%); column (4) is $D^{MD,Det}$ (= 1 if the residual of $log$(MD/MCAP) on a linear time trend is in the top 34%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (5) is $D^{text{INV-PCR}}$ (= 1 in the bottom 34% of the CBOE equity put-call ratio: high call-to-put = high illusion of control). Column (6) is the discriminant specification: it includes both $D^{MD,Det}$ and Baker-Wurgler $D^{SENT}$ with full rank interactions; if $delta^{MD}_1$ remains negative there, H2 is identified independently of the H1 sentiment channel. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover) included but absorbed by fund FE. Cols (1)-(4) and (6) use the full margin-debt sample (1998-2023, $N!approx!190$K); col (5) uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*},p<0.10$, $^{**},p<0.05$, $^{***},p<0.01$.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}
