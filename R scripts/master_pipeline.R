@@ -1,11 +1,23 @@
 # =============================================================================
-# MASTER PIPELINE ORCHESTRATOR                                             v1.1
+# MASTER PIPELINE ORCHESTRATOR                                             v1.2
 #
 # Runs the full dissertation analysis pipeline in the correct sequence.
 # Each phase can be toggled ON/OFF via the CONFIG section below.
 #
+# v1.2 changes vs v1.1:
+#   - Added Phase I (behavioral state variables): behavioral_state_variables.R
+#     produces behavioral_state_vars.xlsx (sentiment, margin debt, regime
+#     dummies) used by H1-H4 panel regressions.
+#   - Added Phase J (panel regressions): panel_regressions_setup.R +
+#     H1_sentiment_convexity.R + H2_disposition_control.R +
+#     H3_lottery_demand.R + H4_fee_elasticity.R + panel_regressions_reporting.R.
+#     Default OFF until the underlying scripts are written.
+#   - run_script() now checks file existence and skips with a warning rather
+#     than erroring if a script file is missing (needed because Phase J
+#     references scripts that may not exist yet on disk).
+#
 # v1.1 changes vs v1.0:
-#   - Added Phase G (factor model robustness): alpha_estimation_robust.R +
+#   - Added Phase H (factor model robustness): alpha_estimation_robust.R +
 #     build_robust_tables.R for Appendix E (FF6 and Carhart+PSL specifications).
 #   - Added TABLES_OUT_DIR config variable and automatic post-pipeline sync
 #     step that copies all table_*.tex files from WORKING_DIR (Drive folder)
@@ -25,18 +37,23 @@
 #   Phase E  Sub-period analysis         (Bai-Perron + bootstrap with cache)
 #   Phase F  Sorts & persistence         (portfolio sorts, alpha persistence)
 #   Phase G  Activeness & performance    (Relationship between degree of activeness and future performance)
-#   Phase H  Factor robustness (NEW)     (FF6 + Carhart+PSL for Appendix E)
+#   Phase H  Factor robustness           (FF6 + Carhart+PSL for Appendix E)
+#   Phase I  Behavioral state variables  (sentiment, margin debt, regime dummies)
+#   Phase J  Panel regressions           (setup + H1-H4 + reporting)
 #   Utility  Lipper category build       (standalone, independent)
 #   SYNC     Copy .tex files -> GitHub   (automatic at end if TABLES_OUT_DIR set)
 #
 # DEPENDENCIES BETWEEN PHASES:
-#   Phase A -> required by B, C, D, E (subperiod), F, G, H
+#   Phase A -> required by B, C, D, E (subperiod), F, G, H, J
 #   Phase B -> required by C, E (structural break reads alpha_rolling.xlsx),
-#              H (build_robust_tables reads Carhart baseline xlsx)
-#              G (Relationship between degree of activeness and future performance)
+#              G (activeness uses alpha_rolling),
+#              H (build_robust_tables reads Carhart baseline xlsx),
+#              J (panel_regressions_setup uses alpha_rolling for activeness)
 #   Phase D -> required by build_ff_tables_manual (reads FF xlsx outputs)
 #   Phase E -> structural_break_test MUST run before subperiod_analysis
 #   Phase H -> alpha_estimation_robust MUST run before build_robust_tables
+#   Phase I -> required by J (behavioral_state_vars merged into panel_reg)
+#   Phase J -> internal order is enforced: setup -> H1 -> H2 -> H3 -> H4 -> reporting
 #
 # All scripts assumed to live in WORKING_DIR alongside data files.
 # =============================================================================
@@ -52,7 +69,7 @@
 # continues to live in the Google Drive folder (the two are no longer required
 # to be the same location).
 # Use forward slashes on both Windows and Mac.
-WORKING_DIR <- "D:/TEZ/data"                 
+WORKING_DIR <- "D:/TEZ/data/R import"
 # WORKING_DIR <- "/Users/omersmba/Library/CloudStorage/GoogleDrive-omer.eren.2019@gmail.com/Drive'ım/TEZ-YENI/data/R import"  # Mac Drive folder (data)
 
  SCRIPTS_DIR <- "D:/TEZ/R scripts"                                       # PC repo clone (scripts)
@@ -70,13 +87,15 @@ WORKING_DIR <- "D:/TEZ/data"
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- FALSE   # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- FALSE  # alpha_reporting + descriptive_statistics
+RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
 RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
-RUN_PHASE_E_SUBPERIODS    <- TRUE   # structural_break_test + subperiod_analysis
-RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
-RUN_PHASE_G_ACTIVENESS    <- TRUE   # Relationship between degree of activeness and future performance
-RUN_PHASE_H_FACTOR_ROBUST <- FALSE  # alpha_estimation_robust + build_robust_tables
-RUN_UTILITY_LIPPER        <- FALSE  # build_lipper_category (rarely re-run)
+RUN_PHASE_E_SUBPERIODS    <- FALSE   # structural_break_test + subperiod_analysis
+RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
+RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis
+RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
+RUN_PHASE_I_BEHAVIORAL    <- FALSE    # behavioral_state_variables (NEW)
+RUN_PHASE_J_PANEL_REG     <- TRUE   # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
+RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
 
 # Stop on first error (TRUE) or keep going and report failures at end (FALSE)
 STOP_ON_ERROR <- TRUE
@@ -109,15 +128,25 @@ tex_snapshot_before <- {
   setNames(mtimes, files)
 }
 
-# Helper: source a script with timing and error handling
+# Helper: source a script with timing and error handling.
+# Skips gracefully (warning, not error) if the script file is missing.
 run_script <- function(script_name, phase_label) {
   cat(sprintf("\n%s\n", strrep("=", 79)))
   cat(sprintf("[%s]  %s\n", phase_label, script_name))
   cat(sprintf("%s\n", strrep("=", 79)))
   
+  script_path <- file.path(SCRIPTS_DIR, script_name)
+  if (!file.exists(script_path)) {
+    cat("\nSKIPPED (file not found):", script_path, "\n")
+    pipeline_log[[script_name]] <<- list(
+      phase = phase_label, status = "SKIPPED", seconds = 0
+    )
+    return(invisible(FALSE))
+  }
+  
   t0 <- Sys.time()
   ok <- tryCatch({
-    source(file.path(SCRIPTS_DIR, script_name), echo = FALSE, max.deparse.length = Inf)
+    source(script_path, echo = FALSE, max.deparse.length = Inf)
     TRUE
   }, error = function(e) {
     cat("\nERROR in", script_name, ":\n")
@@ -174,18 +203,17 @@ if (RUN_PHASE_B_ALPHA) {
 # PHASE C - TABLES & REPORTING
 # =============================================================================
 if (RUN_PHASE_C_REPORTING) {
-  run_script("alpha_reporting.R",        "Phase C")
-  run_script("descriptive_statistics.R", "Phase C")
+  run_script("alpha_reporting.R",         "Phase C")
+  run_script("descriptive_statistics.R",  "Phase C")
 }
 
 
 # =============================================================================
-# PHASE D - FAMA-FRENCH (2010) BENCHMARK REPLICATION
+# PHASE D - FF(2010) BENCHMARK
 # =============================================================================
 if (RUN_PHASE_D_FF_BENCHMARK) {
-  require_session_object("panel_trimmed", "FF_comparison.R")
-  run_script("FF_comparison.R",          "Phase D")
-  run_script("build_ff_tables_manual.R", "Phase D")
+  run_script("FF_comparison.R",           "Phase D")
+  run_script("build_ff_tables_manual.R",  "Phase D")
 }
 
 
@@ -193,74 +221,73 @@ if (RUN_PHASE_D_FF_BENCHMARK) {
 # PHASE E - SUB-PERIOD ANALYSIS
 # =============================================================================
 if (RUN_PHASE_E_SUBPERIODS) {
-  require_session_object("panel_incubation", "subperiod_analysis.R")
   run_script("structural_break_test.R", "Phase E")
   run_script("subperiod_analysis.R",    "Phase E")
 }
 
 
 # =============================================================================
-# PHASE F - PORTFOLIO SORTS & PERSISTENCE
+# PHASE F - SORTS & PERSISTENCE
 # =============================================================================
 if (RUN_PHASE_F_SORTS_PERSIST) {
-  require_session_object("panel_incubation", "portfolio_sorts.R / persistence_testing.R")
   run_script("portfolio_sorts.R",     "Phase F")
   run_script("persistence_testing.R", "Phase F")
 }
+
 
 # =============================================================================
 # PHASE G - ACTIVENESS & PERFORMANCE
 # =============================================================================
 if (RUN_PHASE_G_ACTIVENESS) {
-  require_session_object("panel_incubation", "activeness_analysis.R")
   run_script("activeness_analysis.R", "Phase G")
 }
 
 
-
 # =============================================================================
-# PHASE H - FACTOR MODEL ROBUSTNESS  (Appendix E)
-# =============================================================================
-# alpha_estimation_robust.R (v1.1) re-estimates full-period alphas, FF(2010)
-# bootstrap, and BSW decomposition under two alternative factor specifications:
-#   FF6 : MKT_RF + SMB + HML + RMW + CMA + MOM
-#   C5  : MKT_RF + SMB + HML + MOM + PSL (Pastor-Stambaugh traded liquidity)
-# Inputs:  panel_incubation (session); Carhart baseline xlsx files from Phase B
-#          (alpha_fullperiod.xlsx, bootstrap_results.xlsx).
-# Outputs: alpha_fullperiod_{FF6,C5}.xlsx, bootstrap_results_{FF6,C5}.xlsx,
-#          robust_alpha_summary.xlsx.  build_robust_tables.R then consumes
-#          these and writes three Appendix E .tex files directly to
-#          TABLES_OUT_DIR (bypassing the sync step below).
-# Runtime: ~60-90 minutes total (2 x bootstrap cost, ~30-45 min each spec).
-# Prerequisite: RMW, CMA, PSL rows must be present in the 'factors' sheet of
-# fund_data.xlsx before running Phase A in the same session.
+# PHASE H - FACTOR MODEL ROBUSTNESS (Appendix E)
 # =============================================================================
 if (RUN_PHASE_H_FACTOR_ROBUST) {
-  require_session_object("panel_incubation",
-                         "alpha_estimation_robust.R")
-  # Pre-flight: Carhart baseline xlsx files must exist (Phase B must have run).
-  baseline_ok <- file.exists("alpha_fullperiod.xlsx") &&
-    file.exists("bootstrap_results.xlsx")
-  if (!baseline_ok) {
-    msg <- paste("Phase H requires Carhart baseline xlsx files",
-                 "(alpha_fullperiod.xlsx, bootstrap_results.xlsx).",
-                 "Run Phase B first.")
-    if (STOP_ON_ERROR) stop(msg) else cat("WARNING:", msg, "\n")
-  } else {
-    run_script("alpha_estimation_robust.R", "Phase H")
-    # Direct the Appendix E tables straight to TABLES_OUT_DIR so they don't
-    # need to go through the sync step (which would be a no-op for them
-    # anyway, but cleaner to avoid the round-trip).
-    if (!is.na(TABLES_OUT_DIR)) {
-      OUT_DIR <- TABLES_OUT_DIR
-    }  # else OUT_DIR falls back to "./tables_robust" default in the script
-    run_script("build_robust_tables.R", "Phase H")
-  }
+  run_script("alpha_estimation_robust.R", "Phase H")
+  run_script("build_robust_tables.R",     "Phase H")
 }
 
 
 # =============================================================================
-# UTILITY - LIPPER CATEGORY BUILDER (standalone)
+# PHASE I - BEHAVIORAL STATE VARIABLES (NEW)
+# Reads Sentiment sheet of fund_data.xlsx; produces behavioral_state_vars.xlsx
+# and leaves the data frame `behavioral_state_vars` in the global environment
+# for Phase J to consume. No dependency on panel objects.
+# =============================================================================
+if (RUN_PHASE_I_BEHAVIORAL) {
+  run_script("behavioral_state_variables.R", "Phase I")
+}
+
+
+# =============================================================================
+# PHASE J - PANEL REGRESSIONS H1-H4 (NEW)
+# Pipeline:
+#   panel_regressions_setup.R     -> builds panel_reg (ranks, controls, lags,
+#                                    activeness, merges behavioral_state_vars)
+#   H1_sentiment_convexity.R      -> Table H1
+#   H2_disposition_control.R      -> Table H2
+#   H3_lottery_demand.R           -> Table H3
+#   H4_fee_elasticity.R           -> Table H4 + shadow price input
+#   panel_regressions_reporting.R -> assembled tables and PPF synthesis
+# =============================================================================
+if (RUN_PHASE_J_PANEL_REG) {
+  require_session_object("panel_incubation",       "panel_regressions_setup.R")
+  require_session_object("behavioral_state_vars",  "panel_regressions_setup.R")
+  run_script("panel_regressions_setup.R",     "Phase J")
+  run_script("H1_sentiment_convexity.R",      "Phase J")
+  run_script("H2_disposition_control.R",      "Phase J")
+  run_script("H3_lottery_demand.R",           "Phase J")
+  run_script("H4_fee_elasticity.R",           "Phase J")
+  run_script("panel_regressions_reporting.R", "Phase J")
+}
+
+
+# =============================================================================
+# UTILITY - LIPPER CATEGORY BUILD (standalone)
 # =============================================================================
 if (RUN_UTILITY_LIPPER) {
   run_script("build_lipper_category.R", "Utility")
@@ -268,14 +295,11 @@ if (RUN_UTILITY_LIPPER) {
 
 
 # =============================================================================
-# SYNC - COPY NEW / MODIFIED .tex FILES TO TABLES_OUT_DIR
-# =============================================================================
-# All main-text and FF appendix .tex files are written by individual scripts
-# to WORKING_DIR (the current R working directory). This step copies every
-# table_*.tex file that is new or has been modified during this pipeline run
-# to TABLES_OUT_DIR (the GitHub repo tables/ folder, which syncs to Overleaf).
-# Robustness tables from Phase G are excluded from this step because they
-# were written directly to TABLES_OUT_DIR.
+# SYNC - COPY UPDATED .tex FILES TO TABLES_OUT_DIR (GitHub / Overleaf)
+# This step copies every table_*.tex file that is new or has been modified
+# during this pipeline run to TABLES_OUT_DIR (the GitHub repo tables/ folder,
+# which syncs to Overleaf). Robustness tables from Phase H are excluded from
+# this step because they were written directly to TABLES_OUT_DIR.
 # =============================================================================
 if (!is.na(TABLES_OUT_DIR)) {
   cat(sprintf("\n%s\n", strrep("=", 79)))
@@ -288,7 +312,7 @@ if (!is.na(TABLES_OUT_DIR)) {
     cat("Created target directory:", TABLES_OUT_DIR, "\n")
   }
   
-  # Scan WORKING_DIR for table_*.tex files now.  Compare mtimes against the
+  # Scan WORKING_DIR for table_*.tex files now. Compare mtimes against the
   # pre-pipeline snapshot to find those that were created or modified.
   tex_now <- list.files(WORKING_DIR, pattern = "^table_.*\\.tex$",
                         full.names = FALSE)
@@ -344,10 +368,14 @@ if (length(pipeline_log) > 0) {
   }))
   print(log_df, row.names = FALSE)
   
-  n_failed <- sum(log_df$status == "FAILED")
+  n_failed  <- sum(log_df$status == "FAILED")
+  n_skipped <- sum(log_df$status == "SKIPPED")
   if (n_failed > 0) {
     cat(sprintf("\nWARNING: %d script(s) failed. Review errors above.\n",
                 n_failed))
+  } else if (n_skipped > 0) {
+    cat(sprintf("\nNote: %d script(s) skipped (file not found).\n",
+                n_skipped))
   } else {
     cat("\nAll scripts completed successfully.\n")
   }
