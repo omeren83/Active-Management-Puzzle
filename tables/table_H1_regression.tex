@@ -16,19 +16,19 @@ $R^{MID}$ & 0.0145*** & 0.0153*** & 0.0145*** & 0.0138***\\
  & (16.38) & (15.98) & (16.53) & (14.33)\\
 $R^{HIGH}$ & 0.0815*** & 0.0838*** & 0.0814*** & 0.0771***\\
  & (14.44) & (13.75) & (14.58) & (13.04)\\
-Sentiment ($\lambda$) &  & 0.0055*** & 0.0025*** & NA\\
+Sentiment ($\lambda$) &  & 0.0055*** & 0.0025*** & 0.0003\\
  &  & (3.01) & (3.58) & (0.14)\\
-$R^{LOW}\times$ Sent ($\delta_1$) &  & NA & NA & NA\\
+$R^{LOW}\times$ Sent ($\delta_1$) &  & -0.0098 & -0.0038 & -0.0059\\
  &  & (-1.28) & (-1.21) & (-0.69)\\
-$R^{MID}\times$ Sent ($\delta_2$) &  & -0.0037** & NA & NA\\
+$R^{MID}\times$ Sent ($\delta_2$) &  & -0.0037** & -0.0011 & 0.0027\\
  &  & (-2.10) & (-1.35) & (1.43)\\
-$R^{HIGH}\times$ Sent ($\delta_3$) &  & NA & NA & 0.0199**\\
+$R^{HIGH}\times$ Sent ($\delta_3$) &  & -0.0111 & -0.0067 & 0.0199**\\
  &  & (-1.02) & (-1.42) & (2.00)\\
 $\log(\text{TNA})$ & -0.0042*** & -0.0043*** & -0.0043*** & -0.0042***\\
  & (-8.57) & (-8.64) & (-8.70) & (-8.57)\\
 $\log(\text{Age})$ & -0.0111*** & -0.0113*** & -0.0123*** & -0.0110***\\
  & (-7.84) & (-8.06) & (-8.44) & (-7.73)\\
-Return vol.\ (36m SD) & NA & NA & NA & NA\\
+Return vol.\ (36m SD) & -0.0273 & -0.0352 & -0.0351 & -0.0276\\
  & (-1.08) & (-1.37) & (-1.36) & (-1.09)\\
 Style flow & 0.0994*** & 0.0959*** & 0.0940*** & 0.0994***\\
  & (3.67) & (3.56) & (3.50) & (3.67)\\
@@ -42,7 +42,7 @@ Asymmetry $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & -0.0013 (z=-0.10, p=0.53
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is the regime dummy $D^{SENT}$ (= 1 if Baker--Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker & Wurgler 2007); in column (3) it is the standardised continuous Baker--Wurgler orthogonalised index; in column (4) it is the AAII bull--bear regime dummy. All controls are lagged one period. Time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors are two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*},p<0.10$, $^{**},p<0.05$, $^{***},p<0.01$.
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is the regime dummy $D^{SENT}$ (= 1 if Baker--Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker & Wurgler 2007); in column (3) it is the standardised continuous Baker--Wurgler orthogonalised index; in column (4) it is the AAII bull--bear regime dummy. All controls are lagged one period. Time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors are two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*},p<0.10$, $^{**},p<0.05$, $^{***},p<0.01$.
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}

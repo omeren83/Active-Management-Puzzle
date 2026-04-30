@@ -223,13 +223,40 @@ resolve_coef_name <- function(coef_pat, sentvar) {
   coef_pat
 }
 
-# Get coefficient and t-stat from a fixest model, returning ("","") if absent
+# Get coefficient and t-stat from a fixest model. Returns ("","") if the
+# coef name is absent. Defensive: explicit unnaming, NA handling, and a
+# fallback for fixest's potential reordering of interaction terms.
 get_coef <- function(mod, name) {
-  if (is.na(name) || is.null(name)) return(c(coef = "", t = ""))
-  b <- coef(mod); se <- se(mod)
-  i <- which(names(b) == name)
-  if (length(i) == 0) return(c(coef = "", t = ""))
-  est <- b[i]; tstat <- est / se[i]
+  if (is.null(name) || (length(name) == 1 && is.na(name))) {
+    return(c(coef = "", t = ""))
+  }
+
+  # fixest::coeftable returns a clean matrix with rownames = coef names
+  # and columns Estimate / Std. Error / t value / Pr(>|t|).
+  ct <- tryCatch(fixest::coeftable(mod), error = function(e) NULL)
+  if (is.null(ct)) return(c(coef = "", t = ""))
+
+  rn <- rownames(ct)
+  i <- which(rn == name)
+
+  # If not found, try reversed interaction name (fixest may order the parts
+  # differently than they appear in the formula).
+  if (length(i) == 0L && grepl(":", name, fixed = TRUE)) {
+    parts <- strsplit(name, ":", fixed = TRUE)[[1]]
+    rev_name <- paste(rev(parts), collapse = ":")
+    i <- which(rn == rev_name)
+  }
+  if (length(i) == 0L) return(c(coef = "", t = ""))
+
+  # Pull as plain numeric scalars, stripping any names/attributes
+  est    <- as.numeric(ct[i, "Estimate"])
+  se_val <- as.numeric(ct[i, "Std. Error"])
+
+  if (is.na(est) || is.na(se_val) || se_val == 0) {
+    return(c(coef = "", t = ""))
+  }
+  tstat <- est / se_val
+
   c(coef = add_stars(fmt_num(est, 4), tstat),
     t    = paste0("(", formatC(tstat, format = "f", digits = 2), ")"))
 }
@@ -315,7 +342,8 @@ cap <- paste0(
 )
 footnote_text <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised ",
-  "proportional fund flow (decimal). Performance segments $R^{LOW}$, ",
+  "proportional fund flow (decimal). $t$-statistics in parentheses ",
+  "below each coefficient. Performance segments $R^{LOW}$, ",
   "$R^{MID}$, $R^{HIGH}$ are constructed from the lagged within-Lipper-",
   "category fractional rank of cumulative 12-month gross returns ",
   "(Equations 6--8 of the proposal). Sentiment in column (2) is the ",
