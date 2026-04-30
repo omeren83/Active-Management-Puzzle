@@ -1,4 +1,4 @@
-# panel_regressions_setup.R                                              v1.0
+# panel_regressions_setup.R                                              v1.1
 # =============================================================================
 # Builds panel_reg: the regression-ready fund-month panel consumed by the
 # four hypothesis-test scripts (H1-H4) of behavioral panel regressions
@@ -303,9 +303,10 @@ panel_reg <- panel %>%
     ActR2    = ActR2_lag,
     ActSkew  = ret_skew_lag,
     SENT_ORTH, PLS_SENT, VIX, SKEW, PUT_CALL_RATIO,
-    AAII_BB, UMCSENT, MD_RATIO, DMD_YOY,
+    AAII_BB, UMCSENT, MD_RATIO, DMD_YOY, MD_DETREND,
     D_SENT, D_PLS, D_VIX, D_SKEW, D_PCR,
-    D_MD, D_AAII, D_UMCSENT
+    D_MD, D_MD_LEVEL, D_MD_DETREND,
+    D_AAII, D_UMCSENT
   )
 
 # --- 14. Diagnostics ---------------------------------------------------------

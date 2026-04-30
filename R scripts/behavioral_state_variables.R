@@ -1,49 +1,21 @@
-# behavioral_state_variables.R                                            v1.0
+# behavioral_state_variables.R                                            v1.1
 # =============================================================================
-# Constructs monthly behavioral state variables for H1-H4 panel regressions.
+# v1.1 changes vs v1.0:
+#   - Added MD_DETREND  = residual of OLS regression of log(MD_RATIO) on a
+#     linear time trend, following Daniel-Klos-Pollet (2016 NYU Stern WP) and
+#     Rapach-Ringgenberg-Zhou (2016 JFE). Captures elevated commitment net
+#     of the secular trend in margin debt / market cap.
+#   - Added D_MD_LEVEL   = 1 if MD_RATIO   > Q_66 of in-sample distribution.
+#                          Captures accumulated leverage commitment (level).
+#   - Added D_MD_DETREND = 1 if MD_DETREND > Q_66 of in-sample distribution.
+#                          Methodologically cleanest H2 regime per literature.
+#   - Existing D_MD (based on DMD_YOY year-over-year growth) is unchanged
+#     and corresponds conceptually to D_MD_GROWTH. Three margin-debt
+#     dummies coexist for the 6-column H2 spec.
 #
-# INPUT:
-#   fund_data.xlsx, sheet "Sentiment" (LSEG wide-by-row layout). Schema:
-#     - Column 1 = "Ticker" (= series identifier).
-#     - Columns 2..N = month-end date headers (Excel serials).
-#     - Each row is one monthly time series. Series rows expected:
-#         SENT_ORTH       Baker-Wurgler orthogonalised sentiment (1965-07 -> 2023-12)
-#         PLS_SENT        Huang et al. (2015) PLS sentiment       (         -> 2023-12)
-#         VIX             CBOE Volatility Index                   (1994-12 -> 2026-02)
-#         SKEW            CBOE SKEW Index                         (2005-11 -> 2026-02)
-#         PUT_CALL_RATIO  CBOE equity put-call ratio              (         -> 2019-10)
-#         VOL_NYSE        NYSE share volume                       (         -> 2026-02)
-#         VOL_AMEX        AMEX share volume                       (         -> 2026-02)
-#         VOL_TOTAL       Total US equity volume                  (         -> 2026-02)
-#         MARGIN_DEBT     FINRA margin debt balances              (         -> 2026-01)
-#         TOTAL_MCAP      Total US equity market capitalisation   (         -> 2026-02)
-#         AAII_BULL       AAII survey bullish percentage          (1994-12 -> 2026-02)
-#         AAII_BEAR       AAII survey bearish percentage          (1994-12 -> 2026-02)
-#         UMCSENT         U Michigan Consumer Sentiment Index     (         -> 2026-01)
-#
-# OUTPUT:
-#   behavioral_state_vars.xlsx  in WORKING_DIR. One row per month, columns:
-#     - date (Date, end-of-month) ; yearmo (numeric YYYYMM)
-#     - All raw level series (above)
-#     - Constructed series:
-#         MD_RATIO  = MARGIN_DEBT / TOTAL_MCAP                     (Eq A.8.1)
-#         DMD_YOY   = MD_RATIO_t / MD_RATIO_{t-12} - 1             (Eq A.8.2)
-#         AAII_BB   = AAII_BULL - AAII_BEAR
-#     - 0/1 regime dummies at the 66th-pctile threshold of the in-sample
-#       distribution (Baker & Wurgler 2007; proposal Section 6.4):
-#         D_SENT, D_PLS, D_VIX, D_SKEW, D_PCR, D_MD, D_AAII, D_UMCSENT
-#     Sign convention: D_* = 1 when the raw variable is in its top tertile.
-#     For VIX and PUT_CALL_RATIO this corresponds to a BEARISH regime
-#     (opposite to D_SENT/D_PLS/D_AAII/D_UMCSENT). Regression code must flip
-#     signs as appropriate.
-#
-# REFERENCES:
-#   Baker M., Wurgler J. (2006). J Finance 61(4); (2007). JEP 21(2).
-#   Huang D., Jiang F., Tu J., Zhou G. (2015). RFS 28(3).
-#   Statman M., Thorley S., Vorkink K. (2006). RFS 19(4).
-#   Proposal Section 6.4 (Behavioral State Variables); Appendix A.8.
-#
-# Dependencies: readxl, writexl, dplyr, tidyr, lubridate
+# REFERENCES (added in v1.1):
+#   Daniel K., Klos A., Pollet J. (2016). NYU Stern Working Paper.
+#   Rapach D.E., Ringgenberg M.C., Zhou G. (2016). JFE 121(1).
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -52,16 +24,13 @@ suppressPackageStartupMessages({
 })
 
 # --- 0. Config ---------------------------------------------------------------
-# WORKING_DIR is set by master_pipeline.R; running standalone uses CWD.
 if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 
 INPUT_FILE        <- file.path(WORKING_DIR, "fund_data.xlsx")
 INPUT_SHEET       <- "Sentiment"
 OUTPUT_FILE       <- file.path(WORKING_DIR, "behavioral_state_vars.xlsx")
-REGIME_PERCENTILE <- 0.66   # Baker & Wurgler 2007 convention
+REGIME_PERCENTILE <- 0.66
 
-# Series expected in the input sheet (used only to print a coverage report;
-# missing series are tolerated but flagged).
 EXPECTED_SERIES <- c(
   "SENT_ORTH","PLS_SENT","VIX","SKEW","PUT_CALL_RATIO",
   "VOL_NYSE","VOL_AMEX","VOL_TOTAL","MARGIN_DEBT","TOTAL_MCAP",
@@ -71,54 +40,52 @@ EXPECTED_SERIES <- c(
 # --- 1. Load sheet -----------------------------------------------------------
 cat("Loading", INPUT_FILE, "  sheet:", INPUT_SHEET, "\n")
 
-# Resolve sheet name case-insensitively (Excel sheet names are case-sensitive
-# in readxl, but Sentiment / sentiment / SENTIMENT are all the same to a human).
-available_sheets <- excel_sheets(INPUT_FILE)
-match_idx <- which(tolower(available_sheets) == tolower(INPUT_SHEET))
+# Case-insensitive sheet resolver
+sheet_names <- excel_sheets(INPUT_FILE)
+match_idx <- which(tolower(sheet_names) == tolower(INPUT_SHEET))
 if (length(match_idx) == 0) {
-  cat("\nAvailable sheets in", basename(INPUT_FILE), ":\n")
-  for (s in available_sheets) cat("  -", s, "\n")
-  stop("Sheet '", INPUT_SHEET, "' not found in ", INPUT_FILE,
-       ". Add the sheet (or update INPUT_SHEET in the script).")
+  stop("Sheet '", INPUT_SHEET, "' not found. Available: ",
+       paste(sheet_names, collapse = ", "))
 }
-resolved_sheet <- available_sheets[match_idx[1]]
-if (resolved_sheet != INPUT_SHEET) {
-  cat("Note: requested '", INPUT_SHEET, "', using '", resolved_sheet,
+actual_sheet <- sheet_names[match_idx[1]]
+if (actual_sheet != INPUT_SHEET) {
+  cat("Note: requested '", INPUT_SHEET, "', using '", actual_sheet,
       "' (case-insensitive match).\n", sep = "")
 }
 
-# col_names = TRUE: row 1 (Ticker + date headers) becomes column names;
-# data rows hold each series. readxl serialises Excel-date headers into
-# numeric strings (Excel serial numbers, origin 1899-12-30).
-raw <- read_excel(
-  INPUT_FILE, sheet = resolved_sheet, col_names = TRUE,
+raw <- suppressWarnings(read_excel(
+  INPUT_FILE, sheet = actual_sheet, col_names = FALSE,
   na = c("", "NA", "#N/A N/A", "#N/A Field Not Applicable")
-)
+))
 
-# Parse date column names: handle both Excel serials ("34698") and parsed
-# date strings ("1994-12-30") robustly.
-parse_one_date <- function(s) {
-  # Try ISO date first; if that errors, try Excel serial number.
-  d <- tryCatch(as.Date(s), error = function(e) NA, warning = function(w) NA)
-  if (!is.na(d)) return(d)
-  n <- suppressWarnings(as.numeric(s))
-  if (!is.na(n)) return(as.Date(n, origin = "1899-12-30"))
-  as.Date(NA)
+# Header row parsing (LSEG wide-by-row)
+hdr      <- as.character(unlist(raw[1, ]))
+date_hdr <- hdr[-1]
+
+parse_dates <- function(x) {
+  # Excel serial as numeric/character is the common LSEG case -- try first.
+  # Use tryCatch on as.Date because charToDate raises ERRORS (not warnings)
+  # for unparseable strings, and suppressWarnings does NOT catch errors.
+  n <- suppressWarnings(as.numeric(x))
+  if (!any(is.na(n))) {
+    return(as.Date(n, origin = "1899-12-30"))
+  }
+  d <- tryCatch(
+    suppressWarnings(as.Date(x)),
+    error = function(e) NULL
+  )
+  if (!is.null(d) && !any(is.na(d))) return(d)
+  stop("Could not parse date headers in row 1. ",
+       "First 3 values: ", paste(head(x, 3), collapse = " | "))
 }
-date_hdr   <- names(raw)[-1]
-dates_raw  <- as.Date(vapply(date_hdr, parse_one_date, FUN.VALUE = as.Date(NA)))
-if (any(is.na(dates_raw))) {
-  bad <- date_hdr[is.na(dates_raw)]
-  stop("Failed to parse date headers: ", paste(head(bad, 5), collapse = ", "))
-}
-# Snap to true end-of-month (LSEG headers can be the last trading day).
-dates_eom <- ceiling_date(dates_raw, "month") - days(1)
+dates     <- parse_dates(date_hdr)
+dates_eom <- ceiling_date(dates, "month") - days(1)
 
-# Rename columns: keep "Ticker", replace date headers with EOM ISO strings.
-names(raw) <- c("Ticker", as.character(dates_eom))
+# --- 2. Pivot long, then tidy wide ------------------------------------------
+body <- raw[-1, ]
+names(body) <- c("Ticker", as.character(dates_eom))
 
-# --- 2. Pivot to long, then tidy wide ----------------------------------------
-long <- raw %>%
+long <- body %>%
   pivot_longer(-Ticker, names_to = "date", values_to = "value") %>%
   mutate(date = as.Date(date), value = as.numeric(value))
 
@@ -130,7 +97,7 @@ cat("Months loaded:", nrow(panel_raw),
     " | Range:", format(min(panel_raw$date)), "->",
     format(max(panel_raw$date)), "\n")
 
-# Coverage report (and missing-series flag)
+# Coverage report
 cat("\nSeries coverage:\n")
 present <- intersect(EXPECTED_SERIES, names(panel_raw))
 missing <- setdiff(EXPECTED_SERIES, names(panel_raw))
@@ -155,7 +122,28 @@ panel <- panel_raw %>%
   ) %>%
   mutate(DMD_YOY = MD_RATIO / lag(MD_RATIO, 12) - 1)
 
-# --- 4. Regime dummies (66th pctile, fixed in-sample threshold) --------------
+# --- 3a. NEW: detrended log MD_RATIO (Rapach-Ringgenberg-Zhou methodology) --
+# Regress log(MD_RATIO) on a linear time trend; the residual MD_DETREND
+# captures elevated leverage commitment net of secular growth in margin
+# debt / market cap (hedge fund AUM expansion, equity-lending market
+# expansion, etc., per DKP 2016).
+md_idx <- !is.na(panel$MD_RATIO) & panel$MD_RATIO > 0
+panel$MD_DETREND <- NA_real_
+if (sum(md_idx) >= 24L) {
+  log_md    <- log(panel$MD_RATIO[md_idx])
+  t_seq     <- seq_along(log_md)
+  trend_mod <- lm(log_md ~ t_seq)
+  panel$MD_DETREND[md_idx] <- residuals(trend_mod)
+  cat(sprintf(
+    "\nMD_DETREND: trend slope = %+.6f per month  (R^2 = %.3f, n = %d)\n",
+    coef(trend_mod)[2], summary(trend_mod)$r.squared, length(log_md)
+  ))
+} else {
+  warning("MD_DETREND: insufficient observations (", sum(md_idx),
+          "); column set to NA.")
+}
+
+# --- 4. Regime dummies (66th pctile, in-sample threshold) -------------------
 make_dummy <- function(x, p = REGIME_PERCENTILE) {
   thr <- quantile(x, probs = p, na.rm = TRUE, names = FALSE)
   d   <- as.integer(x > thr)
@@ -165,34 +153,37 @@ make_dummy <- function(x, p = REGIME_PERCENTILE) {
 
 panel <- panel %>%
   mutate(
-    D_SENT    = make_dummy(SENT_ORTH),
-    D_PLS     = make_dummy(PLS_SENT),
-    D_VIX     = make_dummy(VIX),       # high VIX     => bearish regime
-    D_SKEW    = make_dummy(SKEW),
-    D_PCR     = make_dummy(PUT_CALL_RATIO),  # high PCR => bearish regime
-    D_MD      = make_dummy(DMD_YOY),
-    D_AAII    = make_dummy(AAII_BB),
-    D_UMCSENT = make_dummy(UMCSENT)
+    D_SENT       = make_dummy(SENT_ORTH),
+    D_PLS        = make_dummy(PLS_SENT),
+    D_VIX        = make_dummy(VIX),
+    D_SKEW       = make_dummy(SKEW),
+    D_PCR        = make_dummy(PUT_CALL_RATIO),
+    D_MD         = make_dummy(DMD_YOY),     # GROWTH spec (unchanged)
+    D_MD_LEVEL   = make_dummy(MD_RATIO),    # NEW: level spec
+    D_MD_DETREND = make_dummy(MD_DETREND),  # NEW: detrended (DKP/RRZ)
+    D_AAII       = make_dummy(AAII_BB),
+    D_UMCSENT    = make_dummy(UMCSENT)
   )
 
-# Print thresholds (for documentation in dissertation methodology).
+# --- 5. Print thresholds -----------------------------------------------------
 cat("\nRegime thresholds (66th pctile of in-sample distribution):\n")
 thr_vars <- c("SENT_ORTH","PLS_SENT","VIX","SKEW","PUT_CALL_RATIO",
-              "DMD_YOY","AAII_BB","UMCSENT")
+              "DMD_YOY","MD_RATIO","MD_DETREND","AAII_BB","UMCSENT")
 thr_vars <- intersect(thr_vars, names(panel))
 thr_tbl <- sapply(thr_vars, function(v)
   quantile(panel[[v]], REGIME_PERCENTILE, na.rm = TRUE, names = FALSE))
 print(round(thr_tbl, 4))
 
-# --- 5. Order columns and export ---------------------------------------------
+# --- 6. Order columns and export --------------------------------------------
 ordered <- c(
   "date","yearmo",
   "SENT_ORTH","PLS_SENT","VIX","SKEW","PUT_CALL_RATIO",
   "VOL_NYSE","VOL_AMEX","VOL_TOTAL",
-  "MARGIN_DEBT","TOTAL_MCAP","MD_RATIO","DMD_YOY",
+  "MARGIN_DEBT","TOTAL_MCAP","MD_RATIO","DMD_YOY","MD_DETREND",
   "AAII_BULL","AAII_BEAR","AAII_BB","UMCSENT",
   "D_SENT","D_PLS","D_VIX","D_SKEW","D_PCR",
-  "D_MD","D_AAII","D_UMCSENT"
+  "D_MD","D_MD_LEVEL","D_MD_DETREND",
+  "D_AAII","D_UMCSENT"
 )
 panel <- panel[, intersect(ordered, names(panel))]
 
@@ -200,5 +191,6 @@ write_xlsx(panel, OUTPUT_FILE)
 cat(sprintf("\nWrote %s  (%d rows, %d cols)\n",
             OUTPUT_FILE, nrow(panel), ncol(panel)))
 
-# Make available as session object for downstream pipeline scripts.
+# Expose for downstream pipeline scripts
 behavioral_state_vars <- panel
+assign("behavioral_state_vars", behavioral_state_vars, envir = .GlobalEnv)
