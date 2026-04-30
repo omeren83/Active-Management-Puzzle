@@ -381,18 +381,21 @@ cap <- paste0(
   "absorbing aggregate flow-flood and risk-on confounders."
 )
 footnote_text <- paste0(
-  "Same sample, dependent variable, and rank construction as ",
-  "Table~\\ref{tab:H2_regression}. State main effects (margin-debt and ",
-  "PCR regimes, Baker-Wurgler $D^{SENT}$ in col~6) are absorbed by the ",
-  "Lipper $\\times$ yearmo fixed effects and so do not appear in the table. ",
+  # kableExtra threeparttable=TRUE strips ONE backslash: use \\\\cmd for \cmd.
+  # \ref{...} omitted: underscore in label triggers 'missing $' outside math.
+  "Same sample, dependent variable, and rank construction as the primary ",
+  "H2 specification. State main effects (margin-debt and PCR regimes, ",
+  "Baker-Wurgler $D^{SENT}$ in col~6) are absorbed by the Lipper ",
+  "$\\\\times$ yearmo fixed effects and do not appear in the table. ",
   "Time-invariant controls (expense ratio, load dummy, turnover) are now ",
   "identified because there is no fund FE. Standard errors two-way ",
-  "clustered on Ticker and calendar month (Petersen 2009). If $\\delta^{MD}_1$ ",
-  "remains positive and significant relative to the proposal's predicted ",
-  "$\\delta^{MD}_1<0$, the negative finding for the disposition hypothesis ",
-  "is robust to identification strategy and points toward a margin-call ",
-  "alternative (Brunnermeier \\& Pedersen 2009) rather than disposition ",
-  "psychology. Stars: $^{*}\\,p<0.10$, $^{**}\\,p<0.05$, $^{***}\\,p<0.01$."
+  "clustered on Ticker and calendar month (Petersen 2009). If ",
+  "$\\\\delta^{MD}_1$ remains positive and significant relative to the ",
+  "proposal's predicted $\\\\delta^{MD}_1<0$, the negative finding for the ",
+  "disposition hypothesis is robust to identification strategy and points ",
+  "toward a margin-call alternative (Brunnermeier \\\\& Pedersen 2009) ",
+  "rather than disposition psychology. ",
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
 ktab <- kbl(

@@ -291,21 +291,26 @@ cap <- paste0(
   "from within-fund to within-style-month variation."
 )
 footnote_text <- paste0(
-  "Same sample, dependent variable, and rank construction as ",
-  "Table~\\ref{tab:H1_regression}. The fixed-effect strategy here absorbs ",
-  "all aggregate market shocks and style-baseline shocks within each ",
-  "Lipper-category $\\times$ yearmo cell (a la Cheng et al.\\ 2025). The ",
-  "sentiment main effect $\\lambda$ is absorbed by the time component of ",
-  "the FE and so does not appear in the table. Time-invariant controls ",
-  "(expense ratio, load dummy, turnover) are now identified because there ",
-  "is no fund FE. The interaction terms $\\delta_1, \\delta_2, \\delta_3$ ",
-  "remain identified through within-style-month cross-sectional variation ",
-  "in performance ranks. If the primary specification ",
-  "(Table~\\ref{tab:H1_regression}, fund FE) and this robustness ",
-  "specification agree on the sign and significance of $\\delta_3$ and the ",
-  "asymmetry contrast, H1 is robust to identification strategy. Standard ",
-  "errors two-way clustered on Ticker and calendar month (Petersen 2009). ",
-  "Stars: $^{*}\\,p<0.10$, $^{**}\\,p<0.05$, $^{***}\\,p<0.01$."
+  # Note on backslash convention: kableExtra threeparttable=TRUE strips ONE
+  # backslash level from footnote text. Therefore every LaTeX command needs
+  # quadruple backslash in R (\\\\cmd) so it arrives in the .tex as \cmd.
+  # Cross-references (\ref{...}) are omitted: the underscore in the label
+  # argument triggers LaTeX's 'missing $ inserted' outside math mode.
+  "Same sample, dependent variable, and rank construction as the primary ",
+  "H1 specification. The Lipper $\\\\times$ yearmo fixed-effect strategy ",
+  "absorbs all aggregate market shocks and style-baseline shocks within ",
+  "each style-month cell (a la Cheng et al.\\ 2025). The sentiment main ",
+  "effect $\\\\lambda$ is absorbed by the yearmo component of the FE and ",
+  "does not appear in the table. Time-invariant controls (expense ratio, ",
+  "load dummy, turnover) are now identified because there is no fund FE. ",
+  "The interaction terms $\\\\delta_1$, $\\\\delta_2$, $\\\\delta_3$ remain ",
+  "identified through within-style-month cross-sectional variation in ",
+  "performance ranks. Agreement between the primary specification (fund FE) ",
+  "and this robustness specification on the sign and significance of ",
+  "$\\\\delta_3$ and the asymmetry contrast confirms H1 is robust to ",
+  "identification strategy. Standard errors two-way clustered on Ticker ",
+  "and calendar month (Petersen 2009). ",
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
 ktab <- kbl(

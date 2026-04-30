@@ -381,27 +381,29 @@ cap <- paste0(
   "put-call illusion-of-control regime indicators."
 )
 footnote_text <- paste0(
+  # kableExtra threeparttable=TRUE strips ONE backslash: use \\\\cmd for \cmd.
+  # Bare % is a LaTeX comment character — must be \\\\% to survive stripping.
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
   "Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
   "gross returns. The state variable in column (2) is $D^{MD,Lev}$ (= 1 if ",
-  "MD/MCAP is in the top 34\\%); column (3) is $D^{MD,Grw}$ (= 1 if YoY change ",
-  "in MD/MCAP is in the top 34\\%); column (4) is $D^{MD,Det}$ (= 1 if the ",
-  "residual of $\\log$(MD/MCAP) on a linear time trend is in the top 34\\%, ",
+  "MD/MCAP is in the top 34\\\\%); column (3) is $D^{MD,Grw}$ (= 1 if YoY change ",
+  "in MD/MCAP is in the top 34\\\\%); column (4) is $D^{MD,Det}$ (= 1 if the ",
+  "residual of $\\\\log$(MD/MCAP) on a linear time trend is in the top 34\\\\%, ",
   "following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); ",
-  "column (5) is $D^{\\text{INV-PCR}}$ (= 1 in the bottom 34\\% of the CBOE ",
+  "column (5) is $D^{\\\\text{INV-PCR}}$ (= 1 in the bottom 34\\\\% of the CBOE ",
   "equity put-call ratio: high call-to-put = high illusion of control). ",
   "Column (6) is the discriminant specification: it includes both ",
   "$D^{MD,Det}$ and Baker-Wurgler $D^{SENT}$ with full rank interactions; ",
-  "if $\\delta^{MD}_1$ remains negative there, H2 is identified ",
+  "if $\\\\delta^{MD}_1$ remains negative there, H2 is identified ",
   "independently of the H1 sentiment channel. All controls lagged one ",
   "period; time-invariant fund characteristics (expense ratio, load dummy, ",
-  "turnover) included but absorbed by fund FE. Cols (1)-(4) and (6) use ",
-  "the full margin-debt sample (1998-2023, $N\\!\\approx\\!190$K); col (5) ",
-  "uses the PCR sample (2003-10 to 2019-10). Standard errors two-way ",
-  "clustered on Ticker and calendar month (Petersen 2009). ",
-  "Stars: $^{*}\\,p<0.10$, $^{**}\\,p<0.05$, $^{***}\\,p<0.01$."
+  "turnover) included but absorbed by fund FE. Cols (1)--(4) and (6) use ",
+  "the full margin-debt sample (1998--2023, approximately 190K fund-months); ",
+  "col (5) uses the PCR sample (2003-10 to 2019-10). Standard errors ",
+  "two-way clustered on Ticker and calendar month (Petersen 2009). ",
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
 ktab <- kbl(
