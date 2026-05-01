@@ -360,7 +360,7 @@ ktab <- kbl(
   escape    = FALSE,
   linesep   = ""
 ) %>%
-  kable_styling(latex_options = "hold_position") %>%
+  kable_styling(latex_options = c("hold_position", "scale_down")) %>%
   add_header_above(c(" " = 1, "Baseline" = 1, "$D^{MD,Det}$" = 1,
                      "$D^{\\\\text{INV-PCR}}$" = 1,
                      "Discriminant" = 1),
