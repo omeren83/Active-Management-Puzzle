@@ -363,7 +363,7 @@ ktab <- kbl(
   kable_styling(latex_options = "hold_position") %>%
   add_header_above(c(" " = 1, "Baseline" = 1, "$D^{MD,Det}$" = 1,
                      "$D^{\\\\text{INV-PCR}}$" = 1,
-                     "$D^{MD,Det}\\\\,|\\\\,D^{SENT}$" = 1),
+                     "Discriminant" = 1),
                    escape = FALSE) %>%
   row_spec(nrow(body_df), hline_after = TRUE) %>%
   footnote(general = footnote_text, general_title = "",
