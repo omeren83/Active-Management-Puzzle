@@ -334,6 +334,39 @@ est_n <- panel_reg %>%
 cat("\nEst. sample (flow + core controls all non-NA, ex-December): ",
     est_n, " fund-months\n", sep = "")
 
+# =============================================================================
+# PATCH for panel_regressions_setup.R                                    v1.2
+# =============================================================================
+# Add this block to panel_regressions_setup.R AFTER all behavioral state
+# variables have been merged into panel_reg, but BEFORE the final cat() summary
+# / saveRDS().
+#
+# This creates lagged versions of every sentiment variable for use as the
+# PRIMARY specification in H1/H2 (Huang et al. 2015 timing convention).
+# Contemporaneous versions remain available for the timing robustness check.
+# =============================================================================
+
+# Lagged behavioral state variables (one-period lag, within fund)
+# Following Huang, Jiang, Tu, and Zhou (2015, RFS) timing convention.
+panel_reg <- panel_reg %>%
+  arrange(Ticker, date) %>%
+  group_by(Ticker) %>%
+  mutate(
+    # Continuous series lagged
+    SENT_ORTH_lag      = dplyr::lag(SENT_ORTH,      1),
+    PUT_CALL_RATIO_lag = dplyr::lag(PUT_CALL_RATIO, 1),
+    AAII_BB_lag        = dplyr::lag(AAII_BB,        1),
+    # Regime dummies lagged
+    D_SENT_lag         = dplyr::lag(D_SENT,         1),
+    D_AAII_lag         = dplyr::lag(D_AAII,         1),
+    D_MD_DETREND_lag   = dplyr::lag(D_MD_DETREND,   1),
+    D_MD_LEVEL_lag     = dplyr::lag(D_MD_LEVEL,     1),
+    D_MD_lag           = dplyr::lag(D_MD,           1)
+  ) %>%
+  ungroup()
+
+cat("Added lagged sentiment columns (suffix _lag).\n")
+
 # --- 15. Save and expose -----------------------------------------------------
 saveRDS(panel_reg, OUT_FILE_RDS)
 cat("\nWrote", OUT_FILE_RDS, "\n")

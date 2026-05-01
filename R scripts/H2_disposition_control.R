@@ -1,28 +1,29 @@
-# H2_disposition_control.R                                              v2.1
+# H2_disposition_control.R                                              v3.0
 # =============================================================================
-# Tests H2 (Disposition / Illusion-of-Control) by interacting the piecewise
-# performance-rank segments with regime dummies for margin debt and the
-# put-call ratio.
+# Tests H2 (Disposition / Illusion-of-Control) under three specifications and
+# writes three .tex tables. All specifications share aligned samples so
+# coefficient differences reflect spec changes, not sample composition.
 #
-# Four-column structure (v2.1, condensed from v2.0's six columns):
-#   (1) Baseline                              (Sirri-Tufano on H2 sample)
-#   (2) D_MD_DETREND  (DKP/RRZ detrended)     primary H2 margin-debt test
-#   (3) D_INV_PCR                             illusion-of-control via PCR
-#   (4) D_MD_DETREND + D_SENT discriminant    H2 net of H1 sentiment channel
+# (1) PRIMARY                          -> table_H2_regression.tex
+#     Lagged state variables + fund FE   (Huang et al. 2015 timing)
+#     Goes in the main body of the dissertation.
 #
-# Why these columns: D_MD_LEVEL produces near-identical results to D_MD_DETREND
-# in our sample (MD/MCAP trend R^2 = 0.024, near-stationary), so reporting
-# both adds no information. D_MD_GROWTH (YoY change) was tested in v2.0 and
-# produces a statistically null result; it is not displayed here.
+# (2) TIMING ROBUSTNESS                -> table_H2_contemporaneous.tex
+#     Contemporaneous state + fund FE    (Baker-Wurgler 2007 timing)
+#     Goes in Appendix F.1.
 #
-# The proposal's H2 prediction is delta_1 < 0 (high-margin-debt regime
-# attenuates the loser-end flow-performance slope). Three tests:
-#   (a) Joint chi-square on (delta_1, delta_2, delta_3) = 0  -- 3 df
-#   (b) Main effect:  delta_1 < 0  (one-sided z-test)
-#   (c) Asymmetry:    delta_3 > delta_1  (one-sided)
+# (3) IDENTIFICATION ROBUSTNESS        -> table_H2_robustness.tex
+#     Lagged state + Lipper x yearmo FE  (Cheng et al. 2025)
+#     Goes in Appendix F.2.
 #
-# Identification: fund FE | Ticker (within-fund); two-way clustering on
-# Ticker + yearmo (Petersen 2009; Cameron-Gelbach-Miller 2011).
+# Four columns per table:
+#   (1) Baseline
+#   (2) D_MD_DETREND (or _lag)         primary margin-debt test
+#   (3) D_INV_PCR    (or _lag)         illusion of control via PCR
+#   (4) Discriminant: D_MD_DETREND + D_SENT (or both lagged)
+#
+# H2 prediction: delta_1 < 0 (disposition flattens loser-end slope).
+# Brunnermeier-Pedersen (2009) margin-call alternative: delta_1 > 0.
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -33,8 +34,11 @@ suppressPackageStartupMessages({
 
 # --- 0. Config ---------------------------------------------------------------
 if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
-OUTPUT_TEX <- file.path(WORKING_DIR, "table_H2_regression.tex")
-STAR_THR   <- c(`***` = 2.576, `**` = 1.960, `*` = 1.645)
+STAR_THR <- c(`***` = 2.576, `**` = 1.960, `*` = 1.645)
+
+OUTPUT_PRIMARY <- file.path(WORKING_DIR, "table_H2_regression.tex")
+OUTPUT_CONT    <- file.path(WORKING_DIR, "table_H2_contemporaneous.tex")
+OUTPUT_ROBUST  <- file.path(WORKING_DIR, "table_H2_robustness.tex")
 
 # --- 1. Pre-flight -----------------------------------------------------------
 if (!exists("panel_reg")) {
@@ -47,89 +51,81 @@ if (!exists("panel_reg")) {
          WORKING_DIR, ". Run Phase J setup first.")
   }
 }
-
-required_md <- c("D_MD_DETREND", "MD_DETREND")
-missing_md  <- setdiff(required_md, names(panel_reg))
-if (length(missing_md)) {
-  stop("panel_reg is missing column(s): ", paste(missing_md, collapse = ", "),
-       ". Re-run panel_regressions_setup.R (v1.1+) and behavioral_state_",
-       "variables.R (v1.1+).")
+required_lag <- c("D_MD_DETREND_lag", "D_SENT_lag", "PUT_CALL_RATIO_lag")
+missing_lag  <- setdiff(required_lag, names(panel_reg))
+if (length(missing_lag)) {
+  stop("panel_reg is missing lagged columns: ",
+       paste(missing_lag, collapse = ", "),
+       ". Re-run panel_regressions_setup.R (v1.2+) with lag patch applied.")
 }
 
-# --- 2. Build estimation samples ---------------------------------------------
+# --- 2. Build aligned samples ------------------------------------------------
 core_rhs <- c("flow", "R_LOW", "R_MID", "R_HIGH",
               "log_TNA", "log_Age", "ExpRatio", "LoadDummy",
               "ret_vol", "Turnover", "style_flow_lag")
 
-# Primary sample: requires D_MD_DETREND + D_SENT non-NA so cols 1, 2, 4 are
-# estimated on identical observations (col 3 has its own PCR sample).
+# Margin-debt sample: requires both lagged AND contemporaneous MD/sentiment
+# non-NA so all three specs use identical observations.
 samp_md <- panel_reg %>%
   filter(!is_december) %>%
-  filter(if_all(all_of(c(core_rhs, "D_MD_DETREND", "SENT_ORTH")),
+  filter(if_all(all_of(c(core_rhs,
+                         "D_MD_DETREND", "D_SENT",
+                         "D_MD_DETREND_lag", "D_SENT_lag")),
                 ~ !is.na(.))) %>%
   mutate(
-    D_MD_DETREND = as.numeric(D_MD_DETREND),
-    D_SENT       = as.numeric(D_SENT),
-    Ticker       = as.factor(Ticker),
-    yearmo       = as.factor(yearmo)
+    D_MD_DETREND     = as.numeric(D_MD_DETREND),
+    D_MD_DETREND_lag = as.numeric(D_MD_DETREND_lag),
+    D_SENT           = as.numeric(D_SENT),
+    D_SENT_lag       = as.numeric(D_SENT_lag),
+    Ticker           = as.factor(Ticker),
+    yearmo           = as.factor(yearmo),
+    Lipper_Category  = as.factor(Lipper_Category)
   )
 
-# PCR sample: own (shorter) window 2003-10 to 2019-10.
+# PCR sample: own shorter window. D_INV_PCR (cont) and D_INV_PCR_lag built
+# from PUT_CALL_RATIO and its lag respectively, using the same Q34 threshold.
 samp_pcr <- panel_reg %>%
   filter(!is_december) %>%
-  filter(if_all(all_of(c(core_rhs, "PUT_CALL_RATIO")), ~ !is.na(.))) %>%
+  filter(if_all(all_of(c(core_rhs, "PUT_CALL_RATIO", "PUT_CALL_RATIO_lag")),
+                ~ !is.na(.))) %>%
   mutate(
-    pcr_thr   = quantile(PUT_CALL_RATIO, 1 - 0.66, na.rm = TRUE),
-    D_INV_PCR = as.numeric(PUT_CALL_RATIO <= pcr_thr),
-    Ticker    = as.factor(Ticker),
-    yearmo    = as.factor(yearmo)
+    pcr_thr_cont = quantile(PUT_CALL_RATIO,     1 - 0.66, na.rm = TRUE),
+    pcr_thr_lag  = quantile(PUT_CALL_RATIO_lag, 1 - 0.66, na.rm = TRUE),
+    D_INV_PCR     = as.numeric(PUT_CALL_RATIO     <= pcr_thr_cont),
+    D_INV_PCR_lag = as.numeric(PUT_CALL_RATIO_lag <= pcr_thr_lag),
+    Ticker          = as.factor(Ticker),
+    yearmo          = as.factor(yearmo),
+    Lipper_Category = as.factor(Lipper_Category)
   ) %>%
-  select(-pcr_thr)
+  select(-pcr_thr_cont, -pcr_thr_lag)
 
 cat(sprintf(
-  "\nPrimary sample (cols 1-2, 4): %d fund-months | %d funds | %d months\n",
-  nrow(samp_md), nlevels(samp_md$Ticker), nlevels(samp_md$yearmo)
+  "\nAligned MD sample (cols 1, 2, 4): %d fund-months | %d funds | %d months | %d styles\n",
+  nrow(samp_md), nlevels(samp_md$Ticker), nlevels(samp_md$yearmo),
+  nlevels(samp_md$Lipper_Category)
 ))
 cat(sprintf(
-  "PCR sample (col 3): %d fund-months | %d funds | %d months\n",
+  "Aligned PCR sample (col 3): %d fund-months | %d funds | %d months\n",
   nrow(samp_pcr), nlevels(samp_pcr$Ticker), nlevels(samp_pcr$yearmo)
 ))
 
-# --- 3. Estimate four specifications -----------------------------------------
-controls <- c("log_TNA", "log_Age", "ExpRatio", "LoadDummy",
-              "ret_vol", "Turnover", "style_flow_lag")
-ctrl_str <- paste(controls, collapse = " + ")
-
-mk_state_formula <- function(state_var) {
-  as.formula(paste("flow ~ R_LOW + R_MID + R_HIGH",
-                   "+", state_var,
-                   "+ R_LOW:", state_var, " + R_MID:", state_var,
-                   " + R_HIGH:", state_var, " +", ctrl_str,
-                   "| Ticker", sep = ""))
+# --- 3. Helpers --------------------------------------------------------------
+fmt_num <- function(x, n = 4) {
+  if (is.na(x)) return("")
+  formatC(x, format = "f", digits = n, big.mark = "")
+}
+add_stars <- function(coef_str, t) {
+  if (is.na(t) || coef_str == "") return(coef_str)
+  for (s in names(STAR_THR)) {
+    if (abs(t) >= STAR_THR[[s]]) return(paste0(coef_str, s))
+  }
+  coef_str
+}
+fmt_p <- function(p) {
+  if (is.na(p)) return("")
+  if (p < 0.001) "$<\\!0.001$" else formatC(p, format = "f", digits = 3)
 }
 
-f1 <- as.formula(paste("flow ~ R_LOW + R_MID + R_HIGH +", ctrl_str,
-                       "| Ticker"))
-f2 <- mk_state_formula("D_MD_DETREND")
-f3 <- mk_state_formula("D_INV_PCR")
-# Discriminant: D_MD_DETREND + D_SENT, both with 3 rank interactions
-f4 <- as.formula(paste("flow ~ R_LOW + R_MID + R_HIGH",
-                       "+ D_MD_DETREND + D_SENT",
-                       "+ R_LOW:D_MD_DETREND + R_MID:D_MD_DETREND",
-                       "+ R_HIGH:D_MD_DETREND",
-                       "+ R_LOW:D_SENT + R_MID:D_SENT + R_HIGH:D_SENT +",
-                       ctrl_str, "| Ticker"))
-
-cat("Estimating Col (1) Baseline...\n")
-m1 <- feols(f1, data = samp_md,  cluster = ~ Ticker + yearmo)
-cat("Estimating Col (2) D_MD_DETREND (DKP/RRZ detrended)...\n")
-m2 <- feols(f2, data = samp_md,  cluster = ~ Ticker + yearmo)
-cat("Estimating Col (3) D_INV_PCR (PCR sample)...\n")
-m3 <- feols(f3, data = samp_pcr, cluster = ~ Ticker + yearmo)
-cat("Estimating Col (4) D_MD_DETREND + D_SENT discriminant...\n")
-m4 <- feols(f4, data = samp_md,  cluster = ~ Ticker + yearmo)
-
-# --- 4. Hypothesis tests -----------------------------------------------------
 test_h2 <- function(m, state_label) {
   b <- coef(m); V <- vcov(m)
   i_low  <- which(names(b) == paste0("R_LOW:",  state_label))
@@ -140,9 +136,8 @@ test_h2 <- function(m, state_label) {
     i_mid  <- which(names(b) == paste0(state_label, ":R_MID"))
     i_high <- which(names(b) == paste0(state_label, ":R_HIGH"))
   }
-
   pos <- c(i_low, i_mid, i_high)
-  bs  <- b[pos]; Vs <- V[pos, pos]
+  bs <- b[pos]; Vs <- V[pos, pos]
   chi2 <- as.numeric(t(bs) %*% solve(Vs) %*% bs)
   p_joint <- pchisq(chi2, df = length(pos), lower.tail = FALSE)
 
@@ -160,74 +155,6 @@ test_h2 <- function(m, state_label) {
   list(joint_chi2 = chi2,    joint_p    = p_joint,
        d1_b       = d1_b,    d1_z       = z_main,    main_p_1sd = p_main_1sd,
        asym_diff  = diff_b,  asym_z     = z_asym,    asym_p_1sd = p_asym_1sd)
-}
-
-t2 <- test_h2(m2, "D_MD_DETREND")
-t3 <- test_h2(m3, "D_INV_PCR")
-t4 <- test_h2(m4, "D_MD_DETREND")
-
-cat("\n--- H2 hypothesis test results ---\n")
-test_results <- list(
-  "D_MD_DETREND  (col 2)" = t2,
-  "D_INV_PCR     (col 3)" = t3,
-  "D_MD_DETR|H1  (col 4)" = t4
-)
-for (nm in names(test_results)) {
-  tt <- test_results[[nm]]
-  cat(sprintf(
-    "%-22s joint=%6.2f p=%.4f | d1=%+.4f z=%+.2f p_1sd=%.4f | d3-d1=%+.4f z=%+.2f p_1sd=%.4f\n",
-    nm, tt$joint_chi2, tt$joint_p,
-    tt$d1_b, tt$d1_z, tt$main_p_1sd,
-    tt$asym_diff, tt$asym_z, tt$asym_p_1sd))
-}
-
-# --- 5. Build LaTeX table ----------------------------------------------------
-row_specs <- list(
-  list(coef = "R_LOW",          label = "$R^{LOW}$"),
-  list(coef = "R_MID",          label = "$R^{MID}$"),
-  list(coef = "R_HIGH",         label = "$R^{HIGH}$"),
-  list(coef = "STATE",          label = "State ($\\lambda$)"),
-  list(coef = "R_LOW:STATE",    label = "$R^{LOW}\\times$ State ($\\delta_1$)"),
-  list(coef = "R_MID:STATE",    label = "$R^{MID}\\times$ State ($\\delta_2$)"),
-  list(coef = "R_HIGH:STATE",   label = "$R^{HIGH}\\times$ State ($\\delta_3$)"),
-  list(coef = "D_SENT",         label = "$D^{SENT}$"),
-  list(coef = "R_LOW:D_SENT",   label = "$R^{LOW}\\times D^{SENT}$"),
-  list(coef = "R_MID:D_SENT",   label = "$R^{MID}\\times D^{SENT}$"),
-  list(coef = "R_HIGH:D_SENT",  label = "$R^{HIGH}\\times D^{SENT}$"),
-  list(coef = "log_TNA",        label = "$\\log(\\text{TNA})$"),
-  list(coef = "log_Age",        label = "$\\log(\\text{Age})$"),
-  list(coef = "ret_vol",        label = "Return vol.\\ (36m SD)"),
-  list(coef = "style_flow_lag", label = "Style flow")
-)
-
-fmt_num <- function(x, n = 4) {
-  if (is.na(x)) return("")
-  formatC(x, format = "f", digits = n, big.mark = "")
-}
-add_stars <- function(coef_str, t) {
-  if (is.na(t) || coef_str == "") return(coef_str)
-  for (s in names(STAR_THR)) {
-    if (abs(t) >= STAR_THR[[s]]) return(paste0(coef_str, s))
-  }
-  coef_str
-}
-
-state_var <- list(m1 = NULL, m2 = "D_MD_DETREND",
-                  m3 = "D_INV_PCR", m4 = "D_MD_DETREND")
-sent_col  <- list(m1 = FALSE, m2 = FALSE, m3 = FALSE, m4 = TRUE)
-
-resolve_coef_name <- function(coef_pat, sv, has_sent) {
-  if (coef_pat == "STATE") return(sv)
-  if (startsWith(coef_pat, "R_") && grepl(":STATE$", coef_pat)) {
-    if (is.null(sv)) return(NA_character_)
-    return(paste0(sub(":STATE$", "", coef_pat), ":", sv))
-  }
-  if (coef_pat %in% c("D_SENT", "R_LOW:D_SENT", "R_MID:D_SENT",
-                      "R_HIGH:D_SENT")) {
-    if (!has_sent) return(NA_character_)
-    return(coef_pat)
-  }
-  coef_pat
 }
 
 get_coef <- function(mod, name) {
@@ -251,129 +178,290 @@ get_coef <- function(mod, name) {
     t    = paste0("(", formatC(tstat, format = "f", digits = 2), ")"))
 }
 
-mods       <- list(m1 = m1, m2 = m2, m3 = m3, m4 = m4)
-mod_keys   <- c("m1", "m2", "m3", "m4")
-body_rows  <- list()
-for (spec in row_specs) {
-  vals <- vector("list", length(mod_keys))
-  for (j in seq_along(mod_keys)) {
-    sv  <- state_var[[mod_keys[j]]]
-    hs  <- sent_col[[mod_keys[j]]]
-    cn  <- resolve_coef_name(spec$coef, sv, hs)
-    vals[[j]] <- get_coef(mods[[j]], cn)
+# --- 4. Master table builder -------------------------------------------------
+build_h2_table <- function(samp_md, samp_pcr, fe_string,
+                           d_md_var, d_pcr_var, d_sent_var,
+                           output_path, table_label, caption, footnote_text,
+                           show_lambda, col_headers, spec_id) {
+  controls <- c("log_TNA", "log_Age", "ExpRatio", "LoadDummy",
+                "ret_vol", "Turnover", "style_flow_lag")
+  ctrl_str <- paste(controls, collapse = " + ")
+
+  mk_state_formula <- function(state_var) {
+    base_rhs <- paste("R_LOW + R_MID + R_HIGH +", ctrl_str)
+    if (show_lambda) {
+      rhs <- paste(base_rhs, "+", state_var,
+                   "+ R_LOW:", state_var, " + R_MID:", state_var,
+                   " + R_HIGH:", state_var)
+    } else {
+      rhs <- paste(base_rhs,
+                   "+ R_LOW:", state_var, " + R_MID:", state_var,
+                   " + R_HIGH:", state_var)
+    }
+    as.formula(paste("flow ~", rhs, "|", fe_string))
   }
-  coef_row <- c(spec$label, sapply(vals, function(v) v["coef"]))
-  t_row    <- c("",         sapply(vals, function(v) v["t"]))
-  body_rows[[length(body_rows) + 1]] <- coef_row
-  body_rows[[length(body_rows) + 1]] <- t_row
+
+  f1 <- as.formula(paste("flow ~ R_LOW + R_MID + R_HIGH +", ctrl_str,
+                         "|", fe_string))
+  f2 <- mk_state_formula(d_md_var)
+  f3 <- mk_state_formula(d_pcr_var)
+  # Discriminant: include d_md_var and d_sent_var with full rank interactions
+  # State main effects only if show_lambda.
+  if (show_lambda) {
+    f4 <- as.formula(paste(
+      "flow ~ R_LOW + R_MID + R_HIGH +", ctrl_str,
+      "+", d_md_var, "+", d_sent_var,
+      "+ R_LOW:", d_md_var, " + R_MID:", d_md_var, " + R_HIGH:", d_md_var,
+      "+ R_LOW:", d_sent_var, " + R_MID:", d_sent_var, " + R_HIGH:", d_sent_var,
+      "|", fe_string))
+  } else {
+    f4 <- as.formula(paste(
+      "flow ~ R_LOW + R_MID + R_HIGH +", ctrl_str,
+      "+ R_LOW:", d_md_var, " + R_MID:", d_md_var, " + R_HIGH:", d_md_var,
+      "+ R_LOW:", d_sent_var, " + R_MID:", d_sent_var, " + R_HIGH:", d_sent_var,
+      "|", fe_string))
+  }
+
+  cat(sprintf("\n[%s] Estimating 4 specifications...\n", spec_id))
+  m1 <- feols(f1, data = samp_md,  cluster = ~ Ticker + yearmo)
+  m2 <- feols(f2, data = samp_md,  cluster = ~ Ticker + yearmo)
+  m3 <- feols(f3, data = samp_pcr, cluster = ~ Ticker + yearmo)
+  m4 <- feols(f4, data = samp_md,  cluster = ~ Ticker + yearmo)
+
+  t2 <- test_h2(m2, d_md_var)
+  t3 <- test_h2(m3, d_pcr_var)
+  t4 <- test_h2(m4, d_md_var)
+
+  cat(sprintf("  D_MD_DETREND  joint=%5.2f p=%.4f | d1=%+.4f z=%+.2f | d3-d1 z=%+.2f\n",
+              t2$joint_chi2, t2$joint_p, t2$d1_b, t2$d1_z, t2$asym_z))
+  cat(sprintf("  D_INV_PCR     joint=%5.2f p=%.4f | d1=%+.4f z=%+.2f | d3-d1 z=%+.2f\n",
+              t3$joint_chi2, t3$joint_p, t3$d1_b, t3$d1_z, t3$asym_z))
+  cat(sprintf("  Discriminant  joint=%5.2f p=%.4f | d1=%+.4f z=%+.2f | d3-d1 z=%+.2f\n",
+              t4$joint_chi2, t4$joint_p, t4$d1_b, t4$d1_z, t4$asym_z))
+
+  # Row specs for body
+  row_specs <- list(
+    list(coef = "R_LOW",  label = "$R^{LOW}$"),
+    list(coef = "R_MID",  label = "$R^{MID}$"),
+    list(coef = "R_HIGH", label = "$R^{HIGH}$"),
+    list(coef = "STATE",          label = "State ($\\lambda$)"),
+    list(coef = "R_LOW:STATE",    label = "$R^{LOW}\\times$ State ($\\delta_1$)"),
+    list(coef = "R_MID:STATE",    label = "$R^{MID}\\times$ State ($\\delta_2$)"),
+    list(coef = "R_HIGH:STATE",   label = "$R^{HIGH}\\times$ State ($\\delta_3$)"),
+    list(coef = "D_SENT_VAR",     label = "$D^{SENT}$"),
+    list(coef = "R_LOW:D_SENT_VAR",  label = "$R^{LOW}\\times D^{SENT}$"),
+    list(coef = "R_MID:D_SENT_VAR",  label = "$R^{MID}\\times D^{SENT}$"),
+    list(coef = "R_HIGH:D_SENT_VAR", label = "$R^{HIGH}\\times D^{SENT}$"),
+    list(coef = "log_TNA",        label = "$\\log(\\text{TNA})$"),
+    list(coef = "log_Age",        label = "$\\log(\\text{Age})$")
+  )
+  if (!show_lambda) {
+    row_specs <- c(row_specs, list(
+      list(coef = "ExpRatio",  label = "Expense ratio"),
+      list(coef = "LoadDummy", label = "Load dummy")
+    ))
+  }
+  row_specs <- c(row_specs, list(
+    list(coef = "ret_vol",        label = "Return vol.\\ (36m SD)")
+  ))
+  if (!show_lambda) {
+    row_specs <- c(row_specs, list(
+      list(coef = "Turnover",     label = "Turnover")
+    ))
+  }
+  row_specs <- c(row_specs, list(
+    list(coef = "style_flow_lag", label = "Style flow")
+  ))
+
+  # Per-column state-variable name (column 3 has its own state, col 4 has 2)
+  state_var <- list(m1 = NULL, m2 = d_md_var, m3 = d_pcr_var, m4 = d_md_var)
+  has_dsent <- list(m1 = FALSE, m2 = FALSE, m3 = FALSE, m4 = TRUE)
+
+  resolve_coef_name <- function(coef_pat, sv, has_sent) {
+    if (coef_pat == "STATE") {
+      if (!show_lambda || is.null(sv)) return(NA_character_)
+      return(sv)
+    }
+    if (startsWith(coef_pat, "R_") && grepl(":STATE$", coef_pat)) {
+      if (is.null(sv)) return(NA_character_)
+      return(paste0(sub(":STATE$", "", coef_pat), ":", sv))
+    }
+    if (coef_pat == "D_SENT_VAR") {
+      if (!has_sent || !show_lambda) return(NA_character_)
+      return(d_sent_var)
+    }
+    if (startsWith(coef_pat, "R_") && grepl(":D_SENT_VAR$", coef_pat)) {
+      if (!has_sent) return(NA_character_)
+      return(paste0(sub(":D_SENT_VAR$", "", coef_pat), ":", d_sent_var))
+    }
+    coef_pat
+  }
+
+  mods <- list(m1 = m1, m2 = m2, m3 = m3, m4 = m4)
+  mod_keys <- c("m1", "m2", "m3", "m4")
+  body_rows <- list()
+  for (spec in row_specs) {
+    vals <- vector("list", length(mod_keys))
+    for (j in seq_along(mod_keys)) {
+      sv <- state_var[[mod_keys[j]]]
+      hs <- has_dsent[[mod_keys[j]]]
+      cn <- resolve_coef_name(spec$coef, sv, hs)
+      vals[[j]] <- get_coef(mods[[j]], cn)
+    }
+    coef_row <- c(spec$label, sapply(vals, function(v) v["coef"]))
+    t_row    <- c("",         sapply(vals, function(v) v["t"]))
+    body_rows[[length(body_rows) + 1]] <- coef_row
+    body_rows[[length(body_rows) + 1]] <- t_row
+  }
+  body_df <- do.call(rbind, body_rows)
+  colnames(body_df) <- c("Variable", "(1)", "(2)", "(3)", "(4)")
+  rownames(body_df) <- NULL
+
+  fe_label <- if (show_lambda) "Fund FE" else "FE: Lipper $\\times$ yearmo"
+  fe_row    <- c(fe_label, rep("Yes", 4))
+  clust_row <- c("Cluster (Ticker, yearmo)", rep("Yes", 4))
+  n_row     <- c("$N$",
+                 formatC(nobs(m1), format="d", big.mark=","),
+                 formatC(nobs(m2), format="d", big.mark=","),
+                 formatC(nobs(m3), format="d", big.mark=","),
+                 formatC(nobs(m4), format="d", big.mark=","))
+  r2_row    <- c("$R^2$ (within)",
+                 fmt_num(r2(m1, "wr2"), 3), fmt_num(r2(m2, "wr2"), 3),
+                 fmt_num(r2(m3, "wr2"), 3), fmt_num(r2(m4, "wr2"), 3))
+  joint_row <- c("Joint $\\delta_1=\\delta_2=\\delta_3=0$ ($\\chi^2_3$, $p$)",
+                 "--",
+                 sprintf("%.2f (%s)", t2$joint_chi2, fmt_p(t2$joint_p)),
+                 sprintf("%.2f (%s)", t3$joint_chi2, fmt_p(t3$joint_p)),
+                 sprintf("%.2f (%s)", t4$joint_chi2, fmt_p(t4$joint_p)))
+  main_row  <- c("Main $\\delta_1<0$ ($z$, 1-sided $p$)",
+                 "--",
+                 sprintf("z=%+.2f (p=%s)", t2$d1_z, fmt_p(t2$main_p_1sd)),
+                 sprintf("z=%+.2f (p=%s)", t3$d1_z, fmt_p(t3$main_p_1sd)),
+                 sprintf("z=%+.2f (p=%s)", t4$d1_z, fmt_p(t4$main_p_1sd)))
+  asym_row  <- c("Asym $\\delta_3-\\delta_1$ ($z$, 1-sided $p$)",
+                 "--",
+                 sprintf("z=%+.2f (p=%s)", t2$asym_z, fmt_p(t2$asym_p_1sd)),
+                 sprintf("z=%+.2f (p=%s)", t3$asym_z, fmt_p(t3$asym_p_1sd)),
+                 sprintf("z=%+.2f (p=%s)", t4$asym_z, fmt_p(t4$asym_p_1sd)))
+
+  footer_df <- rbind(fe_row, clust_row, n_row, r2_row,
+                     joint_row, main_row, asym_row)
+  colnames(footer_df) <- c("Variable","(1)","(2)","(3)","(4)")
+  rownames(footer_df) <- NULL
+
+  full_df <- rbind(body_df, footer_df)
+  rownames(full_df) <- NULL
+
+  ktab <- kbl(
+    full_df, format = "latex", booktabs = TRUE,
+    caption = caption, label = table_label,
+    align = c("l", rep("r", 4)), escape = FALSE, linesep = ""
+  ) %>%
+    kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+    add_header_above(col_headers, escape = FALSE) %>%
+    row_spec(nrow(body_df), hline_after = TRUE) %>%
+    footnote(general = footnote_text, general_title = "",
+             threeparttable = TRUE, escape = FALSE)
+
+  tex <- as.character(ktab)
+  tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
+  writeLines(tex, output_path)
+  cat(sprintf("Wrote %s\n", output_path))
+
+  list(m1 = m1, m2 = m2, m3 = m3, m4 = m4,
+       tests = list(t2 = t2, t3 = t3, t4 = t4))
 }
-body_df <- do.call(rbind, body_rows)
-colnames(body_df) <- c("Variable", "(1)", "(2)", "(3)", "(4)")
-rownames(body_df) <- NULL
 
-fmt_p <- function(p) {
-  if (is.na(p)) return("")
-  if (p < 0.001) "$<\\!0.001$"
-  else formatC(p, format = "f", digits = 3)
-}
-
-fe_row    <- c("Fund FE", rep("Yes", 4))
-clust_row <- c("Cluster (Ticker, yearmo)", rep("Yes", 4))
-n_row     <- c("$N$",
-               formatC(nobs(m1), format="d", big.mark=","),
-               formatC(nobs(m2), format="d", big.mark=","),
-               formatC(nobs(m3), format="d", big.mark=","),
-               formatC(nobs(m4), format="d", big.mark=","))
-r2_row    <- c("$R^2$ (within)",
-               fmt_num(r2(m1, "wr2"), 3),
-               fmt_num(r2(m2, "wr2"), 3),
-               fmt_num(r2(m3, "wr2"), 3),
-               fmt_num(r2(m4, "wr2"), 3))
-
-joint_row <- c("Joint $\\delta_1=\\delta_2=\\delta_3=0$ ($\\chi^2_3$, $p$)",
-               "--",
-               sprintf("%.2f (%s)", t2$joint_chi2, fmt_p(t2$joint_p)),
-               sprintf("%.2f (%s)", t3$joint_chi2, fmt_p(t3$joint_p)),
-               sprintf("%.2f (%s)", t4$joint_chi2, fmt_p(t4$joint_p)))
-
-main_row  <- c("Main $\\delta_1<0$ ($z$, 1-sided $p$)",
-               "--",
-               sprintf("z=%+.2f (p=%s)", t2$d1_z, fmt_p(t2$main_p_1sd)),
-               sprintf("z=%+.2f (p=%s)", t3$d1_z, fmt_p(t3$main_p_1sd)),
-               sprintf("z=%+.2f (p=%s)", t4$d1_z, fmt_p(t4$main_p_1sd)))
-
-asym_row  <- c("Asym $\\delta_3-\\delta_1$ ($z$, 1-sided $p$)",
-               "--",
-               sprintf("z=%+.2f (p=%s)", t2$asym_z, fmt_p(t2$asym_p_1sd)),
-               sprintf("z=%+.2f (p=%s)", t3$asym_z, fmt_p(t3$asym_p_1sd)),
-               sprintf("z=%+.2f (p=%s)", t4$asym_z, fmt_p(t4$asym_p_1sd)))
-
-footer_df <- rbind(fe_row, clust_row, n_row, r2_row,
-                   joint_row, main_row, asym_row)
-colnames(footer_df) <- c("Variable","(1)","(2)","(3)","(4)")
-rownames(footer_df) <- NULL
-
-full_df <- rbind(body_df, footer_df)
-rownames(full_df) <- NULL
-
-# Caption + footnote (4-column version)
-cap <- paste0(
+# --- 5. Captions and footnotes -----------------------------------------------
+cap_primary <- paste0(
   "H2: Disposition / Illusion-of-Control Hypothesis. Panel regression of ",
-  "monthly proportional fund flows on within-Lipper-category lagged ",
-  "12-month performance-rank segments interacted with margin-debt and ",
-  "put-call illusion-of-control regime indicators."
+  "monthly proportional fund flows on within-Lipper-category lagged 12-month ",
+  "performance-rank segments interacted with margin-debt and put-call ",
+  "illusion-of-control regime indicators, all lagged one period (Huang et al.\\ ",
+  "2015 timing convention)."
 )
-footnote_text <- paste0(
-  # kableExtra threeparttable=TRUE strips ONE backslash: use \\\\cmd for \cmd.
+fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
   "Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
-  "gross returns. The state variable in column (2) is $D^{MD,Det}$ (= 1 if ",
-  "the residual of $\\\\log$(MD/MCAP) on a linear time trend is in the top ",
-  "34\\\\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); ",
-  "column (3) is $D^{\\\\text{INV-PCR}}$ (= 1 in the bottom 34\\\\% of the CBOE ",
-  "equity put-call ratio: high call-to-put = high illusion of control). ",
-  "Column (4) is the discriminant specification: it includes both ",
-  "$D^{MD,Det}$ and the Baker-Wurgler orthogonalised sentiment regime ",
-  "$D^{SENT}$ (= 1 if SENT$^\\\\perp$ is in the top 34\\\\%) with full rank ",
-  "interactions; if $\\\\delta^{MD}_1$ remains negative there, H2 is identified ",
-  "independently of the H1 sentiment channel. All controls lagged one ",
-  "period; time-invariant fund characteristics (expense ratio, load dummy, ",
-  "turnover) included but absorbed by fund FE. Cols (1)-(2) and (4) use ",
-  "the full margin-debt sample (1998-2023, approximately 235K fund-months); ",
-  "col (3) uses the PCR sample (2003-10 to 2019-10). Standard errors ",
-  "two-way clustered on Ticker and calendar month (Petersen 2009). ",
+  "gross returns. State variable in column (2) is $D^{MD,Det}_{t-1}$ (= 1 if ",
+  "the residual of $\\\\log$(MD/MCAP) on a linear time trend was in the top ",
+  "34\\\\% at $t-1$, following Daniel-Klos-Pollet 2016 and ",
+  "Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\\\\text{INV-PCR}}_{t-1}$ ",
+  "(= 1 if the CBOE equity put-call ratio was in the bottom 34\\\\% at $t-1$: ",
+  "high call-to-put = high illusion of control). Column (4) is the ",
+  "discriminant specification: it includes both $D^{MD,Det}_{t-1}$ and the ",
+  "Baker-Wurgler orthogonalised sentiment regime $D^{SENT}_{t-1}$ (= 1 if ",
+  "SENT$^\\\\perp$ at $t-1$ exceeded the 66th percentile) with full rank ",
+  "interactions. All controls lagged one period; time-invariant fund ",
+  "characteristics (expense ratio, load dummy, turnover) included but absorbed ",
+  "by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) ",
+  "uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered ",
+  "on Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
-ktab <- kbl(
-  full_df,
-  format    = "latex",
-  booktabs  = TRUE,
-  caption   = cap,
-  label     = "H2_regression",
-  align     = c("l", rep("r", 4)),
-  escape    = FALSE,
-  linesep   = ""
-) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down")) %>%
-  add_header_above(c(" " = 1, "Baseline" = 1, "$D^{MD,Det}$" = 1,
-                     "$D^{\\\\text{INV-PCR}}$" = 1,
-                     "Discriminant" = 1),
-                   escape = FALSE) %>%
-  row_spec(nrow(body_df), hline_after = TRUE) %>%
-  footnote(general = footnote_text, general_title = "",
-           threeparttable = TRUE, escape = FALSE)
+cap_cont <- paste0(
+  "H2 Robustness --- Contemporaneous State Variables. Same four-column ",
+  "specification as Table~\\ref{tab:H2_regression}, except margin-debt, PCR, ",
+  "and sentiment regime indicators are measured at time $t$ rather than $t-1$ ",
+  "(Baker-Wurgler 2007 timing convention)."
+)
+fn_cont <- paste0(
+  "Same sample, dependent variable, controls, and identification strategy as ",
+  "Table~\\\\ref{tab:H2_regression}. State variables are measured ",
+  "contemporaneously: column (2) uses $D^{MD,Det}_t$, column (3) uses ",
+  "$D^{\\\\text{INV-PCR}}_t$, column (4) is the discriminant with $D^{MD,Det}_t$ ",
+  "and $D^{SENT}_t$. Standard errors two-way clustered on Ticker and calendar ",
+  "month (Petersen 2009). ",
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+)
 
-tex <- as.character(ktab)
-tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
-writeLines(tex, OUTPUT_TEX)
-cat(sprintf("\nWrote %s\n", OUTPUT_TEX))
+cap_robust <- paste0(
+  "H2 Robustness --- Style $\\times$ Time Fixed Effects. Same lagged-state ",
+  "specification as Table~\\ref{tab:H2_regression}, but with Lipper-category ",
+  "$\\times$ yearmo two-way fixed effects in place of fund fixed effects. ",
+  "Identification shifts from within-fund to within-style-month variation, ",
+  "absorbing aggregate flow-flood and risk-on confounders."
+)
+fn_robust <- paste0(
+  "Sample, dependent variable, rank construction, and column specifications ",
+  "identical to Table~\\\\ref{tab:H2_regression}. State main effects (and ",
+  "$D^{SENT}_{t-1}$ in col 4) are absorbed by the Lipper $\\\\times$ yearmo ",
+  "fixed effects and do not appear in the table; time-invariant controls ",
+  "(expense ratio, load dummy, turnover) are now identified because there is ",
+  "no fund FE. Standard errors two-way clustered on Ticker and calendar ",
+  "month (Petersen 2009). The robustness of $\\\\delta^{MD}_1>0$ across both ",
+  "identification strategies points toward a margin-call alternative ",
+  "(Brunnermeier \\\\& Pedersen 2009) rather than disposition psychology. ",
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+)
 
-# --- 6. Expose objects for the reporting script ------------------------------
-H2_models <- list(baseline = m1, dmd_detrend = m2,
-                  dpcr_inv = m3, dmd_det_dsent = m4)
-H2_tests  <- test_results
+hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{MD,Det}_{t-1}$" = 1,
+                "$D^{\\\\text{INV-PCR}}_{t-1}$" = 1, "Discriminant" = 1)
+hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{MD,Det}$" = 1,
+                "$D^{\\\\text{INV-PCR}}$" = 1, "Discriminant" = 1)
+
+# --- 6. Estimate three specifications ----------------------------------------
+H2_primary <- build_h2_table(
+  samp_md, samp_pcr, "Ticker",
+  "D_MD_DETREND_lag", "D_INV_PCR_lag", "D_SENT_lag",
+  OUTPUT_PRIMARY, "H2_regression", cap_primary, fn_primary,
+  show_lambda = TRUE, col_headers = hdr_lagged, spec_id = "PRIMARY"
+)
+H2_cont <- build_h2_table(
+  samp_md, samp_pcr, "Ticker",
+  "D_MD_DETREND", "D_INV_PCR", "D_SENT",
+  OUTPUT_CONT, "H2_contemporaneous", cap_cont, fn_cont,
+  show_lambda = TRUE, col_headers = hdr_cont, spec_id = "TIMING ROBUSTNESS"
+)
+H2_robust <- build_h2_table(
+  samp_md, samp_pcr, "Lipper_Category^yearmo",
+  "D_MD_DETREND_lag", "D_INV_PCR_lag", "D_SENT_lag",
+  OUTPUT_ROBUST, "H2_robustness", cap_robust, fn_robust,
+  show_lambda = FALSE, col_headers = hdr_lagged, spec_id = "FE ROBUSTNESS"
+)
+
+H2_models <- list(primary = H2_primary, cont = H2_cont, robust = H2_robust)
 assign("H2_models", H2_models, envir = .GlobalEnv)
-assign("H2_tests",  H2_tests,  envir = .GlobalEnv)

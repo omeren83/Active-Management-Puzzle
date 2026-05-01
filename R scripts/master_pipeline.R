@@ -93,8 +93,8 @@ RUN_PHASE_E_SUBPERIODS    <- FALSE   # structural_break_test + subperiod_analysi
 RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
 RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis
 RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
-RUN_PHASE_I_BEHAVIORAL    <- FALSE    # behavioral_state_variables (NEW)
-RUN_PHASE_J_PANEL_REG     <- TRUE   # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
+RUN_PHASE_I_BEHAVIORAL    <- TRUE    # behavioral_state_variables (NEW)
+RUN_PHASE_J_PANEL_REG     <- FALSE   # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
 RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
 
 # Stop on first error (TRUE) or keep going and report failures at end (FALSE)
@@ -279,9 +279,7 @@ if (RUN_PHASE_J_PANEL_REG) {
   require_session_object("behavioral_state_vars",  "panel_regressions_setup.R")
   run_script("panel_regressions_setup.R",     "Phase J")
   run_script("H1_sentiment_convexity.R",      "Phase J")
-  run_script("H1_robustness.R",               "Phase J")
   run_script("H2_disposition_control.R",      "Phase J")
-  run_script("H2_robustness.R",               "Phase J")
   run_script("H3_lottery_demand.R",           "Phase J")
   run_script("H4_fee_elasticity.R",           "Phase J")
   run_script("panel_regressions_reporting.R", "Phase J")

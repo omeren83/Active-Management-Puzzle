@@ -162,11 +162,7 @@
 
 \input{tables/table_H1_regression}
 \newpage
-\input{tables/table_H1_robustness}
-\newpage
 \input{tables/table_H2_regression}
-\newpage
-\input{tables/table_H2_robustness}
 
 % =============================================================================
 % APPENDIX A: ALTERNATIVE PANEL DESCRIPTIVE STATISTICS
@@ -486,7 +482,62 @@ use the full December~1994--February~2026 window.
 \input{tables/table_bsw_comparison_robust}
 \clearpage
 
+% =============================================================================
+% APPENDIX F: BEHAVIORAL HYPOTHESIS ROBUSTNESS CHECKS
+% =============================================================================
+
 \clearpage
+\section*{Appendix F: Behavioral Hypothesis Robustness Checks}
+\addcontentsline{toc}{section}{Appendix F: Behavioral Hypothesis Robustness Checks}
+
+This appendix presents two robustness checks for each behavioral hypothesis
+estimated in Section~5. The primary specification reported in the main body
+uses sentiment and state variables lagged one period
+(\textcite{Huang2015} timing convention) and fund fixed effects. The two
+robustness checks below address (i)~the timing assumption and (ii)~the
+identification strategy.
+
+All robustness specifications use the SAME aligned estimation sample as
+the primary specification, so coefficient differences across tables reflect
+only the spec change (timing or fixed-effect structure), not sample
+composition.
+
+\subsection*{F.1 \ Timing Robustness: Contemporaneous State Variables}
+
+The primary specification follows the \textcite{Huang2015} timing
+convention by lagging all sentiment and margin-debt regime indicators one
+period. \textcite{BakerWurgler2007} use contemporaneous values
+in their original sentiment-return regressions. This subsection re-estimates
+each behavioral hypothesis using state variables measured at time~$t$
+(coincident with the dependent flow variable) rather than at $t-1$.
+
+If the lagged primary results are an artefact of timing rather than reflecting
+genuine economic relationships, replacing lagged with contemporaneous state
+variables should change the conclusions. As shown below, the central findings
+(retail sentiment-asymmetry in H1; positive $\delta^{MD}_1$ in H2)
+are stable across the two timing conventions.
+
+\input{tables/table_H1_contemporaneous}
+\newpage
+\input{tables/table_H2_contemporaneous}
+\clearpage
+
+\subsection*{F.2 \ Identification Robustness: Style $\times$ Time Fixed Effects}
+
+The primary specification uses fund fixed effects (within-fund identification).
+This subsection re-estimates each hypothesis with Lipper-category $\times$
+yearmo two-way fixed effects in place of fund fixed effects. The interaction
+absorbs aggregate flow-flood effects within investment styles, ruling out the
+possibility that primary results reflect aggregate sentiment-driven flows
+into entire style categories rather than within-fund performance-slope
+shifts. This identification approach follows
+\textcite{ChengEtAl2025} and \textcite{BerkVanBinsbergen2015}.
+
+\input{tables/table_H1_robustness}
+\newpage
+\input{tables/table_H2_robustness}
+\clearpage
+
 \printbibliography
 
 \end{document}
