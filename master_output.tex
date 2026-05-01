@@ -481,7 +481,6 @@ use the full December~1994--February~2026 window.
 % Table E.3: BSW decomposition comparison
 \input{tables/table_bsw_comparison_robust}
 \clearpage
-
 % =============================================================================
 % APPENDIX F: BEHAVIORAL HYPOTHESIS ROBUSTNESS CHECKS
 % =============================================================================
@@ -492,52 +491,46 @@ use the full December~1994--February~2026 window.
 
 This appendix presents two robustness checks for each behavioral hypothesis
 estimated in Section~5. The primary specification reported in the main body
-uses sentiment and state variables lagged one period
-(\textcite{Huang2015} timing convention) and fund fixed effects. The two
-robustness checks below address (i)~the timing assumption and (ii)~the
-identification strategy.
+uses contemporaneous sentiment and state variables and fund fixed effects,
+following the timing convention of \textcite{SirriTufano1998} for fund-flow
+regressions. The two robustness checks below address (i)~the timing
+assumption and (ii)~the identification strategy. All robustness
+specifications use the same aligned estimation sample as the primary
+specification, so coefficient differences across tables reflect only the
+spec change, not sample composition.
 
-All robustness specifications use the SAME aligned estimation sample as
-the primary specification, so coefficient differences across tables reflect
-only the spec change (timing or fixed-effect structure), not sample
-composition.
+\subsection*{F.1 \ Timing Robustness: Lagged State Variables}
 
-\subsection*{F.1 \ Timing Robustness: Contemporaneous State Variables}
+The primary specification measures sentiment and margin-debt regime
+indicators contemporaneously with the dependent flow variable, consistent
+with \textcite{BakerWurgler2007}. \textcite{Huang2015} use one-period lags
+in their return-predictability tests. This subsection re-estimates each
+behavioral hypothesis with all state variables measured at $t-1$ rather
+than $t$. Treating fund flows as decisions taken in response to information
+available during the month, contemporaneous measurement is the more
+defensible default; the lagged specification is reported here to confirm
+that primary results are not artefacts of the timing assumption.
 
-The primary specification follows the \textcite{Huang2015} timing
-convention by lagging all sentiment and margin-debt regime indicators one
-period. \textcite{BakerWurgler2007} use contemporaneous values
-in their original sentiment-return regressions. This subsection re-estimates
-each behavioral hypothesis using state variables measured at time~$t$
-(coincident with the dependent flow variable) rather than at $t-1$.
-
-If the lagged primary results are an artefact of timing rather than reflecting
-genuine economic relationships, replacing lagged with contemporaneous state
-variables should change the conclusions. As shown below, the central findings
-(retail sentiment-asymmetry in H1; positive $\delta^{MD}_1$ in H2)
-are stable across the two timing conventions.
-
-\input{tables/table_H1_contemporaneous}
+\input{tables/table_H1_lagged}
 \newpage
-\input{tables/table_H2_contemporaneous}
+\input{tables/table_H2_lagged}
 \clearpage
 
 \subsection*{F.2 \ Identification Robustness: Style $\times$ Time Fixed Effects}
 
-The primary specification uses fund fixed effects (within-fund identification).
-This subsection re-estimates each hypothesis with Lipper-category $\times$
-yearmo two-way fixed effects in place of fund fixed effects. The interaction
-absorbs aggregate flow-flood effects within investment styles, ruling out the
-possibility that primary results reflect aggregate sentiment-driven flows
-into entire style categories rather than within-fund performance-slope
-shifts. This identification approach follows
+The primary specification uses fund fixed effects (within-fund
+identification). This subsection re-estimates each hypothesis with
+Lipper-category $\times$ yearmo two-way fixed effects in place of fund
+fixed effects, ruling out the possibility that primary results reflect
+aggregate sentiment-driven flows into entire style categories rather than
+within-fund performance-slope shifts. This identification approach follows
 \textcite{ChengEtAl2025} and \textcite{BerkVanBinsbergen2015}.
 
 \input{tables/table_H1_robustness}
 \newpage
 \input{tables/table_H2_robustness}
 \clearpage
-
+\nocite{SirriTufano1998, BakerWurgler2007, Huang2015, Petersen2009, DanielKlosPollet2016, RapachRinggenbergZhou2016, BrunnermeierPedersen2009, ChengEtAl2025, BerkVanBinsbergen2015}
 \printbibliography
 
 \end{document}
