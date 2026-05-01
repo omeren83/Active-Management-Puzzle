@@ -304,12 +304,9 @@ main_row  <- c("Main $\\delta_1<0$ ($z$, 1-sided $p$)",
 
 asym_row  <- c("Asym $\\delta_3-\\delta_1$ ($z$, 1-sided $p$)",
                "--",
-               sprintf("%+.4f (z=%+.2f, p=%s)",
-                       t2$asym_diff, t2$asym_z, fmt_p(t2$asym_p_1sd)),
-               sprintf("%+.4f (z=%+.2f, p=%s)",
-                       t3$asym_diff, t3$asym_z, fmt_p(t3$asym_p_1sd)),
-               sprintf("%+.4f (z=%+.2f, p=%s)",
-                       t4$asym_diff, t4$asym_z, fmt_p(t4$asym_p_1sd)))
+               sprintf("z=%+.2f (p=%s)", t2$asym_z, fmt_p(t2$asym_p_1sd)),
+               sprintf("z=%+.2f (p=%s)", t3$asym_z, fmt_p(t3$asym_p_1sd)),
+               sprintf("z=%+.2f (p=%s)", t4$asym_z, fmt_p(t4$asym_p_1sd)))
 
 footer_df <- rbind(fe_row, clust_row, n_row, r2_row,
                    joint_row, main_row, asym_row)
