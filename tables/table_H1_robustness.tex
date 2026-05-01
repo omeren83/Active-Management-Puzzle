@@ -1,12 +1,12 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H1_robustness}H1 Robustness: Sentiment-Convexity Hypothesis under Style $\times$ Time fixed effects. Same four sentiment specifications as Table~\ref{tab:H1_regression}, but with Lipper-category $\times$ yearmo two-way fixed effects in place of fund fixed effects. Identification shifts from within-fund to within-style-month variation.}
+\caption{\label{tab:H1_robustness}H1 Robustness --- Style $\times$ Time Fixed Effects. Same contemporaneous-sentiment specification as Table~\ref{tab:H1_regression}, but with Lipper-category $\times$ yearmo two-way fixed effects in place of fund fixed effects. Identification shifts from within-fund to within-style-month variation.}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{SENT}$} & \multicolumn{1}{c}{$SENT^{\perp}$} & \multicolumn{1}{c}{$D^{AAII}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{SENT}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{AAII}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -16,11 +16,13 @@ $R^{MID}$ & 0.0162*** & 0.0173*** & 0.0162*** & 0.0155***\\
  & (17.38) & (17.13) & (17.63) & (15.40)\\
 $R^{HIGH}$ & 0.0805*** & 0.0821*** & 0.0804*** & 0.0773***\\
  & (14.56) & (13.60) & (14.65) & (13.32)\\
-$R^{LOW}\times$ Sent ($\delta_1$) &  & -0.0083 & -0.0034 & -0.0072\\
+Sentiment ($\lambda$) &  &  &  & \\
+ &  &  &  & \\
+$R^{LOW}\times$ Sent.\ ($\delta_1$) &  & -0.0083 & -0.0034 & -0.0072\\
  &  & (-1.15) & (-1.16) & (-0.87)\\
-$R^{MID}\times$ Sent ($\delta_2$) &  & -0.0052*** & -0.0018** & 0.0032\\
+$R^{MID}\times$ Sent.\ ($\delta_2$) &  & -0.0052*** & -0.0018** & 0.0032\\
  &  & (-2.86) & (-2.15) & (1.62)\\
-$R^{HIGH}\times$ Sent ($\delta_3$) &  & -0.0080 & -0.0063 & 0.0146\\
+$R^{HIGH}\times$ Sent.\ ($\delta_3$) &  & -0.0080 & -0.0063 & 0.0146\\
  &  & (-0.74) & (-1.32) & (1.48)\\
 $\log(\text{TNA})$ & -0.0009*** & -0.0009*** & -0.0009*** & -0.0009***\\
  & (-5.72) & (-5.73) & (-5.72) & (-5.72)\\
@@ -42,11 +44,11 @@ Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 235,225 & 235,225 & 235,225 & 235,225\\
 $R^2$ (within) & 0.021 & 0.022 & 0.022 & 0.022\\
 Joint $\delta_1=\delta_2=\delta_3=0$ ($\chi^2_3$, $p$) & -- & 11.99 (0.007) & 11.45 (0.010) & 7.79 (0.051)\\
-Asym $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & +0.0003 (z=+0.02, p=0.491) & -0.0029 (z=-0.57, p=0.715) & +0.0218 (z=+1.73, p=0.042)\\
+Asymmetry $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & z=+0.02 (p=0.491) & z=-0.57 (p=0.715) & z=+1.73 (p=0.042)\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Same sample, dependent variable, and rank construction as the primary H1 specification. The Lipper $\times$ yearmo fixed-effect strategy absorbs all aggregate market shocks and style-baseline shocks within each style-month cell (a la Cheng et al. 2025). The sentiment main effect $\lambda$ is absorbed by the yearmo component of the FE and does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. The interaction terms $\delta_1$, $\delta_2$, $\delta_3$ remain identified through within-style-month cross-sectional variation in performance ranks. Agreement between the primary specification (fund FE) and this robustness specification on the sign and significance of $\delta_3$ and the asymmetry contrast confirms H1 is robust to identification strategy. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\item Same sample, dependent variable, and rank construction as Table~\ref{tab:H1_regression}. Sentiment variables remain contemporaneous. State main effects ($\lambda$) are absorbed by the Lipper $\times$ yearmo fixed effects and so do not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}

@@ -482,6 +482,7 @@ use the full December~1994--February~2026 window.
 \input{tables/table_bsw_comparison_robust}
 \clearpage
 
+\clearpage
 % =============================================================================
 % APPENDIX F: BEHAVIORAL HYPOTHESIS ROBUSTNESS CHECKS
 % =============================================================================
@@ -495,27 +496,22 @@ estimated in Section~5. The primary specification reported in the main body
 uses sentiment and state variables lagged one period
 (\textcite{Huang2015} timing convention) and fund fixed effects. The two
 robustness checks below address (i)~the timing assumption and (ii)~the
-identification strategy.
-
-All robustness specifications use the SAME aligned estimation sample as
-the primary specification, so coefficient differences across tables reflect
-only the spec change (timing or fixed-effect structure), not sample
-composition.
+identification strategy. All robustness specifications use the same aligned
+estimation sample as the primary specification, so coefficient differences
+across tables reflect only the spec change (timing or fixed-effect
+structure), not sample composition.
 
 \subsection*{F.1 \ Timing Robustness: Contemporaneous State Variables}
 
-The primary specification follows the \textcite{Huang2015} timing
-convention by lagging all sentiment and margin-debt regime indicators one
-period. \textcite{BakerWurgler2007} use contemporaneous values
-in their original sentiment-return regressions. This subsection re-estimates
-each behavioral hypothesis using state variables measured at time~$t$
-(coincident with the dependent flow variable) rather than at $t-1$.
-
-If the lagged primary results are an artefact of timing rather than reflecting
-genuine economic relationships, replacing lagged with contemporaneous state
-variables should change the conclusions. As shown below, the central findings
-(retail sentiment-asymmetry in H1; positive $\delta^{MD}_1$ in H2)
-are stable across the two timing conventions.
+The primary specification follows \textcite{Huang2015} by lagging all
+sentiment and margin-debt regime indicators one period.
+\textcite{BakerWurgler2007} use contemporaneous values in their original
+sentiment-return regressions. This subsection re-estimates each behavioral
+hypothesis using state variables measured at time~$t$ (coincident with the
+dependent flow variable) rather than at $t-1$. If the lagged primary results
+are an artefact of timing rather than reflecting genuine economic
+relationships, replacing lagged with contemporaneous state variables should
+change the conclusions.
 
 \input{tables/table_H1_contemporaneous}
 \newpage
@@ -524,13 +520,13 @@ are stable across the two timing conventions.
 
 \subsection*{F.2 \ Identification Robustness: Style $\times$ Time Fixed Effects}
 
-The primary specification uses fund fixed effects (within-fund identification).
-This subsection re-estimates each hypothesis with Lipper-category $\times$
-yearmo two-way fixed effects in place of fund fixed effects. The interaction
-absorbs aggregate flow-flood effects within investment styles, ruling out the
-possibility that primary results reflect aggregate sentiment-driven flows
-into entire style categories rather than within-fund performance-slope
-shifts. This identification approach follows
+The primary specification uses fund fixed effects (within-fund
+identification). This subsection re-estimates each hypothesis with
+Lipper-category $\times$ yearmo two-way fixed effects in place of fund
+fixed effects. The interaction absorbs aggregate flow-flood effects within
+investment styles, ruling out the possibility that primary results reflect
+aggregate sentiment-driven flows into entire style categories rather than
+within-fund performance-slope shifts. This identification approach follows
 \textcite{ChengEtAl2025} and \textcite{BerkVanBinsbergen2015}.
 
 \input{tables/table_H1_robustness}

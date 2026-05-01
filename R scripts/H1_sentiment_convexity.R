@@ -29,7 +29,7 @@ if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 STAR_THR <- c(`***` = 2.576, `**` = 1.960, `*` = 1.645)
 
 OUTPUT_PRIMARY <- file.path(WORKING_DIR, "table_H1_regression.tex")
-OUTPUT_CONT    <- file.path(WORKING_DIR, "table_H1_contemporaneous.tex")
+OUTPUT_LAGGED  <- file.path(WORKING_DIR, "table_H1_lagged.tex")
 OUTPUT_ROBUST  <- file.path(WORKING_DIR, "table_H1_robustness.tex")
 
 # --- 1. Pre-flight -----------------------------------------------------------
@@ -295,8 +295,8 @@ build_h1_table <- function(samp, fe_string,
 cap_primary <- paste0(
   "H1: Sentiment-Convexity Hypothesis. Panel regression of monthly proportional ",
   "fund flows on within-Lipper-category lagged 12-month performance-rank ",
-  "segments (Sirri-Tufano 1998), interacted with sentiment regime indicators ",
-  "lagged one period (Huang et al.\\ 2015 timing convention)."
+  "segments (Sirri-Tufano 1998), interacted with contemporaneous sentiment ",
+  "regime indicators (Baker-Wurgler 2007 timing convention)."
 )
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
@@ -304,46 +304,47 @@ fn_primary <- paste0(
   "Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
   "gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is ",
-  "the regime dummy $D^{SENT}_{t-1}$ (= 1 if Baker-Wurgler orthogonalised ",
-  "sentiment exceeded its 66th in-sample percentile at $t-1$, following ",
-  "Baker-Wurgler 2007); column (3) is the standardised Baker-Wurgler ",
-  "orthogonalised sentiment index at $t-1$; column (4) is the AAII bull-bear ",
-  "regime dummy at $t-1$. All controls lagged one period; time-invariant fund ",
-  "characteristics (expense ratio, load dummy, turnover ratio) are included ",
-  "in the specification but absorbed by the fund fixed effects. Standard ",
-  "errors two-way clustered on Ticker and calendar month (Petersen 2009). ",
+  "the regime dummy $D^{SENT}_t$ (= 1 if Baker-Wurgler orthogonalised ",
+  "sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler ",
+  "2007); column (3) is the standardised Baker-Wurgler orthogonalised ",
+  "sentiment index; column (4) is the AAII bull-bear regime dummy. All ",
+  "controls lagged one period; time-invariant fund characteristics (expense ",
+  "ratio, load dummy, turnover ratio) are included in the specification but ",
+  "absorbed by the fund fixed effects. Standard errors two-way clustered on ",
+  "Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
-cap_cont <- paste0(
-  "H1 Robustness --- Contemporaneous Sentiment. Same four-column specification ",
-  "as Table~\\ref{tab:H1_regression}, except sentiment is measured at time $t$ ",
-  "rather than $t-1$ (Baker-Wurgler 2007 timing convention)."
+cap_lagged <- paste0(
+  "H1 Robustness --- Lagged Sentiment. Same four-column specification as ",
+  "Table~\\ref{tab:H1_regression}, except sentiment is measured at time $t-1$ ",
+  "rather than $t$ (Huang et al.\\ 2015 timing convention)."
 )
-fn_cont <- paste0(
-  "Same sample, dependent variable, controls, and identification strategy ",
-  "as Table~\\\\ref{tab:H1_regression}. Sentiment proxies are measured ",
-  "contemporaneously: column (2) uses $D^{SENT}_t$, column (3) uses the ",
-  "standardised Baker-Wurgler orthogonalised sentiment index at $t$, column ",
-  "(4) uses $D^{AAII}_t$. Standard errors two-way clustered on Ticker and ",
+fn_lagged <- paste0(
+  "Same sample, dependent variable, controls, and identification strategy as ",
+  "Table~\\\\ref{tab:H1_regression}. Sentiment proxies are lagged one period: ",
+  "column (2) uses $D^{SENT}_{t-1}$, column (3) uses the standardised ",
+  "Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses ",
+  "$D^{AAII}_{t-1}$. Standard errors two-way clustered on Ticker and ",
   "calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
 cap_robust <- paste0(
-  "H1 Robustness --- Style $\\times$ Time Fixed Effects. Same lagged-sentiment ",
-  "specification as Table~\\ref{tab:H1_regression}, but with Lipper-category ",
-  "$\\times$ yearmo two-way fixed effects in place of fund fixed effects. ",
-  "Identification shifts from within-fund to within-style-month variation."
+  "H1 Robustness --- Style $\\times$ Time Fixed Effects. Same ",
+  "contemporaneous-sentiment specification as ",
+  "Table~\\ref{tab:H1_regression}, but with Lipper-category $\\times$ yearmo ",
+  "two-way fixed effects in place of fund fixed effects. Identification ",
+  "shifts from within-fund to within-style-month variation."
 )
 fn_robust <- paste0(
   "Same sample, dependent variable, and rank construction as ",
-  "Table~\\\\ref{tab:H1_regression}. Sentiment variables remain lagged at $t-1$. ",
-  "State main effects ($\\\\lambda$) are absorbed by the Lipper $\\\\times$ yearmo ",
-  "fixed effects and so do not appear in the table. Time-invariant controls ",
-  "(expense ratio, load dummy, turnover) are now identified because there is ",
-  "no fund FE. Standard errors two-way clustered on Ticker and calendar ",
-  "month (Petersen 2009). ",
+  "Table~\\\\ref{tab:H1_regression}. Sentiment variables remain ",
+  "contemporaneous. State main effects ($\\\\lambda$) are absorbed by the ",
+  "Lipper $\\\\times$ yearmo fixed effects and so do not appear in the table. ",
+  "Time-invariant controls (expense ratio, load dummy, turnover) are now ",
+  "identified because there is no fund FE. Standard errors two-way clustered ",
+  "on Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
@@ -355,22 +356,22 @@ hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{SENT}$" = 1,
 # --- 6. Estimate three specifications ----------------------------------------
 H1_primary <- build_h1_table(
   samp, "Ticker",
-  "D_SENT_lag", "SENT_ORTH_lag_z", "D_AAII_lag",
-  OUTPUT_PRIMARY, "H1_regression", cap_primary, fn_primary,
-  show_lambda = TRUE, col_headers = hdr_lagged, spec_id = "PRIMARY"
-)
-H1_cont <- build_h1_table(
-  samp, "Ticker",
   "D_SENT", "SENT_ORTH_z", "D_AAII",
-  OUTPUT_CONT, "H1_contemporaneous", cap_cont, fn_cont,
-  show_lambda = TRUE, col_headers = hdr_cont, spec_id = "TIMING ROBUSTNESS"
+  OUTPUT_PRIMARY, "H1_regression", cap_primary, fn_primary,
+  show_lambda = TRUE, col_headers = hdr_cont, spec_id = "PRIMARY"
+)
+H1_lagged <- build_h1_table(
+  samp, "Ticker",
+  "D_SENT_lag", "SENT_ORTH_lag_z", "D_AAII_lag",
+  OUTPUT_LAGGED, "H1_lagged", cap_lagged, fn_lagged,
+  show_lambda = TRUE, col_headers = hdr_lagged, spec_id = "TIMING ROBUSTNESS"
 )
 H1_robust <- build_h1_table(
   samp, "Lipper_Category^yearmo",
-  "D_SENT_lag", "SENT_ORTH_lag_z", "D_AAII_lag",
+  "D_SENT", "SENT_ORTH_z", "D_AAII",
   OUTPUT_ROBUST, "H1_robustness", cap_robust, fn_robust,
-  show_lambda = FALSE, col_headers = hdr_lagged, spec_id = "FE ROBUSTNESS"
+  show_lambda = FALSE, col_headers = hdr_cont, spec_id = "FE ROBUSTNESS"
 )
 
-H1_models <- list(primary = H1_primary, cont = H1_cont, robust = H1_robust)
+H1_models <- list(primary = H1_primary, lagged = H1_lagged, robust = H1_robust)
 assign("H1_models", H1_models, envir = .GlobalEnv)

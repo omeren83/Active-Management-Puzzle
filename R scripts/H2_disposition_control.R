@@ -37,7 +37,7 @@ if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 STAR_THR <- c(`***` = 2.576, `**` = 1.960, `*` = 1.645)
 
 OUTPUT_PRIMARY <- file.path(WORKING_DIR, "table_H2_regression.tex")
-OUTPUT_CONT    <- file.path(WORKING_DIR, "table_H2_contemporaneous.tex")
+OUTPUT_LAGGED  <- file.path(WORKING_DIR, "table_H2_lagged.tex")
 OUTPUT_ROBUST  <- file.path(WORKING_DIR, "table_H2_robustness.tex")
 
 # --- 1. Pre-flight -----------------------------------------------------------
@@ -376,63 +376,63 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
 cap_primary <- paste0(
   "H2: Disposition / Illusion-of-Control Hypothesis. Panel regression of ",
   "monthly proportional fund flows on within-Lipper-category lagged 12-month ",
-  "performance-rank segments interacted with margin-debt and put-call ",
-  "illusion-of-control regime indicators, all lagged one period (Huang et al.\\ ",
-  "2015 timing convention)."
+  "performance-rank segments interacted with contemporaneous margin-debt and ",
+  "put-call illusion-of-control regime indicators (Baker-Wurgler 2007 timing ",
+  "convention)."
 )
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
   "Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
-  "gross returns. State variable in column (2) is $D^{MD,Det}_{t-1}$ (= 1 if ",
-  "the residual of $\\\\log$(MD/MCAP) on a linear time trend was in the top ",
-  "34\\\\% at $t-1$, following Daniel-Klos-Pollet 2016 and ",
-  "Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\\\\text{INV-PCR}}_{t-1}$ ",
-  "(= 1 if the CBOE equity put-call ratio was in the bottom 34\\\\% at $t-1$: ",
-  "high call-to-put = high illusion of control). Column (4) is the ",
-  "discriminant specification: it includes both $D^{MD,Det}_{t-1}$ and the ",
-  "Baker-Wurgler orthogonalised sentiment regime $D^{SENT}_{t-1}$ (= 1 if ",
-  "SENT$^\\\\perp$ at $t-1$ exceeded the 66th percentile) with full rank ",
+  "gross returns. State variable in column (2) is $D^{MD,Det}_t$ (= 1 if the ",
+  "residual of $\\\\log$(MD/MCAP) on a linear time trend is in the top 34\\\\%, ",
+  "following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); ",
+  "column (3) is $D^{\\\\text{INV-PCR}}_t$ (= 1 in the bottom 34\\\\% of the CBOE ",
+  "equity put-call ratio: high call-to-put = high illusion of control). ",
+  "Column (4) is the discriminant specification: it includes both ",
+  "$D^{MD,Det}_t$ and the Baker-Wurgler orthogonalised sentiment regime ",
+  "$D^{SENT}_t$ (= 1 if SENT$^\\\\perp$ is in the top 34\\\\%) with full rank ",
   "interactions. All controls lagged one period; time-invariant fund ",
-  "characteristics (expense ratio, load dummy, turnover) included but absorbed ",
-  "by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) ",
-  "uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered ",
-  "on Ticker and calendar month (Petersen 2009). ",
+  "characteristics (expense ratio, load dummy, turnover) included but ",
+  "absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt ",
+  "sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard ",
+  "errors two-way clustered on Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
-cap_cont <- paste0(
-  "H2 Robustness --- Contemporaneous State Variables. Same four-column ",
-  "specification as Table~\\ref{tab:H2_regression}, except margin-debt, PCR, ",
-  "and sentiment regime indicators are measured at time $t$ rather than $t-1$ ",
-  "(Baker-Wurgler 2007 timing convention)."
+cap_lagged <- paste0(
+  "H2 Robustness --- Lagged State Variables. Same four-column specification ",
+  "as Table~\\ref{tab:H2_regression}, except margin-debt, PCR, and sentiment ",
+  "regime indicators are measured at time $t-1$ rather than $t$ (Huang ",
+  "et al.\\ 2015 timing convention)."
 )
-fn_cont <- paste0(
+fn_lagged <- paste0(
   "Same sample, dependent variable, controls, and identification strategy as ",
-  "Table~\\\\ref{tab:H2_regression}. State variables are measured ",
-  "contemporaneously: column (2) uses $D^{MD,Det}_t$, column (3) uses ",
-  "$D^{\\\\text{INV-PCR}}_t$, column (4) is the discriminant with $D^{MD,Det}_t$ ",
-  "and $D^{SENT}_t$. Standard errors two-way clustered on Ticker and calendar ",
-  "month (Petersen 2009). ",
+  "Table~\\\\ref{tab:H2_regression}. State variables are lagged one period: ",
+  "column (2) uses $D^{MD,Det}_{t-1}$, column (3) uses ",
+  "$D^{\\\\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with ",
+  "$D^{MD,Det}_{t-1}$ and $D^{SENT}_{t-1}$. Standard errors two-way ",
+  "clustered on Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 
 cap_robust <- paste0(
-  "H2 Robustness --- Style $\\times$ Time Fixed Effects. Same lagged-state ",
-  "specification as Table~\\ref{tab:H2_regression}, but with Lipper-category ",
-  "$\\times$ yearmo two-way fixed effects in place of fund fixed effects. ",
-  "Identification shifts from within-fund to within-style-month variation, ",
-  "absorbing aggregate flow-flood and risk-on confounders."
+  "H2 Robustness --- Style $\\times$ Time Fixed Effects. Same ",
+  "contemporaneous-state specification as Table~\\ref{tab:H2_regression}, ",
+  "but with Lipper-category $\\times$ yearmo two-way fixed effects in place ",
+  "of fund fixed effects. Identification shifts from within-fund to ",
+  "within-style-month variation, absorbing aggregate flow-flood and ",
+  "risk-on confounders."
 )
 fn_robust <- paste0(
   "Sample, dependent variable, rank construction, and column specifications ",
   "identical to Table~\\\\ref{tab:H2_regression}. State main effects (and ",
-  "$D^{SENT}_{t-1}$ in col 4) are absorbed by the Lipper $\\\\times$ yearmo ",
-  "fixed effects and do not appear in the table; time-invariant controls ",
-  "(expense ratio, load dummy, turnover) are now identified because there is ",
-  "no fund FE. Standard errors two-way clustered on Ticker and calendar ",
-  "month (Petersen 2009). The robustness of $\\\\delta^{MD}_1>0$ across both ",
+  "$D^{SENT}_t$ in col 4) are absorbed by the Lipper $\\\\times$ yearmo fixed ",
+  "effects and do not appear in the table; time-invariant controls (expense ",
+  "ratio, load dummy, turnover) are now identified because there is no fund ",
+  "FE. Standard errors two-way clustered on Ticker and calendar month ",
+  "(Petersen 2009). The robustness of $\\\\delta^{MD}_1>0$ across both ",
   "identification strategies points toward a margin-call alternative ",
   "(Brunnermeier \\\\& Pedersen 2009) rather than disposition psychology. ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
@@ -446,22 +446,22 @@ hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{MD,Det}$" = 1,
 # --- 6. Estimate three specifications ----------------------------------------
 H2_primary <- build_h2_table(
   samp_md, samp_pcr, "Ticker",
-  "D_MD_DETREND_lag", "D_INV_PCR_lag", "D_SENT_lag",
-  OUTPUT_PRIMARY, "H2_regression", cap_primary, fn_primary,
-  show_lambda = TRUE, col_headers = hdr_lagged, spec_id = "PRIMARY"
-)
-H2_cont <- build_h2_table(
-  samp_md, samp_pcr, "Ticker",
   "D_MD_DETREND", "D_INV_PCR", "D_SENT",
-  OUTPUT_CONT, "H2_contemporaneous", cap_cont, fn_cont,
-  show_lambda = TRUE, col_headers = hdr_cont, spec_id = "TIMING ROBUSTNESS"
+  OUTPUT_PRIMARY, "H2_regression", cap_primary, fn_primary,
+  show_lambda = TRUE, col_headers = hdr_cont, spec_id = "PRIMARY"
+)
+H2_lagged <- build_h2_table(
+  samp_md, samp_pcr, "Ticker",
+  "D_MD_DETREND_lag", "D_INV_PCR_lag", "D_SENT_lag",
+  OUTPUT_LAGGED, "H2_lagged", cap_lagged, fn_lagged,
+  show_lambda = TRUE, col_headers = hdr_lagged, spec_id = "TIMING ROBUSTNESS"
 )
 H2_robust <- build_h2_table(
   samp_md, samp_pcr, "Lipper_Category^yearmo",
-  "D_MD_DETREND_lag", "D_INV_PCR_lag", "D_SENT_lag",
+  "D_MD_DETREND", "D_INV_PCR", "D_SENT",
   OUTPUT_ROBUST, "H2_robustness", cap_robust, fn_robust,
-  show_lambda = FALSE, col_headers = hdr_lagged, spec_id = "FE ROBUSTNESS"
+  show_lambda = FALSE, col_headers = hdr_cont, spec_id = "FE ROBUSTNESS"
 )
 
-H2_models <- list(primary = H2_primary, cont = H2_cont, robust = H2_robust)
+H2_models <- list(primary = H2_primary, lagged = H2_lagged, robust = H2_robust)
 assign("H2_models", H2_models, envir = .GlobalEnv)
