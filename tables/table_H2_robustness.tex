@@ -1,59 +1,58 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H2_robustness}H2 Robustness: Disposition / Illusion-of-Control Hypothesis under Style $\times$ Time fixed effects. Same six margin-debt specifications as Table~\ref{tab:H2_regression}, but with Lipper-category $\times$ yearmo two-way fixed effects in place of fund fixed effects. Identification shifts from within-fund to within-style-month variation, absorbing aggregate flow-flood and risk-on confounders.}
+\caption{\label{tab:H2_robustness}H2 Robustness: Disposition / Illusion-of-Control Hypothesis under Style $\times$ Time fixed effects. Same four margin-debt and PCR specifications as the primary H2 specification, but with Lipper-category $\times$ yearmo two-way fixed effects in place of fund fixed effects. Identification shifts from within-fund to within-style-month variation, absorbing aggregate flow-flood and risk-on confounders.}
 \centering
-\fontsize{7}{9}\selectfont
 \begin{threeparttable}
-\begin{tabular}[t]{lrrrrrr}
+\begin{tabular}[t]{lrrrr}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{MD,Lev}$} & \multicolumn{1}{c}{$D^{MD,Grw}$} & \multicolumn{1}{c}{$D^{MD,Det}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{$D^{MD,Det}\,|\,D^{SENT}$} \\
-\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5} \cmidrule(l{3pt}r{3pt}){6-6} \cmidrule(l{3pt}r{3pt}){7-7}
-Variable & (1) & (2) & (3) & (4) & (5) & (6)\\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{MD,Det}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{$D^{MD,Det}\,|\,D^{SENT}$} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{LOW}$ & 0.0312*** & 0.0245*** & 0.0328*** & 0.0248*** & 0.0354*** & 0.0261***\\
- & (8.94) & (5.64) & (8.71) & (5.79) & (7.41) & (5.26)\\
-$R^{MID}$ & 0.0162*** & 0.0144*** & 0.0158*** & 0.0145*** & 0.0182*** & 0.0159***\\
- & (17.39) & (12.66) & (15.52) & (12.94) & (13.76) & (12.72)\\
-$R^{HIGH}$ & 0.0804*** & 0.0774*** & 0.0789*** & 0.0765*** & 0.0873*** & 0.0783***\\
- & (14.55) & (10.98) & (12.94) & (10.70) & (11.92) & (9.72)\\
-$R^{LOW}\times$ State ($\delta_1$) &  & 0.0142** & -0.0063 & 0.0134** & 0.0018 & 0.0123*\\
- &  & (2.04) & (-0.84) & (2.04) & (0.29) & (1.85)\\
-$R^{MID}\times$ State ($\delta_2$) &  & 0.0038** & 0.0013 & 0.0036** & -0.0012 & 0.0024\\
- &  & (2.19) & (0.66) & (2.06) & (-0.66) & (1.33)\\
-$R^{HIGH}\times$ State ($\delta_3$) &  & 0.0065 & 0.0062 & 0.0082 & 0.0014 & 0.0068\\
- &  & (0.69) & (0.61) & (0.84) & (0.13) & (0.67)\\
-$R^{LOW}\times D^{SENT}$ &  &  &  &  &  & -0.0032\\
- &  &  &  &  &  & (-0.45)\\
-$R^{MID}\times D^{SENT}$ &  &  &  &  &  & -0.0042**\\
- &  &  &  &  &  & (-2.25)\\
-$R^{HIGH}\times D^{SENT}$ &  &  &  &  &  & -0.0052\\
- &  &  &  &  &  & (-0.47)\\
-$\log(\text{TNA})$ & -0.0009*** & -0.0009*** & -0.0009*** & -0.0009*** & -0.0012*** & -0.0009***\\
- & (-5.72) & (-5.71) & (-5.71) & (-5.71) & (-7.46) & (-5.72)\\
-$\log(\text{Age})$ & -0.0031*** & -0.0031*** & -0.0031*** & -0.0031*** & -0.0028*** & -0.0031***\\
- & (-7.75) & (-7.75) & (-7.74) & (-7.75) & (-5.87) & (-7.75)\\
-Expense ratio & -0.0017** & -0.0017** & -0.0017** & -0.0017** & -0.0026*** & -0.0017**\\
- & (-2.03) & (-2.00) & (-2.02) & (-2.01) & (-3.10) & (-1.98)\\
-Load dummy & 0.0001 & 0.0000 & 0.0001 & 0.0000 & -0.0002 & 0.0000\\
- & (0.11) & (0.09) & (0.11) & (0.10) & (-0.35) & (0.09)\\
-Return vol.\ (36m SD) & -0.1176*** & -0.1215*** & -0.1187*** & -0.1199*** & -0.1954*** & -0.1186***\\
- & (-4.14) & (-4.27) & (-4.17) & (-4.22) & (-4.83) & (-4.19)\\
-Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
- & (-0.86) & (-0.88) & (-0.87) & (-0.88) & (-0.52) & (-0.89)\\
-Style flow & 0.1082 & 0.1073 & 0.1088 & 0.1079 & 0.1827 & 0.1073\\
- & (0.61) & (0.61) & (0.62) & (0.61) & (0.77) & (0.61)\\
+$R^{LOW}$ & 0.0312*** & 0.0248*** & 0.0354*** & 0.0261***\\
+ & (8.95) & (5.80) & (7.41) & (5.26)\\
+$R^{MID}$ & 0.0162*** & 0.0145*** & 0.0182*** & 0.0159***\\
+ & (17.38) & (12.94) & (13.76) & (12.72)\\
+$R^{HIGH}$ & 0.0805*** & 0.0766*** & 0.0873*** & 0.0783***\\
+ & (14.56) & (10.71) & (11.92) & (9.72)\\
+$R^{LOW}\times$ State ($\delta_1$) &  & 0.0133** & 0.0018 & 0.0123*\\
+ &  & (2.03) & (0.29) & (1.84)\\
+$R^{MID}\times$ State ($\delta_2$) &  & 0.0036** & -0.0012 & 0.0024\\
+ &  & (2.06) & (-0.66) & (1.33)\\
+$R^{HIGH}\times$ State ($\delta_3$) &  & 0.0082 & 0.0014 & 0.0068\\
+ &  & (0.84) & (0.13) & (0.67)\\
+$R^{LOW}\times D^{SENT}$ &  &  &  & -0.0031\\
+ &  &  &  & (-0.43)\\
+$R^{MID}\times D^{SENT}$ &  &  &  & -0.0042**\\
+ &  &  &  & (-2.26)\\
+$R^{HIGH}\times D^{SENT}$ &  &  &  & -0.0052\\
+ &  &  &  & (-0.47)\\
+$\log(\text{TNA})$ & -0.0009*** & -0.0009*** & -0.0012*** & -0.0009***\\
+ & (-5.72) & (-5.71) & (-7.46) & (-5.72)\\
+$\log(\text{Age})$ & -0.0031*** & -0.0031*** & -0.0028*** & -0.0031***\\
+ & (-7.74) & (-7.74) & (-5.87) & (-7.74)\\
+Expense ratio & -0.0017** & -0.0017** & -0.0026*** & -0.0017**\\
+ & (-2.03) & (-2.01) & (-3.10) & (-1.98)\\
+Load dummy & 0.0001 & 0.0000 & -0.0002 & 0.0000\\
+ & (0.11) & (0.10) & (-0.35) & (0.09)\\
+Return vol.\ (36m SD) & -0.1176*** & -0.1200*** & -0.1954*** & -0.1187***\\
+ & (-4.14) & (-4.22) & (-4.83) & (-4.19)\\
+Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
+ & (-0.86) & (-0.88) & (-0.52) & (-0.89)\\
+Style flow & 0.1045 & 0.1042 & 0.1827 & 0.1035\\
+ & (0.59) & (0.59) & (0.77) & (0.59)\\
 \midrule
-FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes & Yes & Yes\\
-Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes & Yes & Yes\\
-$N$ & 235,179 & 235,179 & 235,179 & 235,179 & 170,713 & 235,179\\
-$R^2$ (within) & 0.021 & 0.022 & 0.021 & 0.022 & 0.025 & 0.022\\
-Joint $\delta_1=\delta_2=\delta_3=0$ ($\chi^2_3$, $p$) & -- & 14.96 (0.002) & 1.48 (0.687) & 14.09 (0.003) & 0.44 (0.933) & 9.29 (0.026)\\
-Main $\delta_1<0$ ($z$, 1-sided $p$) & -- & z=+2.04 (p=0.979) & z=-0.84 (p=0.202) & z=+2.04 (p=0.979) & z=+0.29 (p=0.613) & z=+1.85 (p=0.968)\\
-Asym $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & -0.0077 (z=-0.68, p=0.753) & +0.0125 (z=+0.97, p=0.167) & -0.0052 (z=-0.45, p=0.674) & -0.0004 (z=-0.03, p=0.514) & -0.0056 (z=-0.47, p=0.680)\\
+FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
+Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+$N$ & 235,225 & 235,225 & 170,713 & 235,225\\
+$R^2$ (within) & 0.021 & 0.022 & 0.025 & 0.022\\
+Joint $\delta_1=\delta_2=\delta_3=0$ ($\chi^2_3$, $p$) & -- & 14.07 (0.003) & 0.44 (0.933) & 9.28 (0.026)\\
+Main $\delta_1<0$ ($z$, 1-sided $p$) & -- & z=+2.03 (p=0.979) & z=+0.29 (p=0.613) & z=+1.84 (p=0.967)\\
+Asym $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & -0.0051 (z=-0.45, p=0.673) & -0.0004 (z=-0.03, p=0.514) & -0.0056 (z=-0.47, p=0.680)\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Same sample, dependent variable, and rank construction as the primary H2 specification. State main effects (margin-debt and PCR regimes, Baker-Wurgler $D^{SENT}$ in col~6) are absorbed by the Lipper $\times$ yearmo fixed effects and do not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). If $\delta^{MD}_1$ remains positive and significant relative to the proposal's predicted $\delta^{MD}_1<0$, the negative finding for the disposition hypothesis is robust to identification strategy and points toward a margin-call alternative (Brunnermeier \& Pedersen 2009) rather than disposition psychology. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\item Same sample, dependent variable, and rank construction as the primary H2 specification. The state variable in column (2) is $D^{MD,Det}$ (= 1 if the residual of $\log$(MD/MCAP) on a linear time trend is in the top 34\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\text{INV-PCR}}$ (= 1 in the bottom 34\% of the CBOE equity put-call ratio); column (4) is the discriminant specification including both $D^{MD,Det}$ and the Baker-Wurgler orthogonalised sentiment regime $D^{SENT}$ (= 1 if SENT$^\perp$ is in the top 34\%) with full rank interactions. State main effects (margin-debt, PCR, $D^{SENT}$ in col 4) are absorbed by the Lipper $\times$ yearmo fixed effects and do not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). If $\delta^{MD}_1$ remains positive and significant relative to the proposal's predicted $\delta^{MD}_1<0$, the negative finding for the disposition hypothesis is robust to identification strategy and points toward a margin-call alternative (Brunnermeier \& Pedersen 2009) rather than disposition psychology. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
