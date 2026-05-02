@@ -199,17 +199,17 @@ build_h3_table <- function(samp, fe_string, state_var,
     list(label = "$R^{LOW}$",  accs = list(acc("R_LOW"),  acc("R_LOW"),  acc("R_LOW"),  acc("R_LOW"))),
     list(label = "$R^{MID}$",  accs = list(acc("R_MID"),  acc("R_MID"),  acc("R_MID"),  acc("R_MID"))),
     list(label = "$R^{HIGH}$", accs = list(acc("R_HIGH"), acc("R_HIGH"), acc("R_HIGH"), acc("R_HIGH"))),
-    list(label = "Lottery measure ($\\beta$)",
+    list(label = "Lottery measure",
          accs = list(blank_acc, acc("ActR2"), acc("ActSkew"), acc("MAX12")))
   )
   if (show_state_main) {
     body_specs[[length(body_specs) + 1L]] <- list(
-      label = "Sentiment ($\\gamma$)",
+      label = "Sentiment",
       accs = list(blank_acc, acc(state_var), acc(state_var), acc(state_var))
     )
   }
   body_specs[[length(body_specs) + 1L]] <- list(
-    label = "Lottery $\\times$ Sent.\\ ($\\delta$)",
+    label = "Lottery $\\times$ Sent.",
     accs = list(blank_acc,
                 acc(paste0("ActR2:",   state_var)),
                 acc(paste0("ActSkew:", state_var)),
@@ -217,25 +217,10 @@ build_h3_table <- function(samp, fe_string, state_var,
   )
   ctrl_rows <- list(
     list(label = "$\\log(\\text{TNA})$", var = "log_TNA"),
-    list(label = "$\\log(\\text{Age})$", var = "log_Age")
-  )
-  if (show_state_main) {
-    ctrl_rows <- c(ctrl_rows, list(
-      list(label = "Expense ratio", var = "ExpRatio"),
-      list(label = "Load dummy",    var = "LoadDummy")
-    ))
-  }
-  ctrl_rows <- c(ctrl_rows, list(
-    list(label = "Return vol.\\ (36m SD)", var = "ret_vol")
-  ))
-  if (show_state_main) {
-    ctrl_rows <- c(ctrl_rows, list(
-      list(label = "Turnover", var = "Turnover")
-    ))
-  }
-  ctrl_rows <- c(ctrl_rows, list(
+    list(label = "$\\log(\\text{Age})$", var = "log_Age"),
+    list(label = "Return volatility", var = "ret_vol"),
     list(label = "Style flow", var = "style_flow_lag")
-  ))
+  )
   for (cr in ctrl_rows) {
     body_specs[[length(body_specs) + 1L]] <- list(
       label = cr$label,
@@ -267,12 +252,12 @@ build_h3_table <- function(samp, fe_string, state_var,
   r2_row    <- c("$R^2$ (within)",
                  fmt_num(r2(m1, "wr2"), 3), fmt_num(r2(m2, "wr2"), 3),
                  fmt_num(r2(m3, "wr2"), 3), fmt_num(r2(m4, "wr2"), 3))
-  joint_row <- c("Joint $\\beta=\\delta=0$ ($\\chi^2_2$, $p$)",
+  joint_row <- c("Joint test ($\\chi^2_2$, $p$)",
                  "--",
                  sprintf("%.2f (%s)", t2$joint_chi2, fmt_p(t2$joint_p)),
                  sprintf("%.2f (%s)", t3$joint_chi2, fmt_p(t3$joint_p)),
                  sprintf("%.2f (%s)", t4$joint_chi2, fmt_p(t4$joint_p)))
-  delta_row <- c("Sent.\\ amp.\\ $\\delta>0$ ($z$, 1-sided $p$)",
+  delta_row <- c("Sent.\\ amp.\\ ($z$, 1-sided $p$)",
                  "--",
                  sprintf("z=%+.2f (p=%s)", t2$delta_z, fmt_p(t2$delta_p_1sd)),
                  sprintf("z=%+.2f (p=%s)", t3$delta_z, fmt_p(t3$delta_p_1sd)),

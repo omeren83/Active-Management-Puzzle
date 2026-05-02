@@ -1,8 +1,28 @@
 # =============================================================================
-# MASTER PIPELINE ORCHESTRATOR                                             v1.2
+# MASTER PIPELINE ORCHESTRATOR                                             v1.4
 #
 # Runs the full dissertation analysis pipeline in the correct sequence.
 # Each phase can be toggled ON/OFF via the CONFIG section below.
+#
+# v1.4 changes vs v1.3:
+#   - Phase J now runs psychological_premium.R after panel_regressions_-
+#     reporting.R. Computes shadow prices (proposal eq. 12) from the joint
+#     H1+H3 estimation, with delta-method SEs and parametric MVN bootstrap.
+#     Output: table_psychological_premium.tex.
+#   - Phase J now expects panel_regressions_setup.R (>= v1.3) to populate
+#     MAX12 in panel_reg as a permanent column. H3 v2.0 uses MAX12 across
+#     columns; PPF script also requires it.
+#
+# v1.3 changes vs v1.2:
+#   - Phase J: smart fallback. If panel_incubation + behavioral_state_vars
+#     are present in the session, panel_regressions_setup.R runs as usual.
+#     If not but panel_reg.rds exists in WORKING_DIR, the setup is SKIPPED
+#     and H1-H4 load the panel via their built-in .rds fallback. This lets
+#     a fresh RStudio session re-run the regression layer without first
+#     re-running Phase A + Phase I, provided panel_reg.rds is current.
+#   - Added FORCE_PANEL_SETUP CONFIG flag to override the fallback (forces
+#     a fresh setup run even if panel_reg.rds exists; needed when upstream
+#     panels have changed since the last setup).
 #
 # v1.2 changes vs v1.1:
 #   - Added Phase I (behavioral state variables): behavioral_state_variables.R
@@ -85,7 +105,7 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 # TABLES_OUT_DIR <- NA                                   # disable auto-sync
 
 # Phase toggles - set to FALSE to skip a phase
-RUN_PHASE_A_DATA          <- TRUE   # data_import + flow_calculation
+RUN_PHASE_A_DATA          <- FALSE   # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
 RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
 RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
@@ -96,6 +116,13 @@ RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_ta
 RUN_PHASE_I_BEHAVIORAL    <- FALSE    # behavioral_state_variables (NEW)
 RUN_PHASE_J_PANEL_REG     <- TRUE   # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
 RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
+
+# Phase J sub-toggle: force re-running panel_regressions_setup.R even if
+# panel_reg.rds is on disk. Default FALSE = use cached panel_reg.rds when
+# upstream session objects are not available. Set TRUE when upstream panels
+# (panel_incubation, behavioral_state_vars) have changed since the last
+# setup run, so the cached panel_reg.rds is stale.
+FORCE_PANEL_SETUP         <- FALSE
 
 # Stop on first error (TRUE) or keep going and report failures at end (FALSE)
 STOP_ON_ERROR <- TRUE
@@ -270,19 +297,48 @@ if (RUN_PHASE_I_BEHAVIORAL) {
 #                                    activeness, merges behavioral_state_vars)
 #   H1_sentiment_convexity.R      -> Table H1
 #   H2_disposition_control.R      -> Table H2
-#   H3_lottery_demand.R           -> Table H3
-#   H4_fee_elasticity.R           -> Table H4 + shadow price input
-#   panel_regressions_reporting.R -> assembled tables and PPF synthesis
+#   H3_lottery_demand.R           -> Table H3 (4-col horserace: ActR2/ActSkew/MAX12)
+#   H4_fee_elasticity.R           -> Table H4 (fee elasticity)
+#   panel_regressions_reporting.R -> behavioral hypothesis summary table
+#   psychological_premium.R       -> Table PPF (shadow price / proposal eq. 12)
 # =============================================================================
 if (RUN_PHASE_J_PANEL_REG) {
-  require_session_object("panel_incubation",       "panel_regressions_setup.R")
-  require_session_object("behavioral_state_vars",  "panel_regressions_setup.R")
-  run_script("panel_regressions_setup.R",     "Phase J")
+  panel_reg_rds <- file.path(WORKING_DIR, "panel_reg.rds")
+  setup_required <- TRUE
+  
+  # Decide whether panel_regressions_setup.R needs to run.
+  if (FORCE_PANEL_SETUP) {
+    cat("\nPhase J: FORCE_PANEL_SETUP=TRUE -> will run panel_regressions_setup.R.\n")
+    require_session_object("panel_incubation",       "panel_regressions_setup.R")
+    require_session_object("behavioral_state_vars",  "panel_regressions_setup.R")
+  } else if (exists("panel_incubation",      envir = .GlobalEnv) &&
+             exists("behavioral_state_vars", envir = .GlobalEnv)) {
+    cat("\nPhase J: upstream session objects available -> running setup as usual.\n")
+  } else if (file.exists(panel_reg_rds)) {
+    cat(sprintf(
+      "\nPhase J: upstream session objects not in env, but %s exists.\n",
+      panel_reg_rds))
+    cat("        -> SKIPPING panel_regressions_setup.R; H1-H4 will load from RDS.\n")
+    cat("        -> If upstream panels have changed, set FORCE_PANEL_SETUP <- TRUE\n")
+    cat("           and rerun Phase A + Phase I first.\n")
+    setup_required <- FALSE
+  } else {
+    stop("Phase J cannot proceed. Need either:\n",
+         "  (a) panel_incubation + behavioral_state_vars in the session ",
+         "(run Phase A and Phase I first), or\n",
+         "  (b) ", panel_reg_rds, " on disk.\n",
+         "Neither was found.")
+  }
+  
+  if (setup_required) {
+    run_script("panel_regressions_setup.R", "Phase J")
+  }
   run_script("H1_sentiment_convexity.R",      "Phase J")
   run_script("H2_disposition_control.R",      "Phase J")
   run_script("H3_lottery_demand.R",           "Phase J")
   run_script("H4_fee_elasticity.R",           "Phase J")
   run_script("panel_regressions_reporting.R", "Phase J")
+  run_script("psychological_premium.R",       "Phase J")
 }
 
 

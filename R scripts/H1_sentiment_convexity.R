@@ -185,14 +185,20 @@ build_h1_table <- function(samp, fe_string,
   row_specs <- list(
     list(coef = "R_LOW",  label = "$R^{LOW}$"),
     list(coef = "R_MID",  label = "$R^{MID}$"),
-    list(coef = "R_HIGH", label = "$R^{HIGH}$"),
-    list(coef = "STATE",          label = "Sentiment ($\\lambda$)"),
-    list(coef = "R_LOW:STATE",    label = "$R^{LOW}\\times$ Sent.\\ ($\\delta_1$)"),
-    list(coef = "R_MID:STATE",    label = "$R^{MID}\\times$ Sent.\\ ($\\delta_2$)"),
-    list(coef = "R_HIGH:STATE",   label = "$R^{HIGH}\\times$ Sent.\\ ($\\delta_3$)"),
+    list(coef = "R_HIGH", label = "$R^{HIGH}$")
+  )
+  if (show_lambda) {
+    row_specs <- c(row_specs, list(
+      list(coef = "STATE", label = "Sentiment")
+    ))
+  }
+  row_specs <- c(row_specs, list(
+    list(coef = "R_LOW:STATE",    label = "$R^{LOW}\\times$ Sent."),
+    list(coef = "R_MID:STATE",    label = "$R^{MID}\\times$ Sent."),
+    list(coef = "R_HIGH:STATE",   label = "$R^{HIGH}\\times$ Sent."),
     list(coef = "log_TNA",        label = "$\\log(\\text{TNA})$"),
     list(coef = "log_Age",        label = "$\\log(\\text{Age})$")
-  )
+  ))
   if (!show_lambda) {
     row_specs <- c(row_specs, list(
       list(coef = "ExpRatio",  label = "Expense ratio"),
@@ -200,7 +206,7 @@ build_h1_table <- function(samp, fe_string,
     ))
   }
   row_specs <- c(row_specs, list(
-    list(coef = "ret_vol", label = "Return vol.\\ (36m SD)")
+    list(coef = "ret_vol", label = "Return volatility")
   ))
   if (!show_lambda) {
     row_specs <- c(row_specs, list(
@@ -255,12 +261,12 @@ build_h1_table <- function(samp, fe_string,
   r2_row    <- c("$R^2$ (within)",
                  fmt_num(r2(m1, "wr2"), 3), fmt_num(r2(m2, "wr2"), 3),
                  fmt_num(r2(m3, "wr2"), 3), fmt_num(r2(m4, "wr2"), 3))
-  joint_row <- c("Joint $\\delta_1=\\delta_2=\\delta_3=0$ ($\\chi^2_3$, $p$)",
+  joint_row <- c("Joint test ($\\chi^2_3$, $p$)",
                  "--",
                  sprintf("%.2f (%s)", t2$joint_chi2, fmt_p(t2$joint_p)),
                  sprintf("%.2f (%s)", t3$joint_chi2, fmt_p(t3$joint_p)),
                  sprintf("%.2f (%s)", t4$joint_chi2, fmt_p(t4$joint_p)))
-  asym_row  <- c("Asymmetry $\\delta_3-\\delta_1$ ($z$, 1-sided $p$)",
+  asym_row  <- c("Asymmetry ($z$, 1-sided $p$)",
                  "--",
                  sprintf("z=%+.2f (p=%s)", t2$asym_z, fmt_p(t2$asym_p_1sd)),
                  sprintf("z=%+.2f (p=%s)", t3$asym_z, fmt_p(t3$asym_p_1sd)),

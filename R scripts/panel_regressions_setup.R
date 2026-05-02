@@ -148,7 +148,9 @@ panel <- panel %>%
                              ~ e1071::skewness(.x, na.rm = FALSE),
                              .before = 35, .complete = TRUE),
     age_months   = as.numeric(difftime(date, as.Date(Inception_Date),
-                                       units = "days")) / 30.4375
+                                       units = "days")) / 30.4375,
+    ret_max12_12m = slide_dbl(ret_gross_raw, max,
+                              .before = 11, .complete = TRUE)
   ) %>%
   ungroup()
 
@@ -160,7 +162,8 @@ panel <- panel %>%
     cumret_lag   = lag(cumret_12m,   1),
     ret_vol_lag  = lag(ret_vol_36m,  1),
     ret_skew_lag = lag(ret_skew_36m, 1),
-    age_lag      = lag(age_months,   1)
+    age_lag      = lag(age_months,   1),
+    ret_max12_lag = lag(ret_max12_12m, 1)
   ) %>%
   ungroup()
 
@@ -302,6 +305,7 @@ panel_reg <- panel %>%
     style_flow_lag,
     ActR2    = ActR2_lag,
     ActSkew  = ret_skew_lag,
+    MAX12    = ret_max12_lag,
     SENT_ORTH, PLS_SENT, VIX, SKEW, PUT_CALL_RATIO,
     AAII_BB, UMCSENT, MD_RATIO, DMD_YOY, MD_DETREND,
     D_SENT, D_PLS, D_VIX, D_SKEW, D_PCR,
