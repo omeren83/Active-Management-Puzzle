@@ -217,10 +217,29 @@ build_h3_table <- function(samp, fe_string, state_var,
   )
   ctrl_rows <- list(
     list(label = "$\\log(\\text{TNA})$", var = "log_TNA"),
-    list(label = "$\\log(\\text{Age})$", var = "log_Age"),
-    list(label = "Return volatility", var = "ret_vol"),
-    list(label = "Style flow", var = "style_flow_lag")
+    list(label = "$\\log(\\text{Age})$", var = "log_Age")
   )
+  # Time-invariant controls (ExpRatio, LoadDummy, Turnover) are absorbed
+  # by fund FE in the primary and timing-robust specs, so they're omitted
+  # there. Under Lipper x yearmo FE (show_state_main = FALSE) they are
+  # identified and should be displayed.
+  if (!show_state_main) {
+    ctrl_rows <- c(ctrl_rows, list(
+      list(label = "Expense ratio", var = "ExpRatio"),
+      list(label = "Load dummy",    var = "LoadDummy")
+    ))
+  }
+  ctrl_rows <- c(ctrl_rows, list(
+    list(label = "Return volatility", var = "ret_vol")
+  ))
+  if (!show_state_main) {
+    ctrl_rows <- c(ctrl_rows, list(
+      list(label = "Turnover", var = "Turnover")
+    ))
+  }
+  ctrl_rows <- c(ctrl_rows, list(
+    list(label = "Style flow", var = "style_flow_lag")
+  ))
   for (cr in ctrl_rows) {
     body_specs[[length(body_specs) + 1L]] <- list(
       label = cr$label,
