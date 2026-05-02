@@ -54,6 +54,7 @@
   font      = small,
   skip      = 6pt
 }
+\let\citet\textcite
 \begin{document}
 
 % Table 1: Fund Sample Composition
@@ -490,32 +491,26 @@ use the full December~1994--February~2026 window.
 \clearpage
 \section*{Appendix F: Behavioral Hypothesis Robustness Checks}
 \addcontentsline{toc}{section}{Appendix F: Behavioral Hypothesis Robustness Checks}
+\setcounter{table}{0}
+\renewcommand{\thetable}{F.\arabic{table}}
 
 This appendix presents two robustness checks for each behavioral hypothesis
 estimated in Section~5. The primary specification reported in the main body
 uses sentiment and state variables lagged one period
-(\textcite{Huang2015} timing convention) and fund fixed effects. The two
+(\textcite{HuangEtal2015} timing convention) and fund fixed effects. The two
 robustness checks below address (i)~the timing assumption and (ii)~the
 identification strategy. All robustness specifications use the same aligned
 estimation sample as the primary specification, so coefficient differences
 across tables reflect only the spec change (timing or fixed-effect
 structure), not sample composition.
 
-\subsection*{F.1 \ Timing Robustness: Contemporaneous State Variables}
+\subsection*{F.1 \ Timing Robustness: Lagged State Variables}
 
-The primary specification follows \textcite{Huang2015} by lagging all
-sentiment and margin-debt regime indicators one period.
-\textcite{BakerWurgler2007} use contemporaneous values in their original
-sentiment-return regressions. This subsection re-estimates each behavioral
-hypothesis using state variables measured at time~$t$ (coincident with the
-dependent flow variable) rather than at $t-1$. If the lagged primary results
-are an artefact of timing rather than reflecting genuine economic
-relationships, replacing lagged with contemporaneous state variables should
-change the conclusions.
+The primary specification measures sentiment and margin-debt regime indicators contemporaneously with the dependent flow variable, consistent with \textcite{BakerWurgler2007}. \textcite{HuangEtal2015} use one-period lags in their return-predictability tests. This subsection re-estimates each behavioral hypothesis with all state variables measured at $t-1$ rather than at $t$. Treating fund flows as decisions taken in response to information available during the month, contemporaneous measurement is the more defensible default; the lagged specification is reported here to confirm that primary results are not artefacts of the timing assumption.
 
-\input{tables/table_H1_contemporaneous}
+\input{tables/table_H1_lagged}
 \newpage
-\input{tables/table_H2_contemporaneous}
+\input{tables/table_H2_lagged}
 \clearpage
 
 \subsection*{F.2 \ Identification Robustness: Style $\times$ Time Fixed Effects}
@@ -527,13 +522,99 @@ fixed effects. The interaction absorbs aggregate flow-flood effects within
 investment styles, ruling out the possibility that primary results reflect
 aggregate sentiment-driven flows into entire style categories rather than
 within-fund performance-slope shifts. This identification approach follows
-\textcite{ChengEtAl2025} and \textcite{BerkVanBinsbergen2015}.
+\textcite{ChengEtal2025} and \textcite{BerkVanBinsbergen2015}.
 
 \input{tables/table_H1_robustness}
 \newpage
 \input{tables/table_H2_robustness}
 \clearpage
+% =============================================================================
+% APPENDIX G: ACTIVENESS / LOTTERY PROXY VALIDATION
+% =============================================================================
 
+\clearpage
+\section*{Appendix G: Activeness / Lottery Proxy Validation}
+\addcontentsline{toc}{section}{Appendix G: Activeness / Lottery Proxy Validation}
+\label{app:proxy_validation}
+\setcounter{table}{0}
+\renewcommand{\thetable}{G.\arabic{table}}
+
+The proposal frames H3 around the ``distinctiveness'' or ``lottery''
+attribute of an actively managed fund --- the dimension along which
+investors irrationally substitute psychological for financial utility. The
+ideal regressor in the proposal's Equation~11 is the holdings-based Active
+Share of \textcite{CremersPetajisto2009}, which the LSEG data tier
+available for this study cannot construct. This appendix documents the
+diagnostic procedure used to select an alternative proxy from four
+candidate measures.
+
+The four candidates differ in which behavioural channel they isolate.
+\textit{ActR2}, defined as $1 - R^2$ from the rolling 36-month Carhart
+regression underlying the alpha estimation in Chapter~4, captures
+\textit{statistical activeness}: the fraction of return variation
+unexplained by the systematic factor benchmark. \textcite{AmihudGoyenko2013}
+establish ActR2 as the standard fund-flow-literature proxy when holdings
+data are unavailable and document a positive ActR2--alpha relationship
+that this section replicates as a validation check. \textit{ActSkew},
+the sample skewness of the trailing 36~monthly gross returns, captures
+realised return asymmetry along the entire distribution; positive
+ActSkew can reflect either a fat right tail (the lottery property of
+interest) or a thin left tail (downside protection), and the measure
+does not distinguish these. \textit{MAX12}, the maximum monthly gross
+return over the trailing 12~months, isolates the magnitude of the
+single largest realised gain --- the most direct right-tail measure
+constructible from monthly fund return data. The original
+\textcite{ChengEtal2025} construction uses daily MAX over a one-month
+window, but their robustness specifications confirm that lower-frequency
+analogues preserve the lottery-demand signal. \textit{UpSkew}, the
+sample skewness restricted to returns above the rolling in-window mean
+and scaled by upside semi-deviation, is a custom right-tail-only
+measure included to test whether the asymmetry signal in ActSkew is
+driven specifically by the right tail (which is what cumulative
+prospect theory predicts investors should care about) rather than by
+the full third moment.
+
+Table~\ref{tab:activeness_proxy} reports the diagnostic horse race.
+Sample correlations (Test~A) reveal that the four measures capture
+distinct dimensions of fund-level heterogeneity: pairwise correlations
+range from $-0.21$ to $+0.22$ within fund, ruling out trivial
+substitution. Coverage (Test~B) is comparable across measures, with
+$81$--$93\%$ of fund-months populated. The univariate flow regressions
+(Test~C, both fixed-effect structures) show that ActR2 has no
+detectable relationship with subsequent flows ($t = 0.47$ under
+cross-fund identification, $t = -1.01$ under within-fund
+identification), while ActSkew, MAX12, and UpSkew each predict flows
+with $t$-statistics exceeding conventional thresholds. The horse race
+(Test~D), in which all four measures are estimated jointly, identifies
+ActSkew ($t = 3.70$) and MAX12 ($t = 2.58$) as carrying distinctive
+flow-predictive content; UpSkew is statistically subsumed by these two
+($t = 0.62$), and ActR2 is mechanically subsumed (point estimate
+$2.3 \times 10^{-6}$). The future-alpha test (Test~E) confirms that
+ActR2 retains its \textcite{AmihudGoyenko2013} role as a positive
+predictor of $12$-month-ahead Carhart alpha ($t = 7.16$), validating
+the construction of the variable; ActSkew, by contrast, predicts
+\textit{lower} future alpha ($t = -2.64$), indicating that the skewness
+signal investors chase is uncorrelated with risk-adjusted skill.
+
+The H3 test specifications in Section~5.4 retain three of the four
+candidates: ActR2 (the statistical-activeness baseline whose null in
+flow regressions itself constitutes a behavioural finding), ActSkew
+(the strongest flow-predictor that is also negatively associated with
+future alpha), and MAX12 (an alternative right-tail proxy with
+literature precedent in \textcite{ChengEtal2025}). UpSkew is dropped
+on the basis of the horse-race subsumption result; its informational
+content is fully captured by ActSkew and MAX12 jointly. Reporting all
+three retained measures in the H3 tables permits direct
+within-specification comparison of the rational-activeness channel
+(ActR2), the full-distribution lottery channel (ActSkew), and the
+right-tail-only lottery channel (MAX12), and addresses the standard
+referee concern that an apparent behavioural result might be an
+artefact of proxy choice.
+
+\input{tables/table_activeness_proxy_diagnostic}
+\clearpage
+
+\nocite{SirriTufano1998, BakerWurgler2007, HuangEtal2015, Petersen2009, DanielKlosPollet2016, RapachRinggenbergZhou2016, BrunnermeierPedersen2009, ChengEtal2025, BerkVanBinsbergen2015, AmihudGoyenko2013, CremersPetajisto2009}
 \printbibliography
 
 \end{document}
