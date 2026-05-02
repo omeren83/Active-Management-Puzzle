@@ -1,0 +1,1771 @@
+% =============================================================================
+% dissertation_main.tex
+% "The Active Management Puzzle"
+% PhD Dissertation --- Management Department, Boğaziçi University
+%
+% Compiler    : XeLaTeX  (Overleaf: Menu → Compiler → XeLaTeX)
+% Bibliography: Biber    (detected automatically from biblatex preamble)
+%
+% STRUCTURE (current version):
+%   Front matter  : Title, Approval, Declaration, Abstract, Özet, CV,
+%                   Acknowledgments, Dedication (opt), ToC, LoT, LoF,
+%                   List of Abbreviations, List of Symbols.
+%   Main text     : Ch.1 Introduction, Ch.2 Literature Review,
+%                   Ch.3 Data and Methodology, Ch.4 Empirical Results,
+%                   Ch.5 Behavioral Hypotheses and Tests, Ch.6 Discussion,
+%                   Ch.7 Conclusion.
+%   Back matter   : References, Appendices A--F.
+%
+% SBE compliance checklist implemented here:
+%   [x] Times New Roman 12 pt
+%   [x] Double spacing throughout
+%   [x] 1.27 cm paragraph indent; no indent on first para of chapter/section
+%   [x] Chapter headings: ALL CAPS, centred, number line 1 / title line 2
+%   [x] Sub-headings: sentence case; 2 double-spaces before, 1 after
+%   [x] Two spaces between sub-heading number and text (sep=2em)
+%   [x] ToC: "CHAPTER X: TITLE" and "APPENDIX X: TITLE" format; depth=1
+%   [x] List of Tables / List of Figures
+%   [x] List of Abbreviations, List of Symbols (PhD econ/finance convention)
+%   [x] Roman numerals front matter; Arabic main text
+%   [x] Title page: counted p.i, number hidden
+%   [x] Approval + Declaration: counted pp.ii--iii, numbers hidden
+%   [x] Abstract: first visible page number = iv
+%   [x] Declaration: dashes (not bullet points)
+%   [x] Dedication page placeholder (optional, SBE allows header-less)
+%   [x] APA 7th edition: biblatex-apa + biber
+%   [x] Custom \citealt for no-paren citation inside parenthetical text
+%   [x] DOIs/URLs in reference list rendered as plain unlinked text
+%   [x] References heading via \chapter* (matches chapter heading format)
+%   [x] Appendix headings: "APPENDIX X" on line 1 / title on line 2
+%   [x] Caption labelsep=period ("Table 1.  Title")
+%
+% Content conventions to enforce manually (cannot be automated):
+%   - No period at end of any sub-heading title
+%   - \noindent on first paragraph after every table, figure, or block quote
+%   - Each appendix must be referred to at least once in the main text
+%   - Abstract ≤ 250 words; single paragraph preferred
+%   - LoT required only if ≥ 5 tables; LoF required only if ≥ 5 figures
+%     (current count: 23 tables, 4 figures → LoT required, LoF optional)
+%   - All table files referenced via \input{tables/...} must exist in the
+%     tables/ directory at compile time; see TABLE INVENTORY below
+%
+% TABLE INVENTORY (as produced by the R pipeline; maps filename → ToC label):
+%   table_fund_counts.tex                    → Table 1
+%   table_desc_stats.tex                     → Table 2 (incubation-corrected)
+%   table_return_dist.tex                    → Table 3
+%   table_coverage.tex                       → Table 4
+%   table_perf_aggregate.tex                 → Table 5
+%   table_bootstrap_tails.tex                → Table 6
+%   table_pi0_estimate.tex                   → Table 7
+%   table10b_bsw_decomposition.tex           → Table 8
+%   table_perf_by_lipper.tex                 → Table B.1 (Lipper breakdown)
+%   table_port_chars.tex                     → Table 9
+%   table_port_agg_alpha.tex                 → Table 10
+%   table_port_size_alpha.tex                → Table 11
+%   table_port_mom_alpha.tex                 → Table 12
+%   table_port_fee_alpha.tex                 → Table 13
+%   table_activeness_chars.tex               → Table 14
+%   table_activeness_alpha_r2.tex            → Table 15
+%   table_activeness_alpha_te.tex            → Table 16
+%   table_persistence.tex                    → Table 17
+%   table_desc_stats_master.tex              → Table A.1
+%   table_desc_stats_trimmed.tex             → Table A.2
+%   table_perf_aggregate_FF.tex              → Table C.1
+%   table_bootstrap_tails_FF.tex             → Table C.2
+%   table_pi0_estimate_FF.tex                → Table C.3
+%   table10b_bsw_decomposition_FF.tex        → Table C.4
+%   table_port_agg_alpha_FF.tex              → Table C.5
+%   table_subperiod_perf_aggregate.tex       → Table D.2
+%   table_subperiod_bootstrap_tails.tex      → Table D.3
+%   table_subperiod_pi0_estimate.tex         → Table D.4
+%   table_subperiod_bsw_decomposition.tex    → Table D.5
+%   table_subperiod_port_agg_alpha.tex       → Table D.6
+%   table_alpha_comparison_robust.tex        → Table E.1
+%   table_bootstrap_comparison_robust.tex    → Table E.2
+%   table_bsw_comparison_robust.tex          → Table E.3
+%
+% FIGURE INVENTORY:
+%   fig_fund_flows.png                       → Figure 1
+%   fig_rolling_alphas.png                   → Figure 2
+%   fig_luck_vs_skill_combined.png           → Figure 3
+%   fig_luck_vs_skill_combined_FF.png        → Figure C.1 (FF subperiod)
+%   fig_breaktest.png                        → Figure D.1 (Bai--Perron)
+% =============================================================================
+% !TEX program = xelatex
+\documentclass[12pt, oneside]{report}
+
+% ---- Font: Times New Roman (requires XeLaTeX) -------------------------------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage{unicode-math}
+\setmathfont{XITS Math}       % best open-licence math companion to TNR
+
+% ---- Page geometry ----------------------------------------------------------
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+% ---- Line spacing -----------------------------------------------------------
+\usepackage{setspace}
+\doublespacing
+
+% ---- Paragraph indentation --------------------------------------------------
+% 1.27 cm per SBE. Do NOT load 'indentfirst'.
+% Suppress indent manually with \noindent where required (see comments below).
+\setlength{\parindent}{1.27cm}
+
+% ---- Bibliography: APA 7th edition ------------------------------------------
+\usepackage[style=apa, backend=biber, sorting=nyt, uniquename=false]{biblatex}
+\addbibresource{dissertation.bib}
+
+% \citealt: "Author, Year" with no surrounding parentheses.
+% Use when the citation sits inside an already-parenthetical phrase, e.g.:
+%   "(four-factor model; \citealt{Carhart1997})"
+% biblatex-apa has no built-in \citealt; this definition provides it.
+\DeclareCiteCommand{\citealt}
+  {\boolfalse{citetracker}\boolfalse{pagetracker}\usebibmacro{prenote}}
+  {\ifciteindex{\indexfield{indextitle}}{}%
+   \printnames{labelname}%
+   \setunit{\addcomma\addspace}%
+   \printfield{year}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+% ---- Chapter and section heading format: titlesec ---------------------------
+\usepackage{titlesec}
+
+% [display] shape: number on line 1, title on line 2 (SBE format).
+% Both centred, bold, 12 pt (SBE specifies no font size change).
+\titleformat{\chapter}[display]
+  {\normalfont\normalsize\bfseries\centering}
+  {\MakeUppercase{\chaptertitlename}~\thechapter}
+  {0pt}
+  {\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}   % one double-spaced line after title
+
+% Section (first-level): sentence case, left, bold.
+% Before: 2 double-spaces = 48 pt. After: 1 double-space = 24 pt.
+\titleformat{\section}
+  {\normalfont\normalsize\bfseries}
+  {\thesection}
+  {2em}{}
+\titlespacing*{\section}{0pt}{48pt}{24pt}
+
+% Subsection (second-level): same spacing.
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}
+  {2em}{}
+\titlespacing*{\subsection}{0pt}{48pt}{24pt}
+
+% ---- Table of contents ------------------------------------------------------
+\usepackage{tocloft}
+\setcounter{tocdepth}{1}             % chapters + first-level sections only
+
+% Format: "CHAPTER 1: INTRODUCTION" (SBE requirement)
+\renewcommand{\cftchappresnum}{CHAPTER~}
+\renewcommand{\cftchapaftersnum}{:}
+% SBE: two spaces after number. "CHAPTER 7:" ≈ 5.5em; 6.5em → ~1em gap (≈2 spaces).
+\setlength{\cftchapnumwidth}{6.5em}
+\renewcommand{\cftchapfont}{\normalfont\normalsize}
+\renewcommand{\cftchappagefont}{\normalfont\normalsize}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+
+% Section entries: flush-left (no indent), matching SBE sample layout.
+% "X.XX" ≈ 1.8em; 2.3em numwidth leaves ~0.5em (≈2 spaces) gap.
+\setlength{\cftsecindent}{0pt}
+\setlength{\cftsecnumwidth}{2.3em}
+\renewcommand{\cftsecfont}{\normalfont\normalsize}
+\renewcommand{\cftsecpagefont}{\normalfont\normalsize}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+% Note: after \appendix in the body, \cftchappresnum is changed to "APPENDIX~"
+% so appendix entries read "APPENDIX A: TITLE".
+
+% ---------------------------------------------------------------------------
+% LoT / LoF heading fonts: tocloft defaults to \Large\bfseries (17 pt) for
+% the "LIST OF TABLES" and "LIST OF FIGURES" page headings, violating the
+% SBE 12 pt rule. Override to match the chapter heading style.
+% The \hfill…\hfill trick centres the title in tocloft's layout.
+% ---------------------------------------------------------------------------
+\renewcommand{\cfttoctitlefont}{\hfill\normalfont\normalsize\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\renewcommand{\cftlottitlefont}{\hfill\normalfont\normalsize\bfseries}
+\renewcommand{\cftafterlottitle}{\hfill}
+\renewcommand{\cftloftitlefont}{\hfill\normalfont\normalsize\bfseries}
+\renewcommand{\cftafterloftitle}{\hfill}
+
+% LoT entry formatting. numwidth must accommodate the longest label in the
+% list. After \counterwithin takes effect in appendices, labels reach
+% "Table D.6." (≈4.2 em); 5.0 em provides the required ~2-space gap.
+\setlength{\cfttabnumwidth}{5.0em}
+\renewcommand{\cfttabfont}{\normalfont\normalsize}
+\renewcommand{\cfttabpagefont}{\normalfont\normalsize}
+\renewcommand{\cfttableader}{\cftdotfill{\cftdotsep}}
+
+% LoF entry formatting. Appendix figure labels reach "Figure D.1." (≈4.6 em).
+\setlength{\cftfignumwidth}{5.0em}
+\renewcommand{\cftfigfont}{\normalfont\normalsize}
+\renewcommand{\cftfigpagefont}{\normalfont\normalsize}
+\renewcommand{\cftfigleader}{\cftdotfill{\cftdotsep}}
+
+% ---- Page style -------------------------------------------------------------
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+\pagestyle{plain}
+
+% ---- Tables and figures -----------------------------------------------------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{pdflscape}
+\usepackage{threeparttable}
+\usepackage{makecell}
+\usepackage{colortbl}
+
+% kableExtra compatibility aliases
+\makeatletter
+\@ifundefined{ThreePartTable}
+  {\newenvironment{ThreePartTable}{\begin{threeparttable}}{\end{threeparttable}}}{}
+\@ifundefined{TableNotes}
+  {\newenvironment{TableNotes}{\begin{tablenotes}}{\end{tablenotes}}}{}
+\makeatother
+
+% Counter management for appendix tables/figures (A.1, B.1, C.1, …)
+% \counterwithin is built into LaTeX 2018+; the chngcntr package is a safe
+% compatibility shim for older distributions.
+\usepackage{chngcntr}
+
+% ---------------------------------------------------------------------------
+% SBE caption rules (List of Tables / List of Figures examples, SBE guide):
+%
+%  TABLES  "Table N.  Title in Title Case"
+%    - period after number, NOT colon                            [SBE explicit]
+%    - two spaces between number and title                       [SBE explicit]
+%    - ALL MAJOR WORDS capitalised (Title Case)                  [SBE explicit]
+%    - caption placed ABOVE the table                            [convention]
+%
+%  FIGURES  "Figure N.  Only first word capitalised."
+%    - period after number; two spaces                           [SBE explicit]
+%    - Sentence case (first word + proper nouns only)            [SBE explicit]
+%    - caption placed BELOW the figure                           [convention]
+%
+%  Both:
+%    - font = normalsize (12 pt Times New Roman)                 [SBE: "font…12"]
+%    - width = \linewidth  →  caption always spans full text
+%      width regardless of enclosing environment; prevents
+%      caption overflow when table is inside threeparttable      [bug fix]
+%
+% \enspace ≈ 0.5 em ≈ 2 inter-word spaces at 12 pt — satisfies "two spaces"
+% position=top/bottom tells caption package which side of the content the
+% gap (skip=) applies to; omitting this causes skip to face the wrong way.
+% ---------------------------------------------------------------------------
+\DeclareCaptionLabelSeparator{periodtwospace}{.\enspace}
+
+\captionsetup[table]{
+  labelsep      = periodtwospace,
+  font          = normalsize,    % 12 pt — SBE requires TNR 12 throughout
+  skip          = 8pt,           % gap between caption bottom and table top
+  position      = top,           % caption is ABOVE the table
+  width         = \linewidth,    % prevent overflow in threeparttable
+  justification = justified
+}
+\captionsetup[figure]{
+  labelsep      = periodtwospace,
+  font          = normalsize,    % 12 pt
+  skip          = 8pt,           % gap between figure bottom and caption top
+  position      = bottom,        % caption is BELOW the figure
+  width         = \linewidth,
+  justification = justified
+}
+
+% ---- Mathematics ------------------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% ---- Hyperref ---------------------------------------------------------------
+\usepackage[hidelinks, unicode]{hyperref}
+
+% SBE: "All URLs in the reference list must be unlinked."
+% Render DOIs and URLs as plain non-clickable text in the bibliography.
+\AtBeginBibliography{%
+  \DeclareFieldFormat{url}{\nolinkurl{#1}}%
+  \DeclareFieldFormat{doi}{\nolinkurl{https://doi.org/#1}}%
+}
+
+% ---- Miscellaneous ----------------------------------------------------------
+\usepackage[normalem]{ulem}
+\usepackage{wrapfig}
+\usepackage{eso-pic}
+\usepackage{rotating}
+
+% Landscape page-number rotation (for Table 17 persistence, which is wide).
+\newif\iflscapenum
+\lscapenumfalse
+\AddToShipoutPictureFG{%
+  \iflscapenum
+    \AtPageLowerLeft{%
+      \put(\LenToUnit{\paperwidth-0.5in},\LenToUnit{0.5\paperheight}){%
+        \makebox(0,0){\rotatebox{90}{\thepage}}}%
+    }%
+  \fi
+}
+\fancypagestyle{lscapeblank}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+}
+
+% =============================================================================
+% DOCUMENT BODY
+% =============================================================================
+\begin{document}
+
+% =============================================================================
+% FRONT MATTER
+% Pages i--iii: counted but numbers hidden (\thispagestyle{empty}).
+% Page iv (Abstract): first visible page number per SBE.
+% =============================================================================
+\pagenumbering{roman}
+
+% --- Title page (p.i --- counted, hidden) ------------------------------------
+% \begin{titlepage} resets the counter to 1 at \end{titlepage} in oneside mode.
+% \setcounter{page}{2} on the approval page corrects for this.
+%
+% LAYOUT NOTE: global \doublespacing (24 pt baselineskip at 12 pt) applies here.
+% Each blank line between centred items = 24 pt gap (SBE-required double-spacing).
+% Block A (top 4 items) ≈ 96 pt; Block B (11 items + structural vspaces) ≈ 304 pt;
+% inter-block gap 0.5 in = 36 pt; top padding 0.5 in = 36 pt.
+% Total ≈ 472 pt < 576 pt (= 10 in − 2 × 1 in margins) → fits on one page.
+% Small structural \vspace commands mark logical boundaries within Block B only;
+% the 24 pt double-spacing handles all within-group line separation.
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+
+\vspace*{0.5in}
+
+THE ACTIVE MANAGEMENT PUZZLE
+
+\vspace{0.5in}
+
+\vspace{0.15in}
+
+Thesis submitted to the
+
+Institute for Graduate Studies in Social Sciences
+
+in partial fulfillment of the requirements for the degree of
+
+\vspace{0.5in}    % visual break: degree name stands alone
+
+Doctor of Philosophy
+
+in
+
+Management
+
+\vspace{0.5in}
+
+by
+
+Ömer Eren
+
+\vspace{0.5in}     % visual break: institution + year stand together
+
+Boğaziçi University
+
+2026
+
+\end{center}
+\end{titlepage}
+
+% --- Approval page (p.ii --- counted, hidden) --------------------------------
+\setcounter{page}{2}
+\thispagestyle{empty}
+\begin{center}
+THE ACTIVE MANAGEMENT PUZZLE
+
+\vspace{0.5in}
+
+The thesis of Ömer Eren
+
+has been approved by:
+
+\vspace{0.5in}
+\end{center}
+
+\noindent Prof.\ Vedat Akgiray \hfill \underline{\hspace{3in}}
+
+\noindent (Thesis Advisor)
+
+\vspace{0.5in}
+
+\noindent Assoc Prof.\ Cenk Cevat Karahan \hfill \underline{\hspace{3in}}
+
+\vspace{0.5in}
+
+\noindent Assist. Prof.\ Han Özsöylev \hfill \underline{\hspace{3in}}
+
+\vspace{0.5in}
+
+\noindent [Committee Member 4 --- Title and Full Name] \hfill \underline{\hspace{3in}}
+
+\vspace{0.5in}
+
+\noindent [External Member 5 --- Title and Full Name] \hfill \underline{\hspace{3in}}
+
+\noindent (External Member)
+
+\vspace{0.5in}
+
+\begin{center}
+June 2026
+\end{center}
+
+\clearpage
+
+% --- Declaration of Originality (p.iii --- counted, hidden) ------------------
+\thispagestyle{empty}
+\begin{center}
+DECLARATION OF ORIGINALITY
+\end{center}
+
+\noindent I, Ömer [Surname as Registered], certify that
+
+% SBE uses dash-prefixed items (not bullet points)
+\begin{itemize}
+  \renewcommand\labelitemi{--}
+  \item I am the sole author of this thesis and that I have fully acknowledged
+        and documented in my thesis all sources of ideas and words, including
+        digital resources, which have been produced or published by another
+        person or institution;
+  \item this thesis contains no material that has been submitted or accepted
+        for a degree or diploma in any other educational institution;
+  \item this is a true copy of the thesis approved by my advisor and thesis
+        committee at Boğaziçi University, including final revisions required
+        by them.
+\end{itemize}
+
+\vspace{1in}
+
+\noindent Signature \dotfill
+
+\vspace{0.3in}
+
+\noindent Date \dotfill
+
+\clearpage
+
+% --- Abstract (p.iv --- FIRST VISIBLE PAGE NUMBER) ---------------------------
+\thispagestyle{plain}
+\begin{center}
+ABSTRACT
+
+\vspace{12pt}
+
+The Active Management Puzzle: [Subtitle if Any]
+
+\vspace{12pt}
+\end{center}
+
+% No author name on abstract page (SBE).
+% First paragraph not indented.
+\noindent [Abstract text --- max 250 words. Single paragraph preferred.
+Should mention the aim of the research, what was done, how it was done, and
+the results, plus what the thesis contributes. If a second paragraph is
+essential, indent it, maintaining double spacing.]
+
+\clearpage
+
+% --- Özet (p.v) --------------------------------------------------------------
+\thispagestyle{plain}
+\begin{center}
+ÖZET
+
+\vspace{12pt}
+
+[Türkçe Tez Başlığı: Title Case, Maks.\ 15 Kelime]
+
+\vspace{12pt}
+\end{center}
+
+\noindent [Özet metni. İlk paragraf girintisiz. İngilizce abstract ile yaklaşık
+aynı uzunlukta.]
+
+\clearpage
+
+% --- Curriculum Vitae (PhD only --- follows Özet per SBE) --------------------
+% PhD students only; use simple narrative format, not tabular.
+\thispagestyle{plain}
+\begin{center}
+CURRICULUM VITAE
+\end{center}
+
+\vspace{12pt}
+
+\noindent \textbf{NAME:} Ömer [Surname as Registered]
+
+\vspace{12pt}
+
+\noindent \textbf{EDUCATION:}
+
+\noindent Ph.D.\ in Management, Boğaziçi University, 2026.
+
+\noindent [Prior degree], [Institution], [Year].
+
+\vspace{12pt}
+
+\noindent \textbf{PROFESSIONAL EXPERIENCE:}
+
+\noindent [Role], [Institution], [Years].
+
+\vspace{12pt}
+
+\noindent \textbf{AWARDS AND HONORS:}
+
+\noindent [Entries, one per line.]
+
+\vspace{12pt}
+
+\noindent \textbf{PUBLICATIONS:}
+
+\noindent [Entries in APA format.]
+
+\clearpage
+
+% --- Acknowledgments (optional) ----------------------------------------------
+% Title spelling: "ACKNOWLEDGMENTS" --- not "Acknowledgements" (SBE specifies).
+\thispagestyle{plain}
+\begin{center}
+ACKNOWLEDGMENTS
+\end{center}
+
+\noindent [Optional. Single page preferred. Acknowledge your thesis advisor
+(Prof.\ Vedat Akgiray), committee members (Prof.\ Han Özsöylev, Prof.\ Cenk
+Cevat Karahan), and any institutions that provided financial support.
+Family and personal acknowledgments may follow professional ones.]
+
+\clearpage
+
+% --- Dedication (optional) ---------------------------------------------------
+\thispagestyle{plain}
+
+\begin{center}
+\vspace*{2in}
+\textit{[Optional dedication --- centre on page. Heading "DEDICATION" may be
+omitted per SBE.]}
+\end{center}
+
+\clearpage
+
+% --- Table of Contents -------------------------------------------------------
+% Chapter entries appear as "CHAPTER 1:  INTRODUCTION" per SBE.
+\tableofcontents
+\clearpage
+
+% --- List of Tables ----------------------------------------------------------
+\listoftables
+\clearpage
+
+% --- List of Figures ---------------------------------------------------------
+% SBE: required only if ≥ 5 figures in the thesis. Current count: 4
+% main-text + 1 in Appendix C + 1 in Appendix D = 6. Therefore required.
+\listoffigures
+\clearpage
+
+% --- List of Abbreviations ---------------------------------------------------
+% Standard for empirical finance dissertations; SBE allows under front matter.
+\thispagestyle{plain}
+\begin{center}
+LIST OF ABBREVIATIONS
+\end{center}
+
+\vspace{12pt}
+
+\noindent \begin{tabular}{@{}ll@{}}
+BG        & Berk and Green (2004) \\
+BIC       & Bayesian Information Criterion \\
+BSW       & Barras, Scaillet, and Wermers (2010) \\
+CAPM      & Capital Asset Pricing Model \\
+CI        & Confidence Interval \\
+EMH       & Efficient Markets Hypothesis \\
+EW        & Equal-Weighted \\
+FDR       & False Discovery Rate \\
+FF        & Fama and French \\
+FF6       & Fama--French Six-Factor Model \\
+GFC       & Global Financial Crisis \\
+HAC       & Heteroskedasticity and Autocorrelation Consistent \\
+KTWW      & Kosowski, Timmermann, Wermers, and White (2006) \\
+LSEG      & London Stock Exchange Group \\
+NW        & Newey--West \\
+OLS       & Ordinary Least Squares \\
+PSL       & Pástor and Stambaugh Liquidity factor \\
+SBE       & Institute for Graduate Studies in Social Sciences \\
+SEC       & U.S.\ Securities and Exchange Commission \\
+TNA       & Total Net Assets \\
+VW        & Value-Weighted \\
+\end{tabular}
+
+\clearpage
+
+% --- List of Symbols ---------------------------------------------------------
+\thispagestyle{plain}
+\begin{center}
+LIST OF SYMBOLS
+\end{center}
+
+\vspace{12pt}
+
+\noindent \begin{tabular}{@{}ll@{}}
+$\alpha$                       & Carhart four-factor alpha (annualised, \%) \\
+$\hat{\alpha}_i$                & Estimated alpha for fund $i$ \\
+$t(\hat{\alpha})$               & Newey--West $t$-statistic for $\hat{\alpha}$ \\
+$\pi_0$                         & Population proportion of zero-alpha funds \\
+$\hat{\pi}_0$                   & Storey (2002) estimator of $\pi_0$ \\
+$\pi^-_A$, $\pi^+_A$            & Population proportions of genuinely unskilled / skilled active funds \\
+$T^-_\gamma$, $T^+_\gamma$      & Observed genuinely unskilled / skilled fractions at threshold $\gamma$ \\
+$S^-_\gamma$, $S^+_\gamma$      & Observed significant negative / positive $t(\hat{\alpha})$ fractions \\
+$F_\gamma$                      & Expected false-discovery fraction per tail: $\hat{\pi}_0 \cdot \gamma / 2$ \\
+$\gamma^*$                      & Main-text significance threshold; $\gamma^* = 0.20$ \\
+$\lambda$                       & Storey tuning parameter; $\lambda = 0.5$ \\
+$B$                             & Bootstrap iteration count; $B = 10{,}000$ \\
+$\mathrm{MKT}$--$\mathrm{Rf}$   & Market excess return factor \\
+$\mathrm{SMB}$                  & Small minus big (size) factor \\
+$\mathrm{HML}$                  & High minus low (value) factor \\
+$\mathrm{MOM}$                  & Momentum factor \\
+$\mathrm{RMW}$                  & Robust minus weak (profitability) factor \\
+$\mathrm{CMA}$                  & Conservative minus aggressive (investment) factor \\
+\end{tabular}
+
+\clearpage
+
+% =============================================================================
+% MAIN TEXT --- Arabic numerals from p.1
+% =============================================================================
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% =============================================================================
+% CHAPTER 1
+% INTRODUCTION
+% =============================================================================
+\chapter{INTRODUCTION}
+\label{ch:introduction}
+
+% SBE: first paragraph of every chapter NOT indented.
+\noindent [First paragraph of chapter. Open with the active management puzzle
+as an empirical fact: despite decades of documented underperformance, U.S.\
+equity mutual fund investors continue to allocate trillions of dollars to
+actively managed funds. Frame the central tension: classical rationality
+(BG 2004 equilibrium) versus behavioral alternatives. State the dissertation's
+question.]
+
+[Subsequent paragraphs are indented. Establish the empirical and theoretical
+stakes. Preview the main findings at a high level.]
+
+\section{Research motivation and objectives}
+\label{sec:motivation}
+
+\noindent [First paragraph of section --- not indented. Outline the three
+main motivations: (1) reconcile BG rationality with persistent heterogeneity,
+(2) evaluate whether behavioral frictions generate detectable signatures in
+flow--performance dynamics, (3) extend FF (2010) and BSW (2010) to the
+post-GFC regime.]
+
+\section{Contributions}
+\label{sec:contributions}
+
+\noindent [First paragraph. Four contributions: (i) extension of FF (2010)
+bootstrap and BSW (2010) decomposition to December 1994--February 2026;
+(ii) novel documentation of regime-specific skill heterogeneity at the
+Bai--Perron-identified November 2011 structural break; (iii) the four-way
+behavioral hypothesis framework (H1 sentiment-convexity, H2 disposition,
+H3 lottery demand, H4 fee elasticity); (iv) the VW--EW alpha gap framed as
+the locus of the behavioral puzzle conditional on BG equilibrium.]
+
+\section{Structure of the dissertation}
+\label{sec:structure}
+
+\noindent [First paragraph. Roadmap: Chapter 2 reviews the literature,
+Chapter 3 describes data and methodology, Chapter 4 presents empirical
+results, Chapter 5 tests behavioral hypotheses, Chapter 6 discusses the
+findings, Chapter 7 concludes.]
+
+% =============================================================================
+% CHAPTER 2
+% LITERATURE REVIEW
+% =============================================================================
+\chapter{LITERATURE REVIEW}
+\label{ch:literature}
+
+\noindent [First paragraph. The literature intersects three traditions:
+(i) mutual fund performance measurement (Jensen 1968 through BSW 2010),
+(ii) rational equilibrium models of delegated portfolio management (BG 2004
+and successors), and (iii) behavioral finance (investor sentiment, lottery
+demand, disposition effect). This chapter synthesises all three.]
+
+\section{The active management puzzle: Framing}
+\label{sec:puzzle_framing}
+
+\noindent [First paragraph. Formally state the puzzle: if most active funds
+underperform net of fees (FF 2010), why does the industry not contract?]
+
+The rational null is provided by \textcite{BerkGreen2004}, who demonstrate
+[continuation of BG equilibrium discussion --- diseconomies of scale,
+competitive flow response, zero expected alpha after fees in equilibrium,
+predictions for VW vs EW alpha gap].
+
+\subsection{The Berk--Green equilibrium}
+\label{sec:bg_equilibrium}
+
+\noindent [First paragraph of subsection. Formal BG setup: skilled managers
+exist but face decreasing returns to scale; rational investors chase
+returns; equilibrium outcome is zero expected net alpha at the
+capital-weighted level. Derive testable implications.]
+
+\subsection{Behavioral alternatives}
+\label{sec:behavioral_alternatives}
+
+\noindent [First paragraph of subsection. Rival hypotheses: investor
+sentiment \parencite{BakerWurgler2006}, lottery demand
+\parencite{Kumar2009}, disposition effects, and fee elasticity patterns
+inconsistent with rational updating.]
+
+\section{Mutual fund performance: Empirical evidence}
+\label{sec:performance_evidence}
+
+\noindent [First paragraph. Historical arc: Jensen (1968)
+→ Malkiel (1995) → Carhart (1997) → Wermers (2000)
+→ FF (2010) → BSW (2010) → Berk and van Binsbergen (2015)
+→ Barras, Gagliardini, and Scaillet (2022).]
+
+\subsection{Gross vs.\ net alphas and fund-level skill}
+\label{sec:gross_net}
+
+\noindent [First paragraph of subsection. Distinction matters: gross alpha
+measures managerial skill; net alpha measures investor welfare after fees.
+Discuss the BSW decomposition framework.]
+
+\subsection{Bootstrap methodology}
+\label{sec:bs_lit}
+
+\noindent [First paragraph of subsection. Kosowski, Timmermann, Wermers, and
+White (2006); FF (2010). Calendar-month resampling preserves cross-sectional
+factor dependence. Discuss the rationale for Newey--West symmetry.]
+
+\subsection{False discovery decomposition}
+\label{sec:fdr_lit}
+
+\noindent [First paragraph of subsection. Storey (2002) FDR framework applied
+to fund performance by Barras, Scaillet, and Wermers (2010). Distinguishes
+genuinely skilled/unskilled funds from lucky outliers in the cross-section.]
+
+\section{Fund flows and the flow--performance relation}
+\label{sec:flow_perf_lit}
+
+\noindent [First paragraph. Sirri and Tufano (1998) seminal documentation of
+convex flow--performance response. Chevalier and Ellison (1997) on implicit
+incentives created by this convexity. Subsequent refinements.]
+
+\section{Behavioral explanations}
+\label{sec:behavioral_lit}
+
+\noindent [First paragraph. Motivation for the four-hypothesis framework
+pursued in Chapter 5.]
+
+\subsection{Investor sentiment and fund flows}
+\label{sec:sentiment_lit}
+
+\subsection{Lottery demand and skewness preference}
+\label{sec:lottery_lit}
+
+\subsection{Disposition effect and illusion of control}
+\label{sec:disposition_lit}
+
+\subsection{Fee elasticity and behavioural pricing}
+\label{sec:fee_lit}
+
+\section{Synthesis and research gap}
+\label{sec:synthesis}
+
+\noindent [First paragraph. Position the dissertation within the literature.
+The gap: a unified test of behavioral hypotheses against the BG rational
+null in the post-GFC regime using an extended panel.]
+
+% =============================================================================
+% CHAPTER 3
+% DATA AND METHODOLOGY
+% =============================================================================
+\chapter{DATA AND METHODOLOGY}
+\label{ch:data}
+
+\noindent [First paragraph. Overview: LSEG Workspace share-class data from
+December 1994 through February 2026; approximately 3{,}764 U.S.\ domestic
+equity mutual fund share classes; factor data from the French Data Library
+and the Pástor--Stambaugh liquidity series.]
+
+\section{Data sources and sample construction}
+\label{sec:data_sources}
+
+\noindent [First paragraph. LSEG lower-tier subscription (no holdings data).
+Bloomberg supplementary static fields. Macro data including margin debt
+(FINRA, 1998+) and Baker--Wurgler sentiment index.]
+
+\subsection{Panel construction and incubation correction}
+\label{sec:panel_construction}
+
+\noindent [First paragraph of subsection. Three panels: Master
+(no corrections), Incubation-corrected (Evans 2010 36-month filter; main
+analysis panel), and Trimmed (Evans + 1995--2023; used for panel-level
+regressions of H1--H4 where factor/sentiment series alignment motivates the
+date cap). Detail selection filters: active vs.\ passive classification via
+LSEG Actively Managed field, leveraged/derivative fund exclusion.]
+
+\subsection{Benchmark and style-class assignment}
+\label{sec:benchmarks}
+
+\noindent [First paragraph of subsection. Lipper investment objective codes
+applied via LSEG static data. Discussion of benchmark mismatch risk and
+how the analysis is robust to it (portfolio-level factor regressions rather
+than benchmark-relative returns).]
+
+\section{Return measurement and the gross/net distinction}
+\label{sec:returns}
+
+\noindent [First paragraph. In the LSEG pipeline, gross returns are computed
+first from the total return index, and net returns are derived as
+$r^{\text{net}}_{i,t} = r^{\text{gross}}_{i,t} - (\text{ExpenseRatio}_i / 12)$,
+following \textcite{BarrasScailletWermers2010}. This is the opposite
+direction of the original FF (2010) and CRSP Mutual Fund Database pipelines,
+where net is observed and gross is derived by adding back fees. Flag the
+convention explicitly for committee review.]
+
+\section{Alpha estimation: The Carhart four-factor model}
+\label{sec:alpha_estimation}
+
+\noindent [First paragraph. Specification:
+$r^g_{i,t} - r^f_t = \alpha_i + \beta^{\text{MKT}}_i (\mathrm{MKT}_t - r^f_t)
++ \beta^{\text{SMB}}_i \mathrm{SMB}_t + \beta^{\text{HML}}_i \mathrm{HML}_t
++ \beta^{\text{MOM}}_i \mathrm{MOM}_t + \varepsilon_{i,t}$.
+Estimated by OLS with Newey--West HAC standard errors (6-month lag)
+following \textcite{FamaFrench2010}.]
+
+\subsection{Aggregate portfolio alphas}
+\label{sec:agg_alphas}
+
+\noindent [First paragraph. Portfolio regression methodology (FF 2010
+Section I): aggregate the group's constituent returns into a single monthly
+portfolio return series (EW or VW), then run one Carhart regression on
+that series. Contrasts with fund-level alpha estimation which runs $N$
+separate regressions.]
+
+\subsection{Rolling and sub-period alpha estimation}
+\label{sec:rolling_alphas}
+
+\noindent [First paragraph. 36-month rolling Carhart regressions produce the
+\texttt{alpha\_rolling} series used as input to the Bai--Perron structural break
+test (Section~\ref{sec:subperiod_methodology}) and Figure~2.]
+
+\section{Fund flow calculation}
+\label{sec:flow_calculation}
+
+\noindent [First paragraph. Sirri--Tufano (1998) proportional flow measure
+scaled by lagged TNA, winsorised at 1st/99th percentiles, December
+observations excluded. Validation against LSEG-reported flows shows
+0.92 correlation with calculated flows.]
+
+\section{Bootstrap procedure for luck vs.\ skill}
+\label{sec:bootstrap}
+
+\noindent [First paragraph. FF (2010) calendar-month bootstrap:
+$B = 10{,}000$ iterations; for each fund, subtract estimated alpha from
+excess return to create a zero-alpha null; resample calendar months with
+replacement to preserve cross-sectional factor dependence; re-estimate
+Carhart on each resampled series. Newey--West HAC applied symmetrically
+to actual and simulated $t$-statistics.]
+
+\section{False discovery rate decomposition}
+\label{sec:fdr}
+
+\noindent [First paragraph. BSW (2010) four-way decomposition:
+$\hat{\pi}_0$ (zero-alpha fraction) estimated via Storey (2002) at
+$\lambda = 0.5$; $F_\gamma = \hat{\pi}_0 \cdot \gamma / 2$ is the
+expected false-discovery rate per tail; $T^-_\gamma = S^-_\gamma - F_\gamma$
+and $T^+_\gamma = S^+_\gamma - F_\gamma$ estimate the genuinely
+unskilled and skilled populations. Main text uses $\gamma^* = 0.20$.]
+
+\section{Sub-period construction via Bai--Perron}
+\label{sec:subperiod_methodology}
+
+\noindent [First paragraph. Multiple structural break test of Bai and Perron
+(1998, 2003) applied to the monthly cross-sectional equal-weighted mean of
+the 36-month rolling Carhart gross alpha for active funds. BIC selects the
+optimal break count; Newey--West HAC standard errors with data-driven lag
+(Andrews 1991) provide confidence intervals. Three-regime partition adopted
+with thresholds at Dec 2005 and Nov 2011.]
+
+\section{Behavioral state variables}
+\label{sec:state_variables}
+
+\noindent [First paragraph. For H1--H4 tests: Baker--Wurgler investor
+sentiment index, VIX, SKEW, CBOE put--call ratio, AAII bull--bear spread,
+University of Michigan consumer sentiment, FINRA margin debt. Variable
+definitions and transformations.]
+
+\section{Behavioral hypotheses}
+\label{sec:hypotheses}
+
+\noindent [First paragraph. Formal statement of the four hypotheses tested
+in Chapter 5, with clear null and alternative for each.]
+
+\subsection{H1: Sentiment amplifies flow--performance convexity}
+\label{sec:H1_method}
+
+\noindent [First paragraph. Specification: Sirri--Tufano piecewise flow
+regression augmented with sentiment interaction terms. Auxiliary hypothesis
+reframed as asymmetry test $\delta_3 > \delta_1$ rather than a level claim
+about losers (the level claim does not follow from positive fractional
+ranks).]
+
+\subsection{H2: Disposition and illusion of control}
+\label{sec:H2_method}
+
+\noindent [First paragraph. Interaction of performance with turnover,
+expense ratio, and tenure proxies.]
+
+\subsection{H3: Lottery demand and skewness preference}
+\label{sec:H3_method}
+
+\noindent [First paragraph. Cross-sectional sort by fund-level idiosyncratic
+skewness; flow sensitivity to right-tail returns.]
+
+\subsection{H4: Fee elasticity and behavioural pricing}
+\label{sec:H4_method}
+
+\noindent [First paragraph. Flow--fee relation conditional on performance;
+rational Bayesian updating predicts negative fee elasticity across the
+distribution, behavioral frictions predict heterogeneous response.]
+
+% =============================================================================
+% CHAPTER 4
+% EMPIRICAL RESULTS
+% =============================================================================
+\chapter{EMPIRICAL RESULTS}
+\label{ch:results}
+
+\noindent [First paragraph. Structure of the results: descriptive statistics
+(Section 4.1), aggregate performance (4.2), luck vs.\ skill via bootstrap
+(4.3), false discovery decomposition (4.4), structural breaks and sub-period
+evidence (4.5), portfolio sorts (4.6), and persistence (4.7).]
+
+\section{Fund sample and descriptive statistics}
+\label{sec:descriptive}
+
+\noindent [First paragraph. Overview of the three panels. Active/passive
+breakdown; TNA distribution; coverage characteristics.]
+
+% After every table/figure, the continuation paragraph must begin with
+% \noindent per SBE indentation rule.
+
+\input{tables/table_fund_counts}
+
+\noindent [Continuation paragraph discussing Table 1.]
+
+\input{tables/table_desc_stats}
+
+\noindent [Continuation paragraph discussing Table 2 (Incubation-Corrected
+panel). Note that this is the main-analysis panel; the Master and Trimmed
+variants appear in Appendix A.]
+
+\input{tables/table_return_dist}
+
+\noindent [Continuation paragraph discussing Table 3.]
+
+\input{tables/table_coverage}
+
+\noindent [Continuation paragraph discussing Table 4.]
+
+% Figure 1: Average Monthly Proportional Fund Flows
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{tables/fig_fund_flows.png}
+  \caption[Average monthly proportional fund flows]{%
+    Average monthly proportional fund flows. Bold line: 12-month centred
+    rolling mean. Faint line: raw monthly cross-sectional mean. Proportional
+    flow computed following \textcite{SirriTufano1998}, scaled by lagged
+    TNA, winsorised at the 1st/99th percentiles, December observations
+    excluded.}
+  \label{fig:fund_flows}
+\end{figure}
+
+\noindent [Continuation paragraph discussing Figure 1.]
+
+\section{Aggregate fund performance}
+\label{sec:aggregate_performance}
+
+\noindent [First paragraph. Main finding: Active gross alpha EW = $-0.17\%$,
+VW = $-0.14\%$; net alpha EW = $-1.24\%$ (significant), VW = $-0.86\%$
+(significant). VW net alpha being modestly negative is consistent with BG
+equilibrium; the EW--VW gap is where the behavioral argument lives.]
+
+\input{tables/table_perf_aggregate}
+
+\noindent [Continuation paragraph discussing Table 5.]
+
+\section{Luck versus skill: Bootstrap analysis}
+\label{sec:bootstrap_results}
+
+\noindent [First paragraph. FF (2010) bootstrap on Trimmed Evans-corrected
+panel; $B = 10{,}000$ iterations. Left tail (percentiles 1, 5, 10) shows
+Prob.\ Luck = 0.0\% --- zero of 10{,}000 iterations produced a left tail
+as extreme as the empirical. Right tail consistent with zero-skill null
+at all percentiles above median.]
+
+\input{tables/table_bootstrap_tails}
+
+\noindent [Continuation paragraph discussing Table 6.]
+
+% Figure 2: rolling alpha series
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{tables/fig_rolling_alphas.png}
+  \caption[Time-varying alphas by rolling-window regression]{%
+    Time-varying alphas estimated by 36-month rolling window regressions.
+    The series displays three visually distinct regimes whose boundaries
+    are formally identified by a \textcite{Bai1998,Bai2003} structural
+    break test; see Appendix~\ref{app:subperiod} for break dates,
+    confidence intervals, and regime-mean estimates.}
+  \label{fig:rolling_alphas}
+\end{figure}
+
+\noindent [Continuation paragraph discussing Figure 2 and the three-regime
+structure it motivates.]
+
+\section{False discovery decomposition}
+\label{sec:fdr_results}
+
+\noindent [First paragraph. $\hat{\pi}_0 = 76.9\%$ for the full Trimmed
+panel. Interpretation: approximately three-quarters of active funds
+have true alpha statistically indistinguishable from zero.]
+
+\input{tables/table_pi0_estimate}
+
+\noindent [Continuation paragraph discussing Table 7.]
+
+% Figure 3: empirical vs bootstrap CDF/PDF
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{tables/fig_luck_vs_skill_combined.png}
+  \caption[CDF and PDF of empirical vs.\ simulated alpha distributions]{%
+    Panel A: empirical CDF of active-fund $t(\hat{\alpha})$ (blue) versus
+    bootstrap-derived zero-skill CDF (black). Panel B: empirical PDF
+    (shaded) against the $N(0,1)$ null (dashed).}
+  \label{fig:luck_vs_skill}
+\end{figure}
+
+\noindent [Continuation paragraph discussing Figure 3.]
+
+\input{tables/table10b_bsw_decomposition}
+
+\noindent [Continuation paragraph discussing Table 8. At $\gamma^* = 0.20$:
+$T^-_{\gamma^*} = 20.3\%$ genuinely unskilled; $T^+_{\gamma^*} = -1.2\%$
+indicates right-tail significance does not exceed the false-discovery rate
+at this threshold --- i.e., no detectable genuinely skilled mass.]
+
+\section{Portfolio sorts: Size, momentum, and fee}
+\label{sec:portfolio_sorts}
+
+\noindent [First paragraph. Quintile portfolios sorted monthly within group
+on three characteristics: log-TNA (size), 11-month cumulative return skipping
+the most recent month (momentum), and static expense ratio (fee).]
+
+\input{tables/table_port_chars}
+
+\noindent [Continuation paragraph discussing Table 9.]
+
+\input{tables/table_port_agg_alpha}
+
+\noindent [Continuation paragraph discussing Table 10.]
+
+\input{tables/table_port_size_alpha}
+
+\noindent [Continuation paragraph discussing Table 11.]
+
+\input{tables/table_port_mom_alpha}
+
+\noindent [Continuation paragraph discussing Table 12.]
+
+\input{tables/table_port_fee_alpha}
+
+\noindent [Continuation paragraph discussing Table 13.]
+
+\section{Activeness and the cross-section of fund alphas}
+\label{sec:activeness}
+
+\noindent The fee, size, and momentum quintile sorts of the previous section
+partition the actively managed universe along characteristics that prior
+literature has documented as predictors of cross-sectional alpha. None of
+those characteristics, however, addresses the question that motivates this
+dissertation directly: holding everything else constant, does \emph{being more
+active}---deviating more from systematic factor exposures or from a stated
+benchmark---produce a different alpha? This section provides that test.
+
+The cross-sectional question contrasts three priors. Under
+\textcite{BerkGreen2004}, capital flows erode net-alpha differences across
+funds in equilibrium and no monotone activeness--alpha gradient is predicted.
+\textcite{AmihudGoyenko2013} argue that the residual share of fund return
+variance not explained by systematic factors, $1-R^2$, captures
+\emph{productive} idiosyncratic risk-taking by managers with information
+advantages and is therefore a forward-looking predictor of alpha; under their
+prior the gradient should be positive. \textcite{CremersPetajisto2009},
+working with a holdings-based Active Share measure, document a positive
+activeness--alpha gradient that survives net of fees in the most active
+quintile but deteriorates sharply for closet indexers in the lowest quintile.
+The empirical question is which of these patterns the data exhibit.
+
+The dissertation reports two activeness proxies. The primary measure is the
+fund-level idiosyncratic share, $1-R^2$, computed as the time-series average
+of $1-R^2_{i,t}$ from the rolling 36-month \textcite{Carhart1997} four-factor
+regression that already produces the rolling alpha series of Figure~2 and the
+Bai--Perron structural break test of Section~\ref{sec:subperiod}. Following
+\textcite{AmihudGoyenko2013}, a higher $1-R^2$ indicates returns less
+explained by systematic factor exposures and therefore more idiosyncratic.
+The robustness measure is the annualised Tracking Error of fund gross returns
+against the fund's assigned benchmark index,
+$\mathrm{TE}_i = \sqrt{12}\cdot\mathrm{sd}(r_{i,t}^{\text{gross}}-r_{b(i),t})$,
+following the interpretation of \citet{CremersPetajisto2009}. Holdings-based
+Active Share is not computable from the LSEG subscription used in this
+dissertation; the two return-based measures are reported jointly to mitigate
+single-measure concerns.
+
+For each measure, active funds with at least 24 monthly observations are
+sorted into five quintiles by the time-series mean of the activeness measure.
+Quintile~1 contains the closet indexers (lowest activeness) and Quintile~5
+the most active funds. Equal-weighted and lagged-TNA-weighted monthly
+portfolio returns are computed for each quintile, on both gross and net of
+fees, and regressed on the Carhart four factors with Newey-West
+heteroskedasticity- and autocorrelation-consistent standard errors at a
+six-month lag. The Q5$-$Q1 self-financing spread is regressed without
+subtracting the risk-free rate, as $R_f$ cancels in the long-short
+construction. Net returns deduct one-twelfth of the static annual expense
+ratio per month, following \textcite{BarrasScailletWermers2010}.
+
+\input{tables/table_activeness_chars}
+
+\noindent [Continuation paragraph discussing Table 14: verify the sort
+produces a monotone activeness gradient and discuss cross-sectional fund
+characteristics that vary with activeness---in particular, whether high-
+activeness funds carry systematically higher or lower fees, turnover, or
+TNA.]
+
+\input{tables/table_activeness_alpha_r2}
+
+\noindent [Continuation paragraph discussing Table 15. Headline statistic
+is the Q5$-$Q1 net alpha row in Panels C and D. Tie the result back to the
+\textcite{AmihudGoyenko2013} and \textcite{BerkGreen2004} priors. If the
+Q5$-$Q1 net alpha is negative, the cross-sectional evidence aligns with
+the Section~\ref{sec:H3} test of lottery demand: investors are paying a
+premium for activeness that destroys risk-adjusted value.]
+
+\input{tables/table_activeness_alpha_te}
+
+\noindent [Continuation paragraph discussing Table 16. Compare the Tracking
+Error gradient to the $1-R^2$ gradient. If qualitatively similar, the
+activeness--alpha relationship is robust to the choice of proxy.
+Disagreement would suggest that the $1-R^2$ result reflects something
+distinct from generic benchmark deviation---possibly factor-tilting
+unrelated to security selection, per \citet{CremersPetajisto2009}'s
+critique of TE as conflating factor exposure with security selection.]
+
+\section{Performance persistence}
+\label{sec:persistence}
+
+\noindent [First paragraph. KTWW (2006) bootstrap persistence test applied
+to 36-month formation, 12-month holding non-overlapping cohort-period
+Carhart alphas. Decile 10 (losers) shows significant persistence of
+underperformance; Decile 1 (winners) shows no statistically significant
+alpha. Consistent with Carhart (1997): persistence is in the left tail.]
+
+% Table 17 is landscape-oriented because of its wide factor-loading columns.
+\begin{landscape}
+\lscapenumtrue
+\pagestyle{lscapeblank}%
+\input{tables/table_persistence}
+\end{landscape}
+\lscapenumfalse
+\pagestyle{plain}%
+
+\noindent [Continuation paragraph discussing Table 17.]
+
+\section{Sub-period analysis}
+\label{sec:subperiod}
+
+\noindent [First paragraph. Three-regime partition adopted from the
+Bai--Perron structural break test (full results in
+Appendix~\ref{app:subperiod}). P1 (Jan 1995--Jan 2006, 132 months),
+P2 (Feb 2006--Nov 2011, 70 months), and P3 (Dec 2011--Jan 2026,
+170 months). The regime-specific evidence shows a dramatic collapse of
+$\hat{\pi}_0$ from approximately 81\% in P1 to 60.7\% in P3, with
+$T^-_{\gamma^*}$ (genuinely unskilled) correspondingly rising to 33.7\%
+in P3 --- the strongest single piece of regime-specific evidence in the
+dissertation.]
+
+\noindent [Cross-reference Appendix D tables rather than duplicating them in
+the main text, since they are detailed enough to warrant their own
+appendix.]
+
+% =============================================================================
+% CHAPTER 5
+% BEHAVIORAL HYPOTHESES AND TESTS
+% =============================================================================
+\chapter{BEHAVIORAL HYPOTHESES AND TESTS}
+\label{ch:behavioral}
+
+\noindent [First paragraph. Having established the empirical facts in
+Chapter 4 --- BG-consistent VW net alpha near zero, EW--VW heterogeneity,
+regime-specific skill collapse post-2011 --- this chapter tests whether
+behavioral hypotheses provide explanatory power beyond the BG rational
+null. Four hypotheses are evaluated via panel regressions on the Trimmed
+panel with sentiment interactions.]
+
+\section{Panel regression specification}
+\label{sec:panel_spec}
+
+\noindent [First paragraph. Sirri--Tufano piecewise flow regression with
+performance rank quintile dummies, interaction terms with behavioral state
+variables, and two-way clustered standard errors (fund and time). Sub-period
+interactions are included to sharpen identification given the regime
+heterogeneity documented in Chapter 4.]
+
+\section{H1: Sentiment-convexity hypothesis}
+\label{sec:H1}
+
+\noindent [First paragraph. H1 states that high sentiment amplifies
+flow--performance convexity. The auxiliary test is the asymmetry
+$\delta_3 > \delta_1$: sentiment's amplification of inflows to winners
+exceeds its amplification of outflows from losers.]
+
+% Placeholder for H1 regression table (to be added when H1 pipeline completes)
+% \input{tables/table_H1_regression}
+
+\section{H2: Disposition effect and illusion of control}
+\label{sec:H2}
+
+\noindent [First paragraph. H2 predicts that investor reluctance to realise
+losses reduces outflows from underperformers, attenuating the piecewise
+flow regression's negative segment slope.]
+
+% Placeholder for H2 regression table
+% \input{tables/table_H2_regression}
+
+\section{H3: Lottery demand and skewness preference}
+\label{sec:H3}
+
+\noindent [First paragraph. H3 predicts that funds with high idiosyncratic
+skewness attract disproportionate flow relative to their mean-variance
+characteristics, particularly from retail-dominated share classes.]
+
+% Placeholder for H3 regression table
+% \input{tables/table_H3_regression}
+
+\section{H4: Fee elasticity}
+\label{sec:H4}
+
+\noindent [First paragraph. H4 predicts that flow--fee elasticity is
+heterogeneous across investor clienteles, inconsistent with a single
+rational Bayesian updating rule.]
+
+% Placeholder for H4 regression table
+% \input{tables/table_H4_regression}
+
+\section{The psychological premium framework}
+\label{sec:ppf}
+
+\noindent [First paragraph. Synthesis: the four hypotheses imply a
+``psychological premium'' --- the return-equivalent value of non-pecuniary
+characteristics investors derive from active funds. Discussion of the
+framework's implications for the industry's persistence.]
+
+% =============================================================================
+% CHAPTER 6
+% DISCUSSION
+% =============================================================================
+\chapter{DISCUSSION}
+\label{ch:discussion}
+
+\noindent [First paragraph. Integrate findings from Chapters 4 and 5.
+Main claim: the evidence is consistent with a hybrid model in which the
+VW dimension operates under BG equilibrium (rational, zero expected net
+alpha) while the EW dimension reflects behavioral frictions. The
+regime-specific collapse of $\hat{\pi}_0$ in P3 suggests time-varying
+frictions; structural interpretation follows.]
+
+\section{BG equilibrium: Accepted or rejected?}
+\label{sec:bg_verdict}
+
+\noindent [First paragraph. Argue that BG is not rejected for
+capital-weighted outcomes: VW net alpha is economically small, consistent
+with equilibrium. BG is, however, incomplete at the cross-sectional level,
+where behavioral heterogeneity generates the EW underperformance.]
+
+\section{The regime-specific puzzle in P3}
+\label{sec:p3_puzzle}
+
+\noindent [First paragraph. The 13.6 pp collapse of $\hat{\pi}_0$ from P1
+to P3 --- combined with $T^-_{\gamma^*}$ rising to 33.7\% --- requires
+economic explanation. Candidate explanations: (i) rise of passive
+competition compressing active margins; (ii) post-GFC algorithmic trading
+eliminating cross-sectional alpha opportunities; (iii) selection effects
+from fund entry/exit dynamics.]
+
+\section{Contribution to the active management puzzle literature}
+\label{sec:contribution_puzzle}
+
+\noindent [First paragraph. How the dissertation advances beyond
+FF (2010), BSW (2010), and Berk--van Binsbergen (2015).]
+
+\section{Limitations}
+\label{sec:limitations_disc}
+
+\noindent [First paragraph. Acknowledged limitations: LSEG coverage begins
+December 1994 (no 1984--1993 window of FF 2010); no holdings-level data;
+sentiment proxies are imperfect; Trimmed sample restriction for H1--H4
+reduces statistical power on the most informative recent period.]
+
+% =============================================================================
+% CHAPTER 7
+% CONCLUSION
+% =============================================================================
+\chapter{CONCLUSION}
+\label{ch:conclusion}
+
+\noindent [First paragraph. Summary of findings in their final form.
+Direct answer to the dissertation's central question: is classical
+economic theory sufficient, or does the behavioral alternative add
+explanatory power? Position the answer clearly.]
+
+\section{Summary of findings}
+\label{sec:summary}
+
+\noindent [First paragraph. Six bullet-point level findings, rendered in
+prose per SBE style. ]
+
+\section{Policy and practical implications}
+\label{sec:implications}
+
+\noindent [First paragraph. Implications for retail investors, regulators
+(SEC disclosure regime), industry participants.]
+
+\section{Future research}
+\label{sec:future_research}
+
+\noindent [First paragraph. Extensions: intraday flow dynamics; 401(k)
+channel isolation; holdings-level testing of behavioral hypotheses;
+cross-country replication.]
+
+% =============================================================================
+% REFERENCES
+% \chapter* produces the correct visual format (ALL CAPS, centred, two-line
+% display) without incrementing the chapter counter.
+% \addcontentsline ensures it appears in the ToC.
+% DOIs/URLs are rendered as plain unlinked text (see \AtBeginBibliography above).
+% =============================================================================
+\clearpage
+\chapter*{REFERENCES}
+\addcontentsline{toc}{chapter}{REFERENCES}
+\printbibliography[heading=none]
+
+% =============================================================================
+% APPENDICES
+% Structure matches Results.pdf:
+%   A: Alternative Panel Descriptive Statistics
+%   B: Alpha by Lipper Style Class
+%   C: Fama--French (2010) Subperiod Replication
+%   D: Sub-Period Analysis (full Bai--Perron + three-regime tables)
+%   E: Factor Model Robustness
+%   F: Data Cleaning and Sample Construction Details (methodological notes)
+% =============================================================================
+\appendix
+
+% Switch ToC prefix to "APPENDIX~" so entries read "APPENDIX A: TITLE".
+\renewcommand{\cftchappresnum}{APPENDIX~}
+% "APPENDIX F:" ≈ 6.1 em; 7.0 em gives ~0.9 em ≈ 2–3 spaces (SBE: two spaces).
+\setlength{\cftchapnumwidth}{7.0em}
+
+% Renumber tables and figures as A.1, B.1, C.1, … per appendix chapter.
+% \counterwithin resets the sub-counter on every new \chapter and rewrites
+% \thetable / \thefigure to "ChapterLetter.N" automatically.
+% Applied here (not in preamble) so main-text tables keep sequential numbers.
+\counterwithin{table}{chapter}
+\counterwithin{figure}{chapter}
+
+% Reformat chapter heading for appendices: "APPENDIX X" on line 1, title below.
+\titleformat{\chapter}[display]
+  {\normalfont\normalsize\bfseries\centering}
+  {APPENDIX~\thechapter}
+  {0pt}
+  {\MakeUppercase}
+\titlespacing*{\chapter}{0pt}{0pt}{24pt}
+
+% REMINDER: every appendix must be explicitly referred to in the main text
+% per SBE. Refer to each from Chapter 3 (Methodology) or Chapter 4 (Results).
+
+% --- Appendix A --------------------------------------------------------------
+\chapter{ALTERNATIVE PANEL DESCRIPTIVE STATISTICS}
+\label{app:alt_panels}
+
+\noindent This appendix presents cross-sectional summary statistics for the
+two alternative fund-month panels constructed in the main analysis but not
+used as the primary estimation sample. The Master panel (Table~A.1) imposes
+no incubation correction and no sample-period restriction. The Trimmed
+panel (Table~A.2) applies the \textcite{Evans2010} 36-month incubation
+correction and restricts the sample to 1995--2023; this is the panel used
+for the panel-level regressions of Hypotheses H1--H4, where alignment with
+the available factor and sentiment series motivates the date cap. The
+Incubation-Corrected panel reported in Table~\ref{tab:desc_stats} of the
+main text applies only the Evans (2010) 36-month filter and retains the
+full December 1994--February 2026 history without artificial date trimming.
+Comparing the three variants isolates the contribution of each correction
+to the cross-sectional moments of TNA, expense ratio, turnover, fund age,
+gross returns, and the annualised gross Sharpe ratio.
+
+\input{tables/table_desc_stats_master}
+
+\input{tables/table_desc_stats_trimmed}
+
+% --- Appendix B --------------------------------------------------------------
+\chapter{ALPHA BY LIPPER STYLE CLASS}
+\label{app:lipper}
+
+\noindent This appendix decomposes the aggregate net annualised
+\textcite{Carhart1997} four-factor alpha reported in Table~5 by Lipper
+investment objective code. Funds are grouped by their LSEG-assigned Lipper
+classification and within each class are split into Active and Passive
+sub-aggregates. The breakdown documents the heterogeneity in average
+performance across investment styles and confirms that the aggregate
+negative net alpha reported in the main text is not driven by any single
+style class.
+
+\input{tables/table_perf_by_lipper}
+
+% --- Appendix C --------------------------------------------------------------
+\chapter{FAMA--FRENCH (2010) SUBPERIOD REPLICATION}
+\label{app:ff_subperiod}
+
+\noindent This appendix replicates the principal performance and
+skill-decomposition results of the main analysis on the Jan 1995--Sep 2006
+subperiod, the maximum overlap between this study's sample (Dec 1994
+onwards) and the Jan 1984--Sep 2006 window of \textcite{FamaFrench2010}.
+The estimation kernels, factor model specification, Newey--West lag,
+bootstrap design ($B = 10{,}000$ calendar-month resamples), and the
+\textcite{Storey2002} tuning parameter ($\lambda = 0.5$) are identical to
+those used in the main results, ensuring that any divergence between the
+two sets of estimates reflects sample-period effects rather than
+methodological differences.
+
+\input{tables/table_perf_aggregate_FF}
+
+\input{tables/table_bootstrap_tails_FF}
+
+\input{tables/table_pi0_estimate_FF}
+
+% Figure C.1: CDF/PDF for FF subperiod
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{tables/fig_luck_vs_skill_combined_FF.png}
+  \caption[CDF and PDF of active-fund alpha $t$-statistics --- FF subperiod]{%
+    CDF and PDF of active-fund alpha $t$-statistics --- FF subperiod.}
+  \label{fig:luck_vs_skill_FF}
+\end{figure}
+
+\input{tables/table10b_bsw_decomposition_FF}
+
+\input{tables/table_port_agg_alpha_FF}
+
+\section{Comparison with Fama and French (2010)}
+\label{sec:ff_comparison_discussion}
+
+\noindent The FF (2010) sample spans Jan 1984--Sep 2006 (270 months), of
+which the present subperiod covers only the second half (141 months).
+Differences in point estimates between this appendix and Tables I--III of
+FF (2010) should therefore not be attributed to methodological discrepancies
+but to (i) the absence of the 1984--1994 window, during which the
+cross-section of U.S.\ equity mutual funds exhibited a more favourable mean
+alpha than in the post-1995 era, and (ii) sample-construction
+differences---this study uses LSEG share-class data with the
+\textcite{Evans2010} incubation correction, whereas FF (2010) draw on the
+CRSP Mutual Fund Database aggregated to fund-level. The qualitative
+conclusions of FF (2010)---that the cross-sectional distribution of
+$t(\hat{\alpha})$ lies materially to the left of the bootstrap zero-skill
+null, that $\hat{\pi}_0$ is high, and that VW net alphas are negative and
+statistically significant---are expected to be reproduced; precise
+magnitudes need not be.
+
+% --- Appendix D --------------------------------------------------------------
+\chapter{SUB-PERIOD ANALYSIS}
+\label{app:subperiod}
+
+\noindent The rolling alpha series in Figure~\ref{fig:rolling_alphas}
+exhibits pronounced non-stationarity across the full December
+1994--February 2026 sample. To partition the sample into economically
+coherent sub-periods without imposing thresholds \textit{a priori}, we
+apply the multiple structural break test of \textcite{Bai1998} and
+\textcite{Bai2003} to the monthly cross-sectional equal-weighted mean of
+the 36-month rolling \textcite{Carhart1997} gross alpha for active funds
+--- the same underlying series plotted (after 12-month smoothing) in
+Figure~\ref{fig:rolling_alphas}. The test is applied to the raw, unsmoothed
+series; smoothing the input would introduce additional moving-average serial
+correlation on top of the overlap-induced autocorrelation already present
+in rolling-window estimates, overstating the precision of detected breaks.
+
+The model is a pure mean-shift specification,
+$y_t = \mu_i + \varepsilon_t$ for $t$ in segment $i$, with a minimum segment
+length of 36 months (matching the rolling-window width) and up to five
+breaks tested. The optimal number of breaks is selected by the Bayesian
+Information Criterion (BIC). Confidence intervals for break dates use
+Newey--West heteroskedasticity- and autocorrelation-consistent standard
+errors with a data-driven lag, following the bandwidth rule of
+\textcite{Andrews1991}.
+
+\section{Structural break test results}
+\label{sec:break_test_results}
+
+\noindent Figure~\ref{fig:breaktest} plots the smoothed active-fund rolling
+alpha series together with the Bai--Perron break-date estimates (dashed
+red verticals), 95\,\% HAC confidence intervals (shaded bands), and
+regime-mean step function (solid red). Table~D.1 reports break dates,
+confidence intervals, and mean alpha per segment.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{tables/fig_breaktest.png}
+  \caption[Bai--Perron structural break test --- active fund rolling gross
+           alpha]{%
+    Bai--Perron structural break test: active fund rolling gross alpha.
+    Blue line: 12-month trailing mean of the monthly cross-sectional
+    equal-weighted mean of 36-month rolling \textcite{Carhart1997} gross
+    alpha (matches Figure~\ref{fig:rolling_alphas}). Solid red step:
+    regime-mean alpha per identified segment. Dashed red verticals:
+    \textcite{Bai1998,Bai2003} break-date point estimates. Shaded bands:
+    95\,\% confidence intervals using Newey--West HAC standard errors
+    \parencite{Andrews1991}. BIC selects five breaks (Dec 1999, Dec 2002,
+    Dec 2005, Nov 2011, Jan 2023) defining six regimes. Breaks 1--3 are
+    collapsed into a single pre-2006 regime and Break 5 is collapsed into
+    the post-2011 regime, yielding the three-period partition adopted in
+    Section~\ref{sec:subperiod_panels}; aggregation reflects the
+    small-sample constraints of the FF bootstrap and BSW decomposition
+    which require $T \geq 60$ monthly observations
+    \parencite{BarrasScailletWermers2010}. Sample: Incubation-corrected
+    panel (Evans 2010), active funds only, December 1994--February 2026.}
+  \label{fig:breaktest}
+\end{figure}
+
+% Table D.1 — Bai–Perron break dates, 95% HAC CIs, and regime-mean gross alpha.
+% Migrated from Latex_master_output.txt lines 330–390.
+% Float specifier [htbp] (NOT [H]): allows LaTeX to reposition the float to
+% avoid overflow. [H] forces "exactly here" placement and cannot span pages,
+% which caused the bottom of this table to be clipped in earlier compilations.
+\begin{table}[htbp]
+\centering
+\caption{Bai--Perron Break Dates, 95\,\% HAC Confidence Intervals, and
+         Regime-Mean Gross Alpha}
+\label{tab:breaktest}
+\small
+\begin{tabular}{clccc}
+\toprule
+Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
+      & Regime Mean (\% p.a.) \\
+\midrule
+1 & Dec 1999 & Jul 1999  & May 2000  & --- \\
+2 & Dec 2002 & Oct 2002  & May 2003  & --- \\
+3 & Dec 2005 & Aug 2005  & Apr 2006  & --- \\
+4 & Nov 2011 & Jun 2011  & Feb 2012  & --- \\
+5 & Jan 2023 & Dec 2021  & Jul 2024  & --- \\
+\midrule
+\multicolumn{5}{l}{\textit{Implied six-regime partition:}} \\[3pt]
+\multicolumn{4}{l}{Period 1: Dec 1996 -- Dec 1999 \hfill (37 months)}
+    & $-0.59$ \\
+\multicolumn{4}{l}{Period 2: Jan 2000 -- Dec 2002 \hfill (36 months)}
+    & $+1.67$ \\
+\multicolumn{4}{l}{Period 3: Jan 2003 -- Dec 2005 \hfill (36 months)}
+    & $-0.80$ \\
+\multicolumn{4}{l}{Period 4: Jan 2006 -- Nov 2011 \hfill (71 months)}
+    & $+1.02$ \\
+\multicolumn{4}{l}{Period 5: Dec 2011 -- Jan 2023 \hfill (134 months)}
+    & $-1.13$ \\
+\multicolumn{4}{l}{Period 6: Feb 2023 -- Jan 2026 \hfill (36 months)}
+    & $-2.20$ \\
+\midrule
+\multicolumn{5}{l}{\textit{Three-regime partition adopted in
+                   Section~\ref{sec:subperiod_panels}:}} \\[3pt]
+\multicolumn{4}{l}{P1: Dec 1996 -- Dec 2005 \hfill (109 months)}
+    & $+0.09$ \\
+\multicolumn{4}{l}{P2: Jan 2006 -- Nov 2011 \hfill (71 months)}
+    & $+1.02$ \\
+\multicolumn{4}{l}{P3: Dec 2011 -- Jan 2026 \hfill (170 months)}
+    & $-1.36$ \\
+\bottomrule
+\end{tabular}
+\begin{minipage}{\linewidth}
+\vspace{4pt}
+\footnotesize
+\textit{Note:} Break dates estimated via \textcite{Bai1998} and
+\textcite{Bai2003} with minimum segment 36 months; optimal break count (five)
+selected by BIC from the \citealt{Andrews1991} supF, meanF, and expF tests
+(supF $= 57.33$, meanF $= 23.12$, expF $= 25.44$; all $p < 0.0001$).
+Confidence intervals use Newey--West HAC standard errors
+\parencite{Andrews1991} with lag $= \lfloor 4(T/100)^{2/9} \rfloor$.
+Regime means are equal-weighted cross-sectional means of the monthly
+36-month rolling \textcite{Carhart1997} gross alpha across active funds within
+each segment, annualised ($\times 12$, \%). Periods~1--3 are collapsed and
+Period~6 is pooled with Period~5 to form the three-regime partition. Each
+adopted regime has $T \geq 60$ monthly observations, meeting the minimum
+sample requirement for reliable \textcite{FamaFrench2010} bootstrap and
+\textcite{BarrasScailletWermers2010} decomposition. Three-regime means are
+duration-weighted averages of the corresponding six-regime means.
+Sub-period thresholds adopted in
+Section~\ref{sec:subperiod_panels}: \textbf{Dec~2005} and \textbf{Nov~2011}.
+\end{minipage}
+\end{table}
+
+\noindent The five-break solution selected by BIC identifies four tight,
+economically interpretable breaks (Breaks 1--4, CIs spanning at most ten
+months each) and one wider break at Jan 2023 (Break 5, CI spanning
+31 months). Breaks 1--3 partition the pre-GFC era into its components:
+the late-1990s tail (Period 1, $\bar{\alpha} = -0.59\%$), the dot-com
+peak (Period 2, $\bar{\alpha} = +1.67\%$), and the post-crash recovery
+phase (Period 3, $\bar{\alpha} = -0.80\%$). These oscillations cluster
+tightly around zero on net and each regime spans 36--37 months --- below
+the 60-month minimum recommended by \textcite{BarrasScailletWermers2010}
+for reliable bootstrap inference --- and are therefore collapsed into a
+single pre-2006 regime (P1) in the sub-period analysis. Break~4
+(Nov 2011, CI: Jun 2011--Feb 2012) marks the onset of persistent alpha
+compression and produces the largest regime-mean shift in the sample
+($+1.02\%$ to $-1.13\%$). Break~5 (Jan 2023, CI: Dec 2021--Jul 2024)
+marks a further intensification of compression; its 36-month post-break
+segment is insufficient for separate bootstrap inference and is
+consequently pooled with Period~5 in the sub-period tables, though the
+break itself is retained in the figure and this table as part of the
+formal test output. Accordingly, the sub-period analysis in
+Section~\ref{sec:subperiod_panels} uses \textbf{two thresholds}:
+\textbf{Dec 2005} (separating the volatile pre-GFC era from the clean
+positive-alpha era) and \textbf{Nov 2011} (marking the structural break
+in the alpha-generating process).
+
+\section{Sub-period performance and skill decomposition}
+\label{sec:subperiod_panels}
+
+\noindent This section reports the full set of sub-period performance
+tables, paralleling Tables 5--8 of the main text but estimated separately
+within each of the three Bai--Perron-identified regimes P1 (Jan 1995--Jan
+2006, 132 months), P2 (Feb 2006--Nov 2011, 70 months), and P3 (Dec
+2011--Jan 2026, 170 months). Each adopted regime has $T \geq 60$ monthly
+observations, meeting the \textcite{BarrasScailletWermers2010} minimum
+sample requirement for reliable bootstrap inference.
+
+% ---------------------------------------------------------------------------
+% IMPORTANT — Tables D.2 and D.4 bottom-row truncation:
+% If the bottom rows of table_subperiod_perf_aggregate (D.2) or
+% table_subperiod_pi0_estimate (D.4) are clipped in the compiled PDF, the
+% cause is that kableExtra generated a \begin{tabular} inside \begin{table}[H]
+% rather than a true longtable. A table[H] float cannot span pages, so any
+% content that overflows the page is silently dropped.
+%
+% Fix in the R pipeline (subperiod_analysis.R):
+%   kbl(..., longtable = TRUE, booktabs = TRUE)
+%   Do NOT wrap the output in an outer table[H] environment.
+%   kableExtra's longtable output is a stand-alone \begin{longtable} that
+%   page-breaks natively; an outer float negates this.
+%   After fixing, re-run the pipeline and re-upload the .tex files to Overleaf.
+% ---------------------------------------------------------------------------
+\input{tables/table_subperiod_perf_aggregate}
+
+\input{tables/table_subperiod_bootstrap_tails}
+
+\input{tables/table_subperiod_pi0_estimate}
+
+\input{tables/table_subperiod_bsw_decomposition}
+
+\input{tables/table_subperiod_port_agg_alpha}
+
+% --- Appendix E --------------------------------------------------------------
+\chapter{FACTOR MODEL ROBUSTNESS}
+\label{app:robustness}
+
+\noindent This appendix re-estimates the core performance results under
+two alternative factor specifications to assess robustness of the active
+management puzzle to factor model choice. The \textit{Fama--French
+6-Factor} model (FF6) augments the \textcite{Carhart1997} four-factor
+baseline with the profitability factor (RMW) and investment factor (CMA)
+of \textcite{FamaFrench2015}. The \textit{Carhart + PSL} model (C+PSL)
+augments the Carhart four-factor model with the traded liquidity factor
+of \textcite{PastorStambaugh2003}. The estimation procedure --- full-period
+OLS with Newey--West standard errors (6-month lag), the
+\textcite{FamaFrench2010} calendar-month bootstrap ($B = 10{,}000$), and
+the \textcite{BarrasScailletWermers2010} false-discovery decomposition at
+$\gamma^{*} = 0.20$ --- is identical across all three specifications. SMB
+is held at the \textcite{FamaFrench1993} construction (single
+$2 \times 3$ size--BM sort) throughout; the two SMB definitions correlate
+above 0.97 over the sample window. The Carhart + PSL specification is
+constrained to December 1994--December 2024 by the current data release
+of the Pastor liquidity factor series; the Carhart and FF6 specifications
+use the full December 1994--February 2026 window.
+
+\input{tables/table_alpha_comparison_robust}
+
+\input{tables/table_bootstrap_comparison_robust}
+
+\input{tables/table_bsw_comparison_robust}
+
+% --- Appendix F --------------------------------------------------------------
+\chapter{DATA CLEANING AND SAMPLE CONSTRUCTION DETAILS}
+\label{app:data_cleaning}
+
+\noindent This appendix documents the data cleaning pipeline and sample
+construction decisions beyond the summary in
+Chapter~\ref{ch:data}. It includes technical details on: (i) the
+conversion from LSEG share-class total return indices to monthly gross
+and net returns; (ii) the active/passive classification algorithm; (iii)
+the leveraged/derivative fund exclusion filter; (iv) the
+\textcite{Evans2010} 36-month incubation correction; (v) the flow
+calculation formula and winsorisation procedure; and (vi) the
+validation of calculated flows against LSEG-reported flows.
+
+\section{Return construction from LSEG data}
+\label{sec:return_construction}
+
+\noindent [First paragraph.]
+
+\section{Active/passive classification}
+\label{sec:ap_classification}
+
+\noindent [First paragraph.]
+
+\section{Leveraged and derivative fund exclusion}
+\label{sec:leveraged_exclusion}
+
+\noindent [First paragraph.]
+
+\section{Evans (2010) incubation correction}
+\label{sec:evans_correction}
+
+\noindent [First paragraph.]
+
+\section{Flow calculation and winsorisation}
+\label{sec:flow_construction}
+
+\noindent [First paragraph.]
+
+\section{Validation of calculated vs.\ LSEG-reported flows}
+\label{sec:flow_validation}
+
+\noindent [First paragraph.]
+
+\end{document}
