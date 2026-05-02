@@ -1,0 +1,54 @@
+\begin{table}[H]
+\centering
+\caption{\label{tab:H4_regression}H4: Fee Elasticity Hypothesis. Panel regression of monthly proportional fund flows on within-Lipper-category lagged 12-month performance-rank segments and cross-fund expense ratios, with full triple interactions on contemporaneous sentiment regime indicators (Baker-Wurgler 2007 timing). Under the Berk \& Green (2004) rational equilibrium, sentiment-driven flow should not depend on fee level: $\delta_F = \delta^F_q = 0$. The behavioral alternative predicts $\delta_F > 0$ (sentiment amplifies fee tolerance) or $\delta^F_1 > 0$ (the loser tail is most fee-elastic under high sentiment).}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lrrrr}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{SENT}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{AAII}$} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+$R^{LOW}$ & 0.0315*** & 0.0620*** & 0.0603*** & 0.0597***\\
+ & (9.06) & (8.45) & (9.86) & (8.90)\\
+$R^{MID}$ & 0.0162*** & 0.0189*** & 0.0179*** & 0.0176***\\
+ & (17.42) & (7.99) & (8.67) & (7.33)\\
+$R^{HIGH}$ & 0.0806*** & 0.0669*** & 0.0589*** & 0.0540***\\
+ & (14.58) & (6.08) & (6.28) & (6.27)\\
+Expense ratio ($\theta$) & -0.0017** & 0.0013* & 0.0014** & 0.0010\\
+ & (-2.01) & (1.80) & (2.09) & (1.37)\\
+Exp.\ ratio $\times$ Sent.\ ($\delta_F$) &  & 0.0007 & -0.0000 & 0.0015\\
+ &  & (0.73) & (-0.00) & (1.39)\\
+$R^{LOW}\times$ Exp.\ $\times$ Sent.\ ($\delta^F_1$) &  & -0.0055 & 0.0041 & -0.0063\\
+ &  & (-0.55) & (0.87) & (-0.88)\\
+$R^{MID}\times$ Exp.\ $\times$ Sent.\ ($\delta^F_2$) &  & 0.0004 & -0.0008 & 0.0006\\
+ &  & (0.09) & (-0.55) & (0.14)\\
+$R^{HIGH}\times$ Exp.\ $\times$ Sent.\ ($\delta^F_3$) &  & 0.0146 & 0.0018 & 0.0141\\
+ &  & (0.99) & (0.39) & (0.83)\\
+$\log(\text{TNA})$ & -0.0009*** & -0.0010*** & -0.0010*** & -0.0009***\\
+ & (-5.67) & (-6.80) & (-6.76) & (-6.75)\\
+$\log(\text{Age})$ & -0.0031*** & -0.0030*** & -0.0031*** & -0.0030***\\
+ & (-7.74) & (-7.61) & (-7.64) & (-7.61)\\
+Load dummy & 0.0000 & 0.0003 & 0.0003 & 0.0003\\
+ & (0.10) & (0.58) & (0.57) & (0.57)\\
+Return vol.\ (36m SD) & -0.1170*** & -0.1250*** & -0.1259*** & -0.1259***\\
+ & (-4.12) & (-4.39) & (-4.42) & (-4.38)\\
+Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
+ & (-0.86) & (-0.68) & (-0.73) & (-0.69)\\
+Style flow & 0.1045 & 0.1039 & 0.1058 & 0.1059\\
+ & (0.59) & (0.59) & (0.60) & (0.60)\\
+\midrule
+FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
+Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+$N$ & 234,642 & 234,642 & 234,642 & 234,642\\
+$R^2$ (within) & 0.022 & 0.022 & 0.022 & 0.022\\
+Joint $\delta_F=\delta^F_q=0$ ($\chi^2_4$, $p$) & -- & 3.77 (0.438) & 3.86 (0.425) & 4.76 (0.313)\\
+Headline $\delta_F>0$ ($z$, 1-sided $p$) & -- & z=+0.73 (p=0.234) & z=-0.00 (p=0.502) & z=+1.39 (p=0.083)\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Lower-order interactions $R^q\times$ Sent.\ and $R^q\times$ Exp.\ ratio are included in the regression for valid triple-interaction inference but suppressed from the table; $R^q\times$ Sent.\ estimates are reported in Table~\ref{tab:H1_regression}. Sentiment regimes follow Baker-Wurgler (2007) construction: $D^{SENT}_t$ is the top-34\% indicator for orthogonalised sentiment; column (3) substitutes the standardised continuous index; column (4) substitutes the AAII bull-bear regime dummy. ExpRatio is the time-invariant fund expense ratio (decimal). Lipper-category $\times$ yearmo fixed effects absorb both sentiment main effects and any style-month aggregate flow shocks; cross-fund expense-ratio variation within each (style, month) cell identifies $\theta$ and the fee interactions. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms ($\delta_F$ and the three $\delta^F_q$). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}

@@ -1,0 +1,44 @@
+\begin{table}[H]
+\centering
+\caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects. Same contemporaneous-sentiment specification as Table~\ref{tab:H3_regression}, but with Lipper-category $\times$ yearmo two-way fixed effects in place of fund fixed effects. Identification shifts from within-fund to within-style-month variation, absorbing aggregate flow-flood and risk-on confounders.}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lrrrr}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+$R^{LOW}$ & 0.0313*** & 0.0318*** & 0.0314*** & 0.0301***\\
+ & (8.98) & (8.96) & (8.95) & (8.59)\\
+$R^{MID}$ & 0.0162*** & 0.0162*** & 0.0162*** & 0.0158***\\
+ & (17.39) & (17.38) & (17.57) & (17.00)\\
+$R^{HIGH}$ & 0.0805*** & 0.0802*** & 0.0800*** & 0.0789***\\
+ & (14.56) & (14.44) & (14.51) & (14.47)\\
+Lottery measure ($\beta$) &  & 0.0013 & 0.0032*** & 0.0367***\\
+ &  & (0.47) & (3.51) & (2.74)\\
+Lottery $\times$ Sent.\ ($\delta$) &  & -0.0014 & 0.0034* & 0.0095\\
+ &  & (-0.32) & (1.92) & (0.36)\\
+$\log(\text{TNA})$ & 0.1046 & 0.1047 & 0.1080 & 0.1063\\
+ & (0.59) & (0.59) & (0.61) & \vphantom{3} (0.60)\\
+$\log(\text{Age})$ & 0.1046 & 0.1047 & 0.1080 & 0.1063\\
+ & (0.59) & (0.59) & (0.61) & \vphantom{2} (0.60)\\
+Return vol.\ (36m SD) & 0.1046 & 0.1047 & 0.1080 & 0.1063\\
+ & (0.59) & (0.59) & (0.61) & \vphantom{1} (0.60)\\
+Style flow & 0.1046 & 0.1047 & 0.1080 & 0.1063\\
+ & (0.59) & (0.59) & (0.61) & (0.60)\\
+\midrule
+FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
+Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+$N$ & 235,127 & 235,127 & 235,127 & 235,127\\
+$R^2$ (within) & 0.021 & 0.021 & 0.022 & 0.022\\
+Joint $\beta=\delta=0$ ($\chi^2_2$, $p$) & -- & 0.25 (0.883) & 27.27 ($<\!0.001$) & 11.15 (0.004)\\
+Sent.\ amp.\ $\delta>0$ ($z$, 1-sided $p$) & -- & z=-0.32 (p=0.627) & z=+1.92 (p=0.027) & z=+0.36 (p=0.359)\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{SENT}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}
