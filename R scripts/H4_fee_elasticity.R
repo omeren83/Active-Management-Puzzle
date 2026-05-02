@@ -270,7 +270,7 @@ build_h4_table <- function(samp, fe_string,
     list(parts = "log_TNA",  label = "$\\log(\\text{TNA})$"),
     list(parts = "log_Age",  label = "$\\log(\\text{Age})$"),
     list(parts = "LoadDummy", label = "Load dummy"),
-    list(parts = "ret_vol",  label = "Return vol.\\ (36m SD)"),
+    list(parts = "ret_vol",  label = "Return volatility"),
     list(parts = "Turnover", label = "Turnover"),
     list(parts = "style_flow_lag", label = "Style flow")
   )
