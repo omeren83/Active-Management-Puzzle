@@ -85,7 +85,7 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 # TABLES_OUT_DIR <- NA                                   # disable auto-sync
 
 # Phase toggles - set to FALSE to skip a phase
-RUN_PHASE_A_DATA          <- FALSE   # data_import + flow_calculation
+RUN_PHASE_A_DATA          <- TRUE   # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
 RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
 RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
