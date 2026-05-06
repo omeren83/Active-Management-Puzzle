@@ -3,7 +3,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{booktabs}
 \usepackage{float}          % required for [H] placement specifier
-\usepackage{threeparttable}
+\usepackage{threeparttablex}
 % kableExtra capital-alias compatibility
 \makeatletter
 \@ifundefined{ThreePartTable}{\newenvironment{ThreePartTable}{\begin{threeparttable}}{\end{threeparttable}}}{}
@@ -166,12 +166,13 @@
 \input{tables/table_H2_regression}
 \newpage
 \input{tables/table_H3_regression}
+\newpage
 \input{tables/table_H4_regression}
-\clearpage
+\newpage
 \input{tables/table_psychological_premium}
-\clearpage
+\newpage
 \input{tables/table_behavioral_summary}
-\clearpage
+\newpage
 
 % =============================================================================
 % APPENDIX A: ALTERNATIVE PANEL DESCRIPTIVE STATISTICS
