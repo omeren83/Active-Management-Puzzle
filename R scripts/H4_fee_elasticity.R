@@ -1,15 +1,23 @@
-# H4_fee_elasticity.R                                                  v1.0
+# H4_fee_elasticity.R                                                  v2.0
 # =============================================================================
-# Tests H4 (Fee Elasticity / Berk-Green) under two specifications and writes
-# two .tex tables. Aligned-sample three-spec pattern of H1-H3 is RELAXED for
-# H4 because the focal predictor (ExpRatio) is time-invariant within fund:
-# fund FE perfectly absorbs ExpRatio main effects, leaving only the
-# interactions identified. The PRIMARY spec therefore uses Lipper x yearmo
-# FE (which absorbs only style-month aggregates and leaves cross-fund
-# expense-ratio variation intact). Lagged-sentiment timing robustness is
-# omitted by default: lagging ExpRatio is meaningless and the sentiment-
-# timing question is already answered by H1's lagged spec. To re-enable,
-# set PRODUCE_LAGGED <- TRUE below.
+# Tests H4 (Fee Elasticity / Berk-Green) under three specifications and writes
+# three .tex tables (PRIMARY, LAGGED timing-robustness, FE robustness).
+# Aligned-sample three-spec pattern of H1-H3 is RELAXED for H4 because the
+# focal predictor (ExpRatio) is time-invariant within fund: fund FE perfectly
+# absorbs ExpRatio main effects, leaving only the interactions identified.
+# The PRIMARY spec therefore uses Lipper x yearmo FE (which absorbs only
+# style-month aggregates and leaves cross-fund expense-ratio variation
+# intact).
+#
+# v2.0 changes (May 2026):
+#   - PRODUCE_LAGGED default flipped to TRUE. Closes the asymmetry with
+#     Appendix F.1 (which already contains lagged H1, H2, H3).
+#   - Lower-order R^q x STATE (kappa_q) and R^q x ExpRatio (phi_q) coefficients
+#     now displayed in the table rather than suppressed. Output is taller and
+#     spans more vertical space; longtable used for clean page breaks.
+#   - Footnote text revised: removes "suppressed" language and replaces with
+#     identification narrative ("STATE main effect absorbed by FE; all
+#     lower-order interaction coefficients reported").
 #
 # H4 hypothesis (Berk-Green 2004 vs behavioral alternative): under the
 # rational Berk-Green equilibrium investors should chase performance
@@ -35,7 +43,9 @@
 # Tables produced:
 #   (1) PRIMARY                  -> table_H4_regression.tex
 #       Contemporaneous + Lipper x yearmo FE.   Main body Section 5.5.
-#   (2) FE ROBUSTNESS            -> table_H4_robustness.tex
+#   (2) LAGGED TIMING ROBUSTNESS -> table_H4_lagged.tex
+#       Lagged sentiment + Lipper x yearmo FE.  Appendix F.1.
+#   (3) FE ROBUSTNESS            -> table_H4_robustness.tex
 #       Contemporaneous + yearmo-only FE (between-style identification).
 #       Appendix F.2.
 # =============================================================================
@@ -50,7 +60,7 @@ suppressPackageStartupMessages({
 if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 STAR_THR <- c(`***` = 2.576, `**` = 1.960, `*` = 1.645)
 
-PRODUCE_LAGGED <- FALSE   # set TRUE to also produce table_H4_lagged.tex
+PRODUCE_LAGGED <- TRUE   # set FALSE to suppress table_H4_lagged.tex (default ON in v2.0)
 
 OUTPUT_PRIMARY <- file.path(WORKING_DIR, "table_H4_regression.tex")
 OUTPUT_LAGGED  <- file.path(WORKING_DIR, "table_H4_lagged.tex")
@@ -251,14 +261,32 @@ build_h4_table <- function(samp, fe_string,
     t4$df, t4$joint_chi2, t4$joint_p, t4$delta_z, t4$delta_p_1sd))
 
   # Display rows. "STATE" placeholder is resolved per column via state_var.
-  # Lower-order R_q x STATE and R_q x ExpRatio are included in the
-  # regression (for valid triple-interaction inference) but suppressed
-  # from the table to keep height manageable.
+  # v2.0: lower-order R_q x STATE (kappa_q) and R_q x ExpRatio (phi_q) are
+  # now displayed in the table. Row order is grouped logically:
+  #   (a) rank main effects;
+  #   (b) ExpRatio main + R_q x ExpRatio;
+  #   (c) R_q x STATE (H1 channel inside the H4 sample);
+  #   (d) headline triple interactions (delta_F + 3 x delta^F_q);
+  #   (e) controls.
+  # STATE main effect is absorbed by Lipper x yearmo FE (or yearmo FE in the
+  # FE-robustness spec) and so does not appear in any column.
   row_specs <- list(
     list(parts = "R_LOW",   label = "$R^{LOW}$"),
     list(parts = "R_MID",   label = "$R^{MID}$"),
     list(parts = "R_HIGH",  label = "$R^{HIGH}$"),
     list(parts = "ExpRatio", label = "Expense ratio"),
+    list(parts = "R_LOW_EXP",
+         label = "$R^{LOW}\\times$ Exp.\\ ratio"),
+    list(parts = "R_MID_EXP",
+         label = "$R^{MID}\\times$ Exp.\\ ratio"),
+    list(parts = "R_HIGH_EXP",
+         label = "$R^{HIGH}\\times$ Exp.\\ ratio"),
+    list(parts = "R_LOW_STATE",
+         label = "$R^{LOW}\\times$ Sent."),
+    list(parts = "R_MID_STATE",
+         label = "$R^{MID}\\times$ Sent."),
+    list(parts = "R_HIGH_STATE",
+         label = "$R^{HIGH}\\times$ Sent."),
     list(parts = "EXP_STATE",
          label = "Exp.\\ ratio $\\times$ Sent."),
     list(parts = "R_LOW_EXP_STATE",
@@ -278,10 +306,38 @@ build_h4_table <- function(samp, fe_string,
   state_var <- list(m1 = NULL, m2 = d_sent_var,
                     m3 = sent_cont_var, m4 = d_aaii_var)
   resolve_parts <- function(token, sv) {
+    # Two-way interactions involving STATE: only present in m2-m4.
     if (token == "EXP_STATE") {
       if (is.null(sv)) return(NA_character_)
       return(c("ExpRatio", sv))
     }
+    if (token == "R_LOW_STATE") {
+      if (is.null(sv)) return(NA_character_)
+      return(c("R_LOW", sv))
+    }
+    if (token == "R_MID_STATE") {
+      if (is.null(sv)) return(NA_character_)
+      return(c("R_MID", sv))
+    }
+    if (token == "R_HIGH_STATE") {
+      if (is.null(sv)) return(NA_character_)
+      return(c("R_HIGH", sv))
+    }
+    # R_q x ExpRatio interactions: only included when STATE is in the model
+    # (see mk_formula). Baseline column (m1) has no fee-modulated terms.
+    if (token == "R_LOW_EXP") {
+      if (is.null(sv)) return(NA_character_)
+      return(c("R_LOW", "ExpRatio"))
+    }
+    if (token == "R_MID_EXP") {
+      if (is.null(sv)) return(NA_character_)
+      return(c("R_MID", "ExpRatio"))
+    }
+    if (token == "R_HIGH_EXP") {
+      if (is.null(sv)) return(NA_character_)
+      return(c("R_HIGH", "ExpRatio"))
+    }
+    # Triple interactions: only present in m2-m4.
     if (token == "R_LOW_EXP_STATE") {
       if (is.null(sv)) return(NA_character_)
       return(c("R_LOW", "ExpRatio", sv))
@@ -351,17 +407,21 @@ build_h4_table <- function(samp, fe_string,
   rownames(full_df) <- NULL
 
   ktab <- kbl(
-    full_df, format = "latex", booktabs = TRUE,
+    full_df, format = "latex", booktabs = TRUE, longtable = TRUE,
     caption = caption, label = table_label,
     align = c("l", rep("r", 4)), escape = FALSE, linesep = ""
   ) %>%
-    kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+    kable_styling(latex_options = c("repeat_header"),
+                  font_size = 9) %>%
     add_header_above(col_headers, escape = FALSE) %>%
     row_spec(nrow(body_df), hline_after = TRUE) %>%
     footnote(general = footnote_text, general_title = "",
              threeparttable = TRUE, escape = FALSE)
 
   tex <- as.character(ktab)
+  # Note: longtable does not use the [!h] table float; the gsub below is a
+  # no-op when longtable=TRUE but is retained as defensive in case kableExtra
+  # output changes format in future versions.
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
@@ -385,21 +445,19 @@ cap_primary <- paste0(
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
-  "Lower-order interactions $R^q\\\\times$ Sent.\\\\ and $R^q\\\\times$ Exp.\\\\ ",
-  "ratio are included in the regression for valid triple-interaction ",
-  "inference but suppressed from the table; $R^q\\\\times$ Sent.\\\\ ",
-  "estimates are reported in Table~\\\\ref{tab:H1_regression}. Sentiment ",
-  "regimes follow Baker-Wurgler (2007) construction: $D^{SENT}_t$ is the ",
-  "top-34\\\\% indicator for orthogonalised sentiment; column (3) substitutes ",
-  "the standardised continuous index; column (4) substitutes the AAII bull-",
-  "bear regime dummy. ExpRatio is the time-invariant fund expense ratio ",
-  "(decimal). Lipper-category $\\\\times$ yearmo fixed effects absorb both ",
-  "sentiment main effects and any style-month aggregate flow shocks; cross-",
-  "fund expense-ratio variation within each (style, month) cell identifies ",
-  "$\\\\theta$ and the fee interactions. Standard errors two-way clustered on ",
-  "Ticker and calendar month (Petersen 2009). The joint $\\\\chi^2_4$ test ",
-  "covers all four fee-amplified-sentiment terms ($\\\\delta_F$ and the three ",
-  "$\\\\delta^F_q$). ",
+  "All lower-order interaction coefficients ($R^q\\\\times$ Sent.\\\\ and ",
+  "$R^q\\\\times$ Exp.\\\\ ratio) are reported alongside the headline triple ",
+  "interactions to support full interpretation. Sentiment regimes follow ",
+  "Baker-Wurgler (2007) construction: $D^{SENT}_t$ is the top-34\\\\% indicator ",
+  "for orthogonalised sentiment; column (3) substitutes the standardised ",
+  "continuous index; column (4) substitutes the AAII bull-bear regime dummy. ",
+  "ExpRatio is the time-invariant fund expense ratio (decimal). Lipper-",
+  "category $\\\\times$ yearmo fixed effects absorb both sentiment main effects ",
+  "($\\\\gamma$) and any style-month aggregate flow shocks; cross-fund expense-",
+  "ratio variation within each (style, month) cell identifies $\\\\theta$ and ",
+  "the fee interactions. Standard errors two-way clustered on Ticker and ",
+  "calendar month (Petersen 2009). The joint $\\\\chi^2_4$ test covers all four ",
+  "fee-amplified-sentiment terms ($\\\\delta_F$ and the three $\\\\delta^F_q$). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
 )
 

@@ -1,0 +1,74 @@
+\begingroup\fontsize{9}{11}\selectfont
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item Same sample, dependent variable, controls, identification strategy, and FE structure as Table~\ref{tab:H4_regression}. State variables in columns (2)--(4) are lagged one period. ExpRatio enters at $t$ (= $t-1$ = constant). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:H4_lagged}H4 Robustness --- Lagged Sentiment. Same specification as Table~\ref{tab:H4_regression}, except sentiment is measured at $t-1$ rather than $t$ (Huang et al.\ 2015 timing convention). ExpRatio is left in levels (it is time-invariant within fund, so lagging is meaningless).}\\
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{SENT}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{AAII}_{t-1}$} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+\endfirsthead
+\caption[]{H4 Robustness --- Lagged Sentiment. Same specification as Table~\ref{tab:H4_regression}, except sentiment is measured at $t-1$ rather than $t$ (Huang et al.\ 2015 timing convention). ExpRatio is left in levels (it is time-invariant within fund, so lagging is meaningless). \textit{(continued)}}\\
+\toprule
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\insertTableNotes
+\endlastfoot
+$R^{LOW}$ & 0.0315*** & 0.0630*** & 0.0604*** & 0.0547***\\
+ & (9.06) & (8.13) & (9.88) & (8.85)\\
+$R^{MID}$ & 0.0162*** & 0.0175*** & 0.0178*** & 0.0184***\\
+ & (17.42) & (7.37) & (8.52) & (8.03)\\
+$R^{HIGH}$ & 0.0806*** & 0.0743*** & 0.0605*** & 0.0556***\\
+ & (14.58) & (6.21) & (6.33) & (6.90)\\
+Expense ratio & -0.0017** & 0.0013* & 0.0014** & 0.0008\\
+ & (-2.01) & (1.81) & (2.09) & (1.26)\\
+$R^{LOW}\times$ Exp.\ ratio &  & -0.0235*** & -0.0231*** & -0.0188***\\
+ &  & (-4.04) & (-5.27) & (-4.44)\\
+$R^{MID}\times$ Exp.\ ratio &  & -0.0008 & -0.0019 & -0.0024\\
+ &  & (-0.42) & (-1.08) & (-1.34)\\
+$R^{HIGH}\times$ Exp.\ ratio &  & 0.0084 & 0.0195** & 0.0225***\\
+ &  & (0.83) & (2.46) & (3.95)\\
+$R^{LOW}\times$ Sent. &  & -0.0086 & -0.0094 & 0.0318**\\
+ &  & (-0.55) & (-1.47) & (2.33)\\
+$R^{MID}\times$ Sent. &  & 0.0004 & 0.0002 & -0.0027\\
+ &  & (0.09) & (0.12) & (-0.65)\\
+$R^{HIGH}\times$ Sent. &  & -0.0414** & -0.0114* & -0.0001\\
+ &  & (-2.44) & (-1.79) & (-0.01)\\
+Exp.\ ratio $\times$ Sent. &  & 0.0006 & -0.0000 & 0.0032*\\
+ &  & (0.38) & (-0.03) & (1.93)\\
+$R^{LOW}\times$ Exp.\ $\times$ Sent. &  & -0.0002 & 0.0045 & -0.0254**\\
+ &  & (-0.02) & (0.82) & (-2.41)\\
+$R^{MID}\times$ Exp.\ $\times$ Sent. &  & -0.0039 & -0.0017 & 0.0027\\
+ &  & (-1.01) & (-1.18) & (0.69)\\
+$R^{HIGH}\times$ Exp.\ $\times$ Sent. &  & 0.0307** & 0.0055 & 0.0076\\
+ &  & (2.10) & (1.17) & (0.46)\\
+$\log(\text{TNA})$ & -0.0009*** & -0.0010*** & -0.0010*** & -0.0009***\\
+ & (-5.67) & (-6.83) & (-6.77) & (-6.75)\\
+$\log(\text{Age})$ & -0.0031*** & -0.0030*** & -0.0031*** & -0.0031***\\
+ & (-7.74) & (-7.61) & (-7.63) & (-7.62)\\
+Load dummy & 0.0000 & 0.0003 & 0.0003 & 0.0003\\
+ & (0.10) & (0.60) & (0.57) & (0.57)\\
+Return volatility & -0.1170*** & -0.1260*** & -0.1278*** & -0.1252***\\
+ & (-4.12) & (-4.42) & (-4.47) & (-4.35)\\
+Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
+ & (-0.86) & (-0.64) & (-0.71) & (-0.70)\\
+Style flow & 0.1045 & 0.1046 & 0.1057 & 0.1049\\
+ & (0.59) & (0.59) & (0.60) & (0.60)\\
+\midrule
+FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
+Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+$N$ & 234,642 & 234,642 & 234,642 & 234,642\\
+$R^2$ (within) & 0.022 & 0.022 & 0.022 & 0.022\\
+Joint test ($\chi^2_4$, $p$) & -- & 6.23 (0.183) & 4.31 (0.366) & 6.95 (0.138)\\
+Headline ($z$, 1-sided $p$) & -- & z=+0.38 (p=0.353) & z=-0.03 (p=0.514) & z=+1.93 (p=0.027)\\*
+\end{longtable}
+\end{ThreePartTable}
+\endgroup{}

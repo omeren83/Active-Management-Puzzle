@@ -1,15 +1,27 @@
-\begin{table}[H]
-\centering
-\caption{\label{tab:H4_robustness}H4 Robustness --- Yearmo-only Fixed Effects. Same contemporaneous-sentiment specification as Table~\ref{tab:H4_regression}, but with yearmo fixed effects in place of Lipper-category $\times$ yearmo. Identification of expense-ratio slopes now includes between-style variation, providing a cross-check against unobserved style-level confounders (e.g.\ growth funds systematically charging higher fees and attracting different flows).}
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{threeparttable}
-\begin{tabular}[t]{lrrrr}
+\begingroup\fontsize{9}{11}\selectfont
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item Same sample, dependent variable, and rank construction as Table~\ref{tab:H4_regression}. Yearmo fixed effects absorb all time-aggregate variation (including sentiment main effects, market-wide flow waves, and risk-on/risk-off cycles) but leave both within- and between-style cross-fund variation in expense ratios available for identification. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:H4_robustness}H4 Robustness --- Yearmo-only Fixed Effects. Same contemporaneous-sentiment specification as Table~\ref{tab:H4_regression}, but with yearmo fixed effects in place of Lipper-category $\times$ yearmo. Identification of expense-ratio slopes now includes between-style variation, providing a cross-check against unobserved style-level confounders (e.g.\ growth funds systematically charging higher fees and attracting different flows).}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{SENT}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{AAII}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
+\endfirsthead
+\caption[]{H4 Robustness --- Yearmo-only Fixed Effects. Same contemporaneous-sentiment specification as Table~\ref{tab:H4_regression}, but with yearmo fixed effects in place of Lipper-category $\times$ yearmo. Identification of expense-ratio slopes now includes between-style variation, providing a cross-check against unobserved style-level confounders (e.g.\ growth funds systematically charging higher fees and attracting different flows). \textit{(continued)}}\\
+\toprule
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\insertTableNotes
+\endlastfoot
 $R^{LOW}$ & 0.0322*** & 0.0565*** & 0.0551*** & 0.0551***\\
  & (9.31) & (8.16) & (9.23) & (8.36)\\
 $R^{MID}$ & 0.0162*** & 0.0200*** & 0.0187*** & 0.0178***\\
@@ -18,6 +30,18 @@ $R^{HIGH}$ & 0.0796*** & 0.0672*** & 0.0599*** & 0.0573***\\
  & (14.31) & (5.94) & (6.10) & (6.25)\\
 Expense ratio & -0.0015* & 0.0011 & 0.0012* & 0.0009\\
  & (-1.90) & (1.59) & (1.85) & (1.15)\\
+$R^{LOW}\times$ Exp.\ ratio &  & -0.0168*** & -0.0177*** & -0.0166***\\
+ &  & (-3.45) & (-4.23) & (-3.69)\\
+$R^{MID}\times$ Exp.\ ratio &  & -0.0028 & -0.0026 & -0.0025\\
+ &  & (-1.49) & (-1.62) & (-1.31)\\
+$R^{HIGH}\times$ Exp.\ ratio &  & 0.0142 & 0.0187** & 0.0185***\\
+ &  & (1.51) & (2.31) & (2.64)\\
+$R^{LOW}\times$ Sent. &  & -0.0029 & -0.0072 & -0.0014\\
+ &  & (-0.24) & (-1.37) & (-0.13)\\
+$R^{MID}\times$ Sent. &  & -0.0071 & -0.0013 & 0.0043\\
+ &  & (-1.38) & (-0.80) & (0.94)\\
+$R^{HIGH}\times$ Sent. &  & -0.0214 & -0.0080 & -0.0071\\
+ &  & (-1.30) & (-1.29) & (-0.43)\\
 Exp.\ ratio $\times$ Sent. &  & 0.0007 & -0.0001 & 0.0014\\
  &  & (0.66) & (-0.12) & (1.17)\\
 $R^{LOW}\times$ Exp.\ $\times$ Sent. &  & -0.0070 & 0.0032 & -0.0044\\
@@ -44,11 +68,7 @@ Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 234,694 & 234,694 & 234,694 & 234,694\\
 $R^2$ (within) & 0.021 & 0.021 & 0.021 & 0.021\\
 Joint test ($\chi^2_4$, $p$) & -- & 3.30 (0.509) & 2.86 (0.581) & 3.86 (0.425)\\
-Headline ($z$, 1-sided $p$) & -- & z=+0.66 (p=0.256) & z=-0.12 (p=0.549) & z=+1.17 (p=0.121)\\
-\bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Same sample, dependent variable, and rank construction as Table~\ref{tab:H4_regression}. Yearmo fixed effects absorb all time-aggregate variation (including sentiment main effects, market-wide flow waves, and risk-on/risk-off cycles) but leave both within- and between-style cross-fund variation in expense ratios available for identification. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
-\end{tablenotes}
-\end{threeparttable}}
-\end{table}
+Headline ($z$, 1-sided $p$) & -- & z=+0.66 (p=0.256) & z=-0.12 (p=0.549) & z=+1.17 (p=0.121)\\*
+\end{longtable}
+\end{ThreePartTable}
+\endgroup{}
