@@ -1,6 +1,10 @@
 # =============================================================================
-# PERSISTENCE TESTING                                                      v1.1
-#
+# PERSISTENCE TESTING                                                      v1.2
+
+
+# Changes from v1.1:
+# Panel C/D/E sub-period title strings realigned to Sep 2011 partition
+
 # Changes from v1.0 (Family D pre-defense audit):
 #   - Performance-comparison subsample filter added to the panel-prep stage:
 #     ap <- panel_incubation %>% filter(!excluded_perf) %>% rename(...) %>% ...
@@ -133,13 +137,13 @@ PANELS <- list(
            title = "Panel B: Full sample, raw-alpha ranking (robustness)",
            cohorts = USABLE_COHORTS, rank_var = "alpha"),
   C = list(label = "C",
-           title = "Panel C: P1 sub-period (Jan 1995--Jan 2006)",
+           title = "Panel C: P1 sub-period (Jan 1995--Dec 2005)",
            cohorts = c(1L, 2L, 3L), rank_var = "t_stat"),
   D = list(label = "D",
-           title = "Panel D: P2 sub-period (Feb 2006--Nov 2011)",
+           title = "Panel D: P2 sub-period (Jan 2006--Sep 2011)",
            cohorts = c(4L),           rank_var = "t_stat"),
   E = list(label = "E",
-           title = "Panel E: P3 sub-period (Dec 2011--Feb 2026)",
+           title = "Panel E: P3 sub-period (Oct 2011--Feb 2026)",
            cohorts = c(5L, 6L, 7L),   rank_var = "t_stat"),
   F = list(label = "F",
            title = "Panel F: Cross-regime (boundary-straddling cohorts 3, 5)",
