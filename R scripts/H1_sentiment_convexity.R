@@ -1,4 +1,16 @@
-# H1_sentiment_convexity.R                                              v3.0
+# H1_sentiment_convexity.R                                              v3.1
+# =============================================================================
+# v3.1 changes vs v3.0 (Family E pre-defense audit):
+#   - No filter change. Per data_import_and_cleaning.R Step 8c convention,
+#     the Entire-Analysis exclusions in flagged_funds.xlsx are dropped from
+#     the source panel; H1 sentiment-convexity identification operates on
+#     the resulting full universe and does not need filter(!excluded_perf)
+#     or filter(!excluded_h3).
+#   - Sample-source phrasing added to fn_primary, fn_lagged, fn_robust
+#     (documentation parity with H3, activeness, performance-comparison
+#     scripts that DO apply additional subsample filters).
+#
+# v3.0 (original):
 # =============================================================================
 # Tests H1 (Sentiment-Convexity) under three specifications and writes three
 # .tex tables. All specifications use the SAME aligned estimation sample so
@@ -318,7 +330,10 @@ fn_primary <- paste0(
   "ratio, load dummy, turnover ratio) are included in the specification but ",
   "absorbed by the fund fixed effects. Standard errors two-way clustered on ",
   "Ticker and calendar month (Petersen 2009). ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 cap_lagged <- paste0(
@@ -333,7 +348,10 @@ fn_lagged <- paste0(
   "Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses ",
   "$D^{AAII}_{t-1}$. Standard errors two-way clustered on Ticker and ",
   "calendar month (Petersen 2009). ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 cap_robust <- paste0(
@@ -351,7 +369,10 @@ fn_robust <- paste0(
   "Time-invariant controls (expense ratio, load dummy, turnover) are now ",
   "identified because there is no fund FE. Standard errors two-way clustered ",
   "on Ticker and calendar month (Petersen 2009). ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{SENT}_{t-1}$" = 1,

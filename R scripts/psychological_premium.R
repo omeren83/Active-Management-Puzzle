@@ -1,5 +1,18 @@
-# psychological_premium.R                                              v1.1
+# psychological_premium.R                                              v1.2
 # =============================================================================
+# v1.2 changes (Family E pre-defense audit):
+#   - filter(!excluded_h3) added to the panel-prep stage. The Shadow Price /
+#     Psychological Premium is identified jointly with H1 + H3 channels and
+#     uses the same lottery proxies (ActR2, ActSkew, MAX12) as H3, so it
+#     shares H3's identification scope: the !excluded_h3 subsample of
+#     flagged_funds.xlsx Step 8c. Without this restriction, sector funds,
+#     covered-call overlays, and Lipper categories without unambiguous
+#     size-style benchmarks would contaminate the activeness measures and
+#     therefore the Shadow Price estimates. Mirrors the v2.1 fix in
+#     H3_lottery_demand.R. Requires panel_regressions_setup.R v1.3+, which
+#     preserves the excluded_h3 flag column in panel_reg.
+#   - Sample-source phrasing added to the table footnote.
+#
 # v1.1 changes (May 2026):
 #   - Footnote expanded with alpha-basis-points conversion paragraph for
 #     Table 23. Calibration: EW Carhart alpha Q5-Q1 spread of 2.23% p.a.
@@ -78,12 +91,13 @@ if (!exists("panel_reg")) {
     stop("panel_reg not in session and panel_reg.rds not found.")
   }
 }
-required <- c("ActR2", "ActSkew", "MAX12", "D_SENT")
+required <- c("ActR2", "ActSkew", "MAX12", "D_SENT", "excluded_h3")
 missing_cols <- setdiff(required, names(panel_reg))
 if (length(missing_cols)) {
   stop("panel_reg missing required column(s): ",
        paste(missing_cols, collapse = ", "),
-       ". Re-run panel_regressions_setup.R (>= v1.3 with MAX12).")
+       ". Re-run panel_regressions_setup.R (v1.3 or later: requires ",
+       "MAX12 and the excluded_h3 flag).")
 }
 
 # --- 2. Aligned estimation sample -------------------------------------------
@@ -91,7 +105,11 @@ core_rhs <- c("flow", "R_LOW", "R_MID", "R_HIGH",
               "log_TNA", "log_Age", "ExpRatio", "LoadDummy",
               "ret_vol", "Turnover", "style_flow_lag")
 
+# v1.2: filter(!excluded_h3) restricts to the H3 / activeness subsample
+# per flagged_funds.xlsx Step 8c. The Shadow Price uses lottery proxies
+# (ActR2, ActSkew, MAX12) and therefore shares H3's identification scope.
 samp <- panel_reg %>%
+  filter(!excluded_h3) %>%
   filter(!is_december) %>%
   filter(if_all(all_of(c(core_rhs, "ActR2", "ActSkew", "MAX12", "D_SENT")),
                 ~ !is.na(.))) %>%
@@ -363,7 +381,10 @@ fn <- paste0(
   "within-Lipper-category mapping that drives the H1--H4 panel ",
   "regressions is conceptually similar but slightly attenuated, so the ",
   "quoted basis-point figures should be read as orders of magnitude ",
-  "rather than precise estimates."
+  "rather than precise estimates. ",
+  "\\\\smallskip ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; H3 / activeness subsample per flagged\\\\_funds.xlsx."
 )
 
 ktab <- kbl(

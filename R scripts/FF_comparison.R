@@ -1,5 +1,34 @@
 # =============================================================================
-# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.2
+# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.4
+#
+# v1.4 changes vs v1.3 (figure inline-text strip):
+#   Figure C.1 (fig_luck_vs_skill_combined_FF) inline narrative text stripped
+#   per project-wide convention. plot_annotation() removed entirely (overall
+#   title and methodology subtitle were both narrative; both moved to the
+#   LaTeX \caption{} block). Panel B subtitle ("Dashed line: theoretical
+#   N(0,1) null") removed; the dashed-line meaning is now described in the
+#   LaTeX caption. Panel A and Panel B identifier titles retained as
+#   structural reference handles. Same convention as alpha_reporting.R v8.4
+#   and structural_break_test.R v1.2.
+#
+# v1.3 changes vs v1.2 (Family B audit):
+#   (a) filter(!excluded_perf) added to the ap panel-prep stage so the FF
+#       subperiod replication uses the same performance-comparison subsample
+#       as the main-text analysis (alpha_estimation.R v2.7,
+#       alpha_estimation_robust.R v1.3, aggregate_alphas.R v1.2). Without this
+#       filter, the FF subperiod tables would describe a strictly larger fund
+#       population than the main-text tables, making the parallel comparison
+#       incoherent. The filter is applied to the LOCAL ap copy only and does
+#       not affect panel_trimmed in the parent environment.
+#   (b) Mean-TNA computation in run_full() corrected. v1.2 referenced d$tna
+#       which was NULL (panel_trimmed carries TNA as class_assets/total_assets).
+#       Same fix as alpha_estimation.R v2.7. mean_tna is now computed from
+#       coalesce(class_assets, total_assets) and the resulting alpha_fullperiod_FF.xlsx
+#       has valid mean_tna values for any downstream VW weighting.
+#   (c) [Family C follow-on] BSW (2010) net-return citation corrected at
+#       line 565. Convention attributed to Carhart (1997) and Wermers (2000),
+#       the originators; BSW (2010) shares the arithmetic but applies it in
+#       the reverse direction.
 #
 # v1.2 change vs v1.1:
 #   Table 7 FF (`table_perf_aggregate_FF.tex`) switched from per-fund alpha -->
@@ -91,6 +120,7 @@ cat("Sample window:", format(DATE_MIN_FF), "to", format(DATE_MAX_FF), "\n")
 # 1. PANEL RESTRICTION  (LOCAL COPY ONLY)
 # =============================================================================
 ap <- panel_trimmed %>%
+  filter(!excluded_perf) %>%      # v1.3: performance-comparison subsample
   filter(date >= DATE_MIN_FF, date <= DATE_MAX_FF) %>%
   rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF,
          exp_r = Expense_Ratio) %>%
@@ -211,6 +241,10 @@ run_full <- function(tk) {
   X   <- cbind(1, d$mkt_rf, d$smb, d$hml, d$mom)
   fit <- fast_ols(y, X); if (is.null(fit)) return(NULL)
   se  <- nw_se(X, fit$e, NW_LAG_FULL)
+  # v1.3: mean_tna uses coalesce(class_assets, total_assets) directly. v1.2
+  # referenced d$tna, which was NULL because the column is named class_assets/
+  # total_assets in panel_trimmed. Same fix as alpha_estimation.R v2.7.
+  tv  <- coalesce(d$class_assets, d$total_assets)
   data.frame(
     Ticker        = tk,
     ap_group      = d$ap_group[1],
@@ -221,7 +255,7 @@ run_full <- function(tk) {
     alpha_p_nw    = 2 * pt(-abs(fit$beta[1] / se[1]), n - 5),
     exp_ratio     = d$exp_r[1],
     alpha_net_ann = (fit$beta[1] * 12) - (d$exp_r[1] / 100),
-    mean_tna      = mean(d$tna[d$tna > 0], na.rm = TRUE)
+    mean_tna      = mean(tv[!is.na(tv) & tv > 0], na.rm = TRUE)
   )
 }
 
@@ -542,7 +576,7 @@ fn_t7 <- paste(
   "$1/N_t$). VW: value-weighted portfolio with lagged TNA weights",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
   "Net returns are computed as gross returns less one-twelfth of the static",
-  "annual expense ratio each month, following \\\\textcite{BarrasScailletWermers2010}.",
+  "annual expense ratio each month, following \\\\textcite{Carhart1997} and \\\\textcite{Wermers2000}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
@@ -812,26 +846,12 @@ p_pdf <- ggplot() +
   scale_fill_manual(values = c("Actual Distribution" = "#2166AC")) +
   theme_classic(base_size = 10) +
   labs(title    = "Panel B: Probability Density (PDF)",
-       subtitle = "Dashed line: theoretical N(0,1) null",
        y        = "Density",
        x        = expression(italic(t)*"-Statistic of "*hat(alpha))) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   coord_cartesian(xlim = c(-4, 4))
 
-combined_plot <- (p_cdf / p_pdf) +
-  plot_annotation(
-    title    = expression("Cross-Sectional Distribution of Alpha "*italic(t)*"-Statistics (FF Subperiod)"),
-    subtitle = paste0(
-      "Estimated \u03c0\u2080: ", formatC(pi_0_val * 100, format = "f", digits = 1), "%. ",
-      "Panel A: empirical CDF of active-fund t-statistics (blue) vs. bootstrap-derived ",
-      "zero-skill null (black), constructed by resampling calendar months with replacement ",
-      "following Fama and French (2010, JF). ",
-      "Panel B: kernel density of actual t-statistics vs. the theoretical N(0,1) null (dashed). ",
-      "Sample: actively managed funds, Jan 1995--Sep 2006 (FF subperiod) ",
-      "(N = ", n_active_bs, " funds with \u226524 monthly observations). ",
-      "Compare with Fama and French (2010), Figure 2."
-    )
-  )
+combined_plot <- (p_cdf / p_pdf)
 
 ggsave("fig_luck_vs_skill_combined_FF.png", plot = combined_plot,
        width = 7.5, height = 8, dpi = 300)

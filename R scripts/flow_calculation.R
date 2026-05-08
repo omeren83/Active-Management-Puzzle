@@ -1,5 +1,13 @@
 # =============================================================================
-# FUND FLOW CALCULATION AND VALIDATION
+# FUND FLOW CALCULATION AND VALIDATION                                     v1.1
+#
+# v1.1 changes:
+#   - Net-return derivation comment rewritten: BSW (2010) observe net directly
+#     from CRSP and DERIVE gross by adding back ER/12. The LSEG pipeline
+#     observes gross only and DERIVES net by subtracting ER/12. Same
+#     arithmetic, opposite direction. The convention itself originates in
+#     Carhart (1997) and Wermers (2000) and is used throughout the literature.
+#
 # Computes Sirri-Tufano (1998) flows from TNA and unwinsorised net returns,
 # appends results to all three panels (panel_master, panel_incubation,
 # panel_trimmed), and validates against LSEG-supplied fund_flow values.
@@ -9,11 +17,13 @@
 #       R   = ret_net_raw (unwinsorised approximated net return)
 #             = ret_gross_raw - Expense_Ratio / 1200
 #             LSEG serves identical index series for gross and net total
-#             returns. Net returns are therefore approximated by deducting
-#             one-twelfth of the static annual expense ratio from monthly
-#             gross returns, following Barras, Scaillet & Wermers (2010, JF).
-#             This introduces a small, bounded, predictable downward bias in
-#             estimated flows proportional to the fund expense ratio.
+#             returns; true net returns are unavailable from the index. The
+#             gross-net wedge of Expense_Ratio/12 follows the standard
+#             fee-decomposition convention (Carhart 1997; Wermers 2000;
+#             Pastor and Stambaugh 2002), applied in the opposite direction
+#             to BSW (2010), who observe net and derive gross. This introduces
+#             a small, bounded, predictable downward bias in estimated flows
+#             proportional to the fund expense ratio.
 #
 # NOTE: The flow formula is an accounting identity. It uses ret_net_raw
 # (unwinsorised) rather than ret_net (winsorised). Plugging clipped returns
@@ -34,6 +44,10 @@
 #
 # Reference: Sirri, E.R. & Tufano, P. (1998). Costly search and mutual fund
 #   flows. Journal of Finance, 53(5), 1589-1622.
+# Reference: Carhart, M.M. (1997). On persistence in mutual fund performance.
+#   Journal of Finance, 52(1), 57-82.
+# Reference: Wermers, R. (2000). Mutual fund performance. Journal of Finance,
+#   55(4), 1655-1695.
 # Reference: Barras, L., Scaillet, O., & Wermers, R. (2010). False discoveries
 #   in mutual fund performance. Journal of Finance, 65(1), 179-216.
 #
@@ -73,7 +87,7 @@ compute_flows <- function(panel) {
     mutate(
       tna_lag       = lag(tna),
       # ret_net_raw = ret_gross_raw - Expense_Ratio/1200 (see data_import_and_cleaning.R).
-      # Uses approximated net return (unwinsorised) ??? the flow identity requires
+      # Uses approximated net return (unwinsorised) - the flow identity requires
       # actual returns, not clipped values.
       flow_calc     = tna - tna_lag * (1 + ret_net_raw),
       # Proportional flow
@@ -108,16 +122,16 @@ panel_incubation <- compute_flows(panel_incubation)
 panel_trimmed    <- compute_flows(panel_trimmed)
 
 cat("Flow variables appended to all three panels.\n")
-cat("\npanel_trimmed ??? calculated flow summary (USD millions):\n")
+cat("\npanel_trimmed - calculated flow summary (USD millions):\n")
 print(summary(panel_trimmed$flow_calc))
-cat("\npanel_trimmed ??? proportional flow summary:\n")
+cat("\npanel_trimmed - proportional flow summary:\n")
 print(summary(panel_trimmed$flow_calc_pct))
 cat("\nTNA source distribution (panel_trimmed):\n")
 print(table(panel_trimmed$tna_source, useNA = "always"))
 
 # =============================================================================
 # VALIDATION: compare calculated vs LSEG flows (panel_trimmed only)
-#   Validation is informational ??? performed on panel_trimmed where
+#   Validation is informational - performed on panel_trimmed where
 #   LSEG flow coverage is highest.
 # =============================================================================
 comparison <- panel_trimmed %>%

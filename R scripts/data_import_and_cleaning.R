@@ -1,30 +1,61 @@
 # =============================================================================
-# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.1
+# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.2
 #
-# v1.1 changes:
-#   - Step 8b added: excludes leveraged / derivative-based mutual funds from
-#     the Passive universe. Rydex/ProFunds/Direxion daily-reset products are
-#     classified as passive (Actively_Managed_New = N) by LSEG but use equity
-#     swaps or futures to deliver a constant daily leverage multiple.
-#     Diagnostic: 30 passive funds with Turnover > 200% identified; confirmed
-#     as Rydex 2x, ProFunds UltraSector, and Direxion Bull/Bear products.
-#     Rydex Pure Style funds (Pure Value / Pure Growth, long-only 1x) are
-#     explicitly retained despite high reconstitution turnover reported by LSEG.
-#     Two additional funds (MOJAX, GENDX) are excluded as active strategies
-#     misclassified as passive by LSEG.
+# v1.2 changes:
+#   - Step 8c added: applies the flagged_funds.xlsx exclusion ledger.
+#       (a) "Exclude from Entire Analysis" tickers are dropped from all three
+#           panels at source. This subsumes the prior DATA_ERROR_TICKERS
+#           hardcode and adds PASSIVE_INDEX, GLOBAL_MANDATE, EM_MANDATE,
+#           LONG_SHORT, BEAR_MARKET, MARKET_NEUTRAL exclusions.
+#       (b) Two boolean flag columns are added to surviving observations:
+#             excluded_perf  TRUE for funds in the "Exclude from Perf
+#                            Comparison" sheet (used by aggregate alphas,
+#                            bootstrap, FDR, persistence, sub-period,
+#                            robust factor models, portfolio sorts)
+#             excluded_h3    TRUE for funds in the "Exclude from H3 Only"
+#                            sheet OR with the SECTOR_FUND flag in the
+#                            performance-comparison sheet (used by H3,
+#                            activeness analyses)
+#       The DATA_ERROR_TICKERS hardcode is removed; the same exclusion is
+#       now driven entirely by flagged_funds.xlsx (DATA_ERROR flag).
+#   - parse_inception_date: now accepts ISO-string dates as well as Excel
+#     serial numbers, mirroring parse_col_dates. Prevents silent NA-coercion
+#     of valid dates after a locale or Excel reformat (Issue A.3).
+#   - Net-return approximation comment rewritten: BSW (2010) observe net
+#     directly from CRSP and DERIVE gross by adding back ER/12. The LSEG
+#     pipeline observes gross only and DERIVES net by subtracting ER/12.
+#     The arithmetic wedge is identical; the direction is reversed. The
+#     convention itself goes back to Carhart (1997) and Wermers (2000)
+#     and is described correctly in those terms (Issue A.2).
+#
+# v1.1 changes (retained):
+#   - Step 8b: leveraged / derivative-based passive fund exclusion.
+#     Mostly redundant given Step 8c (PASSIVE_INDEX in flagged_funds.xlsx
+#     covers the universe), but retained as a defensive net for any
+#     inverse / 2x / 3x products that might be missed from the workbook.
+#     Pure Style Rydex retention list also retained but is now of no effect
+#     because RYAVX, RYZAX, RYAZX, RYWAX, RYAWX are flagged as PASSIVE_INDEX
+#     in flagged_funds.xlsx and thereby excluded by Step 8c.
 #
 # Produces three panels:
-#   panel_master      ??? no corrections, no date trimming (audit baseline)
-#   panel_incubation  ??? Evans (2010) 36-month age filter applied
-#   panel_trimmed     ??? Evans filter + 1995-2023 sample period trim
+#   panel_master      - no incubation correction, no date trimming
+#   panel_incubation  - Evans (2010) 36-month age filter applied
+#   panel_trimmed     - Evans filter + 1995-2023 sample period trim
+#
+# Each panel carries the new boolean columns excluded_perf and excluded_h3
+# so downstream scripts can apply the appropriate scope-specific filter:
+#     panel_*  %>% filter(!excluded_perf)   # for performance/alpha tables
+#     panel_*  %>% filter(!excluded_h3)     # for H3 / activeness analyses
+# Behavioral H1/H2/H4 panel regressions need no further filter; the
+# Entire-Analysis exclusion is already applied at source.
 #
 # Cleaning applied to all panels:
-#   (1) Frozen tail removal ??? drops LSEG forward-filled post-closure obs
-#   (2) Empty fund exclusion ??? drops funds with zero valid return obs
-#   (3) Confirmed data error exclusion (QWVOX, VALLCEN)
-#   (4) Evans (2010) incubation bias correction
-#   (5) Winsorisation of monthly returns at 1st / 99th percentile
-#   (6) Leveraged / derivative-based passive fund exclusion [NEW v1.1]
+#   (1) Frozen tail removal - drops LSEG forward-filled post-closure obs
+#   (2) Empty fund exclusion - drops funds with zero valid return obs
+#   (3) Evans (2010) incubation bias correction
+#   (4) Winsorisation of monthly returns at 1st / 99th percentile
+#   (5) Leveraged / derivative-based passive fund exclusion (defensive)
+#   (6) flagged_funds.xlsx Entire-Analysis exclusion + flag columns [NEW v1.2]
 #
 # Dependencies: readxl, dplyr, tidyr, lubridate
 # Evans (2010): Journal of Finance, Vol. LXV, No. 4
@@ -36,9 +67,10 @@ library(dplyr)
 library(tidyr)
 
 FILE          <- "fund_data.xlsx"
+FLAGGED_FILE  <- "flagged_funds.xlsx"   # exclusion ledger (8c)
 DATE_MIN_DATA <- as.Date("1994-12-01")  # include Dec 1994 for lag computation
 DATE_MIN      <- as.Date("1995-01-01")  # actual sample start for analysis
-DATE_MAX      <- as.Date("2023-12-31")  # sample end
+DATE_MAX      <- as.Date("2023-12-31")  # sample end (panel_trimmed)
 EVANS_MONTHS  <- 36   # Evans (2010): <5% of funds incubated longer than 36 months
 
 # =============================================================================
@@ -47,24 +79,29 @@ EVANS_MONTHS  <- 36   # Evans (2010): <5% of funds incubated longer than 36 mont
 parse_col_dates <- function(x) {
   parsed <- suppressWarnings(as.Date(x, format = "%Y-%m-%d"))
   if (!all(is.na(parsed))) return(parsed)
-  
+
   nums <- suppressWarnings(as.numeric(x))
   if (!all(is.na(nums))) return(as.Date(nums, origin = "1899-12-30"))
-  
+
   parsed <- suppressWarnings(as.Date(paste0("01 ", x), format = "%d %b %Y"))
   if (!all(is.na(parsed))) return(parsed)
-  
+
   stop("Could not parse date column headers. Check format in Excel.")
 }
 
 # =============================================================================
 # HELPER 2: parse a single Inception_Date value
-#   Handles Excel serial numbers and LSEG error strings (#N/A N/A etc.)
+#   Handles Excel serial numbers, ISO strings, and LSEG error markers.
+#   Falls back gracefully if Excel reformats inception dates as text.
 # =============================================================================
 parse_inception_date <- function(x) {
   x[grepl("^#|^\\s*$", x)] <- NA
+  # Try ISO first - preserves real dates if Excel writes them as text
+  parsed <- suppressWarnings(as.Date(as.character(x), format = "%Y-%m-%d"))
+  if (any(!is.na(parsed))) return(parsed)
+  # Fall back to Excel serial number
   nums <- suppressWarnings(as.numeric(x))
-  as.Date(ifelse(!is.na(nums), nums, NA), origin = "1899-12-30")
+  as.Date(nums, origin = "1899-12-30")
 }
 
 # =============================================================================
@@ -76,17 +113,6 @@ winsorise <- function(x, low = 0.01, high = 0.99) {
 }
 
 # =============================================================================
-# CONFIRMED DATA ERRORS ??? excluded from all panels
-#   QWVOX US Equity  : total return index reaches 113,446 (base = 1 in Dec
-#     1994), implying >11,000,000% cumulative return. Impossible for a US
-#     domestic equity fund; confirmed LSEG index scaling error.
-#   VALLCEN US Equity: single-month return of -75.9% in April 2022 (S&P 500
-#     fell -8.7% that month). Fund had $152M AUM; no economic justification.
-#     Confirmed LSEG data feed error.
-# =============================================================================
-DATA_ERROR_TICKERS <- c("QWVOX US Equity", "VALLCEN US Equity")
-
-# =============================================================================
 # 1. STATIC DATA
 # =============================================================================
 static <- read_excel(FILE, sheet = "static") %>%
@@ -96,7 +122,7 @@ cat("Static loaded:", nrow(static), "funds |",
     sum(!is.na(static$Inception_Date)), "with valid Inception_Date\n")
 
 # =============================================================================
-# 2. FUND-LEVEL TIME SERIES ??? pivot wide ??? long
+# 2. FUND-LEVEL TIME SERIES - pivot wide -> long
 # =============================================================================
 ts_sheets <- c("gross_return", "net_return", "track_diff",
                "net_assets",   "class_assets", "total_assets",
@@ -105,7 +131,7 @@ ts_sheets <- c("gross_return", "net_return", "track_diff",
 read_fund_ts <- function(sheet) {
   df <- read_excel(FILE, sheet = sheet)
   date_cols <- setdiff(names(df), "Ticker")
-  
+
   df %>%
     pivot_longer(cols = all_of(date_cols), names_to = "date", values_to = sheet) %>%
     mutate(
@@ -120,13 +146,13 @@ fund_panel   <- Reduce(function(a, b) full_join(a, b, by = c("Ticker", "date")),
 cat("Raw panel:", nrow(fund_panel), "rows |", n_distinct(fund_panel$Ticker), "funds\n")
 
 # =============================================================================
-# 3. MACRO SHEETS ??? pivot wide ??? long ??? wide
+# 3. MACRO SHEETS - pivot wide -> long -> wide
 # =============================================================================
 read_macro_ts <- function(sheet) {
   df <- read_excel(FILE, sheet = sheet, col_types = "text")
   label_col <- names(df)[1]
   date_cols  <- names(df)[-1]
-  
+
   df %>%
     pivot_longer(cols = all_of(date_cols), names_to = "date", values_to = "value") %>%
     mutate(date = parse_col_dates(date), value = as.numeric(value)) %>%
@@ -146,7 +172,7 @@ cat("Macro panel:", nrow(macro_panel), "months |",
 
 # =============================================================================
 # 4. FROZEN TAIL REMOVAL (gross_return as master signal)
-#    Drops terminal blocks of repeated values ??? LSEG forward-fills closed
+#    Drops terminal blocks of repeated values - LSEG forward-fills closed
 #    funds. Only removes repeats AFTER the last genuine price movement,
 #    so legitimate mid-life identical consecutive returns are preserved.
 #
@@ -155,8 +181,9 @@ cat("Macro panel:", nrow(macro_panel), "months |",
 #    a fund as dead. Once threshold is met, deletion starts at the FIRST
 #    repeated value.
 #
-#    Known limitation: funds dying within 2 months of Dec 2023 may retain
-#    1-2 carried obs (LSEG carry truncated before reaching the threshold).
+#    Known limitation: funds dying within 2 months of the data pull date
+#    may retain 1-2 carried obs (LSEG carry truncated before reaching the
+#    threshold).
 # =============================================================================
 gross_clean <- fund_panel %>%
   select(Ticker, date, gross_return) %>%
@@ -176,7 +203,7 @@ gross_clean <- fund_panel %>%
   select(-is_frozen, -last_move_date, -terminal_frozen_n) %>%
   ungroup()
 
-# Data-driven effective closure dates ??? byproduct of frozen tail removal
+# Data-driven effective closure dates - byproduct of frozen tail removal
 closure_dates <- gross_clean %>%
   group_by(Ticker) %>%
   summarise(effective_closure = max(date), .groups = "drop")
@@ -195,11 +222,7 @@ cat("Empty funds removed:", n_distinct(fund_panel$Ticker) - length(valid_tickers
 # Sync all series to the cleaned gross_return timeline
 fund_panel_clean <- fund_panel %>%
   semi_join(gross_clean, by = c("Ticker", "date")) %>%
-  filter(Ticker %in% valid_tickers) %>%
-  filter(!Ticker %in% DATA_ERROR_TICKERS)
-
-cat("Data error funds removed:", length(DATA_ERROR_TICKERS),
-    paste0("(", paste(DATA_ERROR_TICKERS, collapse = ", "), ")"), "\n")
+  filter(Ticker %in% valid_tickers)
 
 # =============================================================================
 # 5. ASSEMBLE BASE PANEL (cleaned, no date trim, no Evans filter)
@@ -234,16 +257,16 @@ evans_cutoff <- static %>%
 # 7. PRODUCE THREE PANELS (pre-classification)
 # =============================================================================
 
-# Panel 1: Master ??? no incubation correction, no date trimming
+# Panel 1: Master - no incubation correction, no date trimming
 panel_master <- base_panel
 
-# Panel 2: Incubation-corrected ??? Evans 36-month filter, no date trim
+# Panel 2: Incubation-corrected - Evans 36-month filter, no date trim
 panel_incubation <- base_panel %>%
   left_join(evans_cutoff, by = "Ticker") %>%
   filter(date >= evans_cutoff) %>%
   select(-evans_cutoff)
 
-# Panel 3: Trimmed ??? Evans filter + 1995-2023 sample period
+# Panel 3: Trimmed - Evans filter + 1995-2023 sample period
 panel_trimmed <- panel_incubation %>%
   filter(date >= DATE_MIN_DATA & date <= DATE_MAX)
 
@@ -267,34 +290,25 @@ panel_incubation <- classify_ap(panel_incubation)
 panel_trimmed    <- classify_ap(panel_trimmed)
 
 cat("\nActive/passive classification applied to all panels.\n")
-cat("panel_trimmed distribution:\n")
+cat("panel_trimmed distribution (pre-Step-8b/8c):\n")
 print(table(panel_trimmed$ap_group, useNA = "always"))
 
 # =============================================================================
 # 8b. EXCLUDE LEVERAGED / DERIVATIVE-BASED PRODUCTS FROM PASSIVE UNIVERSE
+#     [Largely redundant after v1.2 Step 8c but retained as defensive net]
 #
 #     Background: daily-reset leveraged mutual funds (Rydex, ProFunds,
 #     Direxion) are classified as passive by LSEG (Actively_Managed_New = N)
 #     because they mechanically track an index. However, they use equity swaps
 #     or futures to deliver a constant daily leverage multiple, resulting in
 #     annual turnover of 200-4000% and severe volatility decay over multi-year
-#     holding periods (Avellaneda & Zhang, 2010). Their inclusion in the
-#     passive benchmark contaminated fee-quintile and flow-performance analyses.
+#     holding periods (Avellaneda & Zhang, 2010).
 #
 #     Diagnostic: 30 passive funds with Turnover > 200% were identified; all
-#     confirmed as leveraged/derivative products on manual review.
-#
-#     Exclusion criteria (Passive group only):
-#       (a) Keyword pattern in fund Name column ??? catches explicit leverage
-#           indicators and all ProFunds share classes (the entire ProFunds
-#           lineup in this universe is leveraged; "profund" is unambiguous)
-#       (b) Hard-coded misclassifications ??? MOJAX (tactical active fund) and
-#           GENDX (Gotham long/short quant) classified as Passive in LSEG
-#
-#     Explicit retention (overrides keyword match):
-#       Rydex Pure Style funds (Pure Value / Pure Growth) are long-only 1x
-#       products tracking S&P Pure Style indices. Their high reported turnover
-#       reflects index reconstitution, not derivative rolling. Retained.
+#     confirmed as leveraged/derivative products on manual review. Most appear
+#     in flagged_funds.xlsx with the BEAR_MARKET or PASSIVE_INDEX flag and
+#     are therefore caught by Step 8c. This step remains as a name-pattern
+#     defensive layer for any leveraged products not yet in the workbook.
 #
 #     References: Avellaneda & Zhang (2010, SIAM J. Financial Math.);
 #     Cremers & Petajisto (2009, RFS); Amihud & Goyenko (2013, RFS).
@@ -312,25 +326,18 @@ LEVERAGED_KEYWORDS <- paste(
   collapse = "|"
 )
 
-# Confirmed active strategies misclassified as passive by LSEG
-ACTIVE_MISLABELLED <- c("MOJAX US Equity", "GENDX US Equity")
-
-# Long-only 1x Rydex Pure Style funds ??? exempt from keyword filter
-PURE_STYLE_RETAIN <- c(
-  "RYAVX US Equity",  # Rydex S&P Mid-Cap 400 Pure Value
-  "RYZAX US Equity",  # Rydex S&P 500 Pure Value
-  "RYAZX US Equity",  # Rydex S&P Small-Cap 600 Pure Value
-  "RYWAX US Equity",  # Rydex S&P Small-Cap 600 Growth
-  "RYAWX US Equity"   # Rydex S&P 500 Pure Growth
-)
+# Note: ACTIVE_MISLABELLED and PURE_STYLE_RETAIN constants removed in v1.2.
+# Both are now superseded by flagged_funds.xlsx in Step 8c:
+#   - MOJAX, GENDX are flagged PASSIVE_INDEX in Entire Analysis (excluded)
+#   - RYAVX/RYZAX/RYAZX/RYWAX/RYAWX (Pure Style) are also flagged PASSIVE_INDEX
+#     in flagged_funds.xlsx and therefore excluded. The user-curated workbook
+#     supersedes the previous explicit-retention logic.
 
 exclude_leveraged <- function(panel) {
   panel %>%
     filter(
       !(ap_group == "Passive" &
-          !Ticker %in% PURE_STYLE_RETAIN &
-          (grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE) |
-             Ticker %in% ACTIVE_MISLABELLED))
+          grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE))
     )
 }
 
@@ -341,10 +348,118 @@ panel_incubation <- exclude_leveraged(panel_incubation)
 panel_trimmed    <- exclude_leveraged(panel_trimmed)
 
 n_pass_after <- n_distinct(panel_trimmed$Ticker[panel_trimmed$ap_group == "Passive"])
-cat("\nLeveraged/derivative filter:\n")
+cat("\nLeveraged/derivative filter (Step 8b - defensive):\n")
 cat("  Passive funds before:", n_pass_before, "\n")
 cat("  Passive funds after :", n_pass_after, "\n")
-cat("  Removed            :", n_pass_before - n_pass_after, "\n")
+cat("  Removed             :", n_pass_before - n_pass_after, "\n")
+
+# =============================================================================
+# 8c. APPLY flagged_funds.xlsx EXCLUSION LEDGER                       [NEW v1.2]
+#
+#     flagged_funds.xlsx is the canonical, user-curated exclusion workbook.
+#     It encodes the dissertation's three-tier scope discipline:
+#
+#       (i)  Exclude from Entire Analysis  (438 funds): dropped at source.
+#            Includes PASSIVE_INDEX (passives), GLOBAL_MANDATE / EM_MANDATE
+#            (non-US), LONG_SHORT, MARKET_NEUTRAL, BEAR_MARKET (violate the
+#            long-only assumption), and DATA_ERROR (the two confirmed LSEG
+#            errors QWVOX, VALLCEN).
+#
+#       (ii) Exclude from Perf Comparison  (585 funds): NOT dropped here.
+#            Tagged on the surviving panel with excluded_perf = TRUE so
+#            that aggregate-alpha, bootstrap, FDR, persistence, sub-period,
+#            robust factor model, and portfolio-sort scripts can apply
+#            filter(!excluded_perf). This is the FF (2010)-style restriction
+#            to diversified long-only funds with style-matched benchmarks
+#            for performance comparison.
+#
+#       (iii) Exclude from H3 Only  (245 funds): tagged with excluded_h3 = TRUE.
+#            For H3 (lottery demand) and the activeness proxy, where Cremers
+#            and Petajisto (2009) require unambiguous size/style benchmarks.
+#            The composite excluded_h3 column is the union of "Exclude from
+#            H3 Only" and SECTOR_FUND-tagged funds in the Perf Comparison
+#            sheet (sector funds are excluded from both performance and H3).
+#
+#     Behavioral H1/H2/H4 panel regressions need no further filter beyond
+#     what is applied at source by (i): they run on the full surviving
+#     universe (~3,326 funds pre-Evans).
+#
+#     This block subsumes the prior DATA_ERROR_TICKERS hardcode.
+# =============================================================================
+
+# Read all three flag sheets
+flagged_entire <- read_excel(FLAGGED_FILE, sheet = "Exclude from Entire Analysis")
+flagged_perf   <- read_excel(FLAGGED_FILE, sheet = "Exclude from Perf Comparison")
+flagged_h3     <- read_excel(FLAGGED_FILE, sheet = "Exclude from H3 Only")
+
+# Defensive: workbook ticker column may be named "Bloomberg Ticker" or "Ticker"
+get_tickers <- function(df) {
+  col <- intersect(c("Bloomberg Ticker", "Ticker"), names(df))[1]
+  if (is.na(col)) stop("flagged_funds.xlsx: no Ticker / Bloomberg Ticker column.")
+  unique(df[[col]])
+}
+
+tickers_entire <- get_tickers(flagged_entire)
+tickers_perf   <- get_tickers(flagged_perf)
+tickers_h3     <- get_tickers(flagged_h3)
+
+# SECTOR_FUND in Perf Comparison contributes to excluded_h3 too (per dissertation)
+sector_in_perf <- if ("Flag(s)" %in% names(flagged_perf)) {
+  pf_col <- if ("Bloomberg Ticker" %in% names(flagged_perf)) "Bloomberg Ticker" else "Ticker"
+  flagged_perf[[pf_col]][grepl("SECTOR_FUND", flagged_perf[["Flag(s)"]], fixed = TRUE)]
+} else character(0)
+
+tickers_h3_full <- unique(c(tickers_h3, sector_in_perf))
+
+# Apply at source to all three panels
+n_before <- list(
+  master     = n_distinct(panel_master$Ticker),
+  incubation = n_distinct(panel_incubation$Ticker),
+  trimmed    = n_distinct(panel_trimmed$Ticker)
+)
+
+panel_master     <- panel_master     %>% filter(!Ticker %in% tickers_entire)
+panel_incubation <- panel_incubation %>% filter(!Ticker %in% tickers_entire)
+panel_trimmed    <- panel_trimmed    %>% filter(!Ticker %in% tickers_entire)
+
+# Tag remaining funds with the two flag columns
+add_flag_cols <- function(panel) {
+  panel %>%
+    mutate(
+      excluded_perf = Ticker %in% tickers_perf,
+      excluded_h3   = Ticker %in% tickers_h3_full
+    )
+}
+
+panel_master     <- add_flag_cols(panel_master)
+panel_incubation <- add_flag_cols(panel_incubation)
+panel_trimmed    <- add_flag_cols(panel_trimmed)
+
+n_after <- list(
+  master     = n_distinct(panel_master$Ticker),
+  incubation = n_distinct(panel_incubation$Ticker),
+  trimmed    = n_distinct(panel_trimmed$Ticker)
+)
+
+cat("\n--- Step 8c: flagged_funds.xlsx applied ---\n")
+cat(sprintf("  Entire Analysis tickers: %d\n", length(tickers_entire)))
+cat(sprintf("  Perf Comparison tickers: %d (tagged excluded_perf)\n",
+            length(tickers_perf)))
+cat(sprintf("  H3 (incl SECTOR_FUND) :  %d (tagged excluded_h3)\n",
+            length(tickers_h3_full)))
+cat("  Funds dropped at source:\n")
+for (k in names(n_before)) {
+  cat(sprintf("    panel_%-10s : %5d -> %5d  (-%d)\n",
+              k, n_before[[k]], n_after[[k]],
+              n_before[[k]] - n_after[[k]]))
+}
+
+# Diagnostic: flag distribution within surviving panel_trimmed
+cat("\n  panel_trimmed flag-column counts (post-source-filter):\n")
+cat(sprintf("    excluded_perf = TRUE : %d funds\n",
+            n_distinct(panel_trimmed$Ticker[panel_trimmed$excluded_perf])))
+cat(sprintf("    excluded_h3   = TRUE : %d funds\n",
+            n_distinct(panel_trimmed$Ticker[panel_trimmed$excluded_h3])))
 
 # =============================================================================
 # 9. MONTHLY PERCENTAGE RETURNS FROM INDEX LEVELS
@@ -352,16 +467,23 @@ cat("  Removed            :", n_pass_before - n_pass_after, "\n")
 #    ret_gross_raw: unwinsorised gross decimal return (index_t/index_{t-1} - 1).
 #    ret_gross: winsorised gross return (Step 10 below).
 #
-#    NET RETURN APPROXIMATION:
-#    LSEG serves identical total return index series for both the gross and net
-#    return fields. True net returns are therefore unavailable from the index.
-#    Following Barras, Scaillet and Wermers (2010, JF), net returns are
-#    approximated by deducting one-twelfth of the static annual expense ratio
-#    from each monthly gross return:
-#        ret_net_raw = ret_gross_raw - Expense_Ratio / 1200
+#    NET RETURN APPROXIMATION (direction reversed from BSW 2010):
+#    LSEG serves identical total return index series for both the gross and
+#    net return fields. True net returns are therefore unavailable from the
+#    LSEG index. We approximate net returns from gross by deducting one-twelfth
+#    of the static annual expense ratio per month:
+#         ret_net_raw = ret_gross_raw - Expense_Ratio / 1200
 #    Expense_Ratio is in percentage terms (e.g. 1.0 = 1%), so dividing by 1200
-#    converts to a monthly decimal deduction. Where Expense_Ratio is missing or
-#    unparseable, ret_net_raw is NA ??? no imputation is applied.
+#    converts to a monthly decimal deduction. Where Expense_Ratio is missing
+#    or unparseable, ret_net_raw is NA - no imputation is applied.
+#
+#    The arithmetic gross-net wedge of Expense_Ratio/12 follows the standard
+#    fee-decomposition convention in the mutual fund literature - originating
+#    in Carhart (1997) and Wermers (2000), adopted in Pastor and Stambaugh
+#    (2002) and used throughout BSW (2010). BSW (2010) and most CRSP-based
+#    studies observe NET returns and DERIVE gross by ADDING back the wedge.
+#    Our pipeline observes gross only and DERIVES net by SUBTRACTING the
+#    wedge - the same arithmetic, applied in the opposite direction.
 #
 #    IMPORTANT: ret_gross_raw and ret_net_raw (unwinsorised) are preserved on
 #    the panel for use in the Sirri-Tufano flow identity in flow_calculation.R.
@@ -391,7 +513,7 @@ panel_trimmed    <- compute_returns(panel_trimmed)
 cat("\nMonthly returns computed for all panels.\n")
 cat("panel_trimmed ret_gross_raw summary:\n")
 print(summary(panel_trimmed$ret_gross_raw))
-cat("panel_trimmed ret_net_raw summary (expense-adjusted approximation):\n")
+cat("panel_trimmed ret_net_raw summary (gross - ER/12 approximation):\n")
 print(summary(panel_trimmed$ret_net_raw))
 
 # =============================================================================
@@ -429,6 +551,8 @@ summarise_panel <- function(panel, label) {
   cat("  Active     :", n_distinct(panel$Ticker[panel$ap_group == "Active"]),   "\n")
   cat("  Passive    :", n_distinct(panel$Ticker[panel$ap_group == "Passive"]),  "\n")
   cat("  Unknown    :", n_distinct(panel$Ticker[panel$ap_group == "Unknown"]),  "\n")
+  cat("  excluded_perf : ", n_distinct(panel$Ticker[panel$excluded_perf]), "\n")
+  cat("  excluded_h3   : ", n_distinct(panel$Ticker[panel$excluded_h3]),   "\n")
   cat("Unique dates :", n_distinct(panel$date), "\n")
   obs_dist <- panel %>%
     group_by(Ticker) %>%

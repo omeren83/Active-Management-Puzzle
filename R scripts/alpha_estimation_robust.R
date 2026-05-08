@@ -1,6 +1,19 @@
 # =============================================================================
-# ROBUSTNESS ALPHA ESTIMATION: FF6 AND CARHART + PS LIQUIDITY (v1.2)
+# ROBUSTNESS ALPHA ESTIMATION: FF6 AND CARHART + PS LIQUIDITY (v1.3)
 #
+# v1.3 changes vs v1.2 (Family B audit):
+#   filter(!excluded_perf) added to the ap_robust panel-prep stage so the
+#   FF6 and C5 robustness specifications are estimated on the same
+#   performance-comparison subsample as the main-text Carhart specification
+#   (alpha_estimation.R v2.7). Without this filter, the Appendix E
+#   robustness tables would describe a strictly larger universe than the
+#   main-text tables, producing a spurious composition difference between
+#   specifications. Per dissertation §4.7 the perf-comparison subsample
+#   excludes 585 funds total, 149 of which are SECTOR_FUND-only flags
+#   (the remainder are caught by Step 8c at source).
+#
+# v1.2 (carried forward) implementation
+# -----
 # Purpose
 # -------
 # Re-estimates the full-period alpha regressions and the Fama-French (2010)
@@ -159,6 +172,7 @@ if (length(missing_cols) > 0L) {
 # missing traded liquidity pre-1968).  Applied universally in case other
 # columns inherit the same sentinel from source files.
 ap_robust <- panel_incubation %>%
+  filter(!excluded_perf) %>%      # v1.3: performance-comparison subsample
   rename(rf     = all_of(FACTOR_RF),
          lipper = all_of(LIPPER_COL),
          exp_r  = all_of(EXP_COL)) %>%
@@ -168,6 +182,9 @@ ap_robust <- panel_incubation %>%
                 ~ ifelse(. == -99, NA_real_, .))) %>%
   filter(!is.na(excess_ret)) %>%
   arrange(Ticker, date)
+
+cat("Funds entering robust estimation:", n_distinct(ap_robust$Ticker),
+    " |  Fund-months:", nrow(ap_robust), "\n")
 
 # Diagnostic: report factor coverage (non-missing months, date range).
 cat("Factor coverage summary:\n")

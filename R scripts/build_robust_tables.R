@@ -1,5 +1,5 @@
 # =============================================================================
-# ROBUST APPENDIX TABLES BUILDER (v1.1)
+# ROBUST APPENDIX TABLES BUILDER (v1.2)
 #
 # Purpose
 # -------
@@ -9,6 +9,20 @@
 #   - Carhart 4-factor (main text baseline)
 #   - Fama-French 6-factor (FF5 + MOM)
 #   - Carhart 4-factor + Pastor-Stambaugh traded liquidity (C5)
+#
+# v1.2 changes vs v1.1 (Family C audit)
+# --------------------------------------
+#   (a) Workflow notes updated: patch_mean_tna.R is no longer a prerequisite.
+#       alpha_estimation.R v2.7 and alpha_estimation_robust.R v1.3 fix
+#       mean_tna at source via coalesce(class_assets, total_assets), so the
+#       alpha xlsx files produced by these versions already carry valid
+#       mean_tna values. patch_mean_tna.R retained as DEPRECATED for
+#       backward compatibility with v2.6-era xlsx outputs only.
+#   (b) Sample-window labels extended to acknowledge that the upstream
+#       alpha estimation now restricts to the performance-comparison
+#       subsample defined by flagged_funds.xlsx. SAMPLE_LABEL_MAIN and
+#       SAMPLE_LABEL_C5 are augmented; the three Appendix E table footnotes
+#       inherit the updated labels automatically through string concatenation.
 #
 # v1.1 changes vs v1.0
 # --------------------
@@ -24,17 +38,19 @@
 #
 # Prerequisite for correct VW values in Table E.1
 # ------------------------------------------------
-# Run patch_mean_tna.R (in same session as data_import_and_cleaning.R) before
-# this script. Without it, mean_tna in the alpha xlsx files is NaN and VW
-# columns display as "--". See patch_mean_tna.R for the one-time fix.
+# alpha_estimation.R v2.7+ and alpha_estimation_robust.R v1.3+ produce alpha
+# xlsx files with valid mean_tna values, so VW columns render correctly out
+# of the box. For legacy xlsx files produced by v2.6 (where d$tna was NULL,
+# making mean_tna NaN), source patch_mean_tna.R once before this script.
+# See patch_mean_tna.R for the one-time backward-compatibility fix.
 #
 # Workflow
 # --------
-#   1. Source data_import_and_cleaning.R
-#   2. Run patch_mean_tna.R (one-time, until alpha_estimation_robust.R v1.2)
-#   3. Run alpha_estimation.R (v2.6) -> alpha_fullperiod.xlsx, bootstrap_results.xlsx
-#   4. Run alpha_estimation_robust.R (v1.1+) -> alpha_fullperiod_{FF6,C5}.xlsx etc.
-#   5. Run THIS script.
+#   1. Source data_import_and_cleaning.R (v1.2+; produces panels with
+#      flag columns excluded_perf and excluded_h3)
+#   2. Run alpha_estimation.R (v2.7+) -> alpha_fullperiod.xlsx, bootstrap_results.xlsx
+#   3. Run alpha_estimation_robust.R (v1.3+) -> alpha_fullperiod_{FF6,C5}.xlsx etc.
+#   4. Run THIS script.
 #
 # Tables produced
 # ---------------
@@ -61,8 +77,8 @@ if (!exists("OUT_DIR", inherits = TRUE) || is.null(OUT_DIR)) {
 }
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
-SAMPLE_LABEL_MAIN <- "Dec 1994--Feb 2026"   # baseline / FF6 window
-SAMPLE_LABEL_C5   <- "Dec 1994--Dec 2024"   # PSL-constrained window
+SAMPLE_LABEL_MAIN <- "Dec 1994--Feb 2026, performance-comparison subsample per flagged\\_funds.xlsx"   # baseline / FF6 window
+SAMPLE_LABEL_C5   <- "Dec 1994--Dec 2024, performance-comparison subsample per flagged\\_funds.xlsx"   # PSL-constrained window
 
 PERCENTILES_TO_SHOW <- c(1, 5, 10, 50, 90, 95, 99)
 GAMMA_STAR          <- 20   # BSW threshold for the headline decomposition
@@ -220,7 +236,8 @@ e1_tex <- c(
     "VW: value-weighted cross-sectional mean using each fund's time-series ",
     "mean TNA as the weight. ",
     "Net returns are gross returns less one-twelfth of the static annual ",
-    "expense ratio each month following \\textcite{BarrasScailletWermers2010}. ",
+    "expense ratio each month, following \\textcite{Carhart1997} and ",
+    "\\textcite{Wermers2000}. ",
     "$N$: funds with at least 24 monthly observations; ",
     "$T_{\\max}$: maximum number of monthly observations per fund. ",
     "SMB is held constant across specifications at the \\textcite{FamaFrench1993} ",

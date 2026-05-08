@@ -2130,13 +2130,20 @@ which is robust to imbalance.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{tables/fig_fund_flows.png}
-  \caption[Average monthly proportional fund flows]{%
-    Average monthly proportional fund flows. The bold line is the
-    12-month centred rolling mean of the cross-sectional equal-weighted
-    average of $\mathrm{Flow}_{i,t}$, the Sirri--Tufano (1998)
-    proportional flow scaled by lagged TNA and winsorised at the
-    1st/99th percentiles, with December observations excluded. The
-    faint line is the raw monthly cross-sectional mean.}
+  \caption[Average monthly proportional fund flows: active vs.\ passive]{%
+    Average monthly proportional fund flows for actively and passively
+    managed domestic-equity mutual funds in the U.S.\ universe. For each
+    group, the bold line is the 12-month centred rolling mean of the
+    cross-sectional equal-weighted average of $\mathrm{Flow}_{i,t}$, the
+    \textcite{SirriTufano1998} proportional flow defined as
+    $\mathrm{Flow}_{i,t} = (\mathrm{TNA}_{i,t} - \mathrm{TNA}_{i,t-1}
+    (1+R_{i,t})) / \mathrm{TNA}_{i,t-1}$, scaled by lagged TNA and
+    winsorised at the 1st and 99th percentiles, with December
+    observations excluded. The faint line is the raw monthly
+    cross-sectional mean. Active funds are shown in dark blue (solid),
+    passive funds in red (dashed). Unknown-classified funds are
+    excluded. Source: LSEG Workspace; sample window December 1994 to
+    February 2026 (the master panel, prior to incubation correction).}
   \label{fig:fund_flows}
 \end{figure}
 
@@ -2250,15 +2257,29 @@ identified it.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{tables/fig_rolling_alphas.png}
-  \caption[Time-varying alphas by rolling-window regression]{%
-    Time-varying alphas estimated by 36-month rolling-window Carhart
-    (1997) four-factor regressions. The series is the 12-month
-    centred rolling mean of the monthly cross-sectional equal-weighted
-    average of fund-level rolling gross alpha. The series displays
-    three visually distinct regimes whose boundaries are formally
-    identified by a Bai and Perron (1998, 2003) structural break
-    test; see Appendix~\ref{app:subperiod} for break dates,
-    confidence intervals, and regime-mean estimates.}
+  \caption[Rolling aggregate gross alpha: active vs.\ passive]{%
+    Rolling aggregate gross alpha for actively and passively managed
+    domestic-equity mutual funds, estimated month by month following
+    \textcite{FamaFrench2010}. For each group $g$ and each month $t$,
+    the aggregate gross return $R^{g}_t$ is the equal-weighted average
+    return of all funds alive in month $t$. The series plotted is the
+    intercept (annualised by multiplication by twelve) of a
+    \textcite{Carhart1997} four-factor regression of the monthly
+    aggregate excess return $R^{g}_t - R^{f}_t$ on the market, size,
+    value, and momentum factors over a 36-month trailing window. This
+    is a portfolio-level regression rather than a cross-sectional
+    average of per-fund rolling alphas; rolling regression already
+    smooths the series so no additional moving-average smoothing is
+    applied. The active series displays three visually distinct regimes
+    whose boundaries are formally identified by a
+    \textcite{Bai1998,Bai2003} structural break test; see
+    Appendix~\ref{app:subperiod} for break dates, confidence intervals,
+    and regime-mean estimates. Sample: Incubation-corrected panel
+    (Evans 2010), no date cap, performance-comparison subsample per
+    \texttt{flagged\_funds.xlsx}; Unknown-classified funds excluded.
+    Passive aggregate alphas reflect benchmark-mismatch residuals
+    rather than managerial underperformance \parencite{Roll1977}; see
+    Table~\ref{tab:perf_aggregate} note.}
   \label{fig:rolling_alphas}
 \end{figure}
 
@@ -2294,14 +2315,30 @@ lower bound on the genuinely skilled mass.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{tables/fig_luck_vs_skill_combined.png}
-  \caption[CDF and PDF of empirical vs.\ simulated alpha distributions]{%
-    Panel A: empirical cumulative distribution function (CDF) of
-    active-fund $t(\hat{\alpha})$ (solid) versus the
-    bootstrap-derived zero-skill CDF (dashed). Panel B: empirical
-    probability density function (shaded) against the standard
-    normal null (dashed). The visible left-shift of the empirical
-    distribution relative to the bootstrap null is the
-    cross-sectional manifestation of the active management puzzle.}
+  \caption[CDF and PDF of empirical vs.\ simulated alpha $t$-statistics]{%
+    Cross-sectional distribution of \textcite{Carhart1997} four-factor
+    alpha $t$-statistics for actively managed funds, with simulated
+    zero-skill comparison. \textbf{Panel A}: empirical cumulative
+    distribution function (CDF) of active-fund $t(\hat{\alpha})$ (solid
+    blue) versus the \textcite{FamaFrench2010} bootstrap-derived
+    zero-skill CDF (solid black, dashed line type), constructed by
+    resampling calendar months with replacement and re-estimating each
+    fund's $t(\hat{\alpha})$ on the resampled sample after subtracting
+    its actual full-period alpha to impose the zero-skill null.
+    \textbf{Panel B}: kernel density of the empirical $t$-statistic
+    distribution (shaded blue) against the theoretical $N(0,1)$
+    reference (dashed black). The $N(0,1)$ reference is included as a
+    visual benchmark for the no-skill hypothesis under normality; the
+    bootstrap null in Panel A is the inferentially appropriate
+    comparison and accounts for cross-sectional dependence, fat tails,
+    and finite-sample estimation error. Percentile-level bootstrap
+    comparisons are reported in Table~\ref{tab:bootstrap_tails}. The
+    visible left-shift of the empirical distribution relative to the
+    bootstrap null is the cross-sectional manifestation of the active
+    management puzzle. Sample: actively managed funds in the
+    Incubation-corrected (Evans 2010) panel, performance-comparison
+    subsample per \texttt{flagged\_funds.xlsx}, with at least 24
+    monthly observations.}
   \label{fig:luck_vs_skill}
 \end{figure}
 
@@ -4386,20 +4423,26 @@ and mean alpha per segment.
   \centering
   \includegraphics[width=\textwidth]{tables/fig_breaktest.png}
   \caption[Bai--Perron structural break test --- active fund rolling gross alpha]{%
-    Bai--Perron structural break test: active fund rolling gross alpha.
-    Blue line: 12-month trailing mean of the monthly cross-sectional
-    equal-weighted mean of 36-month rolling \textcite{Carhart1997} gross
-    alpha (matches Figure~\ref{fig:rolling_alphas}). Solid red step:
-    regime-mean alpha per identified segment. Dashed red verticals:
-    \textcite{Bai1998,Bai2003} break-date point estimates. Shaded bands:
-    95\,\% confidence intervals using Newey--West HAC standard errors
-    \parencite{Andrews1991}. BIC selects five breaks (December 1999,
-    December 2002, December 2005, November 2011, January 2023) defining
-    six regimes. Breaks 1--3 are collapsed into a single pre-2006
-    regime and Break 5 is collapsed into the post-2011 regime,
-    yielding the three-period partition adopted in
-    Section~\ref{sec:subperiod_panels}. Sample: incubation-corrected
-    panel, active funds only, December 1994--February 2026.}
+    Bai--Perron structural break test on the monthly cross-sectional
+    equal-weighted mean of 36-month rolling \textcite{Carhart1997}
+    gross alpha for active funds. The blue line is the 12-month
+    trailing mean of that cross-sectional series, plotted to match the
+    smoothing of Figure~\ref{fig:rolling_alphas}; the solid red step
+    function is the regime-mean alpha per identified segment; dashed
+    red verticals are the \textcite{Bai1998,Bai2003} break-date point
+    estimates; shaded steel-blue bands are 95\,\% confidence intervals
+    constructed using Newey--West HAC standard errors at the
+    \textcite{Andrews1991} bandwidth. The break test itself is applied
+    to the raw (unsmoothed) monthly series; the smoothing in the plot
+    is purely visual. BIC selects five breaks (December 1999, December
+    2002, December 2005, November 2011, January 2023) defining six
+    regimes. Breaks 1--3 are collapsed into a single pre-2006 regime
+    and Break 5 is collapsed into the post-2011 regime, yielding the
+    three-period partition adopted in
+    Section~\ref{sec:subperiod_panels}. Sample: Incubation-corrected
+    (Evans 2010) panel, active funds only, performance-comparison
+    subsample per \texttt{flagged\_funds.xlsx}, December 1994 to
+    February 2026.}
   \label{fig:breaktest}
 \end{figure}
 

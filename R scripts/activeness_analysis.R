@@ -1,5 +1,38 @@
 # =============================================================================
-# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.1
+# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.2
+#
+# v1.2 changes vs v1.1 (Family D pre-defense audit):
+#   - H3 / activeness subsample filter wired in at the panel-prep stage.
+#     Per data_import_and_cleaning.R v1.2 Step 8c, the activeness scripts
+#     must restrict to the !excluded_h3 subsample so that funds in the
+#     "Exclude from H3 Only" sheet of flagged_funds.xlsx (Equity Income,
+#     Specialty Diversified, Specialty/Miscellaneous, sector funds, covered-
+#     call overlays) do not contaminate the activeness measures or the
+#     quintile cutoffs.
+#     Implementation:
+#       (i)  An h3_eligible Ticker lookup is built from panel_incubation %>%
+#            filter(!excluded_h3) %>% distinct(Ticker) at the start of
+#            Section 2 (after pre-flight checks).
+#       (ii) alpha_rolling.xlsx and alpha_fullperiod.xlsx are restricted to
+#            this universe via semi_join. Without this step, the 1-R^2 and
+#            quintile cutoffs would be computed on a universe that includes
+#            !excluded_h3 = TRUE funds (because alpha_estimation.R applies
+#            only !excluded_perf, not !excluded_h3).
+#       (iii) te_input and port_base panel_incubation pulls add filter(!excluded_h3).
+#       (iv) factors_ts (line ~415 region) is left unfiltered because it
+#            takes distinct(date, MKT_RF, ..., RF) and these factor values
+#            are constant within a date.
+#   - BSW (2010) misattribution corrected. The footnote sentence describing
+#     the gross-to-net derivation previously attributed the "deduct one-twelfth
+#     of the static annual expense ratio" arithmetic to BarrasScailletWermers
+#     (2010); the correct attribution is Carhart (1997) and Wermers (2000).
+#     BSW (2010) use the same arithmetic in the OPPOSITE direction (they
+#     observe net from CRSP and derive gross). Fix mirrors the corrections
+#     already applied to FF_comparison.R, subperiod_analysis.R, alpha_reporting.R,
+#     descriptive_statistics.R, and build_robust_tables.R.
+#   - Sample-source sentences in fn_char, fn_base_alpha, and fn_mr footnotes
+#     appended with "H3 / activeness subsample per flagged\_funds.xlsx" to
+#     match the convention adopted across performance-comparison footnotes.
 #
 # v1.1 changes vs v1.0:
 #   Adds Patton & Timmermann (2010, JFE) monotonic relation (MR) bootstrap test
@@ -412,20 +445,35 @@ if (!"Benchmark_Code" %in% names(panel_incubation))
        "of fund_data.xlsx contains Benchmark_Code and re-run Phase A.")
 
 # Factor matrix used by run_models (date + four factors + RF)
+# Note: factor values are constant within a date across the fund cross-section,
+# so distinct(date, ...) is invariant under filter(!excluded_h3); the filter
+# is therefore omitted here to avoid a redundant pass.
 factors_ts <- panel_incubation %>%
   distinct(date, MKT_RF, SMB, HML, MOM, RF) %>%
   filter(!is.na(MKT_RF)) %>%
   arrange(date)
 
+# v1.2: Build the H3 / activeness fund-eligibility lookup. Used to restrict
+# alpha_rolling.xlsx and alpha_fullperiod.xlsx (both produced by
+# alpha_estimation.R, which applies only !excluded_perf) to the
+# !excluded_h3 subsample, so that quintile cutoffs and the activeness
+# measures are computed on the correct universe.
+h3_eligible <- panel_incubation %>%
+  filter(!excluded_h3) %>%
+  distinct(Ticker)
+
 # Per-fund-month rolling R^2 from alpha_estimation.R
 alpha_roll <- read_excel(ROLLING_FILE) %>%
   select(Ticker, date, ap_group, as_r2) %>%
-  mutate(date = as.Date(date))
+  mutate(date = as.Date(date)) %>%
+  semi_join(h3_eligible, by = "Ticker")    # v1.2: !excluded_h3 restriction
 
 # Full-period fund table - used only for Active eligibility filter
 alpha_full <- read_excel(FULLPER_FILE) %>%
-  select(Ticker, ap_group, n_obs)
+  select(Ticker, ap_group, n_obs) %>%
+  semi_join(h3_eligible, by = "Ticker")    # v1.2: !excluded_h3 restriction
 
+cat("  H3-eligible Tickers :", nrow(h3_eligible), "\n")
 cat("  alpha_rolling rows  :", nrow(alpha_roll), "\n")
 cat("  alpha_fullperiod n  :", nrow(alpha_full), "\n")
 
@@ -484,7 +532,9 @@ act_r2 <- alpha_roll %>%
   filter(n_roll >= MIN_OBS_ACT)
 
 # (b) Tracking Error  (Cremers & Petajisto 2009 interpretation)
+# v1.2: filter(!excluded_h3) restricts to the H3 / activeness subsample.
 te_input <- panel_incubation %>%
+  filter(!excluded_h3) %>%
   filter(ap_group == "Active", !is.na(ret_gross),
          !is.na(Benchmark_Code), Benchmark_Code != "",
          !grepl("^#|^N/A", Benchmark_Code)) %>%
@@ -532,6 +582,7 @@ cat("  Quintile distribution (TE)  :", paste(table(fund_activeness$q_TE,
 cat("=== 5. Building port_base ===\n")
 
 port_base <- panel_incubation %>%
+  filter(!excluded_h3) %>%             # v1.2: H3 / activeness subsample
   filter(ap_group == "Active") %>%
   select(Ticker, date, ap_group, ret_gross, ret_net, tna_lag,
          Expense_Ratio, Turnover) %>%
@@ -768,7 +819,8 @@ fn_char <- paste(
   "turnover (\\%). EW Gross / VW Gross: time-series mean of monthly",
   "equal-weighted / lagged-TNA-weighted gross returns (\\%, monthly).",
   "EW Sharpe: annualised Sharpe ratio of the equal-weighted gross excess",
-  "return. Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "return. Sample: Incubation-corrected panel (Evans 2010), no date cap;",
+  "H3 / activeness subsample per flagged\\_funds.xlsx."
 )
 
 latex_char <- char_all %>%
@@ -923,10 +975,11 @@ fn_base_alpha <- paste(
   "$(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$.",
   "EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are computed by",
   "deducting one-twelfth of the static annual expense ratio from each fund's",
-  "monthly gross return, following \\textcite{BarrasScailletWermers2010}.",
+  "monthly gross return, following \\textcite{Carhart1997} and \\textcite{Wermers2000}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\% respectively.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap. Active funds",
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
+  "H3 / activeness subsample per flagged\\_funds.xlsx. Active funds",
   "only. Quintile assignment is fund-level using the time-series average of",
   "the activeness measure across each fund's history (minimum 24 monthly obs.)."
 )
@@ -1027,7 +1080,8 @@ fn_mr <- paste(
   "terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\\\\%,",
   "5\\\\%, 1\\\\%. Implementation follows the recentering procedure of",
   "\\\\textcite{CremersPetajisto2009} and \\\\textcite{AmihudGoyenko2013}.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
+  "H3 / activeness subsample per flagged\\\\_funds.xlsx."
 )
 
 n_panels_per_measure <- 4L
@@ -1106,4 +1160,4 @@ mr_print <- mr_all %>%
   mutate(across(c(alpha_q1, alpha_q5, spread), ~ round(.x, 3)))
 print(as.data.frame(mr_print), row.names = FALSE)
 
-cat("\n[SUCCESS] activeness_analysis.R v1.1 complete.\n")
+cat("\n[SUCCESS] activeness_analysis.R v1.2 complete.\n")

@@ -1,4 +1,20 @@
-# H3_lottery_demand.R                                                  v2.0
+# H3_lottery_demand.R                                                  v2.1
+# =============================================================================
+# v2.1 changes vs v2.0 (Family E pre-defense audit):
+#   - filter(!excluded_h3) added to the panel-prep stage. Per
+#     data_import_and_cleaning.R Step 8c (flagged_funds.xlsx ledger), H3
+#     lottery-demand identification requires the !excluded_h3 subsample so
+#     that Equity Income / Specialty Diversified / Specialty-Miscellaneous
+#     funds (Lipper categories without unambiguous size-style benchmarks),
+#     sector funds, and covered-call overlays do not contaminate the
+#     activeness/lottery proxies. Mirrors the convention already applied in
+#     activeness_analysis.R v1.2 and activeness_persistence.R v1.1.
+#     Requires panel_regressions_setup.R v1.3+, which preserves the
+#     excluded_h3 flag column in panel_reg.
+#   - Sample-source phrasing added to fn_primary, fn_lagged, fn_robust:
+#     "H3 / activeness subsample per flagged\_funds.xlsx".
+#
+# v2.0 (original):
 # =============================================================================
 # Tests H3 (Lottery Demand) under three specifications and writes three .tex
 # tables. The 4-column architecture follows the activeness-proxy diagnostic
@@ -48,12 +64,14 @@ if (!exists("panel_reg")) {
          WORKING_DIR, ". Run panel_regressions_setup.R first.")
   }
 }
-required <- c("ActR2", "ActSkew", "MAX12", "D_SENT", "D_SENT_lag")
+required <- c("ActR2", "ActSkew", "MAX12", "D_SENT", "D_SENT_lag",
+              "excluded_h3")
 missing_cols <- setdiff(required, names(panel_reg))
 if (length(missing_cols)) {
   stop("panel_reg missing required column(s): ",
        paste(missing_cols, collapse = ", "),
-       ". Re-run panel_regressions_setup.R (>= v1.3 with MAX12).")
+       ". Re-run panel_regressions_setup.R (v1.3 or later: requires ",
+       "MAX12 and the excluded_h3 flag).")
 }
 
 # --- 2. Aligned estimation sample --------------------------------------------
@@ -61,7 +79,10 @@ core_rhs <- c("flow", "R_LOW", "R_MID", "R_HIGH",
               "log_TNA", "log_Age", "ExpRatio", "LoadDummy",
               "ret_vol", "Turnover", "style_flow_lag")
 
+# v2.1: filter(!excluded_h3) restricts to the H3 / activeness subsample
+# per flagged_funds.xlsx Step 8c.
 samp <- panel_reg %>%
+  filter(!excluded_h3) %>%
   filter(!is_december) %>%
   filter(if_all(all_of(c(core_rhs,
                          "ActR2", "ActSkew", "MAX12",
@@ -333,7 +354,10 @@ fn_primary <- paste0(
   "is $\\\\beta=\\\\delta=0$ for the focal lottery measure in each column. ",
   "The headline $z$ tests $\\\\delta>0$ (1-sided): sentiment amplifies ",
   "investor response to the lottery proxy. ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, ",
+  "\\\\textcite{Evans2010}-corrected panel, no date cap; H3 / activeness ",
+  "subsample per flagged\\\\_funds.xlsx."
 )
 
 cap_lagged <- paste0(
@@ -346,7 +370,9 @@ fn_lagged <- paste0(
   "strategy as Table~\\\\ref{tab:H3_regression}. $D^{SENT}_{t-1}$ replaces ",
   "$D^{SENT}_{t}$ in columns (2)--(4). Standard errors two-way clustered on ",
   "Ticker and calendar month. ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; H3 / activeness subsample per flagged\\\\_funds.xlsx."
 )
 
 cap_robust <- paste0(
@@ -365,7 +391,9 @@ fn_robust <- paste0(
   "table. Time-invariant controls (expense ratio, load dummy, turnover) ",
   "are now identified because there is no fund FE. Standard errors two-way ",
   "clustered on Ticker and calendar month. ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; H3 / activeness subsample per flagged\\\\_funds.xlsx."
 )
 
 hdr <- c(" " = 1, "Baseline" = 1, "ActR2" = 1, "ActSkew" = 1, "MAX12" = 1)

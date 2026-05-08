@@ -1,5 +1,19 @@
 # =============================================================================
-# ACTIVENESS-CONDITIONED PERSISTENCE                                        v1.0
+# ACTIVENESS-CONDITIONED PERSISTENCE                                        v1.1
+#
+# v1.1 changes vs v1.0 (Family D pre-defense audit):
+#   - H3 / activeness subsample filter added at the panel-prep stage:
+#     ap <- panel_incubation %>% filter(!excluded_h3) %>% rename(...) %>% ...
+#     Per data_import_and_cleaning.R v1.2 Step 8c, activeness analyses must
+#     restrict to the !excluded_h3 subsample so that the formation-window
+#     1-R^2 measure and the within-cohort tercile breakpoints are not
+#     contaminated by funds in the "Exclude from H3 Only" sheet of
+#     flagged_funds.xlsx (Equity Income, Specialty Diversified,
+#     Specialty/Miscellaneous, sector funds, covered-call overlays).
+#   - Sample-source sentence in fn_text footnote updated to append
+#     "H3 / activeness subsample per flagged\_funds.xlsx".
+#
+# v1.0 (original):
 #
 # 10 x 3 bivariate sort: 10 alpha deciles x 3 activeness terciles.
 # Activeness measure: formation-window 1 - R^2 (cohort-local, NOT lifetime),
@@ -157,6 +171,7 @@ if (!exists("panel_incubation"))
        "(and flow_calculation.R) first.")
 
 ap <- panel_incubation %>%
+  filter(!excluded_h3) %>%             # v1.1: H3 / activeness subsample
   rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF,
          exp_r  = Expense_Ratio) %>%
   mutate(excess_ret = ret_gross - rf,
@@ -514,7 +529,8 @@ fn_text <- paste(
   "returns is most severe in unconditional tail sorts, which conditioning on",
   "activeness already attenuates.",
   "Sample: Active funds in the \\textcite{Evans2010}-corrected",
-  "\\texttt{panel\\_incubation}, Jan 1995--Feb 2026."
+  "\\texttt{panel\\_incubation}, Jan 1995--Feb 2026; H3 / activeness subsample",
+  "per flagged\\_funds.xlsx."
 )
 
 k <- full_data %>%

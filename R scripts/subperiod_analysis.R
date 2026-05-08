@@ -1,5 +1,37 @@
 # =============================================================================
-# SUB-PERIOD ANALYSIS                                                      v1.4
+# SUB-PERIOD ANALYSIS                                                      v1.5
+#
+# v1.5 changes vs v1.4 (Family C audit):
+#   (a) filter(!excluded_perf) added to the panel-prep stage of
+#       estimate_subperiod() so all three sub-periods are estimated on the
+#       performance-comparison subsample defined by flagged_funds.xlsx
+#       (matches the main-text and FF subperiod analysis after the Family B
+#       audit). Without this filter, Tables D.2-D.6 would describe a
+#       strictly larger fund population than Tables 5-10b in the main text.
+#   (b) Mean-TNA bug at line 291 fixed. Same pattern as alpha_estimation.R
+#       v2.7 and FF_comparison.R v1.3: d$tna was NULL because panel_incubation
+#       carries TNA as class_assets / total_assets. Now uses
+#       coalesce(class_assets, total_assets). The mean_tna column in
+#       subperiod_results.xlsx had been NaN; no Appendix D table currently
+#       consumes it (Tables D.2-D.6 use FF portfolio regression with live
+#       panel TNA), but the field is now correctly populated for any
+#       downstream VW weighting.
+#   (c) The runtime warning at the panel-prep stage (formerly self-flagged
+#       in v1.3 / v1.4) has been strengthened to STOP execution rather than
+#       merely warn when the SUBPERIODS thresholds match the panel_trimmed
+#       era values. After the v1.2 cleaning pipeline added the perf-comparison
+#       filter, the rolling alpha series itself changes; the Bai-Perron
+#       break dates therefore MUST be re-estimated by structural_break_test.R
+#       before this script can be meaningfully run. Override available via
+#       SKIP_STALE_DATE_CHECK <- TRUE for cases where the user has manually
+#       verified break stability under the new universe.
+#   (d) Five Appendix D footnote strings updated to acknowledge the
+#       performance-comparison subsample (Tables D.2, D.3, D.4, D.5, D.6).
+#       Matches the convention established in alpha_reporting.R v8.2.
+#   (e) BSW (2010) net-return citation in Table D.2 footnote (line 700)
+#       corrected. Convention attributed to Carhart (1997) and Wermers (2000),
+#       the originators; BSW (2010) shares the arithmetic but applies it in
+#       the reverse direction.
 #
 # v1.4 changes vs v1.3:
 #   (1) Footnote correction (Tables D.2--D.6): the hardcoded sample label
@@ -109,28 +141,27 @@ library(digest)   # used by bootstrap cache (v1.2)
 # =============================================================================
 # 0. CONFIGURATION
 # =============================================================================
-
 SUBPERIODS <- list(
   P1 = list(
     label   = "P1",
-    window  = "Jan 1995--Jan 2006",
-    panel   = "Panel A: P1 (Jan 1995--Jan 2006, 132 months)",
+    window  = "Jan 1995--Dec 2005",
+    panel   = "Panel A: P1 (Jan 1995--Dec 2005, 132 months)",
     date_lo = as.Date("1995-01-01"),
-    date_hi = as.Date("2006-01-31")
+    date_hi = as.Date("2005-12-31")
   ),
   P2 = list(
     label   = "P2",
-    window  = "Feb 2006--Nov 2011",
-    panel   = "Panel B: P2 (Feb 2006--Nov 2011, 70 months)",
-    date_lo = as.Date("2006-02-01"),
-    date_hi = as.Date("2011-11-30")
+    window  = "Jan 2006--Sep 2011",                              # ← was Nov 2011
+    panel   = "Panel B: P2 (Jan 2006--Sep 2011, 69 months)",     # ← was 71 months
+    date_lo = as.Date("2006-01-01"),
+    date_hi = as.Date("2011-09-30")                               # ← was 2011-11-30
   ),
   P3 = list(
     label   = "P3",
-    window  = "Dec 2011--Jan 2026",
-    panel   = "Panel C: P3 (Dec 2011--Jan 2026, 170 months)",
-    date_lo = as.Date("2011-12-01"),
-    date_hi = as.Date("2026-01-31")
+    window  = "Oct 2011--Feb 2026",                              # ← was Dec 2011
+    panel   = "Panel C: P3 (Oct 2011--Feb 2026, 173 months)",    # ← was 171 months
+    date_lo = as.Date("2011-10-01"),                              # ← was 2011-12-01
+    date_hi = as.Date("2026-02-28")
   )
 )
 
@@ -255,6 +286,7 @@ estimate_subperiod <- function(sp, panel_source) {
   
   # --- 2a. Panel restriction (local copy) ---
   ap <- panel_source %>%
+    filter(!excluded_perf) %>%   # v1.5: performance-comparison subsample
     filter(date >= sp$date_lo, date <= sp$date_hi) %>%
     rename(mkt_rf = MKT_RF, smb = SMB, hml = HML,
            mom = MOM, rf = RF, exp_r = Expense_Ratio) %>%
@@ -278,6 +310,10 @@ estimate_subperiod <- function(sp, panel_source) {
     X   <- cbind(1, d$mkt_rf, d$smb, d$hml, d$mom)
     fit <- fast_ols(y, X); if (is.null(fit)) return(NULL)
     se  <- nw_se(X, fit$e, NW_LAG_FULL)
+    # v1.5: mean_tna uses coalesce(class_assets, total_assets). v1.4
+    # referenced d$tna which was NULL (column does not exist on
+    # panel_incubation). Same fix as alpha_estimation.R v2.7.
+    tv  <- coalesce(d$class_assets, d$total_assets)
     data.frame(
       Ticker        = tk,
       ap_group      = d$ap_group[1],
@@ -288,7 +324,7 @@ estimate_subperiod <- function(sp, panel_source) {
       alpha_p_nw    = 2 * pt(-abs(fit$beta[1] / se[1]), n - 5),
       exp_ratio     = d$exp_r[1],
       alpha_net_ann = (fit$beta[1] * 12) - (d$exp_r[1] / 100),
-      mean_tna      = mean(d$tna[d$tna > 0], na.rm = TRUE)
+      mean_tna      = mean(tv[!is.na(tv) & tv > 0], na.rm = TRUE)
     )
   }
   alpha_full <- bind_rows(lapply(names(ap_split), run_full)) %>%
@@ -528,22 +564,37 @@ if (!exists("panel_incubation"))
   stop("panel_incubation not found in session. Run data_import_and_cleaning.R ",
        "(and flow_calculation.R) first.")
 
-# Stale-date audit: if the SUBPERIODS list still references the old Jan-2006 /
-# Nov-2011 break thresholds, emit a runtime warning. These thresholds were
-# identified on the panel_trimmed rolling alpha series (see v1.3 note); under
-# panel_incubation, the Bai-Perron test must be re-run and SUBPERIODS updated.
+# Stale-date audit: if the SUBPERIODS list still references the panel_trimmed
+# era thresholds (Jan-2006 / Nov-2011 / Dec-2023), HALT execution. v1.5
+# strengthens this from a runtime warning to a hard stop because the v1.2
+# cleaning pipeline introduces the perf-comparison subsample filter which
+# itself shifts the rolling alpha series; combining stale break dates with
+# a shifted alpha series would silently misalign every regime statistic in
+# the appendix. Set SKIP_STALE_DATE_CHECK <- TRUE in the global environment
+# to override (e.g. when the user has manually verified break stability
+# under the new universe).
 .subperiod_ends <- as.Date(c(SUBPERIODS$P1$date_hi,
                              SUBPERIODS$P2$date_hi,
                              SUBPERIODS$P3$date_hi))
 if (identical(.subperiod_ends,
-              as.Date(c("2006-01-31", "2011-11-30", "2023-12-31")))) {
-  warning(
-    "SUBPERIODS thresholds (2006-01-31, 2011-11-30, 2023-12-31) are from the ",
-    "panel_trimmed-era Bai-Perron run. Re-run structural_break_test.R on the ",
-    "panel_incubation alpha_rolling.xlsx output and update SUBPERIODS before ",
-    "interpreting the results as regime-consistent.",
-    call. = FALSE
-  )
+              as.Date(c("2006-01-31", "2011-11-30", "2026-01-31")))) {
+  if (!isTRUE(get0("SKIP_STALE_DATE_CHECK", envir = globalenv()))) {
+    stop(
+      "SUBPERIODS thresholds (2006-01-31, 2011-11-30, 2026-01-31) are from the ",
+      "panel_trimmed-era Bai-Perron run. Re-run structural_break_test.R on the ",
+      "current alpha_rolling.xlsx (produced by alpha_estimation.R v2.7+ with the ",
+      "perf-comparison subsample filter) and update SUBPERIODS$P*$date_hi with ",
+      "the new break dates before running this script. To override, set ",
+      "SKIP_STALE_DATE_CHECK <- TRUE in the global environment.",
+      call. = FALSE
+    )
+  } else {
+    message(
+      "subperiod_analysis.R: stale-date check overridden via SKIP_STALE_DATE_CHECK. ",
+      "Proceeding with panel_trimmed-era SUBPERIODS thresholds. Verify break ",
+      "stability under the new universe before interpreting results."
+    )
+  }
 }
 rm(.subperiod_ends)
 
@@ -649,12 +700,12 @@ fn_d2 <- paste(
   "sub-period, following \\\\textcite{FamaFrench2010}.",
   "EW: equal-weighted; VW: lagged-TNA-weighted",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
-  "Net = gross $-$ expense/12 \\\\parencite{BarrasScailletWermers2010}.",
+  "Net = gross $-$ expense/12 \\\\parencite{Carhart1997, Wermers2000}.",
   "Newey-West $t$-stats (6-month lag) in parentheses;",
   "$^{*}$, $^{**}$, $^{***}$: 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds; $T$: months in the regression.",
-  "Sub-period thresholds (Jan 2006, Nov 2011) from Bai-Perron test (Section D.1).",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sub-period thresholds (Jan 2006, Oct 2011) from Bai-Perron test (Section D.1).",
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
 latex_d2 <- perf_data %>%
@@ -748,7 +799,7 @@ fn_d3 <- paste(
   paste0("Active fund counts: P1 $N = ", n_active_bs_vec[1],
          "$; P2 $N = ", n_active_bs_vec[2],
          "$; P3 $N = ", n_active_bs_vec[3], "$."),
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
 latex_d3 <- boot_data %>%
@@ -820,7 +871,7 @@ fn_d4 <- paste(
   "where $\\\\lambda = 0.5$ is the standard tuning parameter.",
   "$N$: number of active funds with $\\\\geq 24$ monthly observations within the",
   "sub-period. Passive and Unknown-classified funds are excluded.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap.",
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
   "implied by these estimates is reported in",
   "Table~\\\\ref{tab:subperiod_bsw_decomposition}."
@@ -895,7 +946,7 @@ fn_d5 <- paste(
   "$\\\\hat{\\\\pi}^-_A$, $\\\\hat{\\\\pi}^+_A$. Negative $T^+_\\\\gamma$ means right-tail",
   "significance does not exceed the false-discovery rate.",
   "Percentages of the sub-period active-fund universe.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
 latex_d5 <- bsw_data %>%
@@ -994,7 +1045,7 @@ fn_d6 <- paste(
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",
   "Newey-West $t$-statistics (6-month lag) in parentheses.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\% respectively.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
 latex_d6 <- d6_data %>%

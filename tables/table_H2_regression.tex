@@ -10,48 +10,48 @@
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{LOW}$ & 0.0305*** & 0.0242*** & 0.0381*** & 0.0261***\\
- & (8.08) & (5.05) & (7.38) & (4.88)\\
-$R^{MID}$ & 0.0145*** & 0.0133*** & 0.0155*** & 0.0144***\\
- & (16.38) & (12.17) & (12.07) & (11.73)\\
-$R^{HIGH}$ & 0.0815*** & 0.0761*** & 0.0872*** & 0.0787***\\
- & (14.44) & (10.21) & (11.74) & (9.48)\\
-State &  & -0.0031** & 0.0002 & -0.0018\\
- &  & (-2.07) & (0.11) & (-1.22)\\
-$R^{LOW}\times$ State &  & 0.0135* & -0.0004 & 0.0122*\\
- &  & (1.96) & (-0.06) & (1.74)\\
-$R^{MID}\times$ State &  & 0.0024 & -0.0010 & 0.0015\\
- &  & (1.40) & (-0.57) & (0.85)\\
-$R^{HIGH}\times$ State &  & 0.0110 & 0.0032 & 0.0089\\
- &  & (1.10) & (0.31) & (0.86)\\
-$D^{SENT}$ &  &  &  & 0.0047***\\
- &  &  &  & (2.66)\\
-$R^{LOW}\times D^{SENT}$ &  &  &  & -0.0047\\
- &  &  &  & (-0.62)\\
+$R^{LOW}$ & 0.0304*** & 0.0237*** & 0.0386*** & 0.0260***\\
+ & (8.35) & (5.09) & (7.87) & (5.11)\\
+$R^{MID}$ & 0.0142*** & 0.0129*** & 0.0152*** & 0.0140***\\
+ & (16.42) & (12.21) & (12.12) & (11.76)\\
+$R^{HIGH}$ & 0.0800*** & 0.0758*** & 0.0852*** & 0.0783***\\
+ & (14.70) & (10.61) & (11.84) & (9.83)\\
+State &  & -0.0033** & 0.0003 & -0.0019\\
+ &  & (-2.25) & (0.20) & (-1.38)\\
+$R^{LOW}\times$ State &  & 0.0144** & -0.0011 & 0.0128*\\
+ &  & (2.16) & (-0.18) & (1.90)\\
+$R^{MID}\times$ State &  & 0.0026 & -0.0010 & 0.0017\\
+ &  & (1.54) & (-0.56) & (0.98)\\
+$R^{HIGH}\times$ State &  & 0.0087 & 0.0032 & 0.0066\\
+ &  & (0.90) & (0.32) & (0.67)\\
+$D^{SENT}$ &  &  &  & 0.0049***\\
+ &  &  &  & (2.77)\\
+$R^{LOW}\times D^{SENT}$ &  &  &  & -0.0058\\
+ &  &  &  & (-0.78)\\
 $R^{MID}\times D^{SENT}$ &  &  &  & -0.0031*\\
- &  &  &  & (-1.68)\\
-$R^{HIGH}\times D^{SENT}$ &  &  &  & -0.0074\\
+ &  &  &  & (-1.75)\\
+$R^{HIGH}\times D^{SENT}$ &  &  &  & -0.0071\\
  &  &  &  & (-0.67)\\
-$\log(\text{TNA})$ & -0.0042*** & -0.0042*** & -0.0057*** & -0.0043***\\
- & (-8.57) & (-8.47) & (-8.40) & (-8.61)\\
-$\log(\text{Age})$ & -0.0111*** & -0.0109*** & -0.0139*** & -0.0110***\\
- & (-7.84) & (-7.61) & (-6.33) & (-7.64)\\
-Return volatility & -0.0273 & -0.0266 & -0.1021*** & -0.0336\\
- & (-1.08) & (-1.05) & (-2.70) & (-1.31)\\
-Style flow & 0.0994*** & 0.0993*** & 0.0979*** & 0.0952***\\
- & (3.67) & (3.66) & (2.78) & (3.52)\\
+$\log(\text{TNA})$ & -0.0036*** & -0.0036*** & -0.0049*** & -0.0036***\\
+ & (-8.01) & (-7.89) & (-7.90) & (-8.04)\\
+$\log(\text{Age})$ & -0.0108*** & -0.0106*** & -0.0136*** & -0.0107***\\
+ & (-7.73) & (-7.53) & (-6.25) & (-7.56)\\
+Return volatility & -0.0245 & -0.0238 & -0.0966*** & -0.0307\\
+ & (-0.98) & (-0.95) & (-2.59) & (-1.21)\\
+Style flow & 0.1018*** & 0.1017*** & 0.1016*** & 0.0977***\\
+ & (3.60) & (3.59) & (2.75) & (3.46)\\
 \midrule
 Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
-$N$ & 235,274 & 235,274 & 170,268 & 235,274\\
-$R^2$ (within) & 0.026 & 0.026 & 0.029 & 0.027\\
-Joint test ($\chi^2_3$, $p$) & -- & 10.40 (0.015) & 0.42 (0.935) & 6.85 (0.077)\\
-Loser-end test ($z$, 1-sided $p$) & -- & z=+1.96 (p=0.975) & z=-0.06 (p=0.475) & z=+1.74 (p=0.959)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=-0.21 (p=0.583) & z=+0.29 (p=0.387) & z=-0.27 (p=0.605)\\
+$N$ & 232,800 & 232,800 & 168,488 & 232,800\\
+$R^2$ (within) & 0.028 & 0.028 & 0.031 & 0.028\\
+Joint test ($\chi^2_3$, $p$) & -- & 11.33 (0.010) & 0.49 (0.921) & 7.52 (0.057)\\
+Loser-end test ($z$, 1-sided $p$) & -- & z=+2.16 (p=0.984) & z=-0.18 (p=0.429) & z=+1.90 (p=0.971)\\
+Asymmetry ($z$, 1-sided $p$) & -- & z=-0.50 (p=0.693) & z=+0.36 (p=0.359) & z=-0.52 (p=0.700)\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns. State variable in column (2) is $D^{MD,Det}_t$ (= 1 if the residual of $\log$(MD/MCAP) on a linear time trend is in the top 34\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\text{INV-PCR}}_t$ (= 1 in the bottom 34\% of the CBOE equity put-call ratio: high call-to-put = high illusion of control). Column (4) is the discriminant specification: it includes both $D^{MD,Det}_t$ and the Baker-Wurgler orthogonalised sentiment regime $D^{SENT}_t$ (= 1 if SENT$^\perp$ is in the top 34\%) with full rank interactions. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover) included but absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns. State variable in column (2) is $D^{MD,Det}_t$ (= 1 if the residual of $\log$(MD/MCAP) on a linear time trend is in the top 34\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\text{INV-PCR}}_t$ (= 1 in the bottom 34\% of the CBOE equity put-call ratio: high call-to-put = high illusion of control). Column (4) is the discriminant specification: it includes both $D^{MD,Det}_t$ and the Baker-Wurgler orthogonalised sentiment regime $D^{SENT}_t$ (= 1 if SENT$^\perp$ is in the top 34\%) with full rank interactions. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover) included but absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}

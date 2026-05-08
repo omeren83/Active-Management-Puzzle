@@ -1,5 +1,29 @@
 # =============================================================================
-# DESCRIPTIVE STATISTICS ??? LATEX TABLE OUTPUT (v2.2 ??? Sharpe added; panel switch)
+# DESCRIPTIVE STATISTICS - LATEX TABLE OUTPUT (v2.4 - BSW citation correction)
+#
+# v2.4 changes vs v2.3 (Family C audit follow-on):
+#   Table 2 footnote BSW citation corrected. The net-return-derivation
+#   convention (gross - ER/12) originates in Carhart (1997) and Wermers
+#   (2000), used throughout the literature including Pastor and Stambaugh
+#   (2002) and BSW (2010). BSW (2010) observe net returns from CRSP and
+#   derive gross by adding back ER/12; this pipeline observes gross only and
+#   derives net by subtracting ER/12. Same arithmetic, opposite direction.
+#   Citation now points to Carhart (1997) and Wermers (2000), the convention
+#   originators.
+#
+# v2.3 changes vs v2.2:
+#   - Figure 1 (fig_fund_flows): in-figure title, subtitle, and source caption
+#     removed. Only the y-axis label and the Active/Passive legend remain
+#     embedded in the PNG/PDF. Title and source description belong in the
+#     LaTeX caption so they are searchable, editable, and not rasterised.
+#   - Compatibility with data_import_and_cleaning.R v1.2: panels now carry
+#     excluded_perf and excluded_h3 boolean columns from Step 8c. This script
+#     does not need to filter them - it describes the analysis universe as
+#     produced by the cleaning pipeline. Users should be aware that the
+#     "Active vs Passive" rows in Tables 2-4 will show zero passives because
+#     PASSIVE_INDEX-flagged funds are dropped at source by Step 8c. If you
+#     want to describe pre-Step-8c counts you must reconstruct from raw data
+#     (or read the historical lipper.xlsx separately for Table 1 only).
 #
 # v2.2 changes vs v2.1:
 #   (1) Added annualised gross Sharpe ratio (fund-level time-series Sharpe,
@@ -302,7 +326,7 @@ fn_t2_base <- paste(
   "winsorised at the 1st/99th percentiles cross-sectionally.",
   "Flow is the \\\\textcite{SirriTufano1998} measure scaled by lagged TNA (\\\\%),",
   "winsorised at 1st/99th percentiles, with December excluded.",
-  "Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \\\\textcite{BarrasScailletWermers2010}.",
+  "Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \\\\textcite{Carhart1997} and \\\\textcite{Wermers2000}.",
   "Returns and flows are in \\\\%.",
   "Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns,",
   "$\\\\sqrt{12}\\\\cdot\\\\overline{r^{g}_{i,t}-r^{f}_{t}}/\\\\sigma(r^{g}_{i,t}-r^{f}_{t})$,",
@@ -565,33 +589,24 @@ p_flows <- ggplot(flow_ts, aes(x = date, colour = ap_group)) +
     breaks = pretty_breaks(n = 8)
   ) +
   labs(
-    title    = "Average Monthly Proportional Fund Flows: Active vs. Passive Funds",
-    subtitle = "Bold line: 12-month centred rolling mean.  Faint line: raw monthly cross-sectional mean.",
+    # v2.3: title, subtitle, and source caption moved to the LaTeX
+    # \caption{} block so they are searchable, editable, and not
+    # rasterised into the PNG. Only the y-axis label and the
+    # Active/Passive legend remain in the figure itself.
+    title    = NULL,
+    subtitle = NULL,
+    caption  = NULL,
     x        = NULL,
-    y        = "Mean Proportional Flow (\\% of Lagged TNA)",
-    caption  = str_wrap(paste(
-      "Source: LSEG Workspace. Sample: panel_master,",
-      format(min(flow_ts$date), "%B %Y"), "to",
-      format(date_max_data, "%B %Y"),
-      "(full history, no date restrictions applied).",
-      "Proportional flow computed following Sirri and Tufano (1998),",
-      "scaled by lagged TNA, winsorised at the 1st and 99th percentiles.",
-      "December observations excluded. Unknown-classified funds excluded."
-    ), width = 110)
+    y        = "Mean Proportional Flow (% of Lagged TNA)"
   ) +
   theme_classic(base_size = 11) +
   theme(
-    plot.title       = element_text(face = "bold", size = 11),
-    plot.subtitle    = element_text(size = 8.5, colour = "grey40",
-                                    margin = margin(b = 6)),
-    plot.caption     = element_text(size = 7.5, colour = "grey45",
-                                    hjust = 0, margin = margin(t = 8)),
-    axis.title.y     = element_text(size = 9, margin = margin(r = 6)),
-    axis.text        = element_text(size = 8.5),
-    legend.position  = c(0.88, 0.90),
-    legend.background = element_rect(fill = "white", colour = NA),
-    legend.key.width  = unit(1.6, "cm"),
-    legend.text       = element_text(size = 9),
+    axis.title.y       = element_text(size = 9, margin = margin(r = 6)),
+    axis.text          = element_text(size = 8.5),
+    legend.position    = c(0.88, 0.90),
+    legend.background  = element_rect(fill = "white", colour = NA),
+    legend.key.width   = unit(1.6, "cm"),
+    legend.text        = element_text(size = 9),
     panel.grid.major.y = element_line(colour = "grey90", linewidth = 0.3),
     panel.grid.major.x = element_blank(),
     plot.margin        = margin(10, 14, 8, 8)

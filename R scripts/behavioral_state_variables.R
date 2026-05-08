@@ -1,5 +1,13 @@
-# behavioral_state_variables.R                                            v1.1
+# behavioral_state_variables.R                                            v1.2
 # =============================================================================
+# v1.2 changes (Family E pre-defense audit):
+#   - No code changes. This script builds the time-series of behavioral
+#     state variables (sentiment, VIX, SKEW, PCR, AAII, UMCSENT, margin
+#     debt) from the Sentiment sheet of fund_data.xlsx. It does not consume
+#     the fund-level panel (panel_master / panel_incubation / panel_trimmed)
+#     and is therefore unaffected by the flagged_funds.xlsx Step 8c
+#     exclusion ledger. Audit-stamp bump only.
+#
 # v1.1 changes vs v1.0:
 #   - Added MD_DETREND  = residual of OLS regression of log(MD_RATIO) on a
 #     linear time trend, following Daniel-Klos-Pollet (2016 NYU Stern WP) and

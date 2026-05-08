@@ -1,5 +1,20 @@
 # =============================================================================
-# PERSISTENCE TESTING                                                      v1.0
+# PERSISTENCE TESTING                                                      v1.1
+#
+# Changes from v1.0 (Family D pre-defense audit):
+#   - Performance-comparison subsample filter added to the panel-prep stage:
+#     ap <- panel_incubation %>% filter(!excluded_perf) %>% rename(...) %>% ...
+#     Per the flagged_funds.xlsx exclusion ledger wired in by
+#     data_import_and_cleaning.R v1.2 Step 8c, persistence testing is a
+#     performance-comparison exercise and therefore must restrict to the
+#     !excluded_perf subsample. Without this filter, funds in the "Exclude
+#     from Perf Comparison" sheet (data errors, daily-reset leveraged
+#     products, sector funds, etc.) would contaminate decile cutoffs and
+#     pooled holding-period decile alphas.
+#   - Sample-source sentence in fn_text footnote updated to append
+#     "performance-comparison subsample per flagged\_funds.xlsx".
+#
+# v1.0 (original):
 #
 # Carhart (1997) parametric + Kosowski, Timmermann, Wermers & White (2006,
 # hereafter KTWW) bootstrap persistence tests on 36-month formation /
@@ -267,7 +282,10 @@ if (!exists("panel_incubation"))
        "(and flow_calculation.R) first.")
 
 # Active funds only, gross returns, per methodology Section 2.3.
+# v1.1: filter(!excluded_perf) restricts to the performance-comparison
+# subsample (flagged_funds.xlsx Step 8c).
 ap <- panel_incubation %>%
+  filter(!excluded_perf) %>%
   rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF,
          exp_r  = Expense_Ratio) %>%
   mutate(excess_ret = ret_gross - rf,
@@ -995,7 +1013,8 @@ fn_text <- paste(
   "Significance stars on $\\hat{\\alpha}$ and factor loadings reflect",
   "Newey-West $t$-statistics: $^{*}$, $^{**}$, $^{***}$ at 10\\%, 5\\%, 1\\%.",
   "Sample: Active funds in the \\textcite{Evans2010}-corrected",
-  "panel\\_incubation, Jan 1995--Feb 2026. Panel D uses a single cohort",
+  "panel\\_incubation, Jan 1995--Feb 2026; performance-comparison subsample",
+  "per flagged\\_funds.xlsx. Panel D uses a single cohort",
   "(12 months) and should be interpreted with caution."
 )
 

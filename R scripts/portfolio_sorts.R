@@ -1,5 +1,23 @@
 # =============================================================================
-# PORTFOLIO SORTS ??? Size, Momentum, Fee Quintiles                          v1.3
+# PORTFOLIO SORTS — Size, Momentum, Fee Quintiles                            v1.4
+#
+# Changes from v1.3 (Family D pre-defense audit):
+#   - Performance-comparison subsample filter added to the panel-prep stage:
+#     port_base <- panel_incubation %>% filter(!excluded_perf) %>% ...
+#     Per the flagged_funds.xlsx exclusion ledger wired in by
+#     data_import_and_cleaning.R v1.2 Step 8c, the performance/portfolio-sorts
+#     scripts must restrict to the !excluded_perf subsample so that funds
+#     flagged in the "Exclude from Perf Comparison" sheet do not contaminate
+#     quintile cutoffs or the Q5-Q1 spread alphas. Mirrors the v2.7 fix in
+#     alpha_estimation.R, the v1.3 fix in FF_comparison.R, and the v1.5 fix
+#     in subperiod_analysis.R.
+#   - factors_ts pull (line 265 region) is left unfiltered because it takes
+#     distinct(date, MKT_RF, ..., RF), and these factor values are constant
+#     within a date across the fund cross-section. Filtering would not change
+#     the factor matrix; skipping the filter avoids a redundant pass.
+#   - Sample-source sentence in fn_d1, fn_d2, and fn_base footnotes appended
+#     with "performance-comparison subsample per flagged\_funds.xlsx" to match
+#     the convention adopted in alpha_reporting.R v8.4 and FF_comparison.R v1.4.
 #
 # Changes from v1.2:
 #   - Panel switch: source panel is now panel_incubation (Evans 2010 36-month
@@ -268,6 +286,7 @@ factors_ts <- panel_incubation %>%
   arrange(date)
 
 port_base <- panel_incubation %>%
+  filter(!excluded_perf) %>%      # v1.4: performance-comparison subsample
   filter(ap_group %in% c("Active", "Passive")) %>%
   arrange(Ticker, date) %>%
   group_by(Ticker) %>%
@@ -522,7 +541,8 @@ fn_d1 <- paste(
   # a line-break (\\) followed by literal text "textit{...}" — visible artefact.
   "equal-weighted \\textit{gross} excess return,",
   "$\\sqrt{12}\\cdot\\overline{r^{EW,g}_{q,t}-r^{f}_{t}}/\\sigma(r^{EW,g}_{q,t}-r^{f}_{t})$.",
-  "Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
+  "performance-comparison subsample per flagged\\_funds.xlsx."
 )
 
 lt_d1 <- d1_data %>%
@@ -598,7 +618,8 @@ fn_d2 <- paste(
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",
   "Newey-West $t$-statistics (6-month lag) in parentheses.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\% respectively.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
+  "performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
 # linesep="" suppresses kableExtra's default \addlinespace[0.3em] after every
@@ -763,7 +784,8 @@ fn_base <- paste(
   "EW: equal-weighted; VW: lagged-TNA-weighted.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\% respectively.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
+  "performance-comparison subsample per flagged\\_funds.xlsx."
 )
 
 fn_d3 <- paste(fn_base,
@@ -797,4 +819,4 @@ cat("Written: table_port_size_alpha.tex\n")
 cat("Written: table_port_mom_alpha.tex\n")
 cat("Written: table_port_fee_alpha.tex\n")
 
-cat("\n[SUCCESS] portfolio_sorts.R v1.2 complete.\n")
+cat("\n[SUCCESS] portfolio_sorts.R v1.4 complete.\n")

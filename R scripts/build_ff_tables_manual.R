@@ -1,5 +1,17 @@
 # =============================================================================
-# MANUAL FF TABLES BUILDER                                                  v1.1
+# MANUAL FF TABLES BUILDER                                                  v1.2
+#
+# v1.2 change vs v1.1 (Family B audit + Family C follow-on):
+#   (a) SAMPLE_LABEL extended to acknowledge the performance-comparison subsample
+#       filter applied upstream by FF_comparison.R v1.3. No code-path change; the
+#       extended label flows through the existing footnote concatenations in
+#       Sections 1, 4, and 7. Tables 7, 9, 11 FF inherit the updated label
+#       automatically.
+#   (b) BSW (2010) net-return citation in Table 7 FF footnote (line 183)
+#       corrected. Convention attributed to Carhart (1997) and Wermers (2000),
+#       the originators; BSW (2010) shares the arithmetic but applies it in
+#       the reverse direction. Same fix as alpha_reporting.R v8.3 line 325
+#       and FF_comparison.R v1.3 line 565.
 #
 # v1.1 change vs v1.0:
 #   Section 3 (Table 7 FF, file table_perf_aggregate_FF.tex) rewritten to
@@ -42,7 +54,7 @@ bsw_df       <- read_excel("bootstrap_results_FF.xlsx", sheet = "bsw_decompositi
 bsw_meta     <- read_excel("bootstrap_results_FF.xlsx", sheet = "bsw_meta")
 alpha_agg    <- read_excel("portfolio_alphas_FF.xlsx")
 
-SAMPLE_LABEL <- "Jan 1995--Sep 2006 (Fama--French 2010 subperiod)"
+SAMPLE_LABEL <- "Jan 1995--Sep 2006 (Fama--French 2010 subperiod), performance-comparison subsample per flagged\\_funds.xlsx"
 
 # =============================================================================
 # 2. FORMATTING HELPERS
@@ -173,7 +185,7 @@ t7_tex <- c(
     "VW: value-weighted portfolio with lagged TNA weights ",
     "$w_{i,t-1} = \\text{TNA}_{i,t-1} / \\sum_j \\text{TNA}_{j,t-1}$. ",
     "Net returns are computed as gross returns less one-twelfth of the static ",
-    "annual expense ratio each month, following \\textcite{BarrasScailletWermers2010}. ",
+    "annual expense ratio each month, following \\textcite{Carhart1997} and \\textcite{Wermers2000}. ",
     "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; ",
     "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\%. ",
     "$N$: unique funds contributing to the portfolio series; ",

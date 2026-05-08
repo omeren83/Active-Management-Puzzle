@@ -1,6 +1,33 @@
 # =============================================================================
 # STRUCTURAL BREAK TEST: BAI-PERRON ON ROLLING ACTIVE FUND ALPHA SERIES
-# structural_break_test.R  (v1.0)
+# structural_break_test.R  (v1.2)
+#
+# v1.2 changes vs v1.1 (figure inline-text strip):
+#   fig_breaktest inline narrative text stripped per project-wide convention.
+#   Figure title, subtitle (Bai-Perron methodology metadata), and source
+#   caption (line/colour legend, HAC details) all moved to the LaTeX
+#   \caption{} block in dissertation_main.tex. Only the y-axis label,
+#   x-axis date scale, and the in-figure break-date markers (geom_text
+#   labels added when has_breaks) remain in the PNG itself. The break-date
+#   markers are the one piece of "narrative" that stays in-figure because
+#   they pin specific dates to specific positions on the time axis - no
+#   amount of LaTeX caption can substitute for that.
+#
+# v1.1 changes vs v1.0 (Family C audit):
+#   No code change. This script reads alpha_rolling.xlsx (produced by
+#   alpha_estimation.R), and that input now reflects the v2.7 panel-prep
+#   filter filter(!excluded_perf), so the rolling alpha series itself is
+#   computed on the performance-comparison subsample defined by
+#   flagged_funds.xlsx. The Bai-Perron break dates produced by this script
+#   therefore implicitly inherit the new sample definition.
+#
+#   IMPORTANT: After re-running alpha_estimation.R v2.7, the existing
+#   subperiod_analysis.R SUBPERIODS thresholds (Jan 2006, Nov 2011) become
+#   stale because the rolling alpha series itself shifts. This script must
+#   be re-run BEFORE subperiod_analysis.R, and the new break dates pasted
+#   into SUBPERIODS$P1$date_hi and SUBPERIODS$P2$date_hi (and the panel /
+#   window / months strings updated accordingly). subperiod_analysis.R v1.5
+#   enforces this with a hard stop on the panel_trimmed-era thresholds.
 #
 # PURPOSE:
 #   Formally tests for structural breaks in the monthly cross-sectional mean
@@ -314,21 +341,17 @@ p_break <- ggplot(alpha_ts_raw, aes(x = date)) +
   scale_x_date(date_breaks = "5 years", date_labels = "%Y") +
   theme_classic(base_size = 11) +
   labs(
-    title    = "Structural Break Test: Active Fund Rolling Gross Alpha",
-    subtitle = paste0(
-      "Bai-Perron (1998, 2003) | Optimal breaks by BIC: ", n_optimal,
-      " | Minimum segment: ", MIN_SEG_MONTHS, " months"
-    ),
-    y       = "Annualized Gross Alpha (%)",
-    x       = NULL,
-    caption = paste0(
-      "Blue line: 12-month trailing mean of cross-sectional EW mean rolling alpha (matches Figure 2). ",
-      "Red step: regime-mean alpha per Bai-Perron segment. ",
-      if (has_breaks) paste0("Dashed red verticals: BP break-date estimates. ",
-                             "Shaded bands: 95% confidence intervals with Newey-West HAC (lag = ", nw_lag, " months). ")
-      else "",
-      "Break test applied to the raw (unsmoothed) monthly series."
-    )
+    # v1.2: title, subtitle, and source caption moved to the LaTeX
+    # \caption{} block. Only the y-axis label and the in-figure
+    # break-date markers (added below as geom_text when has_breaks)
+    # remain in the figure itself. The break-date text labels are
+    # essential because they identify regime transitions on the
+    # plot directly; the LaTeX caption can describe them in prose.
+    title    = NULL,
+    subtitle = NULL,
+    caption  = NULL,
+    y        = "Annualized Gross Alpha (%)",
+    x        = NULL
   ) +
   theme(
     plot.caption = element_text(size = 7.5, colour = "grey45",

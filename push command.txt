@@ -1,1 +1,0 @@
-cd /d "D:\TEZ" && git add -A && git commit -m "YOUR MESSAGE HERE" && git push

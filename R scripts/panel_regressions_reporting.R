@@ -1,4 +1,13 @@
-# panel_regressions_reporting.R                                        v1.0
+# panel_regressions_reporting.R                                        v1.1
+# =============================================================================
+# v1.1 changes (Family E pre-defense audit):
+#   - No code changes. This script consumes pre-saved H1_models / H2_models /
+#     H3_models / H4_models objects (or the corresponding .rds files) and
+#     does not touch the fund-month panel directly. The exclusion-ledger
+#     filtering applied in the upstream H1-H4 scripts (per Family E v3.1 /
+#     v2.1 audit) is inherited automatically. Audit-stamp bump only.
+#
+# v1.0 (original):
 # =============================================================================
 # Assembles a dissertation-ready summary of the four behavioral hypothesis
 # tests produced by H1-H4 scripts. Reads test results from H1_models /

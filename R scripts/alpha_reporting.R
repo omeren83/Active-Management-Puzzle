@@ -1,5 +1,51 @@
 # =============================================================================
-# PERFORMANCE REPORTING: TABLES 5-10b AND FIGURES 2-3 (v8.1)
+# PERFORMANCE REPORTING: TABLES 5-10b AND FIGURES 2-3 (v8.4)
+#
+# v8.4 changes vs v8.3 (figure inline-text strip):
+#   Figure 2 (fig_rolling_alphas) and Figure 3 (fig_luck_vs_skill_combined)
+#   inline narrative text stripped per project-wide convention. All
+#   non-essential text (titles, subtitles, source captions, sample
+#   descriptions, methodology paragraphs) moved to the LaTeX \caption{}
+#   block in dissertation_main.tex so it is searchable, editable, and not
+#   rasterised into the PNG. Each figure now retains only:
+#     - axis labels (essential: identifies the variable plotted)
+#     - legend entries (essential: identifies series/groups)
+#     - Panel A / Panel B identifiers in Figure 3 (essential: structural
+#       reference handles for the LaTeX caption to point at)
+#   plot_annotation() removed entirely from Figure 3 (its overall title
+#   and methodology subtitle were both narrative). The N(0,1) dashed-line
+#   subtitle in Panel B is now described in the LaTeX caption.
+#
+# v8.3 changes vs v8.2 (Family C audit follow-on):
+#   (a) Backslash-escaping fix: 5 of the 7 footnote strings introduced in
+#       v8.2 used 2 source backslashes for "flagged\_funds.xlsx", which
+#       kableExtra threeparttable=TRUE strips to 1, breaking the LaTeX
+#       underscore escape and rendering the filename as "flagged_funds.xlsx"
+#       (with _ interpreted as math-mode subscript). Per the convention
+#       documented at line 528 of this script, kableExtra footnotes require
+#       4 source backslashes for any LaTeX command. Fixed at lines 331,
+#       424, 534, 636, 737. The two ggplot2 caption strings (Figures 2
+#       and 3 at lines 485, 847) are NOT kableExtra footnotes; they are
+#       passed directly to the graphics device which has no LaTeX
+#       interpretation, so the underscore is left unescaped.
+#   (b) BSW (2010) citation correction at line 325. The net-return-derivation
+#       convention (gross - ER/12) originates in Carhart (1997) and Wermers
+#       (2000) and is shared with BSW (2010), but applied in the opposite
+#       direction (BSW observe net and derive gross; this pipeline observes
+#       gross and derives net). Citation now points to the convention's
+#       originators. Same correction was applied to data_cleaning_methodology.docx
+#       in Family A and now propagated here.
+#
+# v8.2 changes vs v8.1 (Family B audit):
+#   Six footnote strings updated (Table 7, Table 8, Figure 2, Table 6 fn_t9,
+#   Table 7 BSW, Table 8 BSW) to acknowledge that the upstream pipeline now
+#   filters on the performance-comparison subsample defined by
+#   flagged_funds.xlsx. The phrasing appended is "performance-comparison
+#   subsample per flagged_funds.xlsx" wherever the prior label
+#   "Incubation-corrected panel (Evans 2010); no date cap" appeared. No
+#   panel-level computation is performed in this script (it reads the xlsx
+#   outputs of alpha_estimation.R and aggregate_alphas.R), so the structural
+#   change is upstream; only the descriptive footnotes are touched here.
 #
 # v8.1 changes vs v8.0:
 #   Footnote correction across Tables 5, 6, 7, 8 and Figures 2, 3: the
@@ -311,13 +357,13 @@ fn_t7 <- paste(
   "$1/N_t$). VW: value-weighted portfolio with lagged TNA weights",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
   "Net returns are computed as gross returns less one-twelfth of the static",
-  "annual expense ratio each month, following \\\\textcite{BarrasScailletWermers2010}.",
+  "annual expense ratio each month, following \\\\textcite{Carhart1997} and \\\\textcite{Wermers2000}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
   "$T$: number of monthly observations in the regression.",
   "The Active + Passive row aggregates only the two classified groups.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
 latex_t7 <- t7_display %>%
@@ -410,7 +456,7 @@ fn_t8 <- paste(
   "net returns because the static annual expense ratio used to derive net",
   "returns introduces a class-specific approximation error that would",
   "contaminate the style-class breakdown.",
-  "Sample: Incubation-corrected panel (Evans 2010); no date cap."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
 latex_t8 <- t8_display %>%
@@ -466,27 +512,18 @@ p_alpha <- ggplot(alpha_ts, aes(x = date, y = alpha_ann, color = ap_group)) +
   scale_y_continuous(labels = label_number(suffix = "%")) +
   theme_classic(base_size = 11) +
   labs(
-    title    = "Rolling Aggregate Gross Alpha: Active vs. Passive Portfolios",
-    subtitle = "36-month rolling Carhart (1997) four-factor regression on equal-weighted portfolio returns",
+    # v8.4: title, subtitle, and source caption moved to the LaTeX
+    # \caption{} block so they are searchable, editable, and not
+    # rasterised into the PNG. Only the y-axis label and the
+    # Active/Passive legend remain in the figure itself.
+    title    = NULL,
+    subtitle = NULL,
+    caption  = NULL,
     y        = "Annualized Alpha (%)",
-    x        = NULL,
-    caption  = str_wrap(paste(
-      "Source: LSEG Workspace. Sample: Incubation-corrected panel (Evans 2010), no date cap;",
-      "Unknown-classified funds excluded.",
-      "Each month t, the aggregate gross return of each group is computed as the",
-      "equal-weighted average of all funds alive in month t. This portfolio return",
-      "series is then regressed on the Carhart (1997) four-factor model (market,",
-      "SMB, HML, MOM) over a 36-month trailing window; the plotted value is the",
-      "regression intercept multiplied by 12. Following Fama & French (2010),",
-      "this is a portfolio-level regression rather than a cross-sectional average",
-      "of per-fund alphas. Passive fund alphas reflect benchmark-mismatch residuals",
-      "rather than managerial underperformance; see Roll (1977) and Table 7 footnote."
-    ), width = 120)
+    x        = NULL
   ) +
   theme(
-    legend.position = "bottom",
-    plot.caption    = element_text(size = 7.5, colour = "grey45",
-                                   hjust = 0, margin = margin(t = 8))
+    legend.position = "bottom"
   )
 
 ggsave("fig_rolling_alphas.png", plot = p_alpha, width = 7.5, height = 4.2, dpi = 300)
@@ -520,7 +557,7 @@ boot_tab <- boot_summary %>%
 # i.e. \\\\X in R source. Plain text, $...$, and {,} are unaffected.
 fn_t9 <- paste(
   "Bootstrap procedure follows \\\\textcite{FamaFrench2010}.",
-  "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap),",
+  "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\\\\_funds.xlsx,",
   paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
   "For each fund, estimated monthly alpha is subtracted from the excess return",
   "series to construct a zero-alpha null return.",
@@ -622,7 +659,7 @@ fn_t10 <- paste(
   "the density of p-values in $(\\\\lambda, 1]$ provides a conservative estimate",
   "of the zero-alpha proportion, bounded above at 1.",
   paste0("Sample: actively managed funds ($N = ", total_n, "$),"),
-  "Incubation-corrected (Evans 2010) panel, no date cap.",
+  "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx.",
   "Passive and Unknown-classified funds are excluded.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
   "implied by this estimate is reported in Table~\\\\ref{tab:bsw_decomposition}."
@@ -723,7 +760,7 @@ fn_t10b <- paste(
   "when truly skilled funds exist, so $T^+_\\\\gamma$ values are lower bounds.",
   "All quantities are percentages of the active-fund universe.",
   paste0("Sample: $N = ", total_n, "$ actively managed funds,"),
-  "Incubation-corrected (Evans 2010) panel, no date cap; Passive and Unknown funds excluded."
+  "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx; Passive and Unknown funds excluded."
 )
 
 BSW_BOLD_ROW <- 4L   # gamma = 0.20 is the 4th row of the grid
@@ -814,29 +851,12 @@ p_pdf <- ggplot() +
   scale_fill_manual(values = c("Actual Distribution" = "#2166AC")) +
   theme_classic(base_size = 10) +
   labs(title    = "Panel B: Probability Density (PDF)",
-       subtitle = "Dashed line: theoretical N(0,1) null",
        y = "Density",
        x = expression(italic(t)*"-Statistic of "*hat(alpha))) +
   theme(legend.position = "bottom", legend.title = element_blank()) +
   coord_cartesian(xlim = c(-4, 4))
 
-combined_plot <- (p_cdf / p_pdf) +
-  plot_annotation(
-    title    = expression("Cross-Sectional Distribution of Alpha "*italic(t)*"-Statistics"),
-    subtitle = paste0(
-      "Estimated \u03c0\u2080: ", formatC(pi_0_val * 100, format = "f", digits = 1), "%. ",
-      "Panel A: empirical CDF of active-fund t-statistics (blue) vs. bootstrap-derived ",
-      "zero-skill null (black), constructed by resampling calendar months with replacement ",
-      "following Fama and French (2010, JF). ",
-      "Panel B: kernel density of actual t-statistics vs. the theoretical N(0,1) null (dashed). ",
-      "The N(0,1) reference serves as a visual benchmark for the no-skill hypothesis under ",
-      "normality; the bootstrap null in Panel A is the inferentially appropriate comparison ",
-      "and accounts for cross-sectional dependence, fat tails, and finite-sample estimation ",
-      "error. Percentile-level bootstrap comparisons are reported in Table 9. ",
-      "Sample: actively managed funds in the Incubation-corrected (Evans 2010) panel ",
-      "(N = ", n_active_bs, " funds with \u226524 monthly observations)."
-    )
-  )
+combined_plot <- (p_cdf / p_pdf)
 
 ggsave("fig_luck_vs_skill_combined.png", plot = combined_plot,
        width = 7.5, height = 8, dpi = 300)

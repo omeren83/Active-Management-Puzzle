@@ -1,4 +1,14 @@
-# H4_fee_elasticity.R                                                  v2.0
+# H4_fee_elasticity.R                                                  v2.1
+# =============================================================================
+# v2.1 changes vs v2.0 (Family E pre-defense audit):
+#   - No filter change. Per data_import_and_cleaning.R Step 8c convention,
+#     Entire-Analysis exclusions in flagged_funds.xlsx are dropped from the
+#     source panel; H4 fee-elasticity identification operates on the
+#     resulting full universe and does not need filter(!excluded_perf) or
+#     filter(!excluded_h3).
+#   - Sample-source phrasing added to fn_primary, fn_lagged, fn_robust.
+#
+# v2.0 (May 2026):
 # =============================================================================
 # Tests H4 (Fee Elasticity / Berk-Green) under three specifications and writes
 # three .tex tables (PRIMARY, LAGGED timing-robustness, FE robustness).
@@ -9,7 +19,7 @@
 # style-month aggregates and leaves cross-fund expense-ratio variation
 # intact).
 #
-# v2.0 changes (May 2026):
+# v2.0 changelog:
 #   - PRODUCE_LAGGED default flipped to TRUE. Closes the asymmetry with
 #     Appendix F.1 (which already contains lagged H1, H2, H3).
 #   - Lower-order R^q x STATE (kappa_q) and R^q x ExpRatio (phi_q) coefficients
@@ -458,7 +468,10 @@ fn_primary <- paste0(
   "the fee interactions. Standard errors two-way clustered on Ticker and ",
   "calendar month (Petersen 2009). The joint $\\\\chi^2_4$ test covers all four ",
   "fee-amplified-sentiment terms ($\\\\delta_F$ and the three $\\\\delta^F_q$). ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 cap_lagged <- paste0(
@@ -474,7 +487,10 @@ fn_lagged <- paste0(
   "columns (2)--(4) are lagged one period. ExpRatio enters at $t$ (= $t-1$ ",
   "= constant). Standard errors two-way clustered on Ticker and calendar ",
   "month (Petersen 2009). ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 cap_robust <- paste0(
@@ -495,7 +511,10 @@ fn_robust <- paste0(
   "identification. Standard errors two-way clustered on Ticker and ",
   "calendar month (Petersen 2009). The joint $\\\\chi^2_4$ test covers all ",
   "four fee-amplified-sentiment terms. ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{SENT}_{t-1}$" = 1,

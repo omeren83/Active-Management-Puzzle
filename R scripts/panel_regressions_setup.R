@@ -1,4 +1,27 @@
-# panel_regressions_setup.R                                              v1.1
+# panel_regressions_setup.R                                              v1.3
+# =============================================================================
+# v1.3 changes vs v1.2 (Family E pre-defense audit):
+#   - Default PANEL_CHOICE switched from "trimmed" to "incubation". This
+#     aligns the H1-H4 behavioral panel regressions with the rest of the
+#     dissertation, which migrated to panel_incubation (Evans 2010 36-month
+#     incubation correction, no date cap) some time ago. panel_trimmed
+#     remains selectable for robustness checks.
+#   - excluded_perf and excluded_h3 boolean flag columns from
+#     data_import_and_cleaning.R Step 8c (flagged_funds.xlsx ledger) are
+#     now preserved through the transmute and carried into panel_reg.
+#     This lets H3-channel scripts (H3_lottery_demand.R, psychological_premium.R)
+#     apply filter(!excluded_h3) at panel-prep stage. Behavioral H1, H2, H4
+#     scripts ignore these flags (Entire-Analysis exclusions already applied
+#     at source, no further filter needed).
+#   - Pre-flight check added: if the source panel lacks excluded_perf /
+#     excluded_h3, the script errors with an instruction to re-run
+#     data_import_and_cleaning.R v1.2+ Step 8c. No silent fallback.
+#
+# v1.2 changes (inline patch, May 2026):
+#   - Lagged-sentiment columns added at end of script (suffix _lag), per
+#     Huang, Jiang, Tu, and Zhou (2015, RFS) timing convention.
+#
+# v1.1 (original):
 # =============================================================================
 # Builds panel_reg: the regression-ready fund-month panel consumed by the
 # four hypothesis-test scripts (H1-H4) of behavioral panel regressions
@@ -68,9 +91,13 @@ suppressPackageStartupMessages({
 })
 
 # --- 0. Config ---------------------------------------------------------------
-PANEL_CHOICE <- "trimmed"   # "trimmed" | "incubation" | "master"
-SUBSET       <- "active"    # "active"  | "passive"   | "all"
-MIN_CAT_SIZE <- 5L          # min funds per (date, Lipper_Category) for rank
+# v1.3: default panel switched from "trimmed" to "incubation" to align with
+# the rest of the dissertation (alpha_estimation.R, FF_comparison.R,
+# subperiod_analysis.R, persistence_testing.R, activeness_analysis.R have
+# all been on panel_incubation since the Evans-2010 migration).
+PANEL_CHOICE <- "incubation"  # "incubation" (default) | "trimmed" | "master"
+SUBSET       <- "active"      # "active"  | "passive"   | "all"
+MIN_CAT_SIZE <- 5L            # min funds per (date, Lipper_Category) for rank
 
 if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 ALPHA_ROLLING_FILE <- file.path(WORKING_DIR, "alpha_rolling.xlsx")
@@ -102,6 +129,18 @@ missing_cols <- setdiff(required, names(panel))
 if (length(missing_cols)) {
   stop("Missing required column(s) in ", panel_obj_name, ": ",
        paste(missing_cols, collapse = ", "))
+}
+
+# v1.3: flagged_funds.xlsx Step 8c flags must be present so downstream
+# H3-channel scripts can apply filter(!excluded_h3). Behavioral H1/H2/H4
+# scripts ignore these flags but they are preserved in panel_reg for audit.
+required_flags <- c("excluded_perf", "excluded_h3")
+missing_flags  <- setdiff(required_flags, names(panel))
+if (length(missing_flags)) {
+  stop("Missing flagged_funds.xlsx Step 8c flag(s) in ", panel_obj_name, ": ",
+       paste(missing_flags, collapse = ", "),
+       ". Re-run data_import_and_cleaning.R (v1.2 or later) so that the ",
+       "flagged_funds.xlsx exclusion ledger is wired into the source panel.")
 }
 
 # --- 3. Filter to fund subset ------------------------------------------------
@@ -310,7 +349,10 @@ panel_reg <- panel %>%
     AAII_BB, UMCSENT, MD_RATIO, DMD_YOY, MD_DETREND,
     D_SENT, D_PLS, D_VIX, D_SKEW, D_PCR,
     D_MD, D_MD_LEVEL, D_MD_DETREND,
-    D_AAII, D_UMCSENT
+    D_AAII, D_UMCSENT,
+    # v1.3: flagged_funds.xlsx Step 8c flags carried through so that
+    # H3-channel scripts can apply filter(!excluded_h3).
+    excluded_perf, excluded_h3
   )
 
 # --- 14. Diagnostics ---------------------------------------------------------

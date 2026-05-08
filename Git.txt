@@ -1,0 +1,11 @@
+PUSH 
+cd /d "D:\TEZ"  
+git status
+
+git add -A  
+git commit -m "Dissertation draft 1.0, dissertation_main and bib file are updated"  
+git push
+
+PULL
+cd /d "D:\TEZ"
+git pull

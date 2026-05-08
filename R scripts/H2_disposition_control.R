@@ -1,4 +1,14 @@
-# H2_disposition_control.R                                              v3.0
+# H2_disposition_control.R                                              v3.1
+# =============================================================================
+# v3.1 changes vs v3.0 (Family E pre-defense audit):
+#   - No filter change. Per data_import_and_cleaning.R Step 8c convention,
+#     Entire-Analysis exclusions in flagged_funds.xlsx are dropped from the
+#     source panel; H2 disposition / illusion-of-control identification
+#     operates on the resulting full universe and does not need
+#     filter(!excluded_perf) or filter(!excluded_h3).
+#   - Sample-source phrasing added to fn_primary, fn_lagged, fn_robust.
+#
+# v3.0 (original):
 # =============================================================================
 # Tests H2 (Disposition / Illusion-of-Control) under three specifications and
 # writes three .tex tables. All specifications share aligned samples so
@@ -410,7 +420,10 @@ fn_primary <- paste0(
   "absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt ",
   "sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard ",
   "errors two-way clustered on Ticker and calendar month (Petersen 2009). ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 cap_lagged <- paste0(
@@ -426,7 +439,10 @@ fn_lagged <- paste0(
   "$D^{\\\\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with ",
   "$D^{MD,Det}_{t-1}$ and $D^{SENT}_{t-1}$. Standard errors two-way ",
   "clustered on Ticker and calendar month (Petersen 2009). ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 cap_robust <- paste0(
@@ -447,7 +463,10 @@ fn_robust <- paste0(
   "(Petersen 2009). The robustness of $\\\\delta^{MD}_1>0$ across both ",
   "identification strategies points toward a margin-call alternative ",
   "(Brunnermeier \\\\& Pedersen 2009) rather than disposition psychology. ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$."
+  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
+  "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
+  "at source."
 )
 
 hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{MD,Det}_{t-1}$" = 1,

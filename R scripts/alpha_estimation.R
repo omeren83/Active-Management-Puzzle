@@ -1,6 +1,25 @@
 # =============================================================================
 # ALPHA ESTIMATION, ROLLING REGRESSIONS, RANK CONSTRUCTION
-# AND FAMA-FRENCH (2010) BOOTSTRAP SIMULATION (v2.6 - panel switch)
+# AND FAMA-FRENCH (2010) BOOTSTRAP SIMULATION (v2.7 - Family B audit)
+#
+# v2.7 changes vs v2.6 (Family B audit):
+#   (a) filter(!excluded_perf) added to the ap panel-prep stage. This restricts
+#       full-period regressions, rolling regressions, rank construction, and
+#       the bootstrap+BSW decomposition to the performance-comparison subsample
+#       defined by flagged_funds.xlsx (sector funds, benchmark-mismatched
+#       products, and entire-analysis exclusions all removed). Per dissertation
+#       §4.7 the implied sample is approximately 3,179 funds pre-Evans, of
+#       which ~2,400 active are eligible after the per-spec MIN_OBS_FULL=24
+#       cut. Tables 5 (cross-sectional moments), 6 (bootstrap tails), 7
+#       (pi0), 8 (BSW decomposition), 9 (BSW gamma grid), and Figure 3
+#       (luck-vs-skill PDFs/CDFs) all change downstream.
+#   (b) Mean-TNA computation in run_full_period() corrected. v2.6 referenced
+#       d$tna which was NULL (the column is named class_assets/total_assets
+#       in panel_incubation; tna is added later by flow_calculation.R). The
+#       resulting NaN mean_tna in alpha_fullperiod.xlsx broke VW weights in
+#       build_robust_tables.R, requiring the patch_mean_tna.R workaround.
+#       v2.7 uses coalesce(class_assets, total_assets) directly. patch_mean_tna.R
+#       is no longer required and has been marked DEPRECATED.
 #
 # v2.6 change vs v2.5:
 #   Source panel switched from panel_trimmed (Evans-corrected, 1995-2023 cap)
@@ -79,13 +98,20 @@ LAMBDA_STOREY <- 0.5              # Storey (2002) tuning parameter
 # --- 1. DATA PREPARATION ---
 cat("=== 1. Data preparation ===\n")
 ap <- panel_incubation %>%
+  filter(!excluded_perf) %>%      # v2.7: performance-comparison subsample
   rename(mkt_rf = all_of(FACTOR_MKT), smb = all_of(FACTOR_SMB), hml = all_of(FACTOR_HML),
          mom = all_of(FACTOR_MOM), rf = all_of(FACTOR_RF), lipper = all_of(LIPPER_COL),
          exp_r  = all_of(EXP_COL)) %>%
   mutate(ret_rank = ret_gross, excess_ret = ret_gross - rf,
-         exp_r = suppressWarnings(as.numeric(exp_r))) %>%
+         exp_r = suppressWarnings(as.numeric(exp_r)),
+         # v2.7: derive tna locally so this script does not depend on
+         # flow_calculation.R having been run first.
+         tna_local = coalesce(class_assets, total_assets)) %>%
   filter(!is.na(excess_ret), !is.na(mkt_rf), !is.na(smb), !is.na(hml), !is.na(mom)) %>%
   arrange(Ticker, date)
+
+cat("  Funds entering estimation:", n_distinct(ap$Ticker),
+    " |  Fund-months:", nrow(ap), "\n")
 
 ap_split <- split(ap, ap$Ticker)
 
@@ -125,9 +151,10 @@ run_full_period <- function(tk) {
              alpha_m=fit$beta[1], alpha_ann=fit$beta[1]*12, alpha_t_nw=fit$beta[1]/se_nw_vec[1],
              alpha_p_nw=2*pt(-abs(fit$beta[1]/se_nw_vec[1]), n-5),
              exp_ratio=d$exp_r[1], alpha_net_ann=(fit$beta[1]*12)-(d$exp_r[1]/100),
-             # mean_tna: time-series mean of monthly TNA (USD millions), used for
-             # VW weighting in alpha_reporting.R Tables 7 and 8.
-             mean_tna=mean(d$tna[d$tna > 0], na.rm=TRUE))
+             # v2.7: mean_tna uses tna_local (coalesce of class_assets and
+             # total_assets, computed in Section 1). v2.6 referenced d$tna
+             # which was NULL, producing NaN and requiring patch_mean_tna.R.
+             mean_tna=mean(d$tna_local[!is.na(d$tna_local) & d$tna_local > 0], na.rm=TRUE))
 }
 alpha_full <- bind_rows(lapply(names(ap_split), run_full_period))
 

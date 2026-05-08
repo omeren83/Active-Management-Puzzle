@@ -10,39 +10,39 @@
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{LOW}$ & 0.0305*** & 0.0327*** & 0.0307*** & 0.0301***\\
- & (8.08) & (7.65) & (8.15) & (7.59)\\
-$R^{MID}$ & 0.0145*** & 0.0150*** & 0.0145*** & 0.0145***\\
- & (16.38) & (15.74) & (16.51) & (14.86)\\
-$R^{HIGH}$ & 0.0815*** & 0.0832*** & 0.0815*** & 0.0794***\\
- & (14.44) & (13.52) & (14.54) & (13.22)\\
-Sentiment &  & 0.0053*** & 0.0025*** & 0.0010\\
- &  & (2.97) & (3.43) & (0.59)\\
-$R^{LOW}\times$ Sent. &  & -0.0087 & -0.0046 & 0.0021\\
- &  & (-1.23) & (-1.49) & (0.29)\\
-$R^{MID}\times$ Sent. &  & -0.0022 & -0.0010 & -0.0002\\
- &  & (-1.21) & (-1.27) & (-0.13)\\
-$R^{HIGH}\times$ Sent. &  & -0.0081 & -0.0046 & 0.0100\\
- &  & (-0.72) & (-0.95) & (0.91)\\
-$\log(\text{TNA})$ & -0.0042*** & -0.0043*** & -0.0043*** & -0.0043***\\
- & (-8.57) & (-8.65) & (-8.68) & (-8.59)\\
-$\log(\text{Age})$ & -0.0111*** & -0.0115*** & -0.0122*** & -0.0108***\\
- & (-7.84) & (-8.17) & (-8.32) & (-7.37)\\
-Return volatility & -0.0273 & -0.0364 & -0.0339 & -0.0266\\
- & (-1.08) & (-1.42) & (-1.32) & (-1.06)\\
-Style flow & 0.0994*** & 0.0954*** & 0.0946*** & 0.0981***\\
- & (3.67) & (3.55) & (3.51) & (3.64)\\
+$R^{LOW}$ & 0.0304*** & 0.0327*** & 0.0306*** & 0.0304***\\
+ & (8.35) & (8.01) & (8.45) & (7.94)\\
+$R^{MID}$ & 0.0142*** & 0.0147*** & 0.0142*** & 0.0141***\\
+ & (16.42) & (15.65) & (16.53) & (14.83)\\
+$R^{HIGH}$ & 0.0800*** & 0.0817*** & 0.0800*** & 0.0781***\\
+ & (14.70) & (13.77) & (14.80) & (13.43)\\
+Sentiment &  & 0.0053*** & 0.0025*** & 0.0012\\
+ &  & (2.97) & (3.51) & (0.72)\\
+$R^{LOW}\times$ Sent. &  & -0.0092 & -0.0053* & 0.0003\\
+ &  & (-1.30) & (-1.76) & (0.04)\\
+$R^{MID}\times$ Sent. &  & -0.0024 & -0.0009 & 0.0002\\
+ &  & (-1.32) & (-1.21) & (0.11)\\
+$R^{HIGH}\times$ Sent. &  & -0.0078 & -0.0042 & 0.0096\\
+ &  & (-0.73) & (-0.94) & (0.94)\\
+$\log(\text{TNA})$ & -0.0036*** & -0.0037*** & -0.0037*** & -0.0036***\\
+ & (-8.01) & (-8.10) & (-8.14) & (-8.03)\\
+$\log(\text{Age})$ & -0.0108*** & -0.0112*** & -0.0119*** & -0.0105***\\
+ & (-7.73) & (-8.06) & (-8.20) & (-7.26)\\
+Return volatility & -0.0245 & -0.0335 & -0.0310 & -0.0238\\
+ & (-0.98) & (-1.31) & (-1.22) & (-0.96)\\
+Style flow & 0.1018*** & 0.0979*** & 0.0968*** & 0.1008***\\
+ & (3.60) & (3.49) & (3.45) & (3.58)\\
 \midrule
 Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
-$N$ & 235,274 & 235,274 & 235,274 & 235,274\\
-$R^2$ (within) & 0.026 & 0.027 & 0.027 & 0.026\\
-Joint test ($\chi^2_3$, $p$) & -- & 4.32 (0.229) & 5.80 (0.122) & 1.19 (0.757)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=+0.05 (p=0.481) & z=+0.01 (p=0.498) & z=+0.54 (p=0.296)\\
+$N$ & 232,800 & 232,800 & 232,800 & 232,800\\
+$R^2$ (within) & 0.028 & 0.028 & 0.028 & 0.028\\
+Joint test ($\chi^2_3$, $p$) & -- & 4.68 (0.196) & 6.36 (0.095) & 1.12 (0.771)\\
+Asymmetry ($z$, 1-sided $p$) & -- & z=+0.11 (p=0.455) & z=+0.20 (p=0.421) & z=+0.67 (p=0.252)\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{SENT}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{AAII}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{SENT}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{AAII}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}

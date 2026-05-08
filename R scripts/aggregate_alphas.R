@@ -1,5 +1,16 @@
 # =============================================================================
-# AGGREGATE PORTFOLIO ALPHAS - FF (2010) METHODOLOGY                     v1.1
+# AGGREGATE PORTFOLIO ALPHAS - FF (2010) METHODOLOGY                     v1.2
+#
+# v1.2 changes vs v1.1 (Family B audit):
+#   filter(!excluded_perf) added to the ap_agg panel-prep stage so that
+#   Tables 7 (aggregate alpha by ap_group), Table 8 (Lipper x ap_group),
+#   and Figure 2 (rolling EW portfolio alpha) are constructed on the
+#   performance-comparison subsample defined by flagged_funds.xlsx.
+#   Sector funds (149 SECTOR_FUND-only flags) are dropped beyond the
+#   Step-8c entire-analysis exclusions. Active aggregate is approximately
+#   3,124 funds; Passive aggregate is approximately 53 funds (the
+#   unflagged broad-market index funds suitable for Active vs Passive
+#   comparison).
 #
 # v1.1 changes vs v1.0:
 #   - Source panel switched from panel_trimmed to panel_incubation, matching
@@ -66,6 +77,7 @@ MIN_FUNDS_LIP <- 3L    # Skip Lipper x group cells with fewer than this many fun
 cat("=== 1. Data preparation ===\n")
 
 ap_agg <- panel_incubation %>%
+  filter(!excluded_perf) %>%      # v1.2: performance-comparison subsample
   rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF,
          lipper = Lipper_Category) %>%
   filter(!is.na(ret_gross), !is.na(mkt_rf), !is.na(rf)) %>%
@@ -76,7 +88,8 @@ factors_ts <- ap_agg %>%
   distinct(date, mkt_rf, smb, hml, mom, rf) %>%
   arrange(date)
 
-cat("  Fund-months:", nrow(ap_agg),
+cat("  Funds entering aggregate estimation:", n_distinct(ap_agg$Ticker),
+    " |  Fund-months:", nrow(ap_agg),
     " |  Unique dates:", nrow(factors_ts), "\n")
 
 # -----------------------------------------------------------------------------

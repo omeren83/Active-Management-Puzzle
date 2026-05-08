@@ -1,6 +1,24 @@
 # =============================================================================
-# PATCH MEAN_TNA IN ALPHA XLSX FILES (v1.0)
+# PATCH MEAN_TNA IN ALPHA XLSX FILES (v1.1 - DEPRECATED)
 #
+# DEPRECATION NOTICE (May 2026)
+# -----------------------------
+# This script is no longer required for fresh pipeline runs. As of
+# alpha_estimation.R v2.7 and alpha_estimation_robust.R v1.2, mean_tna is
+# computed correctly at source by coalescing class_assets and total_assets.
+# alpha_fullperiod*.xlsx files produced by these script versions already
+# carry valid mean_tna values, so build_robust_tables.R can run directly
+# without invoking this patch.
+#
+# This script is RETAINED for backward compatibility: if you need to
+# reproduce results from alpha_fullperiod*.xlsx files generated with
+# alpha_estimation.R v2.6 or earlier (where mean_tna was NaN due to a
+# d$tna NULL reference), source this script in the same R session as the
+# panel_incubation object and the patch will fix the legacy xlsx files
+# in place.
+#
+# Original v1.0 documentation
+# ---------------------------
 # Problem
 # -------
 # alpha_estimation.R and alpha_estimation_robust.R both reference d$tna to
