@@ -554,11 +554,11 @@ CURRICULUM VITAE
 
 \vspace{12pt}
 
-\noindent \textbf{NAME:} Ömer Eren
+\noindent NAME: Ömer Eren
 
 \vspace{12pt}
 
-\noindent \textbf{EDUCATION:}
+\noindent EDUCATION:
 
 \noindent Ph.D.\ in Management, Boğaziçi University, 2026.
 
@@ -568,19 +568,19 @@ CURRICULUM VITAE
 
 \vspace{12pt}
 
-\noindent \textbf{PROFESSIONAL EXPERIENCE:}
+\noindent PROFESSIONAL EXPERIENCE:
 
 \noindent [Role], [Institution], [Years].
 
 \vspace{12pt}
 
-\noindent \textbf{AWARDS AND HONORS:}
+\noindent AWARDS AND HONORS:
 
 \noindent [Entries, one per line.]
 
 \vspace{12pt}
 
-\noindent \textbf{PUBLICATIONS:}
+\noindent PUBLICATIONS:
 
 \noindent [Entries in APA format.]
 
@@ -1575,15 +1575,15 @@ behaviour, following the volatility-decay analysis of
 \textcite{AvellanedaZhang2010}).
 
 The pipeline produces three analytically distinct panels.
-\textbf{panel\_master} retains the full December 1994--February 2026
+panel\_master retains the full December 1994--February 2026
 sample after the data-error and frozen-tail cleaning but applies neither
 incubation correction nor winsorisation; this panel is the audit
 baseline whose descriptive statistics appear in
-Appendix~\ref{app:alt_panels}. \textbf{panel\_incubation} additionally
+Appendix~\ref{app:alt_panels}. panel\_incubation additionally
 applies the Evans 36-month age filter and return winsorisation; this is
 the primary analytical panel for all main-text tables and is the panel
 on which Tables~\ref{tab:fund_counts} through \ref{tab:persistence} are
-estimated. \textbf{panel\_trimmed} additionally restricts the sample to
+estimated. panel\_trimmed additionally restricts the sample to
 January 1995--December 2023 to align with the available factor and
 sentiment series at the time the panel-regression specifications of
 Chapter~\ref{ch:behavioral} were finalised; this panel underlies the
@@ -2299,7 +2299,7 @@ Chapter~\ref{ch:discussion} and Appendix~\ref{app:subperiod}.
 \section{False discovery decomposition}
 \label{sec:fdr_results}
 
-\noindent Table~\ref{tab:pi0} reports the
+\noindent Table~\ref{tab:pi0_estimate} reports the
 \textcite{Storey2002} estimator of the population proportion of
 zero-alpha active funds. On the full Trimmed-evans panel,
 $\hat{\pi}_0 = 76.9\%$ at the standard tuning parameter $\lambda =
@@ -2318,14 +2318,14 @@ lower bound on the genuinely skilled mass.
   \caption[CDF and PDF of empirical vs.\ simulated alpha $t$-statistics]{%
     Cross-sectional distribution of \textcite{Carhart1997} four-factor
     alpha $t$-statistics for actively managed funds, with simulated
-    zero-skill comparison. \textbf{Panel A}: empirical cumulative
+    zero-skill comparison. Panel A: empirical cumulative
     distribution function (CDF) of active-fund $t(\hat{\alpha})$ (solid
     blue) versus the \textcite{FamaFrench2010} bootstrap-derived
     zero-skill CDF (solid black, dashed line type), constructed by
     resampling calendar months with replacement and re-estimating each
     fund's $t(\hat{\alpha})$ on the resampled sample after subtracting
     its actual full-period alpha to impose the zero-skill null.
-    \textbf{Panel B}: kernel density of the empirical $t$-statistic
+    Panel B: kernel density of the empirical $t$-statistic
     distribution (shaded blue) against the theoretical $N(0,1)$
     reference (dashed black). The $N(0,1)$ reference is included as a
     visual benchmark for the no-skill hypothesis under normality; the
@@ -2388,7 +2388,7 @@ detectable signal of outperformance net of fees.
 \section{Portfolio sorts: Size, momentum, and fee}
 \label{sec:portfolio_sorts}
 
-\noindent Tables~\ref{tab:port_chars} and \ref{tab:port_agg_alpha}
+\noindent Tables~\ref{tab:port_characteristics} and \ref{tab:port_agg_alpha}
 through \ref{tab:port_fee_alpha} report the cross-sectional alpha
 patterns from quintile sorts on three fund characteristics. The sort
 variables are log lagged TNA (size), the cumulative 11-month gross
@@ -2802,7 +2802,7 @@ state-variable variants are reported there as well.
 flow--performance convexity. The hypothesis is rejected only if the
 sentiment-rank-segment interactions $\delta_q$ are jointly zero
 across $q \in \{\mathrm{LOW}, \mathrm{MID}, \mathrm{HIGH}\}$.
-Table~\ref{tab:H1} reports the panel regression results under three
+Table~\ref{tab:H1_regression} reports the panel regression results under three
 sentiment proxies: the Baker--Wurgler high-sentiment regime indicator
 $D^{\mathrm{SENT}}$, the orthogonalised continuous Baker--Wurgler
 sentiment $\mathrm{SENT}^{\perp}$, and the AAII bull-minus-bear
@@ -2860,7 +2860,7 @@ attenuate the loser-segment outflow.
 
 \input{tables/table_H2_regression}
 
-\noindent Table~\ref{tab:H2} reports the panel regression results
+\noindent Table~\ref{tab:H2_regression} reports the panel regression results
 under three competing state-variable proxies: the detrended
 margin-debt regime indicator $D^{\mathrm{MD,Det}}$, the inverse
 put-call ratio regime indicator $D^{\mathrm{INV\text{-}PCR}}_t$,
@@ -2919,7 +2919,7 @@ is documented in detail in that appendix.
 
 \input{tables/table_H3_regression}
 
-\noindent Table~\ref{tab:H3} reports the four-column horse race.
+\noindent Table~\ref{tab:H3_regression} reports the four-column horse race.
 Column (1) is the baseline Sirri--Tufano specification without
 any lottery proxy, providing the benchmark coefficients. Columns
 (2)--(4) add each of the three lottery proxies in turn, fully
@@ -2993,7 +2993,7 @@ joint $\chi^2$ on the triple interactions.
 
 \input{tables/table_H4_regression}
 
-\noindent Table~\ref{tab:H4} reports the H4 regression under three
+\noindent Table~\ref{tab:H4_regression} reports the H4 regression under three
 sentiment proxies. The joint $\chi^2(4)$ test of the triple-interaction
 restriction is statistically insignificant under all three proxies:
 $\chi^2 = 3.77$ ($p = 0.438$) under the Baker-Wurgler high-sentiment
@@ -3816,17 +3816,17 @@ returns and extreme turnover values, producing results that are
 uninterpretable as a fee--performance comparison.
 
 Three exclusion criteria are applied to the passive group only.
-\textbf{Keyword filter on fund name}: funds whose name contains any of
+Keyword filter on fund name: funds whose name contains any of
 \texttt{2x}, \texttt{3x}, \texttt{1.5x}, \texttt{ultra}, \texttt{inverse},
 \texttt{bear market}, \texttt{bull 1} (capturing Direxion ``Bull 125'',
 ``Bull 150'', etc.), and \texttt{profund} (all ProFunds share classes
 in this universe are leveraged) are excluded. Matching is
-case-insensitive. \textbf{Hard-coded misclassifications}: two funds
+case-insensitive. Hard-coded misclassifications: two funds
 are excluded as active strategies misclassified as passive by their
 data vendor: \texttt{MOJAX US Equity} (DF Tactical Momentum Fund, a
 tactical active fund) and \texttt{GENDX US Equity} (Gotham Enhanced
-Index, a long/short quantitative strategy). \textbf{Explicit retention
-of Rydex Pure Style funds}: five Rydex Pure Style funds (\texttt{RYAVX},
+Index, a long/short quantitative strategy). Explicit retention
+of Rydex Pure Style funds: five Rydex Pure Style funds (\texttt{RYAVX},
 \texttt{RYZAX}, \texttt{RYAZX}, \texttt{RYWAX}, \texttt{RYAWX}) match
 the \texttt{profund} keyword pattern but are explicitly retained.
 These are long-only, 1$\times$ products tracking S\&P Pure Style
@@ -3869,14 +3869,14 @@ Section~\ref{sec:flow_calculation} are constructed.
 
 \noindent Three fields from the merged static-data file
 (\texttt{lipper.xlsx}) are used in the assignment procedure.
-\textbf{LSEG Category} --- the authoritative Lipper classification
+LSEG Category --- the authoritative Lipper classification
 sourced directly from the Department's LSEG Workspace export. Used
-as-is where populated. \textbf{New\_Benchmark} --- the assigned
+as-is where populated. New\_Benchmark --- the assigned
 benchmark code from the benchmark-assignment exercise documented in
 Appendix~\ref{app:benchmark}. Codes such as RLV, RUT, and RMCG
 uniquely identify the size-style combination of the benchmark and
-therefore the appropriate Lipper peer group. \textbf{Mcap\_Focus and
-Fund\_Strategy} --- Bloomberg static fields capturing market-cap
+therefore the appropriate Lipper peer group. Mcap\_Focus and
+Fund\_Strategy --- Bloomberg static fields capturing market-cap
 focus (Large-cap, Mid-cap, Small-cap, Broad Market) and investment
 style (Value, Blend, Growth). Used as a fallback when neither the
 LSEG Category nor a specific-style benchmark code is available.
@@ -3888,13 +3888,13 @@ LSEG Category nor a specific-style benchmark code is available.
 once a fund is assigned at a given priority, lower priorities are
 not evaluated.
 
-\textbf{Priority 1 --- LSEG Category (Direct)}. Where the LSEG
+Priority 1 --- LSEG Category (Direct). Where the LSEG
 Category field is populated and contains a valid Lipper category
 string, the value is used directly. This is the authoritative source
 and covers 1{,}712 funds (45.5\% of the panel). Source tag:
 \texttt{LSEG\_Direct}.
 
-\textbf{Priority 2 --- Benchmark Code Map}. For the remaining 2{,}052
+Priority 2 --- Benchmark Code Map. For the remaining 2{,}052
 funds, the assigned benchmark code is checked against a deterministic
 mapping table. Style-specific Russell and S\&P benchmark codes
 unambiguously identify the size and style characteristics of the
@@ -3908,7 +3908,7 @@ Funds assigned RUA fall through to Priority 3 or 4. Source tag:
 \texttt{Benchmark\_Map}. The full mapping table is reported in
 Appendix~\ref{app:benchmark}.
 
-\textbf{Priority 3 --- Bloomberg field derivation}. For funds not
+Priority 3 --- Bloomberg field derivation. For funds not
 resolved by Priorities 1 or 2, the Bloomberg \texttt{Mcap\_Focus} and
 \texttt{Fund\_Strategy} fields are combined to construct a Lipper
 category label. Three sub-cases are applied in order. \textit{3a:}
@@ -3929,7 +3929,7 @@ category for the identified style; Broad Market and missing Mcap
 fields indicate no specific size constraint, and Multi-Cap is the
 appropriate Lipper designation for unconstrained mandates.
 
-\textbf{Priority 4 --- Unresolvable (NA)}. Funds for which none of
+Priority 4 --- Unresolvable (NA). Funds for which none of
 the above priorities yields a valid assignment are coded as NA. These
 105 funds (2.8\%) consist entirely of sector funds, long/short equity,
 market-neutral, bear-market, and Unknown-AM funds, all of which are
@@ -4012,12 +4012,12 @@ membership in the various hypothesis sub-samples.
 \section{Three-tier assessment process}
 \label{sec:benchmark_tiers}
 
-\noindent Each fund was assessed in three stages. \textbf{Tier 1 ---
-Bloomberg benchmark screening}: Bloomberg's \texttt{Primary\_Benchmark}
+\noindent Each fund was assessed in three stages. Tier 1 ---
+Bloomberg benchmark screening: Bloomberg's \texttt{Primary\_Benchmark}
 field was reviewed for transparent misassignments. Sector funds
 benchmarked to S\&P 500, small/mid-cap funds benchmarked to S\&P 500,
 and funds with no benchmark were flagged for further research.
-\textbf{Tier 2 --- Active research}: for flagged funds, primary-source
+Tier 2 --- Active research: for flagged funds, primary-source
 research established the correct declared benchmark. The principal
 sources were SEC EDGAR (prospectuses, annual reports), fund
 factsheets and family websites, Morningstar / U.S.\ News /
@@ -4025,7 +4025,7 @@ StockAnalysis (for cross-reference), and direct fund-family
 documentation where the fund's prospectus did not explicitly state a
 benchmark (most prominently, Guggenheim's confirmation that Rydex
 sector funds declare no official primary benchmark).
-\textbf{Tier 3 --- Inference for undisclosed benchmarks}: for funds
+Tier 3 --- Inference for undisclosed benchmarks: for funds
 with no declared benchmark (primarily Rydex sector funds), a proxy
 sector index was inferred from the fund's GICS sector classification,
 cap focus, and strategy, and flagged as \texttt{INFERRED}.
@@ -4132,8 +4132,8 @@ REIT funds.
 subscription tier constraints. Each is documented with its rationale
 and the magnitude of its effect.
 
-\textbf{MSCI U.S.\ REIT Index $\rightarrow$ FTSE NAREIT All-Equity
-REITs Index}. The confirmed benchmark for Cohen \& Steers REIT funds
+MSCI U.S.\ REIT Index $\rightarrow$ FTSE NAREIT All-Equity
+REITs Index. The confirmed benchmark for Cohen \& Steers REIT funds
 is the MSCI U.S.\ REIT Index (RIC: RMZTR). The total-return series
 for this index is inaccessible within the LSEG subscription tier
 used in this dissertation. The FTSE NAREIT All-Equity REITs Total
@@ -4151,7 +4151,7 @@ variant, which includes mortgage REITs --- to preserve alignment
 with the Cohen \& Steers mandate, which focuses exclusively on
 equity REITs.
 
-\textbf{S\&P MidCap 400 $\rightarrow$ Russell Midcap Index}.
+S\&P MidCap 400 $\rightarrow$ Russell Midcap Index.
 Thirty-one funds in the benchmark dataset are assigned the S\&P
 MidCap 400 as their primary benchmark, of which 17 carry the
 benchmark-required flag. The S\&P MidCap 400 total-return series was
@@ -4165,7 +4165,7 @@ selection (S\&P committee-driven; Russell rules-based market cap
 ranking); for the purposes of computing rolling Carhart $R^2$ and
 tracking error this difference is immaterial.
 
-\textbf{Russell 2500 Value $\rightarrow$ Russell 2000 Value}. Ten
+Russell 2500 Value $\rightarrow$ Russell 2000 Value. Ten
 funds carry Russell 2500 Value as their primary benchmark. The LSEG
 total-return series for this index has insufficient sample coverage
 within the available subscription tier. The Russell 2000 Value Index
@@ -4258,7 +4258,7 @@ H3 regressions to avoid contemporaneous endogeneity.
 
 \input{tables/table_activeness_proxy_diagnostic}
 
-\noindent Table~\ref{tab:proxy_diagnostic} reports the diagnostic
+\noindent Table~\ref{tab:activeness_proxy} reports the diagnostic
 statistics for each candidate proxy. The headline metrics are: (i)
 the within-fund persistence of the proxy (autocorrelation at one
 month and one year); (ii) the cross-sectional dispersion (standard
@@ -4281,7 +4281,7 @@ $\mathrm{MAX12}$ exhibit modest cross-sectional correlation with
 $\mathrm{ActR2}$ (in the 0.20--0.40 range) and are retained as
 distinct lottery-character measures.
 
-The selected three-proxy horse race (Table~\ref{tab:H3}) reports
+The selected three-proxy horse race (Table~\ref{tab:H3_regression}) reports
 $\mathrm{ActR2}$, $\mathrm{ActSkew}$, and $\mathrm{MAX12}$. The
 empirical finding is that $\mathrm{MAX12}$ is the proxy that
 generates a behaviorally consistent sentiment-amplification
