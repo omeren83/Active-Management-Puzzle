@@ -312,7 +312,7 @@ e2_tex <- c(
     "percentiles indicate outperformance inconsistent with luck. ",
     "Entries of 0.0% at lower percentiles indicate that zero out ",
     "of $B = 10{,}000$ bootstrap iterations produced a simulated $t$-statistic ",
-    "as extreme as the actual value.} This is the strongest possible bootstrap ",
+    "as extreme as the actual value. This is the strongest possible bootstrap ",
     "statement: actual left-tail performance exceeds the worst-luck scenario ",
     "across all simulated samples. Entries shown as $<$0.1\\% indicate ",
     "between 0 and 5 iterations out of $B = 10{,}000$ (i.e.\\ Prob.\\ Luck ",
