@@ -4,6 +4,10 @@
 # Runs the full dissertation analysis pipeline in the correct sequence.
 # Each phase can be toggled ON/OFF via the CONFIG section below.
 #
+# v1.5 (May 8, 2026): Sync block extended to also copy fig_*.png files. 
+# Architecture is now: every script writes table_*.tex and fig_*.png to WORKING_DIR; 
+# sync step copies both classes to TABLES_OUT_DIR.
+#
 # v1.4 changes vs v1.3:
 #   - Phase J now runs psychological_premium.R after panel_regressions_-
 #     reporting.R. Computes shadow prices (proposal eq. 12) from the joint
@@ -61,7 +65,7 @@
 #   Phase I  Behavioral state variables  (sentiment, margin debt, regime dummies)
 #   Phase J  Panel regressions           (setup + H1-H4 + reporting)
 #   Utility  Lipper category build       (standalone, independent)
-#   SYNC     Copy .tex files -> GitHub   (automatic at end if TABLES_OUT_DIR set)
+#   SYNC     Copy .tex .png files -> GitHub   (automatic at end if TABLES_OUT_DIR set)
 #
 # DEPENDENCIES BETWEEN PHASES:
 #   Phase A -> required by B, C, D, E (subperiod), F, G, H, J
@@ -109,8 +113,8 @@ RUN_PHASE_A_DATA          <- FALSE    # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
 RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
 RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
-RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
-RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
+RUN_PHASE_E_SUBPERIODS    <- TRUE    # structural_break_test + subperiod_analysis
+RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
 RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis
 RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
 RUN_PHASE_I_BEHAVIORAL    <- FALSE   # behavioral_state_variables (NEW)
@@ -147,13 +151,17 @@ cat("\n")
 # Tracks timing and status for each script run
 pipeline_log <- list()
 
-# Snapshot of .tex files BEFORE the pipeline runs, used by the sync step at
-# end to identify which .tex files are new / modified.
-tex_snapshot_before <- {
-  files <- list.files(WORKING_DIR, pattern = "^table_.*\\.tex$", full.names = FALSE)
+# Snapshot of artifacts BEFORE the pipeline runs, used by the sync step at
+# end to identify which files are new / modified. Two file classes are tracked:
+#   table_*.tex  (LaTeX tables)
+#   fig_*.png    (annotated figures)
+.snapshot_files <- function(pattern) {
+  files  <- list.files(WORKING_DIR, pattern = pattern, full.names = FALSE)
   mtimes <- file.info(file.path(WORKING_DIR, files))$mtime
   setNames(mtimes, files)
 }
+tex_snapshot_before <- .snapshot_files("^table_.*\\.tex$")
+fig_snapshot_before <- .snapshot_files("^fig_.*\\.png$")
 
 # Helper: source a script with timing and error handling.
 # Skips gracefully (warning, not error) if the script file is missing.
@@ -350,17 +358,16 @@ if (RUN_UTILITY_LIPPER) {
   run_script("build_lipper_category.R", "Utility")
 }
 
+# SYNC - COPY UPDATED ARTIFACTS TO TABLES_OUT_DIR (GitHub / Overleaf)
+# This step copies every table_*.tex AND fig_*.png file that is new or has
+# been modified during this pipeline run to TABLES_OUT_DIR (the GitHub repo
+# tables/ folder, which syncs to Overleaf). Robustness tables from Phase H
+# are excluded from this step because they were written directly to
+# TABLES_OUT_DIR.
 
-# =============================================================================
-# SYNC - COPY UPDATED .tex FILES TO TABLES_OUT_DIR (GitHub / Overleaf)
-# This step copies every table_*.tex file that is new or has been modified
-# during this pipeline run to TABLES_OUT_DIR (the GitHub repo tables/ folder,
-# which syncs to Overleaf). Robustness tables from Phase H are excluded from
-# this step because they were written directly to TABLES_OUT_DIR.
-# =============================================================================
 if (!is.na(TABLES_OUT_DIR)) {
   cat(sprintf("\n%s\n", strrep("=", 79)))
-  cat("SYNC  Copy table_*.tex files -> TABLES_OUT_DIR\n")
+  cat("SYNC  Copy artifacts (table_*.tex + fig_*.png) -> TABLES_OUT_DIR\n")
   cat(sprintf("%s\n", strrep("=", 79)))
   
   # Ensure target exists.
@@ -369,36 +376,41 @@ if (!is.na(TABLES_OUT_DIR)) {
     cat("Created target directory:", TABLES_OUT_DIR, "\n")
   }
   
-  # Scan WORKING_DIR for table_*.tex files now. Compare mtimes against the
-  # pre-pipeline snapshot to find those that were created or modified.
-  tex_now <- list.files(WORKING_DIR, pattern = "^table_.*\\.tex$",
-                        full.names = FALSE)
-  to_copy <- character(0)
-  for (f in tex_now) {
-    mt_now <- file.info(file.path(WORKING_DIR, f))$mtime
-    mt_before <- tex_snapshot_before[f]
-    if (is.na(mt_before) || mt_now > mt_before) {
-      to_copy <- c(to_copy, f)
+  # Helper: copy any file matching `pattern` from WORKING_DIR to
+  # TABLES_OUT_DIR if its mtime is newer than the pre-run snapshot. Returns
+  # the count of files copied.
+  .sync_class <- function(pattern, snapshot_before, label) {
+    files_now <- list.files(WORKING_DIR, pattern = pattern, full.names = FALSE)
+    to_copy <- character(0)
+    for (f in files_now) {
+      mt_now    <- file.info(file.path(WORKING_DIR, f))$mtime
+      mt_before <- snapshot_before[f]
+      if (is.na(mt_before) || mt_now > mt_before) {
+        to_copy <- c(to_copy, f)
+      }
     }
-  }
-  
-  if (length(to_copy) == 0L) {
-    cat("No new or modified table_*.tex files to sync.\n")
-  } else {
-    cat(sprintf("Syncing %d file(s) to %s:\n", length(to_copy), TABLES_OUT_DIR))
-    sync_results <- vapply(to_copy, function(f) {
+    if (length(to_copy) == 0L) {
+      cat(sprintf("No new or modified %s files to sync.\n", label))
+      return(0L)
+    }
+    cat(sprintf("Syncing %d %s file(s):\n", length(to_copy), label))
+    res <- vapply(to_copy, function(f) {
       src <- file.path(WORKING_DIR, f)
       dst <- file.path(TABLES_OUT_DIR, f)
       ok  <- file.copy(src, dst, overwrite = TRUE, copy.date = TRUE)
       cat(sprintf("  %s  %s\n", if (ok) "OK" else "FAIL", f))
       ok
     }, logical(1))
-    n_ok <- sum(sync_results)
-    cat(sprintf("Sync complete: %d/%d file(s) copied.\n",
-                n_ok, length(sync_results)))
+    sum(res)
   }
+  
+  n_tex <- .sync_class("^table_.*\\.tex$", tex_snapshot_before, "table_*.tex")
+  n_fig <- .sync_class("^fig_.*\\.png$",   fig_snapshot_before, "fig_*.png")
+  
+  cat(sprintf("Sync complete: %d table(s), %d figure(s) copied.\n",
+              n_tex, n_fig))
 } else {
-  cat("\nSYNC disabled (TABLES_OUT_DIR is NA). Copy tables manually if needed.\n")
+  cat("\nSYNC disabled (TABLES_OUT_DIR is NA). Copy artifacts manually if needed.\n")
 }
 
 

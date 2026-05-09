@@ -3,7 +3,7 @@ cd /d "D:\TEZ"
 git status
 
 git add -A  
-git commit -m "Dissertation draft 1.0, dissertation_main and bib file are updated"  
+git commit -m "Figure D1 corrected with new break points"  
 git push
 
 PULL
