@@ -996,7 +996,7 @@ fn_te <- paste(fn_base_alpha,
   "Activeness measured as annualised Tracking Error against the fund's assigned",
   "benchmark index, $\\sqrt{12}\\cdot\\mathrm{sd}(r_{i,t}^{\\text{gross}}-r_{b(i),t})$,",
   "where $b(i)$ is the benchmark code recorded for fund $i$ in the static",
-  "metadata. Following the interpretation of \\citet{CremersPetajisto2009},",
+  "metadata. Following the interpretation of \\textcite{CremersPetajisto2009},",
   "higher tracking error indicates greater portfolio deviation from the",
   "assigned benchmark. Funds with missing or unmatched benchmark codes are",
   "excluded from this sort only."

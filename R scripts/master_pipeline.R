@@ -118,7 +118,7 @@ RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
 RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis
 RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
 RUN_PHASE_I_BEHAVIORAL    <- FALSE   # behavioral_state_variables (NEW)
-RUN_PHASE_J_PANEL_REG     <- FALSE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
+# RUN_PHASE_J_PANEL_REG     <- FALSE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
 RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
 
 # Phase J sub-toggle: force re-running panel_regressions_setup.R even if

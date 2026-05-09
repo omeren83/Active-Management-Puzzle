@@ -331,7 +331,7 @@ write_tex(t10_tex, "table_pi0_estimate_FF.tex")
 cat("=== Table 11 (FF) ===\n")
 
 # Bold the gamma=0.20 row by wrapping its cells in \textbf{}
-boldify <- function(s, do_bold) if (do_bold) paste0("\\textbf{", s, "}") else s
+boldify <- function(s, do_bold) s
 
 t11_rows <- vapply(seq_len(nrow(bsw_df)), function(i) {
   is_bold <- as.numeric(bsw_df$gamma[i]) == 20

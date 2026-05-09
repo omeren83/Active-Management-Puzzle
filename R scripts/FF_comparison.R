@@ -800,7 +800,6 @@ latex_t10b <- bsw_display %>%
                      "False Disc."     = 1,
                      "True Proportions" = 2),
                    escape = FALSE) %>%
-  row_spec(BSW_BOLD_ROW, bold = TRUE) %>%
   footnote(general        = fn_t10b,
            general_title  = "",
            escape         = FALSE,

@@ -1,30 +1,29 @@
 \begin{table}[H]
 \small
 \centering
-\caption{BSW (2010) Four-Way Decomposition: Proportions of Skilled, Unskilled, and Lucky Funds (\%) -- FF Subperiod}
-\label{tab:bsw_decomposition_FF}
+\caption{\label{tab:bsw_decomposition_FF}BSW (2010) Four-Way Decomposition: Proportions of Skilled, Unskilled, and Lucky Funds (\%) -- FF Subperiod}
+\centering
 \begin{threeparttable}
-\begin{tabular}{rrrrrr}
+\begin{tabular}[t]{rrrrrr}
 \toprule
- & \multicolumn{2}{c}{Observed Tails} & False Disc. & \multicolumn{2}{c}{True Proportions} \\
-\cmidrule(lr){2-3} \cmidrule(lr){4-4} \cmidrule(lr){5-6}
-$\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma$ \\
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Observed Tails} & \multicolumn{1}{c}{False Disc.} & \multicolumn{2}{c}{True Proportions} \\
+\cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-6}
+$\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma$\\
 \midrule
-5\% & 10.9 & 2.5 & 1.9 & 9.0 & 0.6 \\
-10\% & 15.5 & 4.3 & 3.8 & 11.7 & 0.5 \\
-15\% & 19.0 & 5.7 & 5.7 & 13.3 & 0.0 \\
-\textbf{20\%} & \textbf{23.1} & \textbf{7.0} & \textbf{7.6} & \textbf{15.5} & \textbf{-0.6} \\
-25\% & 26.6 & 9.2 & 9.5 & 17.1 & -0.3 \\
-30\% & 29.8 & 11.4 & 11.4 & 18.4 & 0.0 \\
-35\% & 33.9 & 13.9 & 13.3 & 20.6 & 0.6 \\
-40\% & 37.5 & 15.5 & 15.2 & 22.3 & 0.3 \\
-45\% & 39.8 & 17.1 & 17.1 & 22.6 & 0.0 \\
-50\% & 43.5 & 19.0 & 19.0 & 24.5 & 0.0 \\
+5\% & 10.9 & 2.5 & 1.9 & 9.0 & 0.6\\
+10\% & 15.5 & 4.3 & 3.8 & 11.7 & 0.5\\
+15\% & 19.0 & 5.7 & 5.7 & 13.3 & 0.0\\
+20\% & 23.1 & 7.0 & 7.6 & 15.5 & -0.6\\
+25\% & 26.6 & 9.2 & 9.5 & 17.1 & -0.3\\
+30\% & 29.8 & 11.4 & 11.4 & 18.4 & 0.0\\
+35\% & 33.9 & 13.9 & 13.3 & 20.6 & 0.6\\
+40\% & 37.5 & 15.5 & 15.2 & 22.3 & 0.3\\
+45\% & 39.8 & 17.1 & 17.1 & 22.6 & 0.0\\
+50\% & 43.5 & 19.0 & 19.0 & 24.5 & 0.0\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\footnotesize
-\item Decomposition follows \textcite{BarrasScailletWermers2010}, Section~II.B and Table~III. $S^-_\gamma$ ($S^+_\gamma$): observed fraction of active funds with significantly negative (positive) Newey--West $t(\hat{\alpha})$ at two-sided significance level $\gamma$, using full-period \textcite{Carhart1997} four-factor alphas. Critical values are from the standard normal distribution, consistent with the large-sample approximation in \textcite{BarrasScailletWermers2010}. $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected proportion of false discoveries per tail arising from zero-alpha funds, where $\hat{\pi}_0 = 76.0\%$ is the \textcite{Storey2002} estimate at $\lambda = 0.5$ (see Table~\ref{tab:pi0_estimate_FF}). $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled funds (significant negative alpha net of false discoveries). $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled funds. The bolded row ($\gamma = 0.20$) provides the population-level estimates $\hat{\pi}^-_A$ and $\hat{\pi}^+_A$ following \textcite{BarrasScailletWermers2010}. Negative $T^+_\gamma$ entries indicate right-tail significance does not exceed the false-discovery rate at that threshold. Sample: $N = 805$ actively managed funds, Jan 1995--Sep 2006 (Fama--French 2010 subperiod), performance-comparison subsample per flagged\_funds.xlsx; Passive and Unknown funds excluded.
+\item Decomposition follows Barras, Scaillet and Wermers (2010, \textit{Journal of Finance}), Section~II.B and Table~III. $S^-_\gamma$ ($S^+_\gamma$): observed fraction of active funds with significantly negative (positive) Newey-West $t(\hat{\alpha})$ at two-sided significance level $\gamma$, using full-period Carhart (1997) four-factor alphas. Critical values are from the standard normal distribution, consistent with the large-sample approximation in BSW (2010). $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected proportion of false discoveries per tail arising from zero-alpha funds, where $\hat{\pi}_0 = 76.0\%$ is the Storey (2002) estimate at $\lambda = 0.5$ (see Table~\ref{tab:pi0_estimate_FF}). $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled funds (significant negative alpha net of false discoveries). $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled funds (significant positive alpha net of false discoveries). The bolded row ($\gamma = 0.20$) provides the population-level estimates $\hat{\pi}^-_A$ and $\hat{\pi}^+_A$ following BSW (2010). Negative $T^+_\gamma$ entries indicate right-tail significance does not exceed the false-discovery rate at that threshold. Sample: $N = 805$ actively managed funds, Jan 1995--Sep 2006 (Fama-French 2010 subperiod); Passive and Unknown funds excluded.
 \end{tablenotes}
 \end{threeparttable}
 \end{table}

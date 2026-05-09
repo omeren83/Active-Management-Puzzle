@@ -233,7 +233,7 @@ caption <- paste0(
 fn <- paste0(
   "Stars on individual coefficients are reported in the underlying tables. ",
   "All specifications use the primary-spec aligned sample (contemporaneous ",
-  "state variables; fund FE for H1--H3; Lipper $\\\\times$ yearmo FE for H4) ",
+  "state variables; fund FE for H1--H3; Lipper $\\times$ yearmo FE for H4) ",
   "with two-way clustering on Ticker and calendar month (Petersen 2009)."
 )
 

@@ -975,9 +975,7 @@ for (i in seq_len(nrow(bsw_packs))) {
   latex_d5 <- latex_d5 %>%
     pack_rows(bsw_packs$label[i], bsw_packs$start[i], bsw_packs$end[i],
               bold = FALSE, italic = TRUE,
-              hline_before = (i > 1), hline_after = FALSE) %>%
-    # Bold the gamma = 0.20 row (row 4 within each panel)
-    row_spec(bsw_packs$start[i] + BSW_BOLD_OFF - 1L, bold = TRUE)
+              hline_before = (i > 1), hline_after = FALSE)
 }
 
 d5_str <- as.character(latex_d5)

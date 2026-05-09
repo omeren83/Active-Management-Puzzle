@@ -363,7 +363,7 @@ fn_t7 <- paste(
   "$N$: unique funds contributing to the portfolio series;",
   "$T$: number of monthly observations in the regression.",
   "The Active + Passive row aggregates only the two classified groups.",
-  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\_funds.xlsx."
 )
 
 latex_t7 <- t7_display %>%
@@ -456,7 +456,7 @@ fn_t8 <- paste(
   "net returns because the static annual expense ratio used to derive net",
   "returns introduces a class-specific approximation error that would",
   "contaminate the style-class breakdown.",
-  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
+  "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\_funds.xlsx."
 )
 
 latex_t8 <- t8_display %>%
@@ -557,7 +557,7 @@ boot_tab <- boot_summary %>%
 # i.e. \\\\X in R source. Plain text, $...$, and {,} are unaffected.
 fn_t9 <- paste(
   "Bootstrap procedure follows \\\\textcite{FamaFrench2010}.",
-  "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\\\\_funds.xlsx,",
+  "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\\_funds.xlsx,",
   paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
   "For each fund, estimated monthly alpha is subtracted from the excess return",
   "series to construct a zero-alpha null return.",
@@ -801,7 +801,6 @@ latex_t10b <- bsw_display %>%
     "False Disc."     = 1,
     "True Proportions" = 2
   ), escape = FALSE) %>%
-  row_spec(BSW_BOLD_ROW, bold = TRUE) %>%
   footnote(general        = fn_t10b,
            general_title  = "",
            escape         = FALSE,

@@ -310,7 +310,7 @@ e2_tex <- c(
     "Values below 5\\% at lower percentiles indicate underperformance ",
     "inconsistent with the zero-alpha null; values above 95\\% at upper ",
     "percentiles indicate outperformance inconsistent with luck. ",
-    "\\textbf{Entries of 0.0\\% at lower percentiles indicate that zero out ",
+    "Entries of 0.0% at lower percentiles indicate that zero out ",
     "of $B = 10{,}000$ bootstrap iterations produced a simulated $t$-statistic ",
     "as extreme as the actual value.} This is the strongest possible bootstrap ",
     "statement: actual left-tail performance exceeds the worst-luck scenario ",
