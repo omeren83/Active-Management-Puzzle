@@ -782,7 +782,7 @@ fn_t10b <- paste(
   "Passive and Unknown funds excluded."
 )
 
-BSW_BOLD_ROW <- 4L  # gamma = 0.20
+
 
 latex_t10b <- bsw_display %>%
   kbl(format    = "latex",

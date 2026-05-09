@@ -763,7 +763,7 @@ fn_t10b <- paste(
   "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx; Passive and Unknown funds excluded."
 )
 
-BSW_BOLD_ROW <- 4L   # gamma = 0.20 is the 4th row of the grid
+
 
 # SPACING FIXES:
 #   (1) add_header_above() lifts the descriptive labels "(Unskilled)"/"(Skilled)"

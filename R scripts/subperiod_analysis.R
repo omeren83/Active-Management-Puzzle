@@ -923,7 +923,6 @@ bsw_data <- bind_rows(lapply(results,
 rownames(bsw_data) <- NULL
 
 BSW_ROWS_PP  <- length(GAMMA_GRID)   # 10 rows per panel
-BSW_BOLD_OFF <- 4L                   # gamma = 0.20 is the 4th row within each panel
 
 bsw_packs <- data.frame(
   label = sapply(results, `[[`, "panel"),
