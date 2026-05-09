@@ -11,9 +11,9 @@ Hypothesis & State proxy & Joint $\chi^2$ & Headline $z$ (1-sided $p$) & $N$ & D
 H1: Sent.-Convexity & $D^{SENT}$ & 9.23 (df=3, p=0.026) & +0.10 (p=0.462) & 232,800 & Reject (asym +)\\
 H1: Sent.-Convexity & $\text{SENT}^\perp$ & 6.92 (df=3, p=0.074) & -0.29 (p=0.612) & 232,800 & Reject (asym -)\\
 H1: Sent.-Convexity & $D^{AAII}$ & 11.39 (df=3, p=0.010) & +2.11 (p=0.017) & 232,800 & Reject (asym +)\\
-H2: Disp./IoC & $D^{MD,Det}$ & 11.33 (df=3, p=0.010) & +2.16 (p=0.984) & 232,800 & Reject (BP margin-call (delta_1 > 0))\\
-H2: Disp./IoC & $D^{\text{INV-PCR}}$ & 0.49 (df=3, p=0.921) & -0.18 (p=0.429) & 232,800 & Fail to reject (Disposition (delta_1 < 0))\\
-H2: Disp./IoC & Discriminant & 7.52 (df=3, p=0.057) & +1.90 (p=0.971) & 232,800 & Reject (BP margin-call (delta_1 > 0))\\
+H2: Disp./IoC & $D^{MD,Det}$ & 11.33 (df=3, p=0.010) & +2.16 (p=0.984) & 232,800 & Reject (BP margin-call ($\delta_1 > 0$))\\
+H2: Disp./IoC & $D^{\text{INV-PCR}}$ & 0.49 (df=3, p=0.921) & -0.18 (p=0.429) & 232,800 & Fail to reject (Disposition ($\delta_1 < 0$))\\
+H2: Disp./IoC & Discriminant & 7.52 (df=3, p=0.057) & +1.90 (p=0.971) & 232,800 & Reject (BP margin-call ($\delta_1 > 0$))\\
 H3: Lottery & ActR2 & 0.93 (df=2, p=0.629) & +0.06 (p=0.476) & 202,779 & Fail to reject (lottery amp +)\\
 H3: Lottery & ActSkew & 1.82 (df=2, p=0.402) & +0.15 (p=0.439) & 202,779 & Fail to reject (lottery amp +)\\
 H3: Lottery & MAX12 & 11.29 (df=2, p=0.004) & +1.56 (p=0.060) & 202,779 & Reject (lottery amp +)\\
@@ -23,7 +23,7 @@ H4: Fee Elast. & $D^{AAII}$ & 5.15 (df=4, p=0.272) & +1.37 (p=0.085) & 232,168 &
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Stars on individual coefficients are reported in the underlying tables. All specifications use the primary-spec aligned sample (contemporaneous state variables; fund FE for H1--H3; Lipper $times$ yearmo FE for H4) with two-way clustering on Ticker and calendar month (Petersen 2009).
+\item Stars on individual coefficients are reported in the underlying tables. All specifications use the primary-spec aligned sample (contemporaneous state variables; fund FE for H1--H3; Lipper $\times$ yearmo FE for H4) with two-way clustering on Ticker and calendar month (Petersen 2009).
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}
