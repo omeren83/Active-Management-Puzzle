@@ -964,7 +964,7 @@ fn_d5 <- paste(
   "with $\\\\hat{\\\\pi}_0$ the sub-period \\\\textcite{Storey2002} estimator at",
   "$\\\\lambda = 0.5$ (Table~\\\\ref{tab:subperiod_pi0_estimate}).",
   "$T^\\\\pm_\\\\gamma = S^\\\\pm_\\\\gamma - F_\\\\gamma$: genuinely unskilled ($-$) or skilled ($+$).",
-  "Bolded row ($\\\\gamma = 0.20$) gives population-level",
+  "The row at $\\\\gamma = 0.20$ gives population-level",
   "$\\\\hat{\\\\pi}^-_A$, $\\\\hat{\\\\pi}^+_A$. Negative $T^+_\\\\gamma$ means right-tail",
   "significance does not exceed the false-discovery rate.",
   "Percentages of the sub-period active-fund universe.",

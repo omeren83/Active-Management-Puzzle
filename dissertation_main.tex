@@ -279,6 +279,8 @@
 \captionsetup[table]{
   labelsep        = periodtwospace,
   font            = normalsize,    % 12 pt — SBE requires TNR 12 throughout
+  labelfont       = normalfont,    % force non-bold caption label ("Table 1.")
+  textfont        = normalfont,    % force non-bold caption text
   skip            = 8pt,           % gap between caption bottom and table top
   position        = top,           % caption is ABOVE the table
   width           = \linewidth,    % prevent overflow in threeparttable
@@ -288,6 +290,8 @@
 \captionsetup[figure]{
   labelsep        = periodtwospace,
   font            = normalsize,    % 12 pt
+  labelfont       = normalfont,    % force non-bold caption label ("Figure 1.")
+  textfont        = normalfont,    % force non-bold caption text
   skip            = 8pt,           % gap between figure bottom and caption top
   position        = bottom,        % caption is BELOW the figure
   width           = \linewidth,
@@ -296,7 +300,7 @@
 }
 % \captionsetup[table] does not propagate to longtable (separate float class).
 % Mirror SBE rules onto longtable so floats and longtables look identical.
-\captionsetup[longtable]{font=normalsize, width=\linewidth, justification=raggedright, singlelinecheck=false, position=top}
+\captionsetup[longtable]{font=normalsize, labelfont=normalfont, textfont=normalfont, width=\linewidth, justification=raggedright, singlelinecheck=false, position=top}
 
 % ---- Mathematics ------------------------------------------------------------
 \usepackage{amsmath}
@@ -310,6 +314,10 @@
 \AtBeginBibliography{%
   \DeclareFieldFormat{url}{\nolinkurl{#1}}%
   \DeclareFieldFormat{doi}{\nolinkurl{https://doi.org/#1}}%
+  % SBE forbids bold anywhere; neutralise any \mkbibbold call (defensive
+  % belt-and-braces — apa.bbx does not currently use bold for any field,
+  % but a future biblatex-apa update or a stray field format could).
+  \renewcommand*{\mkbibbold}[1]{##1}%
 }
 
 % ---- Miscellaneous ----------------------------------------------------------
