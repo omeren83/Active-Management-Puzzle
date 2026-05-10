@@ -50,6 +50,25 @@ OUTPUT_PRIMARY <- file.path(WORKING_DIR, "table_H2_regression.tex")
 OUTPUT_LAGGED  <- file.path(WORKING_DIR, "table_H2_lagged.tex")
 OUTPUT_ROBUST  <- file.path(WORKING_DIR, "table_H2_robustness.tex")
 
+# PHASE B helper: move tablenotes outside the table float (fixes Overfull \vbox).
+threeparttable_note_after <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s  <- gsub(note_rx, "", s, perl = TRUE)
+  s  <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s  <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  sub("\\end{table}", paste0("\\end{table}\n\\begin{minipage}{0.92\\linewidth}\n",
+    "\\footnotesize\\textit{Note:} ", ni, "\n\\end{minipage}\n"),
+    s, fixed = TRUE)
+}
+
 # --- 1. Pre-flight -----------------------------------------------------------
 if (!exists("panel_reg")) {
   rds_path <- file.path(WORKING_DIR, "panel_reg.rds")
@@ -387,6 +406,7 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
 
   tex <- as.character(ktab)
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
+  tex <- threeparttable_note_after(tex)  # PHASE B: move note outside float
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 

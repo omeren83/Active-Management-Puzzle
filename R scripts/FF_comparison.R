@@ -774,7 +774,7 @@ fn_t10b <- paste(
   "(significant negative alpha net of false discoveries).",
   "$T^+_\\\\gamma = S^+_\\\\gamma - F_\\\\gamma$: genuinely skilled funds",
   "(significant positive alpha net of false discoveries).",
-  "The bolded row ($\\\\gamma = 0.20$) provides the population-level estimates",
+  "The reference row ($\\\\gamma = 0.20$) provides the population-level estimates",
   "$\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$ following BSW (2010).",
   "Negative $T^+_\\\\gamma$ entries indicate right-tail significance does not",
   "exceed the false-discovery rate at that threshold.",

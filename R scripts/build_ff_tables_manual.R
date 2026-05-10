@@ -379,7 +379,7 @@ t11_tex <- c(
     "$T^-_\\gamma = S^-_\\gamma - F_\\gamma$: genuinely unskilled funds ",
     "(significant negative alpha net of false discoveries). ",
     "$T^+_\\gamma = S^+_\\gamma - F_\\gamma$: genuinely skilled funds. ",
-    "The bolded row ($\\gamma = 0.20$) provides the population-level ",
+    "The reference row ($\\gamma = 0.20$) provides the population-level ",
     "estimates $\\hat{\\pi}^-_A$ and $\\hat{\\pi}^+_A$ following ",
     "\\textcite{BarrasScailletWermers2010}. ",
     "Negative $T^+_\\gamma$ entries indicate right-tail significance does ",

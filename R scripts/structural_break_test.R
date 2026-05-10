@@ -71,6 +71,10 @@ library(slider)
 library(strucchange)   # Bai-Perron breakpoints(), Fstats(), sctest()
 library(sandwich)      # NeweyWest() for HAC CIs on break dates
 
+# Working directory: data folder (same convention as master_pipeline.R)
+if (!exists("WORKING_DIR")) WORKING_DIR <- "D:/TEZ/data/R import"
+setwd(WORKING_DIR)
+
 # =============================================================================
 # CONFIGURATION
 # =============================================================================

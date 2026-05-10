@@ -84,6 +84,25 @@ fmt_n <- function(n) {
   formatC(n, format = "d", big.mark = ",")
 }
 
+# PHASE B helper: move tablenotes outside the table float (fixes Overfull \vbox).
+threeparttable_note_after <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s  <- gsub(note_rx, "", s, perl = TRUE)
+  s  <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s  <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  sub("\\end{table}", paste0("\\end{table}\n\\begin{minipage}{0.92\\linewidth}\n",
+    "\\footnotesize\\textit{Note:} ", ni, "\n\\end{minipage}\n"),
+    s, fixed = TRUE)
+}
+
 # Decision tag from joint p and a directional signal. "Reject" if joint p
 # crosses a 10% threshold; appended interpretation depends on the
 # hypothesis-specific direction stored in `dir_tag`.
@@ -136,9 +155,11 @@ if (!is.null(H2_models)) {
       "t4" = "Discriminant"
     )
     n_used <- if (!is.null(tt$n)) tt$n else nobs(pri$m2)
+    # BUG FIX (v1.x): delta_1 in plain text → subscript math-mode cascade
+    # in LaTeX (escape=FALSE passes _ through). Wrap in $...\delta_1...$.
     dir_tag <- if (is.na(tt$d1_z)) "" else
-               if (tt$d1_z > 0) "BP margin-call (delta_1 > 0)"
-               else "Disposition (delta_1 < 0)"
+               if (tt$d1_z > 0) "BP margin-call ($\\delta_1 > 0$)"
+               else "Disposition ($\\delta_1 < 0$)"
     rows[[length(rows) + 1L]] <- c(
       "H2: Disp./IoC",
       state_lbl,
@@ -233,7 +254,10 @@ caption <- paste0(
 fn <- paste0(
   "Stars on individual coefficients are reported in the underlying tables. ",
   "All specifications use the primary-spec aligned sample (contemporaneous ",
-  "state variables; fund FE for H1--H3; Lipper $\\times$ yearmo FE for H4) ",
+  # BUG FIX: $\\times$ in threeparttable footnote → kableExtra strips one
+  # backslash → $times$ in LaTeX (wrong). 4 source backslashes needed:
+  # \\\\times in source → \\times in memory → \times in LaTeX after stripping.
+  "state variables; fund FE for H1--H3; Lipper $\\\\times$ yearmo FE for H4) ",
   "with two-way clustering on Ticker and calendar month (Petersen 2009)."
 )
 
@@ -249,6 +273,7 @@ ktab <- kbl(
 
 tex <- as.character(ktab)
 tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
+tex <- threeparttable_note_after(tex)  # PHASE B: move note outside float
 writeLines(tex, OUTPUT_SUMMARY)
 cat(sprintf("Wrote %s\n", OUTPUT_SUMMARY))
 

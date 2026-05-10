@@ -1,9 +1,9 @@
 PUSH 
-cd /d "D:\TEZ"  
+cd "D:\TEZ"  
 git status
 
 git add -A  
-git commit -m 'fixed backslash count and bold characters'
+git commit -m 'Phase B complete: threeparttable_note_after() across 10 scripts; Patches 1-3; bold/texttt sweeps; alpha_reporting v8.5'
 git push
 
 PULL

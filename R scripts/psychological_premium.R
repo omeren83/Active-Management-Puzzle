@@ -76,6 +76,25 @@ if (!requireNamespace("MASS", quietly = TRUE))
 if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 OUTPUT_TEX <- file.path(WORKING_DIR, "table_psychological_premium.tex")
 
+# PHASE B helper: move tablenotes outside the table float (fixes Overfull \vbox).
+threeparttable_note_after <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s  <- gsub(note_rx, "", s, perl = TRUE)
+  s  <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s  <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  sub("\\end{table}", paste0("\\end{table}\n\\begin{minipage}{0.92\\linewidth}\n",
+    "\\footnotesize\\textit{Note:} ", ni, "\n\\end{minipage}\n"),
+    s, fixed = TRUE)
+}
+
 DO_BOOTSTRAP <- TRUE
 B_BOOT       <- 1000L
 SET_SEED     <- 20260502L
@@ -400,6 +419,7 @@ ktab <- kbl(
 
 tex <- as.character(ktab)
 tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
+tex <- threeparttable_note_after(tex)  # PHASE B: move note outside float
 writeLines(tex, OUTPUT_TEX)
 cat(sprintf("Wrote %s\n", OUTPUT_TEX))
 
