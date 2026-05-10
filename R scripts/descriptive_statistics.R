@@ -146,6 +146,19 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
       x <- sub("(\\\\end[{]tabular[}])", "\\1\n}", x)
     }
   }
+  # SBE caption-width fix (Phase 2b in the SBE_needed_fixes audit):
+  # Move \caption inside \begin{threeparttable} so threeparttable constrains
+  # the caption width to the tabular's natural width. kableExtra otherwise
+  # emits \caption BEFORE threeparttable, leaving caption at full \linewidth
+  # and visually overhanging narrower tables. Also strips the redundant
+  # second \centering kableExtra inserts between \caption and threeparttable.
+  # Brace-balanced caption matching via perl regex (handles \label{...} inside).
+  x <- gsub(
+    "\\\\caption\\{((?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*)\\}\\s*\n\\\\centering\\s*\n((?:\\\\resizebox\\{[^{}]*(?:\\{[^{}]*\\}[^{}]*)*\\}\\{[^}]*\\}\\{\\s*\n)?)\\\\begin\\{threeparttable\\}",
+    "\\2\\\\begin{threeparttable}\n\\\\caption{\\1}",
+    x,
+    perl = TRUE
+  )
   # small=TRUE: reduce footnote font to prevent "Float too large" on long-footnote tables
   if (small) {
     x <- sub("(\\\\begin\\{table\\}[^\n]*\n)", "\\1\\\\small\n", x)
@@ -186,7 +199,8 @@ latex_t1 <- counts_raw %>%
     caption   = "Fund Sample Composition by Panel",
     label     = "fund_counts",
     col.names = c("Panel", "Active", "Passive", "Unknown", "Total"),
-    align     = c("l", "r", "r", "r", "r")
+    align     = c("l", "r", "r", "r", "r"),
+    format.args = list(big.mark = ",")        # SBE Part 7 (p.36): commas for thousands
   ) %>%
   kable_styling(latex_options = "hold_position") %>%
   footnote(

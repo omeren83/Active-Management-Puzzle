@@ -347,9 +347,13 @@
   textfont        = normalfont,    % force non-bold caption text
   skip            = 12pt,          % gap between caption bottom and table top (visible separation)
   position        = top,           % caption is ABOVE the table
-  width           = \linewidth,    % prevent overflow in threeparttable
   singlelinecheck = false,         % short captions also obey justification (else \centering wrapper centres them)
   justification   = raggedright    % left-align caption text to table left edge
+  % NOTE: width= intentionally not set. With \caption{} placed INSIDE the
+  % threeparttable environment in each table file, threeparttable measures
+  % the tabular's natural width and constrains the caption to match it.
+  % Setting width=\linewidth would override this and force every caption
+  % to span the full text width regardless of the table's actual width.
 }
 \captionsetup[figure]{
   labelsep        = periodtwospace,
@@ -358,9 +362,9 @@
   textfont        = normalfont,    % force non-bold caption text
   skip            = 12pt,          % gap between figure bottom and caption top (visible separation)
   position        = bottom,        % caption is BELOW the figure
-  width           = \linewidth,
   singlelinecheck = false,
   justification   = raggedright
+  % NOTE: width= intentionally not set. See [table] block above.
 }
 % \captionsetup[table] does not propagate to longtable (separate float class).
 % Mirror SBE rules onto longtable so floats and longtables look identical.
