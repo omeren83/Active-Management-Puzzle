@@ -180,6 +180,27 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
       x <- sub("(\\\\end[{]tabular[}])", "\\1\n}", x)
     }
   }
+  # SBE caption-width fix (Phase 2b in the SBE_needed_fixes audit):
+  # Move \caption inside \begin{threeparttable} so threeparttable constrains
+  # the caption width to the tabular's natural width. kableExtra otherwise
+  # emits \caption BEFORE threeparttable, leaving caption at full \linewidth
+  # and visually overhanging narrower tables. Also strips the redundant
+  # second \centering kableExtra inserts between \caption and threeparttable.
+  # Brace-balanced caption matching via perl regex (handles \label{...} inside).
+  x <- gsub(
+    "\\\\caption\\{((?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*)\\}\\s*\n\\\\centering\\s*\n((?:\\\\resizebox\\{[^{}]*(?:\\{[^{}]*\\}[^{}]*)*\\}\\{[^}]*\\}\\{\\s*\n)?)\\\\begin\\{threeparttable\\}",
+    "\\2\\\\begin{threeparttable}\n\\\\caption{\\1}",
+    x,
+    perl = TRUE
+  )
+  # Same transform for the ThreePartTable (longtable) variant used by
+  # portfolio_sorts.R, persistence_testing.R, and activeness_analysis.R.
+  x <- gsub(
+    "\\\\caption\\{((?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*)\\}\\s*\n\\\\centering\\s*\n((?:\\\\resizebox\\{[^{}]*(?:\\{[^{}]*\\}[^{}]*)*\\}\\{[^}]*\\}\\{\\s*\n)?)\\\\begin\\{ThreePartTable\\}",
+    "\\2\\\\begin{ThreePartTable}\n\\\\caption{\\1}",
+    x,
+    perl = TRUE
+  )
   if (small) x <- sub("(\\\\begin\\{table\\}[^\n]*\n)", "\\1\\\\small\n", x)
   x
 }
