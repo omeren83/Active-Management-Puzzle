@@ -833,7 +833,7 @@ Berk--Green logic survives that extension; \textcite{PastorStambaughTaylor2015}
 provide robust empirical support for both fund-level and industry-level
 diseconomies of scale. \textcite{BerkVanBinsbergen2015} go further and
 argue that, when measured in dollars rather than basis points, active
-managers \emph{are} skilled --- the average manager extracts approximately
+managers are skilled --- the average manager extracts approximately
 \$3.2 million per year of value-added from capital markets --- and that
 this skill is persistent for as long as ten years.
 
@@ -1621,7 +1621,7 @@ descriptive statistics of Section~\ref{sec:descriptive} for completeness.
 \label{sec:returns}
 
 \noindent The Bloomberg total-return index series carries dividend
-reinvestment but is published \emph{gross} of fees at the share-class
+reinvestment but is published gross of fees at the share-class
 level, in the convention adopted by most non-CRSP databases. Monthly
 gross returns are computed as
 $r^{\mathrm{gross}}_{i,t} = \mathrm{Index}_{i,t} / \mathrm{Index}_{i,t-1} - 1$
@@ -1779,7 +1779,7 @@ full-period alpha $\hat{\alpha}_i$ is subtracted from the excess return
 series, yielding a zero-alpha null series
 $\tilde{r}_{i,t} = r^g_{i,t} - r^f_t - \hat{\alpha}_i$. In each of
 $B = 10{,}000$ bootstrap iterations, calendar months are resampled with
-replacement \emph{across all funds simultaneously} --- the same set of
+replacement across all funds simultaneously --- the same set of
 calendar months is drawn for every fund in a given iteration --- and
 the Carhart four-factor model of Equation~\ref{eq:carhart} is
 re-estimated on the resampled series for each fund. The cross-sectional
@@ -2389,7 +2389,7 @@ conventional inferential thresholds. This finding does not imply that
 managerial skill does not exist in the population --- it almost
 certainly does, in the \textcite{BerkVanBinsbergen2015} dollar-value
 sense --- but that the population mass of managers whose
-\emph{net-of-fee} alpha is detectably positive in standard hypothesis
+net-of-fee alpha is detectably positive in standard hypothesis
 tests is, on this sample, indistinguishable from the false-discovery
 rate at any threshold the data can support. The genuinely unskilled
 mass, by contrast, is robustly estimated at approximately 20\% across
@@ -2484,7 +2484,7 @@ section partition the actively managed universe along characteristics
 that prior literature has documented as predictors of cross-sectional
 alpha. None of those characteristics, however, addresses the question
 that motivates this dissertation directly: holding everything else
-constant, does \emph{being more active} --- deviating more from
+constant, does being more active --- deviating more from
 systematic factor exposures or from a stated benchmark --- produce a
 different alpha? This section provides that test.
 
@@ -2493,7 +2493,7 @@ The cross-sectional question contrasts three priors. Under
 across funds in equilibrium and no monotone activeness--alpha
 gradient is predicted. \textcite{AmihudGoyenko2013} argue that the
 residual share of fund return variance not explained by systematic
-factors, $1-R^2$, captures \emph{productive} idiosyncratic
+factors, $1-R^2$, captures productive idiosyncratic
 risk-taking by managers with information advantages and is therefore
 a forward-looking predictor of alpha; under their prior the gradient
 should be positive. \textcite{CremersPetajisto2009}, working with a
@@ -2748,7 +2748,7 @@ the cross-section. Second, the
 identifies a population unskilled mass of approximately 20\% with no
 detectable population skilled mass, and a Bai--Perron structural break
 at November 2011 that materially intensifies the unskilled
-proportion in the post-break regime. Third, activeness predicts \emph{worse}
+proportion in the post-break regime. Third, activeness predicts worse
 risk-adjusted returns net of fees in the cross-section, and amplifies
 loser persistence in the longitudinal dimension. These facts jointly
 falsify the simple ``investors are paying for skill'' interpretation:
@@ -2889,7 +2889,7 @@ prediction is $0.975$). The result rejects the
 the \textcite{BrunnermeierPedersen2009} margin-call alternative.
 
 The economic interpretation is that high margin-debt regimes are
-associated with \emph{accelerated} redemptions of losers, not with
+associated with accelerated redemptions of losers, not with
 disposition-driven retention. This is the opposite of the
 behavioral prediction H2 was originally designed to test, and the
 finding is reported as such. The result does not falsify the
@@ -3284,7 +3284,7 @@ Three competing readings of the regime shift are consistent with
 the empirical evidence, each of which the present dissertation
 neither confirms nor rules out.
 
-\textit{Reading 1: Passive competition compressing active margins.}
+Reading 1: Passive competition compressing active margins.
 The 2010s witnessed an unprecedented secular shift of retail
 capital from active to passive vehicles. By 2019, index mutual
 funds and exchange-traded funds first crossed the fifty-percent
@@ -3299,8 +3299,8 @@ returns to scale prediction: as the active management industry's
 share of capital declines, the per-fund hurdle for generating
 positive net alpha rises mechanically.
 
-\textit{Reading 2: Algorithmic trading eliminating cross-sectional
-alpha opportunities.} The 2010s also witnessed the maturation of
+Reading 2: Algorithmic trading eliminating cross-sectional
+alpha opportunities. The 2010s also witnessed the maturation of
 high-frequency and quantitative trading strategies that exploit
 cross-sectional return predictability at high frequency. Under
 this reading, the post-2011 alpha compression reflects the
@@ -3313,7 +3313,7 @@ factor-investing literature, in which apparent cross-sectional
 predictability has been substantially reduced by the maturation
 of quantitative competition.
 
-\textit{Reading 3: Selection effects from fund entry/exit.} The
+Reading 3: Selection effects from fund entry/exit. The
 post-2011 regime shift could in principle reflect changes in the
 composition of the active fund universe rather than changes in
 average managerial skill. Under this reading, the post-2011
@@ -3708,7 +3708,7 @@ month's value. (3) The last date on which the index moved is identified
 for each fund. (4) The length of the terminal frozen block --- the
 count of \texttt{is\_frozen} observations strictly after the last
 movement date --- is computed. (5) The terminal frozen block is removed
-\emph{only if its length is at least two}, which corresponds to at
+only if its length is at least two, which corresponds to at
 least three consecutive identical index values at the tail; once this
 threshold is met, deletion begins at the first repeated value.
 
@@ -3936,17 +3936,17 @@ Appendix~\ref{app:benchmark}.
 Priority 3 --- Bloomberg field derivation. For funds not
 resolved by Priorities 1 or 2, the Bloomberg \texttt{Mcap\_Focus} and
 \texttt{Fund\_Strategy} fields are combined to construct a Lipper
-category label. Three sub-cases are applied in order. \textit{3a:}
+category label. Three sub-cases are applied in order. 3a:
 both fields present (182 funds, source tag
 \texttt{Derived\_McapStrat}). The Lipper category is constructed as
 [Size~Prefix]~[Style~Suffix]~Funds, where the size prefix is derived
 from \texttt{Mcap\_Focus} and the style suffix from
-\texttt{Fund\_Strategy}. \textit{3b:} \texttt{Mcap\_Focus} present,
+\texttt{Fund\_Strategy}. 3b: \texttt{Mcap\_Focus} present,
 \texttt{Fund\_Strategy} missing or non-standard (49 funds, source tag
 \texttt{Derived\_McapOnly}). The fund is assigned to the Core
 category for the identified size tier; the rationale is that a
 missing strategy field provides no style evidence, and Core (Blend)
-is the modal category and the least biased default. \textit{3c:}
+is the modal category and the least biased default. 3c:
 \texttt{Fund\_Strategy} present, \texttt{Mcap\_Focus} missing or
 equal to Broad Market (175 funds, source tag
 \texttt{Derived\_StratOnly}). The fund is assigned to the Multi-Cap
@@ -4488,7 +4488,7 @@ Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
 4 & Nov 2011 & Jun 2011  & Feb 2012  & --- \\
 5 & Jan 2023 & Dec 2021  & Jul 2024  & --- \\
 \midrule
-\multicolumn{5}{l}{\textit{Implied six-regime partition:}} \\[3pt]
+\multicolumn{5}{l}{Implied six-regime partition:} \\[3pt]
 \multicolumn{4}{l}{Period 1: Dec 1996 -- Dec 1999 \hfill (37 months)}
     & $-0.59$ \\
 \multicolumn{4}{l}{Period 2: Jan 2000 -- Dec 2002 \hfill (36 months)}
@@ -4502,8 +4502,8 @@ Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
 \multicolumn{4}{l}{Period 6: Feb 2023 -- Jan 2026 \hfill (36 months)}
     & $-2.20$ \\
 \midrule
-\multicolumn{5}{l}{\textit{Three-regime partition adopted in
-                   Section~\ref{sec:subperiod_panels}:}} \\[3pt]
+\multicolumn{5}{l}{Three-regime partition adopted in
+                   Section~\ref{sec:subperiod_panels}:} \\[3pt]
 \multicolumn{4}{l}{P1: Dec 1996 -- Dec 2005 \hfill (109 months)}
     & $+0.09$ \\
 \multicolumn{4}{l}{P2: Jan 2006 -- Nov 2011 \hfill (71 months)}
@@ -4515,7 +4515,7 @@ Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
 \begin{minipage}{\linewidth}
 \vspace{4pt}
 \footnotesize
-\textit{Note:} Break dates estimated via \textcite{Bai1998} and
+Note: Break dates estimated via \textcite{Bai1998} and
 \textcite{Bai2003} with minimum segment 36 months; optimal break count
 (five) selected by BIC from the \citealt{Andrews1991} supF, meanF, and
 expF tests (supF $= 57.33$, meanF $= 23.12$, expF $= 25.44$; all
@@ -4647,7 +4647,7 @@ puzzle survives qualitatively under FF6 and Carhart$+$PSL. Pooled EW
 net alpha remains negative under both specifications; VW net alpha
 remains modestly negative; and the BSW decomposition remains within
 the $\gamma^* = 0.20$ range documented in the main text. Indeed, the
-puzzle \emph{strengthens} under FF6: the median fund alpha is more
+puzzle strengthens under FF6: the median fund alpha is more
 negative under FF6 than under Carhart, the Storey $\hat{\pi}_0$
 estimate falls slightly, and the genuinely unskilled mass
 $T^-_{\gamma^*}$ rises by approximately 1.5 percentage points. The
