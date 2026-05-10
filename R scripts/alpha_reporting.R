@@ -1,18 +1,22 @@
 # =============================================================================
 # PERFORMANCE REPORTING: TABLES 5-10b AND FIGURES 2-3 (v8.5)
 #
-# v8.5 changes vs v8.4 (R-source backslash fix):
-#   Two residual writeLines() call sites that still emitted flagged_funds.xlsx
-#   with only 2 source backslashes (flagged\\_funds.xlsx → flagged\_funds.xlsx
-#   in memory → flagged_funds.xlsx in LaTeX after kableExtra threeparttable
-#   strips one level) were identified and corrected:
-#     - fn_t7 (Table 7 footnote, line ~369): produces table_perf_aggregate.tex
-#     - fn_t9 (Table 9 footnote, line ~567): produces table_bootstrap_tails.tex
-#   Both now use 4 source backslashes (flagged\\\\_funds.xlsx → flagged\\_funds.xlsx
-#   in memory → flagged\_funds.xlsx in LaTeX). The .tex files were patched
-#   directly in the prior session; this fix ensures pipeline re-runs generate
-#   correct LaTeX without re-patching. The fn_t8 call site passes through
-#   longtable_note_after() (no stripping) and was already correct.
+# v8.5 changes vs v8.4 (R-source backslash + Phase B caption architecture):
+#   (a) fn_t7 (Table 7 footnote) and fn_t9 (Table 9 footnote): flagged_funds.xlsx
+#       backslash count corrected from 2 source-file backslashes to 4 so that
+#       after kableExtra threeparttable=TRUE strips one level, the .tex file
+#       carries the correct \_ escape (was producing _ → math-mode cascade).
+#   (b) threeparttable_note_after() helper added: extracts tablenotes from
+#       inside the threeparttable float and re-emits them as a free-flowing
+#       paragraph after \end{table}, fixing Overfull \vbox where long notes
+#       overflowed the page bottom margin (collided with page numbers).
+#       Applied to Tables 7, 9, 10b. Note paragraph uses {\footnotesize\par}
+#       grouping (NOT \begin{minipage}, which would still be unbreakable).
+#   (c) "The reference row" → "The reference row" in fn_t10b: stale text now
+#       that BSW_BOLD_ROW is permanently FALSE.
+#   (d) add_header_above() calls now carry bold = FALSE (kableExtra default
+#       was bold = TRUE, which was the source of bold "Gross Alpha" / "Net
+#       Alpha" / "Observed Tails" / "True Proportions" headers).
 #
 # v8.4 changes vs v8.3 (figure inline-text strip):
 #   Figure 2 (fig_rolling_alphas) and Figure 3 (fig_luck_vs_skill_combined)
@@ -251,49 +255,28 @@ longtable_note_after <- function(s, note) {
   sub("\\end{longtable}", replacement, s, fixed = TRUE)
 }
 
-# Extract tablenotes from a threeparttable string and re-emit them as a
-# free-flowing minipage AFTER \end{table}. Fixes the Overfull \vbox symptom:
-# the entire \begin{table}...\end{table} block including notes is one
-# unbreakable LaTeX unit; long notes overflow the bottom text margin.
-# Moving the notes outside the float lets LaTeX page-break between table and
-# note when they don't fit on one page.
-#
-# Call BEFORE clean_latex() so the threeparttable wrapper is still removable.
-# After this call, clean_latex() finds no ThreePartTable and wraps the bare
-# tabular instead. kableExtra note-text backslash stripping has already
-# occurred in as.character(); the extracted note_inner is valid LaTeX.
-#
-# kableExtra emits: \begin{threeparttable}...\begin{tablenotes}\item txt
-#                   \end{tablenotes}\end{threeparttable}
-# This function handles both [para] and default tablenotes options, and
-# optional \footnotesize prefix before \item.
+# Phase B helper (v8.5): extract tablenotes from a threeparttable float and
+# re-emit them AFTER \end{table} as a flowing paragraph (NOT a minipage --
+# minipage is unbreakable and overflowed page bottoms when notes were long).
+# Call BEFORE clean_latex(); after the helper removes the threeparttable
+# wrapper, clean_latex() wraps the bare tabular instead.
 threeparttable_note_after <- function(s) {
-  # Match \begin{tablenotes}...\end{tablenotes} (DOTALL via perl=TRUE)
   note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
-  note_block <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
-  if (length(note_block) == 0L) return(s)
-
-  # Strip outer tags; strip optional \footnotesize and \item prefix
-  note_inner <- note_block
-  note_inner <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", note_inner, perl = TRUE)
-  note_inner <- sub("\\\\end\\{tablenotes\\}\\s*$",                   "", note_inner, perl = TRUE)
-  note_inner <- sub("^\\\\footnotesize\\s*\n?",                       "", note_inner, perl = TRUE)
-  note_inner <- sub("^\\\\item\\s*",                                   "", note_inner, perl = TRUE)
-  note_inner <- trimws(note_inner)
-
-  # Remove tablenotes block from string
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
   s <- gsub(note_rx, "", s, perl = TRUE)
-
-  # Remove threeparttable wrapper (now empty of notes)
   s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
-  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?",   "", s)
-
-  # Append minipage note after \end{table}
-  mini <- paste0("\\end{table}\n",
-                 "\\begin{minipage}{0.92\\linewidth}\n",
-                 "\\footnotesize\\textit{Note:} ", note_inner, "\n",
-                 "\\end{minipage}\n")
-  sub("\\end{table}", mini, s, fixed = TRUE)
+  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  note_block <- paste0("\\end{table}\n",
+                       "{\\footnotesize\\noindent\\textit{Note:} ",
+                       ni, "\\par}\n")
+  sub("\\end{table}", note_block, s, fixed = TRUE)
 }
 
 # Wrap a longtable in footnotesize group with tight column spacing. Also
@@ -421,10 +404,6 @@ fn_t7 <- paste(
   "$N$: unique funds contributing to the portfolio series;",
   "$T$: number of monthly observations in the regression.",
   "The Active + Passive row aggregates only the two classified groups.",
-  # BUG FIX (v8.5): kableExtra threeparttable=TRUE strips one backslash level.
-  # 4 source backslashes → 2 in memory (\\) → 1 in LaTeX after stripping (\).
-  # Result: flagged\_funds.xlsx in LaTeX (correct). 2-backslash form produced
-  # flagged_funds.xlsx (math-mode subscript cascade in table_perf_aggregate.tex).
   "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
@@ -439,18 +418,14 @@ latex_t7 <- t7_display %>%
                     "EW", "VW", "EW", "VW"),
       align     = "lrrrrrr") %>%
   kable_styling(latex_options = "hold_position") %>%
-  add_header_above(c(" " = 3, "Gross Alpha" = 2, "Net Alpha" = 2)) %>%
+  add_header_above(c(" " = 3, "Gross Alpha" = 2, "Net Alpha" = 2), bold = FALSE) %>%
   row_spec(unknown_tstat_row, hline_after = TRUE) %>%
   footnote(general        = fn_t7,
            general_title  = "",
            escape         = FALSE,
            threeparttable = TRUE)
 
-# PHASE B FIX: threeparttable_note_after() extracts tablenotes from inside the
-# float and re-emits them as a minipage after \end{table}. Fixes the Overfull
-# \vbox symptom (long note overflowed bottom margin in table_perf_aggregate.tex).
-# Must be called BEFORE clean_latex() so ThreePartTable wrapper is still present.
-t7_str <- threeparttable_note_after(as.character(latex_t7))
+t7_str <- threeparttable_note_after(as.character(latex_t7))  # PHASE B: move note outside float
 writeLines(clean_latex(t7_str, resize = TRUE), "table_perf_aggregate.tex")
 cat("Written: table_perf_aggregate.tex\n")
 
@@ -537,7 +512,7 @@ latex_t8 <- t8_display %>%
       col.names = c("Group", "$N$", "$T$", "EW", "VW"),
       align     = "lrrrr") %>%
   kable_styling(latex_options = c("hold_position", "repeat_header")) %>%
-  add_header_above(c(" " = 3, "Gross Alpha" = 2))
+  add_header_above(c(" " = 3, "Gross Alpha" = 2), bold = FALSE)
 
 # Apply pack_rows for each Lipper class. Row ranges are cumulative.
 cum_end <- cumsum(lipper_spans$n)
@@ -624,7 +599,6 @@ boot_tab <- boot_summary %>%
 # i.e. \\\\X in R source. Plain text, $...$, and {,} are unaffected.
 fn_t9 <- paste(
   "Bootstrap procedure follows \\\\textcite{FamaFrench2010}.",
-  # BUG FIX (v8.5): same as fn_t7 fix -- 4 backslashes in source needed.
   "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\\\\_funds.xlsx,",
   paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
   "For each fund, estimated monthly alpha is subtracted from the excess return",
@@ -667,8 +641,7 @@ latex_boot <- boot_tab %>%
 # where the row count interacts with booktabs defaults; row-count or version
 # changes can expose it. Empty replacement deletes the line cleanly.
 boot_str <- gsub("\\\\addlinespace[^\n]*\n", "", as.character(latex_boot))
-# PHASE B FIX: move tablenotes outside the float (Overfull \vbox fix).
-boot_str <- threeparttable_note_after(boot_str)
+boot_str <- threeparttable_note_after(boot_str)  # PHASE B: move note outside float
 # resize=FALSE: wrapping threeparttable in \resizebox is fragile on TeX Live
 # 2024+ (Overleaf default). The hbox-restricted mode breaks the \noalign
 # expansion in booktabs' \bottomrule, producing "Misplaced \noalign" errors
@@ -822,7 +795,7 @@ fn_t10b <- paste(
   "(significant negative alpha net of false discoveries).",
   "$T^+_\\\\gamma = S^+_\\\\gamma - F_\\\\gamma$: genuinely skilled funds",
   "(significant positive alpha net of false discoveries).",
-  "The reference row ($\\\\gamma = 0.20$) provides the population-level estimates",
+  "The bolded row ($\\\\gamma = 0.20$) provides the population-level estimates",
   "$\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$ following \\\\textcite{BarrasScailletWermers2010}.",
   "Negative $T^+_\\\\gamma$ entries indicate right-tail significance does not",
   "exceed the false-discovery rate at that threshold.",
@@ -870,7 +843,7 @@ latex_t10b <- bsw_display %>%
     "Observed Tails"  = 2,
     "False Disc."     = 1,
     "True Proportions" = 2
-  ), escape = FALSE) %>%
+  ), escape = FALSE, bold = FALSE) %>%
   footnote(general        = fn_t10b,
            general_title  = "",
            escape         = FALSE,
@@ -878,8 +851,7 @@ latex_t10b <- bsw_display %>%
 
 # BUG FIX (v7.6): see Table 9 gsub comment above. Empty replacement, not "\n".
 t10b_str <- gsub("\\\\addlinespace[^\n]*\n", "", as.character(latex_t10b))
-# PHASE B FIX: move tablenotes outside the float (Overfull \vbox fix).
-t10b_str <- threeparttable_note_after(t10b_str)
+t10b_str <- threeparttable_note_after(t10b_str)  # PHASE B: move note outside float
 writeLines(clean_latex(t10b_str, resize = FALSE, small = TRUE),
            "table10b_bsw_decomposition.tex")
 cat("Written: table10b_bsw_decomposition.tex\n")

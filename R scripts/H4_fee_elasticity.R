@@ -76,25 +76,6 @@ OUTPUT_PRIMARY <- file.path(WORKING_DIR, "table_H4_regression.tex")
 OUTPUT_LAGGED  <- file.path(WORKING_DIR, "table_H4_lagged.tex")
 OUTPUT_ROBUST  <- file.path(WORKING_DIR, "table_H4_robustness.tex")
 
-# PHASE B helper: move tablenotes outside the table float (fixes Overfull \vbox).
-threeparttable_note_after <- function(s) {
-  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
-  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
-  if (!length(nb)) return(s)
-  ni <- nb
-  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
-  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
-  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
-  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
-  ni <- trimws(ni)
-  s  <- gsub(note_rx, "", s, perl = TRUE)
-  s  <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
-  s  <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
-  sub("\\end{table}", paste0("\\end{table}\n\\begin{minipage}{0.92\\linewidth}\n",
-    "\\footnotesize\\textit{Note:} ", ni, "\n\\end{minipage}\n"),
-    s, fixed = TRUE)
-}
-
 # --- 1. Pre-flight -----------------------------------------------------------
 if (!exists("panel_reg")) {
   rds_path <- file.path(WORKING_DIR, "panel_reg.rds")
@@ -244,6 +225,27 @@ get_coef <- function(mod, parts) {
 # (R_q main, ExpRatio main, ExpRatio x STATE, R_q x ExpRatio x STATE) are
 # displayed. Lower-order R_q x STATE and R_q x ExpRatio are estimated for
 # valid triple-interaction inference and suppressed for table clarity.
+# Phase B helper (compact form): extract tablenotes from a threeparttable
+# float and re-emit them AFTER \end{table} as a flowing paragraph (NOT a
+# minipage --- minipage is unbreakable and overflowed page bottoms).
+threeparttable_note_after_compact <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s <- gsub(note_rx, "", s, perl = TRUE)
+  s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  sub("\\end{table}",
+      paste0("\\end{table}\n{\\footnotesize\\noindent\\textit{Note:} ", ni, "\\par}\n"),
+      s, fixed = TRUE)
+}
+
 build_h4_table <- function(samp, fe_string,
                            d_sent_var, sent_cont_var, d_aaii_var,
                            output_path, table_label, caption, footnote_text,
@@ -442,7 +444,7 @@ build_h4_table <- function(samp, fe_string,
   ) %>%
     kable_styling(latex_options = c("repeat_header"),
                   font_size = 9) %>%
-    add_header_above(col_headers, escape = FALSE) %>%
+    add_header_above(col_headers, escape = FALSE, bold = FALSE) %>%
     row_spec(nrow(body_df), hline_after = TRUE) %>%
     footnote(general = footnote_text, general_title = "",
              threeparttable = TRUE, escape = FALSE)
@@ -452,7 +454,7 @@ build_h4_table <- function(samp, fe_string,
   # no-op when longtable=TRUE but is retained as defensive in case kableExtra
   # output changes format in future versions.
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
-  tex <- threeparttable_note_after(tex)  # PHASE B: move note outside float
+  tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 
@@ -461,17 +463,7 @@ build_h4_table <- function(samp, fe_string,
 }
 
 # --- 5. Captions and footnotes -----------------------------------------------
-cap_primary <- paste0(
-  "H4: Fee Elasticity Hypothesis. Panel regression of monthly proportional ",
-  "fund flows on within-Lipper-category lagged 12-month performance-rank ",
-  "segments and cross-fund expense ratios, with full triple interactions on ",
-  "contemporaneous sentiment regime indicators (Baker-Wurgler 2007 timing). ",
-  "Under the Berk \\& Green (2004) rational equilibrium, sentiment-driven ",
-  "flow should not depend on fee level: $\\delta_F = \\delta^F_q = 0$. The ",
-  "behavioral alternative predicts $\\delta_F > 0$ (sentiment amplifies ",
-  "fee tolerance) or $\\delta^F_1 > 0$ (the loser tail is most fee-elastic ",
-  "under high sentiment)."
-)
+cap_primary <- "H4: Fee Elasticity Hypothesis"
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
@@ -494,13 +486,7 @@ fn_primary <- paste0(
   "at source."
 )
 
-cap_lagged <- paste0(
-  "H4 Robustness --- Lagged Sentiment. Same specification as ",
-  "Table~\\ref{tab:H4_regression}, except sentiment is measured at $t-1$ ",
-  "rather than $t$ (Huang et al.\\ 2015 timing convention). ExpRatio is ",
-  "left in levels (it is time-invariant within fund, so lagging is ",
-  "meaningless)."
-)
+cap_lagged <- "H4 Robustness --- Lagged Sentiment"
 fn_lagged <- paste0(
   "Same sample, dependent variable, controls, identification strategy, ",
   "and FE structure as Table~\\\\ref{tab:H4_regression}. State variables in ",
@@ -513,15 +499,7 @@ fn_lagged <- paste0(
   "at source."
 )
 
-cap_robust <- paste0(
-  "H4 Robustness --- Yearmo-only Fixed Effects. Same contemporaneous-",
-  "sentiment specification as Table~\\ref{tab:H4_regression}, but with ",
-  "yearmo fixed effects in place of Lipper-category $\\times$ yearmo. ",
-  "Identification of expense-ratio slopes now includes between-style ",
-  "variation, providing a cross-check against unobserved style-level ",
-  "confounders (e.g.\\ growth funds systematically charging higher fees and ",
-  "attracting different flows)."
-)
+cap_robust <- "H4 Robustness --- Yearmo-Only Fixed Effects"
 fn_robust <- paste0(
   "Same sample, dependent variable, and rank construction as ",
   "Table~\\\\ref{tab:H4_regression}. Yearmo fixed effects absorb all ",

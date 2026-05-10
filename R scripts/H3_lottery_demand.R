@@ -53,25 +53,6 @@ OUTPUT_PRIMARY <- file.path(WORKING_DIR, "table_H3_regression.tex")
 OUTPUT_LAGGED  <- file.path(WORKING_DIR, "table_H3_lagged.tex")
 OUTPUT_ROBUST  <- file.path(WORKING_DIR, "table_H3_robustness.tex")
 
-# PHASE B helper: move tablenotes outside the table float (fixes Overfull \vbox).
-threeparttable_note_after <- function(s) {
-  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
-  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
-  if (!length(nb)) return(s)
-  ni <- nb
-  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
-  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
-  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
-  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
-  ni <- trimws(ni)
-  s  <- gsub(note_rx, "", s, perl = TRUE)
-  s  <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
-  s  <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
-  sub("\\end{table}", paste0("\\end{table}\n\\begin{minipage}{0.92\\linewidth}\n",
-    "\\footnotesize\\textit{Note:} ", ni, "\n\\end{minipage}\n"),
-    s, fixed = TRUE)
-}
-
 # --- 1. Pre-flight -----------------------------------------------------------
 if (!exists("panel_reg")) {
   rds_path <- file.path(WORKING_DIR, "panel_reg.rds")
@@ -195,6 +176,27 @@ get_coef <- function(mod, name) {
   tstat <- est / se_val
   c(coef = add_stars(fmt_num(est, 4), tstat),
     t    = paste0("(", formatC(tstat, format = "f", digits = 2), ")"))
+}
+
+# Phase B helper (compact form): extract tablenotes from a threeparttable
+# float and re-emit them AFTER \end{table} as a flowing paragraph (NOT a
+# minipage --- minipage is unbreakable and overflowed page bottoms).
+threeparttable_note_after_compact <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s <- gsub(note_rx, "", s, perl = TRUE)
+  s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  sub("\\end{table}",
+      paste0("\\end{table}\n{\\footnotesize\\noindent\\textit{Note:} ", ni, "\\par}\n"),
+      s, fixed = TRUE)
 }
 
 # --- 4. Master table builder -------------------------------------------------
@@ -333,14 +335,14 @@ build_h3_table <- function(samp, fe_string, state_var,
     align = c("l", rep("r", 4)), escape = FALSE, linesep = ""
   ) %>%
     kable_styling(latex_options = c("hold_position", "scale_down")) %>%
-    add_header_above(col_headers, escape = FALSE) %>%
+    add_header_above(col_headers, escape = FALSE, bold = FALSE) %>%
     row_spec(nrow(body_df), hline_after = TRUE) %>%
     footnote(general = footnote_text, general_title = "",
              threeparttable = TRUE, escape = FALSE)
 
   tex <- as.character(ktab)
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
-  tex <- threeparttable_note_after(tex)  # PHASE B: move note outside float
+  tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 
@@ -349,18 +351,7 @@ build_h3_table <- function(samp, fe_string, state_var,
 }
 
 # --- 5. Captions and footnotes -----------------------------------------------
-cap_primary <- paste0(
-  "H3: Lottery Demand Hypothesis. Panel regression of monthly proportional ",
-  "fund flows on three candidate activeness/lottery proxies, each interacted ",
-  "with the contemporaneous Baker--Wurgler sentiment regime indicator ",
-  "$D^{SENT}$. ActR2 is $1-R^2$ from the rolling 36-month Carhart regression ",
-  "(\\textcite{AmihudGoyenko2013} convention); ActSkew is sample skewness ",
-  "of trailing 36 monthly gross returns; MAX12 is the maximum monthly gross ",
-  "return over the trailing 12 months. Proxy selection methodology is ",
-  "documented in Appendix~G; the predicted null on ActR2's interaction ",
-  "tests the rational-channel restriction, while positive interactions on ",
-  "ActSkew and MAX12 test the behavioural-channel alternative."
-)
+cap_primary <- "H3: Lottery Demand Hypothesis"
 fn_primary <- paste0(
   "Dependent variable is the Sirri--Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
@@ -380,11 +371,7 @@ fn_primary <- paste0(
   "subsample per flagged\\\\_funds.xlsx."
 )
 
-cap_lagged <- paste0(
-  "H3 Robustness --- Lagged Sentiment. Same column specification as ",
-  "Table~\\ref{tab:H3_regression}, except $D^{SENT}$ is measured at $t-1$ ",
-  "rather than $t$ (\\textcite{HuangEtal2015} timing convention)."
-)
+cap_lagged <- "H3 Robustness --- Lagged Sentiment"
 fn_lagged <- paste0(
   "Same sample, dependent variable, lottery measures, and identification ",
   "strategy as Table~\\\\ref{tab:H3_regression}. $D^{SENT}_{t-1}$ replaces ",
@@ -395,14 +382,7 @@ fn_lagged <- paste0(
   "no date cap; H3 / activeness subsample per flagged\\\\_funds.xlsx."
 )
 
-cap_robust <- paste0(
-  "H3 Robustness --- Style $\\times$ Time Fixed Effects. Same ",
-  "contemporaneous-sentiment specification as ",
-  "Table~\\ref{tab:H3_regression}, but with Lipper-category $\\times$ yearmo ",
-  "two-way fixed effects in place of fund fixed effects. Identification ",
-  "shifts from within-fund to within-style-month variation, absorbing ",
-  "aggregate flow-flood and risk-on confounders."
-)
+cap_robust <- "H3 Robustness --- Style $\\times$ Time Fixed Effects"
 fn_robust <- paste0(
   "Same sample, dependent variable, and lottery measure construction as ",
   "Table~\\\\ref{tab:H3_regression}. Sentiment regime $D^{SENT}$ remains ",

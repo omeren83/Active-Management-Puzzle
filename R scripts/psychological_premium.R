@@ -76,25 +76,6 @@ if (!requireNamespace("MASS", quietly = TRUE))
 if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 OUTPUT_TEX <- file.path(WORKING_DIR, "table_psychological_premium.tex")
 
-# PHASE B helper: move tablenotes outside the table float (fixes Overfull \vbox).
-threeparttable_note_after <- function(s) {
-  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
-  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
-  if (!length(nb)) return(s)
-  ni <- nb
-  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
-  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
-  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
-  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
-  ni <- trimws(ni)
-  s  <- gsub(note_rx, "", s, perl = TRUE)
-  s  <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
-  s  <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
-  sub("\\end{table}", paste0("\\end{table}\n\\begin{minipage}{0.92\\linewidth}\n",
-    "\\footnotesize\\textit{Note:} ", ni, "\n\\end{minipage}\n"),
-    s, fixed = TRUE)
-}
-
 DO_BOOTSTRAP <- TRUE
 B_BOOT       <- 1000L
 SET_SEED     <- 20260502L
@@ -331,6 +312,26 @@ if (DO_BOOTSTRAP) {
   cat("  Bootstrap complete.\n")
 }
 
+# Phase B helper: extract tablenotes from a threeparttable float and re-emit
+# them AFTER \end{table} as a flowing paragraph (NOT a minipage).
+threeparttable_note_after_compact <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s <- gsub(note_rx, "", s, perl = TRUE)
+  s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  sub("\\end{table}",
+      paste0("\\end{table}\n{\\footnotesize\\noindent\\textit{Note:} ", ni, "\\par}\n"),
+      s, fixed = TRUE)
+}
+
 # --- 7. Build summary table -------------------------------------------------
 seg_label <- c(LOW = "$R^{LOW}$", MID = "$R^{MID}$", HIGH = "$R^{HIGH}$")
 all_sps <- list(ActR2 = sp_actr2, ActSkew = sp_actskew, MAX12 = sp_max12)
@@ -357,20 +358,7 @@ colnames(ppf_df) <- c("Lottery", "Segment",
                       "$p$ (1-sided)")
 rownames(ppf_df) <- NULL
 
-caption <- paste0(
-  "Psychological Premium (Shadow Price) Estimates. Marginal rate of ",
-  "substitution between performance rank ($R$) and the lottery proxy ",
-  "($\\text{AS}$) implied by the flow indifference condition ",
-  "$dF=0$, computed at three points along the Sirri--Tufano piecewise ",
-  "rank distribution and under both sentiment regimes (low: $D^{SENT}=0$; ",
-  "high: $D^{SENT}=1$). Negative entries indicate that investors trade ",
-  "off rank for lottery exposure; larger absolute values correspond to a ",
-  "larger psychological premium. The proposal's prediction is that ",
-  "$|\\text{SP}_{\\text{high}}|>|\\text{SP}_{\\text{low}}|$ for the ",
-  "behavioural-channel proxies (ActSkew, MAX12), with no such gap for ",
-  "the rational-channel proxy (ActR2). The 1-sided $p$ tests ",
-  "$\\text{Diff}=\\text{SP}_{\\text{high}}-\\text{SP}_{\\text{low}}<0$."
-)
+caption <- "Psychological Premium (Shadow Price) Estimates"
 fn <- paste0(
   "Each row is computed from a separate joint regression of the form ",
   "$\\\\text{flow}=\\\\beta_q R^q + \\\\delta_q R^q D^{SENT} + ",
@@ -419,7 +407,7 @@ ktab <- kbl(
 
 tex <- as.character(ktab)
 tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
-tex <- threeparttable_note_after(tex)  # PHASE B: move note outside float
+tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
 writeLines(tex, OUTPUT_TEX)
 cat(sprintf("Wrote %s\n", OUTPUT_TEX))
 

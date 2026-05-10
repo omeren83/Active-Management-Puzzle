@@ -539,7 +539,7 @@ k <- full_data %>%
       linesep   = "",
       escape    = FALSE,
       longtable = TRUE,
-      caption   = "Activeness-Conditioned Persistence: $10 \\times 3$ Bivariate Sort",
+      caption   = "Activeness-Conditioned Persistence Test",
       label     = "activeness_persistence",
       col.names = c("Decile",
                     "$\\hat{\\alpha}$", "$t(\\hat{\\alpha})$", "$p^C$",

@@ -150,31 +150,35 @@ write_tex <- function(lines, fn) {
   cat("Written:", path, "\n")
 }
 
-# PHASE B helper: for manually-built table character vectors, move
-# \begin{tablenotes}...\end{tablenotes} outside the \end{table} float as a
-# minipage. Removes \begin/\end{threeparttable} wrappers and the tablenotes
-# block; appends note as a minipage paragraph after \end{table}.
-# Fixes Overfull \vbox: the full table+notes block is an unbreakable unit.
+# Phase B helper: rewrite a manually-built table vector so the tablenotes
+# emerge AFTER \end{table} as a flowing paragraph instead of being trapped
+# inside an unbreakable threeparttable. Without this, long notes overflow
+# the page bottom and overwrite the page number.
 move_note_after_table <- function(lines) {
-  start_tn <- which(lines == "\\begin{tablenotes}")
-  end_tn   <- which(lines == "\\end{tablenotes}")
-  if (length(start_tn) == 0L) return(lines)
-  # lines inside: \footnotesize then \item text
-  note_text <- paste(lines[(start_tn + 2L):(end_tn - 1L)], collapse = " ")
-  rm_idx <- sort(unique(c(
-    which(lines == "\\begin{threeparttable}"),
-    which(lines == "\\end{threeparttable}"),
-    seq.int(start_tn, end_tn)
-  )))
-  lines <- lines[-rm_idx]
-  end_table_idx <- which(lines == "\\end{table}")
-  minipage <- c(
-    "\\begin{minipage}{0.92\\linewidth}",
-    paste0("\\footnotesize\\textit{Note:} ", note_text),
-    "\\end{minipage}"
-  )
-  c(lines[seq_len(end_table_idx)], minipage)
+  notes_open  <- grep("\\\\begin\\{tablenotes\\}", lines)[1]
+  notes_close <- grep("\\\\end\\{tablenotes\\}",   lines)[1]
+  tp_open     <- grep("\\\\begin\\{threeparttable\\}", lines)[1]
+  tp_close    <- grep("\\\\end\\{threeparttable\\}",   lines)[1]
+  tab_close   <- grep("\\\\end\\{table\\}", lines)[1]
+  if (any(is.na(c(notes_open, notes_close, tp_open, tp_close, tab_close)))) return(lines)
+  # Extract note body (between \begin{tablenotes} and \end{tablenotes},
+  # excluding the boundary lines and any \footnotesize / \item prefixes).
+  note_body <- lines[(notes_open + 1L):(notes_close - 1L)]
+  note_body <- sub("^\\\\footnotesize\\s*$", "", note_body)
+  note_body <- sub("^\\\\item\\s*",          "", note_body)
+  note_text <- paste(trimws(note_body), collapse = " ")
+  note_text <- gsub("\\s+", " ", trimws(note_text))
+  # Strip the threeparttable wrapper and tablenotes block from the table.
+  to_drop <- c(tp_open, tp_close,
+               notes_open:notes_close)
+  kept <- lines[setdiff(seq_along(lines), to_drop)]
+  # Find the new \end{table} index after dropping
+  new_tab_close <- grep("\\\\end\\{table\\}", kept)[1]
+  note_block <- paste0("{\\footnotesize\\noindent\\textit{Note:} ",
+                       note_text, "\\par}")
+  c(kept[seq_len(new_tab_close)], note_block)
 }
+
 
 # Compute pooled statistics for one spec and one ap_group.
 # Returns a named list; n_funds = 0 if group not in spec.
@@ -277,7 +281,8 @@ e1_tex <- c(
   "\\end{threeparttable}",
   "\\end{table}"
 )
-write_tex(move_note_after_table(e1_tex), "table_alpha_comparison_robust.tex")
+e1_tex <- move_note_after_table(e1_tex)  # PHASE B: move note outside float
+write_tex(e1_tex, "table_alpha_comparison_robust.tex")
 
 # =============================================================================
 # 4. TABLE E.2:  BOOTSTRAP PERCENTILE COMPARISON
@@ -358,7 +363,8 @@ e2_tex <- c(
   "\\end{threeparttable}",
   "\\end{table}"
 )
-write_tex(move_note_after_table(e2_tex), "table_bootstrap_comparison_robust.tex")
+e2_tex <- move_note_after_table(e2_tex)  # PHASE B: move note outside float
+write_tex(e2_tex, "table_bootstrap_comparison_robust.tex")
 
 # =============================================================================
 # 5. TABLE E.3:  BSW DECOMPOSITION COMPARISON AT GAMMA* = 0.20
@@ -444,7 +450,8 @@ e3_tex <- c(
   "\\end{threeparttable}",
   "\\end{table}"
 )
-write_tex(move_note_after_table(e3_tex), "table_bsw_comparison_robust.tex")
+e3_tex <- move_note_after_table(e3_tex)  # PHASE B: move note outside float
+write_tex(e3_tex, "table_bsw_comparison_robust.tex")
 
 # =============================================================================
 # 6. SUMMARY + BIBLIOGRAPHY NOTE

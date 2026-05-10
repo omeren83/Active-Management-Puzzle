@@ -600,7 +600,7 @@ latex_t7 <- t7_display %>%
                     "EW", "VW", "EW", "VW"),
       align     = "lrrrrrr") %>%
   kable_styling(latex_options = "hold_position") %>%
-  add_header_above(c(" " = 3, "Gross Alpha" = 2, "Net Alpha" = 2)) %>%
+  add_header_above(c(" " = 3, "Gross Alpha" = 2, "Net Alpha" = 2), bold = FALSE) %>%
   row_spec(unknown_tstat_row_FF, hline_after = TRUE) %>%
   footnote(general        = fn_t7,
            general_title  = "",
@@ -799,7 +799,7 @@ latex_t10b <- bsw_display %>%
                      "Observed Tails"  = 2,
                      "False Disc."     = 1,
                      "True Proportions" = 2),
-                   escape = FALSE) %>%
+                   escape = FALSE, bold = FALSE) %>%
   footnote(general        = fn_t10b,
            general_title  = "",
            escape         = FALSE,

@@ -273,28 +273,26 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
   x
 }
 
-# Phase B helper: extract tablenotes from inside a threeparttable float and
-# emit them as a free-flowing minipage AFTER \end{table}. Fixes Overfull \vbox
-# (long notes overflow bottom margin). Mirror of the helper in alpha_reporting.R.
-# Call BEFORE clean_latex() so the threeparttable wrapper is still present.
+# Phase B helper: extract tablenotes from a threeparttable float and re-emit
+# them AFTER \end{table} as a flowing paragraph (NOT a minipage --- minipage
+# is unbreakable and overflowed page bottoms when notes were long).
 threeparttable_note_after <- function(s) {
   note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
-  note_block <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
-  if (length(note_block) == 0L) return(s)
-  note_inner <- note_block
-  note_inner <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", note_inner, perl = TRUE)
-  note_inner <- sub("\\\\end\\{tablenotes\\}\\s*$",                   "", note_inner, perl = TRUE)
-  note_inner <- sub("^\\\\footnotesize\\s*\n?",                       "", note_inner, perl = TRUE)
-  note_inner <- sub("^\\\\item\\s*",                                   "", note_inner, perl = TRUE)
-  note_inner <- trimws(note_inner)
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
   s <- gsub(note_rx, "", s, perl = TRUE)
   s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
-  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?",   "", s)
-  mini <- paste0("\\end{table}\n",
-                 "\\begin{minipage}{0.92\\linewidth}\n",
-                 "\\footnotesize\\textit{Note:} ", note_inner, "\n",
-                 "\\end{minipage}\n")
-  sub("\\end{table}", mini, s, fixed = TRUE)
+  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  note_block <- paste0("\\end{table}\n",
+                       "{\\footnotesize\\noindent\\textit{Note:} ",
+                       ni, "\\par}\n")
+  sub("\\end{table}", note_block, s, fixed = TRUE)
 }
 
 # =============================================================================
@@ -744,7 +742,7 @@ latex_d2 <- perf_data %>%
                     "EW", "VW", "EW", "VW"),
       align     = "lrrrrrr") %>%
   kable_styling(latex_options = "hold_position") %>%
-  add_header_above(c(" " = 3, "Gross Alpha" = 2, "Net Alpha" = 2)) %>%
+  add_header_above(c(" " = 3, "Gross Alpha" = 2, "Net Alpha" = 2), bold = FALSE) %>%
   footnote(general        = fn_d2,
            general_title  = "",
            escape         = FALSE,
@@ -855,8 +853,7 @@ d3_str <- as.character(latex_d3)
 # Strip any \addlinespace kableExtra may have inserted (bug-fix rule from
 # alpha_reporting.R v7.6 -- empty replacement, not "\n").
 d3_str <- gsub("\\\\addlinespace[^\n]*\n", "", d3_str)
-# PHASE B FIX: move tablenotes outside float (was 170pt Overfull \vbox).
-d3_str <- threeparttable_note_after(d3_str)
+d3_str <- threeparttable_note_after(d3_str)  # PHASE B: move note outside float
 writeLines(clean_latex(d3_str, resize = FALSE, small = TRUE),
            "table_subperiod_bootstrap_tails.tex")
 cat("Written: table_subperiod_bootstrap_tails.tex\n")
@@ -990,7 +987,7 @@ latex_d5 <- bsw_data %>%
                      "Observed Tails"   = 2,
                      "False Disc."      = 1,
                      "True Proportions" = 2),
-                   escape = FALSE) %>%
+                   escape = FALSE, bold = FALSE) %>%
   footnote(general        = fn_d5,
            general_title  = "",
            escape         = FALSE,
@@ -1005,6 +1002,7 @@ for (i in seq_len(nrow(bsw_packs))) {
 
 d5_str <- as.character(latex_d5)
 d5_str <- gsub("\\\\addlinespace[^\n]*\n", "", d5_str)
+d5_str <- threeparttable_note_after(d5_str)  # PHASE B: move note outside float
 writeLines(clean_latex(d5_str, resize = FALSE, small = TRUE),
            "table_subperiod_bsw_decomposition.tex")
 cat("Written: table_subperiod_bsw_decomposition.tex\n")
@@ -1097,11 +1095,8 @@ for (i in seq_len(nrow(d6_packs))) {
               hline_before = (i > 1), hline_after = FALSE)
 }
 
-writeLines(
-  # PHASE B FIX: move tablenotes outside float (was 71pt Overfull \vbox).
-  clean_latex(threeparttable_note_after(as.character(latex_d6)),
-              resize = FALSE, small = FALSE),
-  "table_subperiod_port_agg_alpha.tex")
+writeLines(clean_latex(as.character(latex_d6), resize = FALSE, small = FALSE),
+           "table_subperiod_port_agg_alpha.tex")
 cat("Written: table_subperiod_port_agg_alpha.tex\n")
 
 # =============================================================================

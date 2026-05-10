@@ -270,24 +270,26 @@
 \DeclareCaptionLabelSeparator{periodtwospace}{.\enspace}
 
 \captionsetup[table]{
-  labelsep      = periodtwospace,
-  font          = normalsize,    % 12 pt — SBE requires TNR 12 throughout
-  skip          = 8pt,           % gap between caption bottom and table top
-  position      = top,           % caption is ABOVE the table
-  width         = \linewidth,    % prevent overflow in threeparttable
-  justification = justified
+  labelsep        = periodtwospace,
+  font            = normalsize,    % 12 pt — SBE requires TNR 12 throughout
+  skip            = 8pt,           % gap between caption bottom and table top
+  position        = top,           % caption is ABOVE the table
+  width           = \linewidth,    % prevent overflow in threeparttable
+  singlelinecheck = false,         % short captions also obey justification (else \centering wrapper centres them)
+  justification   = raggedright    % left-align caption text to table left edge
 }
 \captionsetup[figure]{
-  labelsep      = periodtwospace,
-  font          = normalsize,    % 12 pt
-  skip          = 8pt,           % gap between figure bottom and caption top
-  position      = bottom,        % caption is BELOW the figure
-  width         = \linewidth,
-  justification = justified
+  labelsep        = periodtwospace,
+  font            = normalsize,    % 12 pt
+  skip            = 8pt,           % gap between figure bottom and caption top
+  position        = bottom,        % caption is BELOW the figure
+  width           = \linewidth,
+  singlelinecheck = false,
+  justification   = raggedright
 }
 % \captionsetup[table] does not propagate to longtable (separate float class).
-% This propagates SBE rules (12 pt, full-width, justified) to longtable captions.
-\captionsetup[longtable]{font=normalsize, width=\linewidth, justification=justified, position=top}
+% Mirror SBE rules onto longtable so floats and longtables look identical.
+\captionsetup[longtable]{font=normalsize, width=\linewidth, justification=raggedright, singlelinecheck=false, position=top}
 
 % ---- Mathematics ------------------------------------------------------------
 \usepackage{amsmath}
@@ -2281,7 +2283,7 @@ identified it.
     Appendix~\ref{app:subperiod} for break dates, confidence intervals,
     and regime-mean estimates. Sample: Incubation-corrected panel
     (Evans 2010), no date cap, performance-comparison subsample per
-    \textit{flagged\_funds.xlsx}; Unknown-classified funds excluded.
+    \texttt{flagged\_funds.xlsx}; Unknown-classified funds excluded.
     Passive aggregate alphas reflect benchmark-mismatch residuals
     rather than managerial underperformance \parencite{Roll1977}; see
     Table~\ref{tab:perf_aggregate} note.}
@@ -2342,7 +2344,7 @@ lower bound on the genuinely skilled mass.
     bootstrap null is the cross-sectional manifestation of the active
     management puzzle. Sample: actively managed funds in the
     Incubation-corrected (Evans 2010) panel, performance-comparison
-    subsample per \textit{flagged\_funds.xlsx}, with at least 24
+    subsample per \texttt{flagged\_funds.xlsx}, with at least 24
     monthly observations.}
   \label{fig:luck_vs_skill}
 \end{figure}
@@ -3721,12 +3723,12 @@ sample falls to 3{,}735 share classes after this step.
 \label{sec:data_errors}
 
 \noindent Two funds are excluded for confirmed data errors in the LSEG
-return-index series. \textit{QWVOX US Equity}: the gross total return
+return-index series. \texttt{QWVOX US Equity}: the gross total return
 index for this fund reaches 113{,}446 by February 2026 from a base
 value of 1 in December 1994, implying a cumulative gross return
 exceeding 11{,}300{,}000\,\% --- impossible for any U.S.\ domestic
 equity mutual fund. The series exhibits excess kurtosis of 91.6,
-confirming the anomalous nature of the data. \textit{VALLCEN US
+confirming the anomalous nature of the data. \texttt{VALLCEN US
 Equity}: this fund records a single-month gross return of $-75.9\%$ in
 April 2022, during which the S\&P 500 fell approximately 8.7\%. The
 fund held approximately \$152 million in assets and had no documented
@@ -3821,18 +3823,18 @@ returns and extreme turnover values, producing results that are
 uninterpretable as a fee--performance comparison.
 
 Three exclusion criteria are applied to the passive group only.
-\textit{Keyword filter on fund name:} funds whose name contains any of
+Keyword filter on fund name: funds whose name contains any of
 \texttt{2x}, \texttt{3x}, \texttt{1.5x}, \texttt{ultra}, \texttt{inverse},
 \texttt{bear market}, \texttt{bull 1} (capturing Direxion ``Bull 125'',
 ``Bull 150'', etc.), and \texttt{profund} (all ProFunds share classes
 in this universe are leveraged) are excluded. Matching is
-case-insensitive. \textit{Hard-coded misclassifications:} two funds
+case-insensitive. Hard-coded misclassifications: two funds
 are excluded as active strategies misclassified as passive by their
-data vendor: \textit{MOJAX US Equity} (DF Tactical Momentum Fund, a
-tactical active fund) and \textit{GENDX US Equity} (Gotham Enhanced
-Index, a long/short quantitative strategy). \textit{Explicit retention
-of Rydex Pure Style funds:} five Rydex Pure Style funds (\textit{RYAVX},
-\textit{RYZAX}, \textit{RYAZX}, \textit{RYWAX}, \textit{RYAWX}) match
+data vendor: \texttt{MOJAX US Equity} (DF Tactical Momentum Fund, a
+tactical active fund) and \texttt{GENDX US Equity} (Gotham Enhanced
+Index, a long/short quantitative strategy). Explicit retention
+of Rydex Pure Style funds: five Rydex Pure Style funds (\texttt{RYAVX},
+\texttt{RYZAX}, \texttt{RYAZX}, \texttt{RYWAX}, \texttt{RYAWX}) match
 the \texttt{profund} keyword pattern but are explicitly retained.
 These are long-only, 1$\times$ products tracking S\&P Pure Style
 indices, whose elevated reported turnover reflects the
@@ -3865,7 +3867,7 @@ the available factor and sentiment series.
 which Lipper investment-objective codes are assigned to the 3{,}764
 share classes in the working panel. The cascade is implemented in
 the \texttt{build\_lipper\_category.R} script and produces the
-\textit{lipper\_category\_output.xlsx} workbook from which the
+\texttt{lipper\_category\_output.xlsx} workbook from which the
 within-Lipper-category fractional ranks of
 Section~\ref{sec:flow_calculation} are constructed.
 
@@ -3873,7 +3875,7 @@ Section~\ref{sec:flow_calculation} are constructed.
 \label{sec:lipper_sources}
 
 \noindent Three fields from the merged static-data file
-(\textit{lipper.xlsx}) are used in the assignment procedure.
+(\texttt{lipper.xlsx}) are used in the assignment procedure.
 LSEG Category --- the authoritative Lipper classification
 sourced directly from the Department's LSEG Workspace export. Used
 as-is where populated. New\_Benchmark --- the assigned
@@ -3969,7 +3971,7 @@ independently verified evidence rather than derived circularly from
 the same data inputs that drive the activeness measure.
 
 The robustness check supporting the cascade is documented in the
-\texttt{Lipper\_Source} column of \textit{lipper\_category\_output.xlsx},
+\texttt{Lipper\_Source} column of \texttt{lipper\_category\_output.xlsx},
 which records the priority tag for each fund and permits restriction
 of any downstream analysis to the LSEG-Direct-only sub-sample
 ($n = 1{,}712$) or the LSEG-Direct$+$Benchmark-Map sub-sample
@@ -4004,7 +4006,7 @@ scripts via the panel object.
 \label{app:benchmark}
 
 \noindent This appendix documents the benchmark-assignment process
-that produced the \textit{Benchmark\_Assignment\_updated.xlsx}
+that produced the \texttt{Benchmark\_Assignment\_updated.xlsx}
 workbook, the source data for the activeness/tracking-error
 robustness measure of Section~\ref{sec:activeness} and the per-fund
 benchmark--total-return series used in benchmark-relative descriptive
@@ -4066,17 +4068,17 @@ requirements imposed on regulated investment companies under the
 U.S.\ Internal Revenue Code.
 
 Five confirmed benchmark-change events are documented for Fidelity
-Select funds. \textit{FSTCX}/\textit{FWRLX} (September--November
+Select funds. \texttt{FSTCX}/\texttt{FWRLX} (September--November
 2018): GICS reclassification of Telecom Services into Communication
 Services; benchmark changed from S\&P 500 Telecom Services Index to
-MSCI U.S.\ IMI Communication Services 25/50. \textit{FIUIX}
+MSCI U.S.\ IMI Communication Services 25/50. \texttt{FIUIX}
 (September 2018): similar GICS reclassification; benchmark changed
-to MSCI U.S.\ IMI Utilities 25/50. \textit{FBIOX}/\textit{FBTAX}
+to MSCI U.S.\ IMI Utilities 25/50. \texttt{FBIOX}/\texttt{FBTAX}
 (January 2010): benchmark changed from MSCI U.S.\ IM Capital Goods
-to MSCI U.S.\ IMI Biotechnology 25/50. \textit{FRESX}/\textit{FRIFX}
+to MSCI U.S.\ IMI Biotechnology 25/50. \texttt{FRESX}/\texttt{FRIFX}
 (December 2020): benchmark changed from Dow Jones U.S.\ Select Real
 Estate Securities Index to MSCI U.S.\ IMI Real Estate 25/50.
-\textit{FSHOX} (March 2023): post-GICS reclassification of
+\texttt{FSHOX} (March 2023): post-GICS reclassification of
 homebuilders from Real Estate / Materials to Consumer Discretionary;
 benchmark updated to MSCI U.S.\ IMI Consumer Discretionary 25/50.
 
@@ -4187,16 +4189,16 @@ affects only 10 funds and is immaterial to the aggregate results.
 \section{Sample-membership flag matrix}
 \label{sec:sample_membership}
 
-\noindent The \textit{flagged\_funds.xlsx} workbook organises sample
-membership across three exclusion scopes. The \textit{Exclude from
+\noindent The \texttt{flagged\_funds.xlsx} workbook organises sample
+membership across three exclusion scopes. The \texttt{Exclude from
 Entire Analysis} sheet (439 funds) covers passive index funds, funds
 with non-U.S.\ benchmarks (global, EM), long/short, bear market,
 market-neutral strategies, and the two confirmed data-error funds.
-The \textit{Exclude from H3 Only} sheet (246 funds) covers sector
+The \texttt{Exclude from H3 Only} sheet (246 funds) covers sector
 funds, equity-income, specialty, and covered-call-overlay funds,
 which retain validity for H1/H2/H4 (full-sample flow regressions)
 but lack unambiguous size-style benchmarks for the activeness/tracking-
-error component of H3. The \textit{Exclude from Performance
+error component of H3. The \texttt{Exclude from Performance
 Comparison} sheet (586 funds) covers the H3 set plus a slightly
 different boundary on sector funds for the Carhart-alpha tables, to
 avoid contamination of fund-level alphas by benchmark-mismatched
@@ -4446,7 +4448,7 @@ and mean alpha per segment.
     three-period partition adopted in
     Section~\ref{sec:subperiod_panels}. Sample: Incubation-corrected
     (Evans 2010) panel, active funds only, performance-comparison
-    subsample per \textit{flagged\_funds.xlsx}, December 1994 to
+    subsample per \texttt{flagged\_funds.xlsx}, December 1994 to
     February 2026.}
   \label{fig:breaktest}
 \end{figure}

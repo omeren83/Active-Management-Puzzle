@@ -88,20 +88,17 @@ upskew_fun <- function(r) {
   mean(((r_pos - m) / sigma_up)^3)
 }
 
-cat("\nConstructing MAX12 and UpSkew from panel_incubation...\n")
+cat("\nConstructing UpSkew from panel_incubation (MAX12 already in panel_reg via panel_regressions_setup.R)...\n")
 extra_proxies <- panel_incubation %>%
   arrange(Ticker, date) %>%
   group_by(Ticker) %>%
   mutate(
-    MAX12_raw  = slider::slide_dbl(ret_gross_raw, max,
-                                   .before = 11, .complete = TRUE),
     UpSkew_raw = slider::slide_dbl(ret_gross_raw, upskew_fun,
                                    .before = 35, .complete = TRUE),
-    MAX12  = dplyr::lag(MAX12_raw,  1),
     UpSkew = dplyr::lag(UpSkew_raw, 1)
   ) %>%
   ungroup() %>%
-  select(Ticker, date, MAX12, UpSkew)
+  select(Ticker, date, UpSkew)
 
 # --- 3. Build working frame -------------------------------------------------
 df <- panel_reg %>%
@@ -338,26 +335,7 @@ colnames(summary_df) <- c("Measure",
                           "Horserace $t$",
                           "$\\alpha_{t+12}$-pred.\\ $t$")
 
-caption <- paste0(
-  "Activeness / Lottery Proxy Diagnostic. Horse race among four candidate ",
-  "H3 regressors. ActR2 = $1-R^2$ from rolling 36-month Carhart regression ",
-  "(Amihud--Goyenko 2013 convention); ActSkew = sample skewness of trailing ",
-  "36 monthly gross returns; MAX12 = maximum monthly gross return over the ",
-  "trailing 12 months (Bali, Cakici \\& Whitelaw 2011 convention adapted to ",
-  "monthly fund data); UpSkew = right-tail conditional skewness of returns ",
-  "above the in-window mean, scaled by upside semi-deviation. All measures ",
-  "lagged one period and standardised. Univariate $t$ from $\\text{flow}_{i,t} ",
-  "= \\beta\\cdot X^z_{i,t-1} + \\text{controls}_{i,t-1} + \\text{FE} + ",
-  "\\varepsilon$ under two FE structures: Lipper $\\times$ yearmo (cross-fund ",
-  "identification, the fair comparison) and Ticker + yearmo (within-fund ",
-  "identification, matching the H3 primary spec). Horserace $t$ from a ",
-  "single regression with all four measures simultaneously, Lipper $\\times$ ",
-  "yearmo FE. $\\alpha_{t+12}$-pred.\\ $t$ tests Amihud--Goyenko's (2013) ",
-  "prediction that 1-$R^2$ positively predicts future Carhart alpha; ",
-  "comparison values for the other three measures indicate whether the ",
-  "predictive power is shared across lottery-like characteristics or unique ",
-  "to ActR2."
-)
+caption <- "Activeness / Lottery Proxy Diagnostic"
 fn <- paste0(
   "Aligned sample restricted to fund-month observations with all four ",
   "measures and core controls non-NA. Two-way clustered standard errors on ",
@@ -378,8 +356,29 @@ ktab <- kbl(
   footnote(general = fn, general_title = "",
            threeparttable = TRUE, escape = FALSE)
 
+# Phase B helper: extract tablenotes from a threeparttable float and re-emit
+# them AFTER \end{table} as a flowing paragraph (NOT a minipage).
+threeparttable_note_after_compact <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s <- gsub(note_rx, "", s, perl = TRUE)
+  s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  sub("\\end{table}",
+      paste0("\\end{table}\n{\\footnotesize\\noindent\\textit{Note:} ", ni, "\\par}\n"),
+      s, fixed = TRUE)
+}
+
 tex <- as.character(ktab)
 tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
+tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
 writeLines(tex, OUTPUT_TEX)
 cat(sprintf("Wrote %s\n", OUTPUT_TEX))
 
