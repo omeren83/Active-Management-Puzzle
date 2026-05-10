@@ -20,7 +20,7 @@
 %   [x] Times New Roman 12 pt
 %   [x] Double spacing throughout
 %   [x] 1.27 cm paragraph indent; no indent on first para of chapter/section
-%   [x] Chapter headings: ALL CAPS, centred, number line 1 / title line 2
+%   [x] Chapter headings: ALL CAPS, centred, number line 1 / title line 2, normal weight
 %   [x] Sub-headings: sentence case; 2 double-spaces before, 1 after
 %   [x] Two spaces between sub-heading number and text (sep=2em)
 %   [x] ToC: "CHAPTER X: TITLE" and "APPENDIX X: TITLE" format; depth=1
@@ -102,11 +102,17 @@
 \setmathfont{XITS Math}       % best open-licence math companion to TNR
 
 % ---- Page geometry ----------------------------------------------------------
-\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+% SBE: left 4 cm; top, right, bottom 2.5 cm. Page size A4.
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=4cm, right=2.5cm]{geometry}
 
 % ---- Line spacing -----------------------------------------------------------
 \usepackage{setspace}
 \doublespacing
+
+% ---- Alignment: ragged-right (SBE forbids justification) --------------------
+% [document] applies \RaggedRight everywhere; preserves hyphenation (unlike
+% raw \raggedright) so words are not unbroken across lines.
+\usepackage[document]{ragged2e}
 
 % ---- Paragraph indentation --------------------------------------------------
 % 1.27 cm per SBE. Do NOT load 'indentfirst'.
@@ -134,25 +140,25 @@
 \usepackage{titlesec}
 
 % [display] shape: number on line 1, title on line 2 (SBE format).
-% Both centred, bold, 12 pt (SBE specifies no font size change).
+% Both centred, normal weight, 12 pt (SBE: no bold anywhere; no font size change).
 \titleformat{\chapter}[display]
-  {\normalfont\normalsize\bfseries\centering}
+  {\normalfont\normalsize\centering}
   {\MakeUppercase{\chaptertitlename}~\thechapter}
   {0pt}
   {\MakeUppercase}
 \titlespacing*{\chapter}{0pt}{0pt}{24pt}   % one double-spaced line after title
 
-% Section (first-level): sentence case, left, bold.
+% Section (first-level): sentence case, left-aligned, normal weight.
 % Before: 2 double-spaces = 48 pt. After: 1 double-space = 24 pt.
 \titleformat{\section}
-  {\normalfont\normalsize\bfseries}
+  {\normalfont\normalsize}
   {\thesection}
   {2em}{}
 \titlespacing*{\section}{0pt}{48pt}{24pt}
 
-% Subsection (second-level): same spacing.
+% Subsection (second-level): same spacing, normal weight.
 \titleformat{\subsection}
-  {\normalfont\normalsize\bfseries}
+  {\normalfont\normalsize}
   {\thesubsection}
   {2em}{}
 \titlespacing*{\subsection}{0pt}{48pt}{24pt}
@@ -184,15 +190,16 @@
 % ---------------------------------------------------------------------------
 % LoT / LoF heading fonts: tocloft defaults to \Large\bfseries (17 pt) for
 % the "LIST OF TABLES" and "LIST OF FIGURES" page headings, violating the
-% SBE 12 pt rule. Override to match the chapter heading style.
+% SBE 12 pt and no-bold rules. Override to match the chapter heading style
+% (centred, normal weight, normal size).
 % The \hfill…\hfill trick centres the title in tocloft's layout.
 % ---------------------------------------------------------------------------
-\renewcommand{\cfttoctitlefont}{\hfill\normalfont\normalsize\bfseries}
-\renewcommand{\cftaftertoctitle}{\hfill\mdseries}
-\renewcommand{\cftlottitlefont}{\hfill\normalfont\normalsize\bfseries}
-\renewcommand{\cftafterlottitle}{\hfill\mdseries}
-\renewcommand{\cftloftitlefont}{\hfill\normalfont\normalsize\bfseries}
-\renewcommand{\cftafterloftitle}{\hfill\mdseries}
+\renewcommand{\cfttoctitlefont}{\hfill\normalfont\normalsize}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\renewcommand{\cftlottitlefont}{\hfill\normalfont\normalsize}
+\renewcommand{\cftafterlottitle}{\hfill}
+\renewcommand{\cftloftitlefont}{\hfill\normalfont\normalsize}
+\renewcommand{\cftafterloftitle}{\hfill}
 
 % LoT entry formatting. numwidth must accommodate the longest label in the
 % list. After \counterwithin takes effect in appendices, labels reach
@@ -3634,8 +3641,19 @@ cross-section is not.
 \renewcommand{\thefigure}{\thechapter.\arabic{figure}}
 \renewcommand{\theequation}{\thechapter.\arabic{equation}}
 
+% Write the prefix switch directly into the .toc file so that the
+% front-matter \tableofcontents (which has already been written when
+% it reaches this point) renders chapter entries from here on as
+% "APPENDIX A: TITLE" instead of "CHAPTER A: TITLE". A bare
+% \renewcommand here would only affect a TOC typeset after this
+% point, which the dissertation does not have.
+% "APPENDIX A:" is wider than "CHAPTER 7:", so the cftchapnumwidth
+% must grow to keep the two-space gap and prevent the title from
+% colliding with the prefix block.
+\addtocontents{toc}{\protect\renewcommand{\protect\cftchappresnum}{APPENDIX~}}
+\addtocontents{toc}{\protect\setlength{\protect\cftchapnumwidth}{7.5em}}
 \renewcommand{\cftchappresnum}{APPENDIX~}
-\renewcommand{\cftchapnumwidth}{6em}
+\setlength{\cftchapnumwidth}{7.5em}
 
 % --- Appendix A --------------------------------------------------------------
 \chapter{DATA CONSTRUCTION AND CLEANING}
