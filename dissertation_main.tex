@@ -112,6 +112,18 @@
 \usepackage{setspace}
 \doublespacing
 
+% SBE Part 1.1 (p.10): do not leave wide gaps at page bottoms. \raggedbottom
+% allows variable bottom-of-page whitespace so float placement does not force
+% awkward mid-page breaks.
+\raggedbottom
+
+% ---- SBE-mandated page-heading renames --------------------------------------
+% SBE Part 4 (p.24): page headings must be ALL CAPS. Default LaTeX produces
+% mixed-case "Contents", "List of Tables", "List of Figures".
+\renewcommand{\contentsname}{TABLE OF CONTENTS}
+\renewcommand{\listtablename}{LIST OF TABLES}
+\renewcommand{\listfigurename}{LIST OF FIGURES}
+
 % ---- Alignment: ragged-right (SBE forbids justification) --------------------
 % [document] applies \RaggedRight everywhere; preserves hyphenation (unlike
 % raw \raggedright) so words are not unbroken across lines.
@@ -125,6 +137,12 @@
 % ---- Bibliography: APA 7th edition ------------------------------------------
 \usepackage[style=apa, backend=biber, sorting=nyt, uniquename=false]{biblatex}
 \addbibresource{dissertation.bib}
+
+% SBE Part 5.2.2 (p.33): individual entries SINGLE-spaced, double-space BETWEEN
+% entries. \printbibliography otherwise inherits \doublespacing from the body.
+\AtBeginBibliography{\singlespacing}
+\setlength{\bibitemsep}{\baselineskip}   % one full double-line gap between entries
+\setlength{\bibhang}{1.27cm}             % hanging indent matches \parindent
 
 % \citealt: "Author, Year" with no surrounding parentheses.
 % Use when the citation sits inside an already-parenthetical phrase, e.g.:
@@ -153,17 +171,19 @@
 
 % Section (first-level): sentence case, left-aligned, normal weight.
 % Before: 2 double-spaces = 48 pt. After: 1 double-space = 24 pt.
+% Number-title gap: SBE Part 3.7 (p.18) "two horizontal spaces" ≈ 1em in
+% Times 12pt. Was 2em (visibly too wide); reduced to 1em.
 \titleformat{\section}
   {\normalfont\normalsize}
   {\thesection}
-  {2em}{}
+  {1em}{}
 \titlespacing*{\section}{0pt}{48pt}{24pt}
 
 % Subsection (second-level): same spacing, normal weight.
 \titleformat{\subsection}
   {\normalfont\normalsize}
   {\thesubsection}
-  {2em}{}
+  {1em}{}
 \titlespacing*{\subsection}{0pt}{48pt}{24pt}
 
 % ---- Table of contents ------------------------------------------------------
@@ -398,6 +418,54 @@
 % Page iv (Abstract): first visible page number per SBE.
 % =============================================================================
 \pagenumbering{roman}
+
+% --- Cover page (uncounted per SBE Part 4 page-order table, p.24) ------------
+% SBE Part 4.1 (p.25): "All text on the cover page must be in capital letters."
+% The cover page is NOT counted in pagination; uses titlepage environment so
+% the page counter stays at 1 for the Title page that follows.
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+
+\vspace*{0.5in}
+
+THE ACTIVE MANAGEMENT PUZZLE
+
+\vspace{0.5in}
+
+\vspace{0.15in}
+
+THESIS SUBMITTED TO THE
+
+INSTITUTE FOR GRADUATE STUDIES IN SOCIAL SCIENCES
+
+IN PARTIAL FULFILLMENT OF THE REQUIREMENTS FOR THE DEGREE OF
+
+\vspace{0.5in}
+
+DOCTOR OF PHILOSOPHY
+
+IN
+
+MANAGEMENT
+
+\vspace{0.5in}
+
+BY
+
+ÖMER EREN
+
+\vspace{0.5in}
+
+BOĞAZİÇİ UNIVERSITY
+
+2026
+
+\end{center}
+\end{titlepage}
+
+% Reset counter to 1 so the Title page below is page i.
+\setcounter{page}{1}
 
 % --- Title page (p.i --- counted, hidden) ------------------------------------
 \begin{titlepage}
@@ -708,10 +776,12 @@ omitted per SBE.]}
 \listoffigures
 \clearpage
 
-% --- List of Abbreviations ---------------------------------------------------
+% --- Abbreviations -----------------------------------------------------------
+% SBE Part 4 page-order table (p.24): "ABBREVIATIONS" (not "List of Abbreviations").
+% SBE Part 4.13 (p.30): "Heading should be uppercase, ABBREVIATIONS."
 \thispagestyle{plain}
 \begin{center}
-LIST OF ABBREVIATIONS
+ABBREVIATIONS
 \end{center}
 
 \vspace{12pt}
@@ -2207,10 +2277,11 @@ which is robust to imbalance.
     winsorised at the 1st and 99th percentiles, with December
     observations excluded. The faint line is the raw monthly
     cross-sectional mean. Active funds are shown in dark blue (solid),
-    passive funds in red (dashed). Unknown-classified funds are
-    excluded. Source: LSEG Workspace; sample window December 1994 to
-    February 2026 (the master panel, prior to incubation correction).}
+    passive funds in red (dashed). Unknown-classified funds are excluded.}
   \label{fig:fund_flows}
+  \par\smallskip
+  {\footnotesize\noindent Source: LSEG Workspace; sample window December
+  1994 to February 2026 (the master panel, prior to incubation correction).}
 \end{figure}
 
 \noindent Figure~\ref{fig:fund_flows} plots the cross-sectional
