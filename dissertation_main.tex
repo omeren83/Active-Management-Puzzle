@@ -258,6 +258,14 @@
 \setlength{\floatsep}{24pt plus 4pt minus 4pt}
 \setlength{\textfloatsep}{24pt plus 4pt minus 4pt}
 
+% longtable is NOT a float, so the standard \intextsep does not apply. Use
+% \LTpre and \LTpost to enforce the SBE double-space rule above the
+% longtable title and below the longtable body for tables that span
+% multiple pages (kableExtra produces these for the H1--H4, J series,
+% activeness_*, and persistence tables).
+\setlength{\LTpre}{24pt plus 4pt minus 4pt}
+\setlength{\LTpost}{24pt plus 4pt minus 4pt}
+
 % Uniform table body font size: SBE requires consistency across all tables.
 % Hook applies \footnotesize (10 pt) at the start of every table and
 % longtable environment; per-file size declarations have been stripped.
@@ -265,6 +273,13 @@
 \usepackage{etoolbox}
 \AtBeginEnvironment{table}{\footnotesize}
 \AtBeginEnvironment{longtable}{\footnotesize}
+
+% Table notes: SBE p.18 prescribes single-spacing for footnotes and (by
+% convention) for table notes, regardless of body double-spacing. Without
+% this hook, tablenotes inherit \doublespacing from the body, which makes
+% threeparttable-based notes look loose while manually-written notes
+% (e.g. Table H.1) are single-spaced — visible inconsistency.
+\AtBeginEnvironment{tablenotes}{\setstretch{1}}
 
 % kableExtra compatibility aliases
 \makeatletter
@@ -1452,17 +1467,17 @@ that follow.
 \label{sec:bloomberg_extract}
 
 \noindent The starting universe was extracted via Bloomberg using the
-Equity \texttt{SRCH} screen restricted to U.S.\ domestic equity mutual
+Equity SRCH screen restricted to U.S.\ domestic equity mutual
 funds, including all share classes and aggregating both currently active
 and historical (closed/inactive) funds. The initial extract contained
 2{,}786 share classes meeting the screening criteria, of which 1{,}936
-carried a Bloomberg \texttt{Actively\_Managed = Y} flag at the most
+carried a Bloomberg Actively\_Managed = Y flag at the most
 recent disclosure date. Bloomberg supplied the share-class identifying
-fields (ticker in \texttt{XXXXX US Equity} format, ISIN, fund name,
+fields (ticker in XXXXX US Equity format, ISIN, fund name,
 inception date, market status), Bloomberg's assigned primary benchmark,
 the market-capitalisation focus field
-(\texttt{Mcap\_Focus} $\in$ \{Large-cap, Mid-cap, Small-cap, Broad
-Market\}), the strategy field (\texttt{Fund\_Strategy} $\in$ \{Value,
+(Mcap\_Focus $\in$ \{Large-cap, Mid-cap, Small-cap, Broad
+Market\}), the strategy field (Fund\_Strategy $\in$ \{Value,
 Blend, Growth, Bear Market, Long Short, Market Neutral\}), the active
 management flag, and a set of risk/return summary statistics (NAV
 tracking error, excess return, alpha, beta, Sharpe ratio, information
@@ -1495,7 +1510,7 @@ matched to the Bloomberg roster on the International Securities
 Identification Number (ISIN), with Bloomberg ticker as a fallback
 matching key for the small subset of share classes where ISIN was
 missing or non-unique. Of the 3{,}764 funds in the merged panel, the
-LSEG \texttt{Lipper Category} field is populated for 1{,}712 (45.5\%);
+LSEG Lipper Category field is populated for 1{,}712 (45.5\%);
 the remainder are resolved by the priority-ordered cascade documented in
 Appendix~\ref{app:lipper_assignment}.
 
@@ -1553,7 +1568,7 @@ A second correction group concerns Rydex sector funds, for which
 Guggenheim's fund-family documentation confirms that no primary
 benchmark is officially declared. For these 14 funds a proxy sector
 index was inferred from the fund's GICS sector classification and
-flagged as \texttt{INFERRED} with a confidence score of 4 in the
+flagged as INFERRED with a confidence score of 4 in the
 benchmark assignment workbook. Smaller correction groups cover Cohen \&
 Steers realty funds (3 funds, MSCI U.S.\ REIT confirmed; FTSE NAREIT
 substitute applied), MFS Utilities and BULIX (S\&P 500 Utilities
@@ -1642,7 +1657,7 @@ H1--H4 panel regressions and the Bai--Perron sub-period analyses
 reported in Appendix~\ref{app:subperiod}.
 
 The active / passive classification follows Bloomberg's
-\texttt{Actively\_Managed} flag with two manual overrides documented in
+Actively\_Managed flag with two manual overrides documented in
 Appendix~\ref{app:data_cleaning}: MOJAX (DF Tactical Momentum Fund) and
 GENDX (Gotham Enhanced Index) are reclassified from passive to active,
 and five Rydex Pure Style funds matching the leveraged/derivative
@@ -1650,7 +1665,7 @@ keyword filter are explicitly retained in the passive universe because
 they are 1$\times$ long-only products tracking S\&P Pure Style indices
 whose elevated turnover reflects index reconstitution rather than
 derivative rolling. Funds carrying neither an active nor a passive flag
-in the Bloomberg static export are coded as \texttt{Unknown} and are
+in the Bloomberg static export are coded as Unknown and are
 excluded from all regression analyses; they are retained in the
 descriptive statistics of Section~\ref{sec:descriptive} for completeness.
 
@@ -2327,7 +2342,7 @@ identified it.
     Appendix~\ref{app:subperiod} for break dates, confidence intervals,
     and regime-mean estimates. Sample: Incubation-corrected panel
     (Evans 2010), no date cap, performance-comparison subsample per
-    \texttt{flagged\_funds.xlsx}; Unknown-classified funds excluded.
+    flagged\_funds.xlsx; Unknown-classified funds excluded.
     Passive aggregate alphas reflect benchmark-mismatch residuals
     rather than managerial underperformance \parencite{Roll1977}; see
     Table~\ref{tab:perf_aggregate} note.}
@@ -2388,7 +2403,7 @@ lower bound on the genuinely skilled mass.
     bootstrap null is the cross-sectional manifestation of the active
     management puzzle. Sample: actively managed funds in the
     Incubation-corrected (Evans 2010) panel, performance-comparison
-    subsample per \texttt{flagged\_funds.xlsx}, with at least 24
+    subsample per flagged\_funds.xlsx, with at least 24
     monthly observations.}
   \label{fig:luck_vs_skill}
 \end{figure}
@@ -3700,7 +3715,7 @@ cross-section is not.
 converts the raw extract from the Department's Bloomberg Terminal and
 LSEG Workspace subscriptions into the three analytical panels used in
 the main text. The pipeline is implemented in R via the
-\texttt{data\_import\_and\_cleaning.R} script and is reproducible from
+data\_import\_and\_cleaning.R script and is reproducible from
 the raw data sources.
 
 \section{Raw extract structure}
@@ -3711,7 +3726,7 @@ sheets, with fund tickers on rows and calendar months on columns, in
 the master Excel workbook. Static fund attributes (Ticker, ISIN, fund
 name, inception date, market status, primary benchmark, market-cap
 focus, fund strategy, active management flag, expense ratio) are
-stored on a separate \texttt{static} sheet. Each time-series sheet is
+stored on a separate static sheet. Each time-series sheet is
 imported and pivoted to long format --- one observation per fund-month
 --- and the resulting long tables are joined on the composite key
 (Ticker, date) using a full outer join. The static fund attributes are
@@ -3720,7 +3735,7 @@ merged by date. The result is an unbalanced long-format panel in which
 each row corresponds to a unique fund-month observation. Date column
 headers in the raw Excel files are stored as Excel serial numbers and
 converted using the standard Excel origin of December 30, 1899. LSEG
-error strings (\texttt{\#N/A N/A}, \texttt{\#N/A Field Not Applicable})
+error strings (\#N/A N/A, \#N/A Field Not Applicable)
 are coerced to missing values prior to numeric conversion.
 
 \section{Step 1: Removal of post-closure forward-filled observations}
@@ -3731,7 +3746,7 @@ series of liquidated or inactive funds at the point of closure. Instead,
 the terminal carries the last valid total-return index value forward
 indefinitely, generating spurious zero-return months in the panel that
 would, if uncorrected, bias measured performance downward and
-contaminate fund-flow regressions. The \texttt{Close Date} field in
+contaminate fund-flow regressions. The Close Date field in
 LSEG static data is unreliable for filtering: all active funds receive
 the data-pull date as their close date, liquidated funds receive
 either the pull date or an error string, and inactive funds receive
@@ -3739,11 +3754,11 @@ only error strings.
 
 A data-driven algorithm operates on the gross total-return index series
 as the master signal. (1) Observations with a missing gross index are
-removed. (2) A binary indicator \texttt{is\_frozen} is constructed,
+removed. (2) A binary indicator is\_frozen is constructed,
 equal to one if the current month's index value equals the prior
 month's value. (3) The last date on which the index moved is identified
 for each fund. (4) The length of the terminal frozen block --- the
-count of \texttt{is\_frozen} observations strictly after the last
+count of is\_frozen observations strictly after the last
 movement date --- is computed. (5) The terminal frozen block is removed
 only if its length is at least two, which corresponds to at
 least three consecutive identical index values at the tail; once this
@@ -3778,19 +3793,19 @@ sample falls to 3{,}735 share classes after this step.
 \label{sec:data_errors}
 
 \noindent Two funds are excluded for confirmed data errors in the LSEG
-return-index series. \texttt{QWVOX US Equity}: the gross total return
+return-index series. QWVOX US Equity: the gross total return
 index for this fund reaches 113{,}446 by February 2026 from a base
 value of 1 in December 1994, implying a cumulative gross return
 exceeding 11{,}300{,}000\,\% --- impossible for any U.S.\ domestic
 equity mutual fund. The series exhibits excess kurtosis of 91.6,
-confirming the anomalous nature of the data. \texttt{VALLCEN US
-Equity}: this fund records a single-month gross return of $-75.9\%$ in
+confirming the anomalous nature of the data. VALLCEN US
+Equity: this fund records a single-month gross return of $-75.9\%$ in
 April 2022, during which the S\&P 500 fell approximately 8.7\%. The
 fund held approximately \$152 million in assets and had no documented
 leverage or derivative overlay that could produce a return of this
 magnitude; all other monthly returns for the fund are within plausible
 ranges. Both funds are recorded in the exclusion registry under the
-\texttt{DATA\_ERROR} flag and are excluded prior to panel assembly.
+DATA\_ERROR flag and are excluded prior to panel assembly.
 The working sample falls to 3{,}733 share classes after this step.
 
 \section{Step 4: Evans (2010) incubation correction}
@@ -3816,8 +3831,8 @@ each fund in the present panel, an Evans cutoff date is computed as
 the inception date plus 36 calendar months. Where the inception date
 is missing or contains an error string, the first observed return
 date is used as a fallback. The Evans correction is applied to the
-\texttt{panel\_incubation} and \texttt{panel\_trimmed} variants but
-not to the \texttt{panel\_master} variant, which serves as the
+panel\_incubation and panel\_trimmed variants but
+not to the panel\_master variant, which serves as the
 audit baseline.
 
 \section{Step 5: Winsorisation of monthly returns}
@@ -3858,7 +3873,7 @@ turnover exceeding 200\%, with values ranging from 205\% to 3{,}996\%.
 Manual review confirmed all 30 to be leveraged or derivative-based
 mutual funds: Rydex 2$\times$ Strategy funds, ProFunds UltraSector
 products, and Direxion Bull products. These funds carry the LSEG
-\texttt{Actively\_Managed = N} flag because they mechanically track an
+Actively\_Managed = N flag because they mechanically track an
 index, but their economic character is categorically different from
 conventional long-only index funds. The products deliver a constant
 daily leverage multiple --- typically 1.25$\times$, 1.5$\times$, or
@@ -3879,18 +3894,18 @@ uninterpretable as a fee--performance comparison.
 
 Three exclusion criteria are applied to the passive group only.
 Keyword filter on fund name: funds whose name contains any of
-\texttt{2x}, \texttt{3x}, \texttt{1.5x}, \texttt{ultra}, \texttt{inverse},
-\texttt{bear market}, \texttt{bull 1} (capturing Direxion ``Bull 125'',
-``Bull 150'', etc.), and \texttt{profund} (all ProFunds share classes
+2x, 3x, 1.5x, ultra, inverse,
+bear market, bull 1 (capturing Direxion ``Bull 125'',
+``Bull 150'', etc.), and profund (all ProFunds share classes
 in this universe are leveraged) are excluded. Matching is
 case-insensitive. Hard-coded misclassifications: two funds
 are excluded as active strategies misclassified as passive by their
-data vendor: \texttt{MOJAX US Equity} (DF Tactical Momentum Fund, a
-tactical active fund) and \texttt{GENDX US Equity} (Gotham Enhanced
+data vendor: MOJAX US Equity (DF Tactical Momentum Fund, a
+tactical active fund) and GENDX US Equity (Gotham Enhanced
 Index, a long/short quantitative strategy). Explicit retention
-of Rydex Pure Style funds: five Rydex Pure Style funds (\texttt{RYAVX},
-\texttt{RYZAX}, \texttt{RYAZX}, \texttt{RYWAX}, \texttt{RYAWX}) match
-the \texttt{profund} keyword pattern but are explicitly retained.
+of Rydex Pure Style funds: five Rydex Pure Style funds (RYAVX,
+RYZAX, RYAZX, RYWAX, RYAWX) match
+the profund keyword pattern but are explicitly retained.
 These are long-only, 1$\times$ products tracking S\&P Pure Style
 indices, whose elevated reported turnover reflects the
 reconstitution-heavy methodology of the underlying index rather than
@@ -3900,16 +3915,16 @@ derivative rolling.
 \label{sec:output_panels}
 
 \noindent The pipeline produces three analytically distinct panels.
-\texttt{panel\_master} is the full cleaned panel after frozen-tail
+panel\_master is the full cleaned panel after frozen-tail
 removal, empty-fund exclusion, data-error exclusion, active/passive
 classification, and leveraged-fund exclusion --- no incubation
 correction and no date restriction. Both raw and unwinsorised columns
 are present but identical at this stage, since winsorisation is
 applied at panel construction rather than at cleaning. This panel
-serves as the audit baseline. \texttt{panel\_incubation} additionally
+serves as the audit baseline. panel\_incubation additionally
 applies the Evans 36-month age filter and the return winsorisation,
 with no date restriction; this is the primary main-text panel.
-\texttt{panel\_trimmed} additionally restricts the sample to January
+panel\_trimmed additionally restricts the sample to January
 1995--December 2023 (December 1994 retained for lag computation); it
 underlies the H1--H4 panel regressions where the date cap aligns with
 the available factor and sentiment series.
@@ -3921,8 +3936,8 @@ the available factor and sentiment series.
 \noindent This appendix documents the priority-ordered cascade by
 which Lipper investment-objective codes are assigned to the 3{,}764
 share classes in the working panel. The cascade is implemented in
-the \texttt{build\_lipper\_category.R} script and produces the
-\texttt{lipper\_category\_output.xlsx} workbook from which the
+the build\_lipper\_category.R script and produces the
+lipper\_category\_output.xlsx workbook from which the
 within-Lipper-category fractional ranks of
 Section~\ref{sec:flow_calculation} are constructed.
 
@@ -3930,7 +3945,7 @@ Section~\ref{sec:flow_calculation} are constructed.
 \label{sec:lipper_sources}
 
 \noindent Three fields from the merged static-data file
-(\texttt{lipper.xlsx}) are used in the assignment procedure.
+(lipper.xlsx) are used in the assignment procedure.
 LSEG Category --- the authoritative Lipper classification
 sourced directly from the Department's LSEG Workspace export. Used
 as-is where populated. New\_Benchmark --- the assigned
@@ -3954,7 +3969,7 @@ Priority 1 --- LSEG Category (Direct). Where the LSEG
 Category field is populated and contains a valid Lipper category
 string, the value is used directly. This is the authoritative source
 and covers 1{,}712 funds (45.5\% of the panel). Source tag:
-\texttt{LSEG\_Direct}.
+LSEG\_Direct.
 
 Priority 2 --- Benchmark Code Map. For the remaining 2{,}052
 funds, the assigned benchmark code is checked against a deterministic
@@ -3967,26 +3982,26 @@ RUA is the default catch-all benchmark assigned to funds where no
 more specific information was available (confidence score 1 in the
 benchmark assignment exercise), and carries no style information.
 Funds assigned RUA fall through to Priority 3 or 4. Source tag:
-\texttt{Benchmark\_Map}. The full mapping table is reported in
+Benchmark\_Map. The full mapping table is reported in
 Appendix~\ref{app:benchmark}.
 
 Priority 3 --- Bloomberg field derivation. For funds not
-resolved by Priorities 1 or 2, the Bloomberg \texttt{Mcap\_Focus} and
-\texttt{Fund\_Strategy} fields are combined to construct a Lipper
+resolved by Priorities 1 or 2, the Bloomberg Mcap\_Focus and
+Fund\_Strategy fields are combined to construct a Lipper
 category label. Three sub-cases are applied in order. 3a:
 both fields present (182 funds, source tag
-\texttt{Derived\_McapStrat}). The Lipper category is constructed as
+Derived\_McapStrat). The Lipper category is constructed as
 [Size~Prefix]~[Style~Suffix]~Funds, where the size prefix is derived
-from \texttt{Mcap\_Focus} and the style suffix from
-\texttt{Fund\_Strategy}. 3b: \texttt{Mcap\_Focus} present,
-\texttt{Fund\_Strategy} missing or non-standard (49 funds, source tag
-\texttt{Derived\_McapOnly}). The fund is assigned to the Core
+from Mcap\_Focus and the style suffix from
+Fund\_Strategy. 3b: Mcap\_Focus present,
+Fund\_Strategy missing or non-standard (49 funds, source tag
+Derived\_McapOnly). The fund is assigned to the Core
 category for the identified size tier; the rationale is that a
 missing strategy field provides no style evidence, and Core (Blend)
 is the modal category and the least biased default. 3c:
-\texttt{Fund\_Strategy} present, \texttt{Mcap\_Focus} missing or
+Fund\_Strategy present, Mcap\_Focus missing or
 equal to Broad Market (175 funds, source tag
-\texttt{Derived\_StratOnly}). The fund is assigned to the Multi-Cap
+Derived\_StratOnly). The fund is assigned to the Multi-Cap
 category for the identified style; Broad Market and missing Mcap
 fields indicate no specific size constraint, and Multi-Cap is the
 appropriate Lipper designation for unconstrained mandates.
@@ -3997,7 +4012,7 @@ the above priorities yields a valid assignment are coded as NA. These
 market-neutral, bear-market, and Unknown-AM funds, all of which are
 excluded from the H1/H2/H4 regression sample by independent criteria.
 The NA assignment for these funds entails no loss of analytical
-sample. Source tag: \texttt{Unresolvable}.
+sample. Source tag: Unresolvable.
 
 \section{Classification outcome and circularity acknowledgement}
 \label{sec:lipper_outcome}
@@ -4026,7 +4041,7 @@ independently verified evidence rather than derived circularly from
 the same data inputs that drive the activeness measure.
 
 The robustness check supporting the cascade is documented in the
-\texttt{Lipper\_Source} column of \texttt{lipper\_category\_output.xlsx},
+Lipper\_Source column of lipper\_category\_output.xlsx,
 which records the priority tag for each fund and permits restriction
 of any downstream analysis to the LSEG-Direct-only sub-sample
 ($n = 1{,}712$) or the LSEG-Direct$+$Benchmark-Map sub-sample
@@ -4048,10 +4063,10 @@ category labels that appear in the LSEG Category field but do not
 correspond to the twelve standard size-style categories (for example,
 Equity Income Funds, Real Estate Funds, Science \& Technology Funds)
 are retained as-is. These funds are excluded from H3 by the
-\texttt{H3\_EXCLUDED} flag in the sample-membership matrix
+H3\_EXCLUDED flag in the sample-membership matrix
 documented in Appendix~\ref{app:benchmark}, but appear in H1, H2, and
 H4 with their LSEG-supplied label forming their peer group. Third,
-the script merges the \texttt{Lipper\_Category} column from the
+the script merges the Lipper\_Category column from the
 output workbook into the static sheet of the master fund-data
 workbook, making the classification available to all downstream R
 scripts via the panel object.
@@ -4061,7 +4076,7 @@ scripts via the panel object.
 \label{app:benchmark}
 
 \noindent This appendix documents the benchmark-assignment process
-that produced the \texttt{Benchmark\_Assignment\_updated.xlsx}
+that produced the Benchmark\_Assignment\_updated.xlsx
 workbook, the source data for the activeness/tracking-error
 robustness measure of Section~\ref{sec:activeness} and the per-fund
 benchmark--total-return series used in benchmark-relative descriptive
@@ -4075,7 +4090,7 @@ membership in the various hypothesis sub-samples.
 \label{sec:benchmark_tiers}
 
 \noindent Each fund was assessed in three stages. Tier 1 ---
-Bloomberg benchmark screening: Bloomberg's \texttt{Primary\_Benchmark}
+Bloomberg benchmark screening: Bloomberg's Primary\_Benchmark
 field was reviewed for transparent misassignments. Sector funds
 benchmarked to S\&P 500, small/mid-cap funds benchmarked to S\&P 500,
 and funds with no benchmark were flagged for further research.
@@ -4090,7 +4105,7 @@ sector funds declare no official primary benchmark).
 Tier 3 --- Inference for undisclosed benchmarks: for funds
 with no declared benchmark (primarily Rydex sector funds), a proxy
 sector index was inferred from the fund's GICS sector classification,
-cap focus, and strategy, and flagged as \texttt{INFERRED}.
+cap focus, and strategy, and flagged as INFERRED.
 
 For the overwhelming majority of funds (1{,}839 of 1{,}936 active
 funds, 95.0\%), the Bloomberg-provided benchmark was appropriate and
@@ -4123,17 +4138,17 @@ requirements imposed on regulated investment companies under the
 U.S.\ Internal Revenue Code.
 
 Five confirmed benchmark-change events are documented for Fidelity
-Select funds. \texttt{FSTCX}/\texttt{FWRLX} (September--November
+Select funds. FSTCX/FWRLX (September--November
 2018): GICS reclassification of Telecom Services into Communication
 Services; benchmark changed from S\&P 500 Telecom Services Index to
-MSCI U.S.\ IMI Communication Services 25/50. \texttt{FIUIX}
+MSCI U.S.\ IMI Communication Services 25/50. FIUIX
 (September 2018): similar GICS reclassification; benchmark changed
-to MSCI U.S.\ IMI Utilities 25/50. \texttt{FBIOX}/\texttt{FBTAX}
+to MSCI U.S.\ IMI Utilities 25/50. FBIOX/FBTAX
 (January 2010): benchmark changed from MSCI U.S.\ IM Capital Goods
-to MSCI U.S.\ IMI Biotechnology 25/50. \texttt{FRESX}/\texttt{FRIFX}
+to MSCI U.S.\ IMI Biotechnology 25/50. FRESX/FRIFX
 (December 2020): benchmark changed from Dow Jones U.S.\ Select Real
 Estate Securities Index to MSCI U.S.\ IMI Real Estate 25/50.
-\texttt{FSHOX} (March 2023): post-GICS reclassification of
+FSHOX (March 2023): post-GICS reclassification of
 homebuilders from Real Estate / Materials to Consumer Discretionary;
 benchmark updated to MSCI U.S.\ IMI Consumer Discretionary 25/50.
 
@@ -4141,7 +4156,7 @@ A second correction group concerns Rydex sector funds, for which
 Guggenheim's documentation confirms the absence of a declared
 primary benchmark. For these 14 funds a proxy sector index is
 inferred from the fund's GICS sector classification and labelled
-\texttt{INFERRED PROXY} with confidence score 4. Smaller correction
+INFERRED PROXY with confidence score 4. Smaller correction
 groups cover Cohen \& Steers Realty funds (3 funds, MSCI U.S.\ REIT
 confirmed), MFS Utilities and BULIX (S\&P 500 Utilities Index), and
 approximately 20 additional sector funds.
@@ -4156,13 +4171,13 @@ in the high-confidence tiers: 17 funds at score 10 (verbatim
 prospectus confirmation), 1{,}697 at score 8 (LSEG Lipper-category
 to standard Russell/MSCI map), 660 at score 7 (Bloomberg primary
 benchmark direct map to recognised index family), 902 at score 5
-(strong inference from Bloomberg \texttt{Mcap\_Focus} +
-\texttt{Fund\_Strategy}), 387 at score 3 (partial inference from one
+(strong inference from Bloomberg Mcap\_Focus +
+Fund\_Strategy), 387 at score 3 (partial inference from one
 field), and 101 at score 1 (default Russell 3000 placeholder).
 Approximately 37\% of assignments carry confidence $\leq 5$
 (inferred). The most heavily inferred funds --- sector, equity
 income, specialty --- are excluded from the H3 active share analysis
-under the \texttt{H3\_EXCLUDED} or \texttt{SECTOR\_FUND} flags
+under the H3\_EXCLUDED or SECTOR\_FUND flags
 documented in Section~\ref{sec:sample_membership}, and the primary
 activeness measure ($1-R^2$ from the Carhart factor regression) does
 not use the assigned benchmark at all. The benchmark inference
@@ -4199,7 +4214,7 @@ REITs Index. The confirmed benchmark for Cohen \& Steers REIT funds
 is the MSCI U.S.\ REIT Index (RIC: RMZTR). The total-return series
 for this index is inaccessible within the LSEG subscription tier
 used in this dissertation. The FTSE NAREIT All-Equity REITs Total
-Return Index (RIC: \texttt{.FTFNERUSDT}) is adopted as a substitute.
+Return Index (RIC: .FTFNERUSDT) is adopted as a substitute.
 The substitution is methodologically defensible on three grounds.
 First, the FTSE NAREIT All-Equity REITs Index is the industry-standard
 benchmark for U.S.\ REIT funds and is more widely cited in the
@@ -4219,7 +4234,7 @@ MidCap 400 as their primary benchmark, of which 17 carry the
 benchmark-required flag. The S\&P MidCap 400 total-return series was
 unavailable within the LSEG subscription tier for the full sample
 period. The Russell Midcap Index total-return series (RIC:
-\texttt{.RUMTU}) is adopted as a substitute. Both indices cover the
+.RUMTU) is adopted as a substitute. Both indices cover the
 U.S.\ mid-capitalisation equity segment and their monthly total
 returns exhibit correlation in excess of 0.97 over the full sample.
 The methodological difference between the two indices is constituent
@@ -4231,7 +4246,7 @@ Russell 2500 Value $\rightarrow$ Russell 2000 Value. Ten
 funds carry Russell 2500 Value as their primary benchmark. The LSEG
 total-return series for this index has insufficient sample coverage
 within the available subscription tier. The Russell 2000 Value Index
-total-return series (RIC: \texttt{.RUJTRI}) is adopted as a
+total-return series (RIC: .RUJTRI) is adopted as a
 substitute. The Russell 2500 is defined as the bottom 2{,}500
 constituents of the Russell 3000 by market cap, encompassing the
 entire Russell 2000 plus the smallest 500 stocks of the Russell
@@ -4244,17 +4259,17 @@ affects only 10 funds and is immaterial to the aggregate results.
 \section{Sample-membership flag matrix}
 \label{sec:sample_membership}
 
-\noindent The \texttt{flagged\_funds.xlsx} workbook organises sample
-membership across three exclusion scopes. The \texttt{Exclude from
-Entire Analysis} sheet (439 funds) covers passive index funds, funds
+\noindent The flagged\_funds.xlsx workbook organises sample
+membership across three exclusion scopes. The Exclude from
+Entire Analysis sheet (439 funds) covers passive index funds, funds
 with non-U.S.\ benchmarks (global, EM), long/short, bear market,
 market-neutral strategies, and the two confirmed data-error funds.
-The \texttt{Exclude from H3 Only} sheet (246 funds) covers sector
+The Exclude from H3 Only sheet (246 funds) covers sector
 funds, equity-income, specialty, and covered-call-overlay funds,
 which retain validity for H1/H2/H4 (full-sample flow regressions)
 but lack unambiguous size-style benchmarks for the activeness/tracking-
-error component of H3. The \texttt{Exclude from Performance
-Comparison} sheet (586 funds) covers the H3 set plus a slightly
+error component of H3. The Exclude from Performance
+Comparison sheet (586 funds) covers the H3 set plus a slightly
 different boundary on sector funds for the Carhart-alpha tables, to
 avoid contamination of fund-level alphas by benchmark-mismatched
 sector funds.
@@ -4503,7 +4518,7 @@ and mean alpha per segment.
     three-period partition adopted in
     Section~\ref{sec:subperiod_panels}. Sample: Incubation-corrected
     (Evans 2010) panel, active funds only, performance-comparison
-    subsample per \texttt{flagged\_funds.xlsx}, December 1994 to
+    subsample per flagged\_funds.xlsx, December 1994 to
     February 2026.}
   \label{fig:breaktest}
 \end{figure}

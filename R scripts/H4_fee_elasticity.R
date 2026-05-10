@@ -302,30 +302,30 @@ build_h4_table <- function(samp, fe_string,
   # STATE main effect is absorbed by Lipper x yearmo FE (or yearmo FE in the
   # FE-robustness spec) and so does not appear in any column.
   row_specs <- list(
-    list(parts = "R_LOW",   label = "$R^{LOW}$"),
-    list(parts = "R_MID",   label = "$R^{MID}$"),
-    list(parts = "R_HIGH",  label = "$R^{HIGH}$"),
+    list(parts = "R_LOW",   label = "$R^{\text{LOW}}$"),
+    list(parts = "R_MID",   label = "$R^{\text{MID}}$"),
+    list(parts = "R_HIGH",  label = "$R^{\text{HIGH}}$"),
     list(parts = "ExpRatio", label = "Expense ratio"),
     list(parts = "R_LOW_EXP",
-         label = "$R^{LOW}\\times$ Exp.\\ ratio"),
+         label = "$R^{\text{LOW}}\\times$ Exp.\\ ratio"),
     list(parts = "R_MID_EXP",
-         label = "$R^{MID}\\times$ Exp.\\ ratio"),
+         label = "$R^{\text{MID}}\\times$ Exp.\\ ratio"),
     list(parts = "R_HIGH_EXP",
-         label = "$R^{HIGH}\\times$ Exp.\\ ratio"),
+         label = "$R^{\text{HIGH}}\\times$ Exp.\\ ratio"),
     list(parts = "R_LOW_STATE",
-         label = "$R^{LOW}\\times$ Sent."),
+         label = "$R^{\text{LOW}}\\times$ Sent."),
     list(parts = "R_MID_STATE",
-         label = "$R^{MID}\\times$ Sent."),
+         label = "$R^{\text{MID}}\\times$ Sent."),
     list(parts = "R_HIGH_STATE",
-         label = "$R^{HIGH}\\times$ Sent."),
+         label = "$R^{\text{HIGH}}\\times$ Sent."),
     list(parts = "EXP_STATE",
          label = "Exp.\\ ratio $\\times$ Sent."),
     list(parts = "R_LOW_EXP_STATE",
-         label = "$R^{LOW}\\times$ Exp.\\ $\\times$ Sent."),
+         label = "$R^{\text{LOW}}\\times$ Exp.\\ $\\times$ Sent."),
     list(parts = "R_MID_EXP_STATE",
-         label = "$R^{MID}\\times$ Exp.\\ $\\times$ Sent."),
+         label = "$R^{\text{MID}}\\times$ Exp.\\ $\\times$ Sent."),
     list(parts = "R_HIGH_EXP_STATE",
-         label = "$R^{HIGH}\\times$ Exp.\\ $\\times$ Sent."),
+         label = "$R^{\text{HIGH}}\\times$ Exp.\\ $\\times$ Sent."),
     list(parts = "log_TNA",  label = "$\\log(\\text{TNA})$"),
     list(parts = "log_Age",  label = "$\\log(\\text{Age})$"),
     list(parts = "LoadDummy", label = "Load dummy"),
@@ -442,7 +442,8 @@ build_h4_table <- function(samp, fe_string,
     caption = caption, label = table_label,
     align = c("l", rep("r", 4)), escape = FALSE, linesep = ""
   ) %>%
-    kable_styling(latex_options = c("repeat_header")) %>%
+    kable_styling(latex_options = c("repeat_header"),
+                  font_size = 9) %>%
     add_header_above(col_headers, escape = FALSE, bold = FALSE) %>%
     row_spec(nrow(body_df), hline_after = TRUE) %>%
     footnote(general = footnote_text, general_title = "",
@@ -469,7 +470,7 @@ fn_primary <- paste0(
   "All lower-order interaction coefficients ($R^q\\\\times$ Sent.\\\\ and ",
   "$R^q\\\\times$ Exp.\\\\ ratio) are reported alongside the headline triple ",
   "interactions to support full interpretation. Sentiment regimes follow ",
-  "Baker-Wurgler (2007) construction: $D^{SENT}_t$ is the top-34\\\\% indicator ",
+  "Baker-Wurgler (2007) construction: $D^{\text{SENT}}_t$ is the top-34\\\\% indicator ",
   "for orthogonalised sentiment; column (3) substitutes the standardised ",
   "continuous index; column (4) substitutes the AAII bull-bear regime dummy. ",
   "ExpRatio is the time-invariant fund expense ratio (decimal). Lipper-",
@@ -514,10 +515,10 @@ fn_robust <- paste0(
   "at source."
 )
 
-hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{SENT}_{t-1}$" = 1,
-                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{AAII}_{t-1}$" = 1)
-hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{SENT}$" = 1,
-                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{AAII}$" = 1)
+hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\text{SENT}}_{t-1}$" = 1,
+                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\text{AAII}}_{t-1}$" = 1)
+hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\text{SENT}}$" = 1,
+                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\text{AAII}}$" = 1)
 
 # --- 6. Estimate specifications ---------------------------------------------
 H4_primary <- build_h4_table(

@@ -105,9 +105,9 @@ if (!is.null(H1_models)) {
     tt <- pri$tests[[key]]
     state_lbl <- switch(
       key,
-      "t2" = "$D^{SENT}$",
+      "t2" = "$D^{\text{SENT}}$",
       "t3" = "$\\text{SENT}^\\perp$",
-      "t4" = "$D^{AAII}$"
+      "t4" = "$D^{\text{AAII}}$"
     )
     dir_tag <- if (!is.na(tt$asym_z) && tt$asym_z > 0) "asym +" else "asym -"
     rows[[length(rows) + 1L]] <- c(
@@ -187,9 +187,9 @@ if (!is.null(H4_models)) {
     tt <- pri$tests[[key]]
     state_lbl <- switch(
       key,
-      "t2" = "$D^{SENT}$",
+      "t2" = "$D^{\text{SENT}}$",
       "t3" = "$\\text{SENT}^\\perp$",
-      "t4" = "$D^{AAII}$"
+      "t4" = "$D^{\text{AAII}}$"
     )
     df_used <- if (!is.null(tt$df)) tt$df else 4L
     dir_tag <- if (is.na(tt$delta_z)) "" else

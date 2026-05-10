@@ -1,6 +1,6 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:behavioral_summary}Behavioral Hypotheses --- Summary of Primary-Spec Test Statistics. Joint $\chi^2$ tests the null that all rank-segment $\times$ state interactions are zero (H1, H2; df=3), the null that ActSkew enters with neither main effect nor sentiment modulation (H3; df=2), or the null that the four fee-amplified-sentiment terms are zero (H4; df=4). The headline $z$ is hypothesis-specific: H1 reports the $\delta_3-\delta_1$ asymmetry (1-sided positive); H2 reports $\delta_1$ with a 1-sided LEFT-tail $p$ (disposition prediction) --- positive $\delta_1$ paired with high $p$ rejects disposition in favour of the Brunnermeier-Pedersen (2009) margin-call alternative; H3 and H4 report the focal interaction with 1-sided positive $p$. Detailed coefficients and timing-/FE-robustness checks appear in Tables \ref{tab:H1_regression}--\ref{tab:H4_regression} and Appendix F.}
+\caption{\label{tab:behavioral_summary}Behavioral Hypotheses --- Summary of Primary-Spec Test Statistics}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{threeparttable}
@@ -8,18 +8,18 @@
 \toprule
 Hypothesis & State proxy & Joint $\chi^2$ & Headline $z$ (1-sided $p$) & $N$ & Decision\\
 \midrule
-H1: Sent.-Convexity & $D^{SENT}$ & 9.23 (df=3, p=0.026) & +0.10 (p=0.462) & 232,800 & Reject (asym +)\\
+H1: Sent.-Convexity & $D^{\text{SENT}}$ & 9.23 (df=3, p=0.026) & +0.10 (p=0.462) & 232,800 & Reject (asym +)\\
 H1: Sent.-Convexity & $\text{SENT}^\perp$ & 6.92 (df=3, p=0.074) & -0.29 (p=0.612) & 232,800 & Reject (asym -)\\
-H1: Sent.-Convexity & $D^{AAII}$ & 11.39 (df=3, p=0.010) & +2.11 (p=0.017) & 232,800 & Reject (asym +)\\
-H2: Disp./IoC & $D^{MD,Det}$ & 11.33 (df=3, p=0.010) & +2.16 (p=0.984) & 232,800 & Reject (BP margin-call ($\delta_1 > 0$))\\
+H1: Sent.-Convexity & $D^{\text{AAII}}$ & 11.39 (df=3, p=0.010) & +2.11 (p=0.017) & 232,800 & Reject (asym +)\\
+H2: Disp./IoC & $D^{\text{MD,Det}}$ & 11.33 (df=3, p=0.010) & +2.16 (p=0.984) & 232,800 & Reject (BP margin-call ($\delta_1 > 0$))\\
 H2: Disp./IoC & $D^{\text{INV-PCR}}$ & 0.49 (df=3, p=0.921) & -0.18 (p=0.429) & 232,800 & Fail to reject (Disposition ($\delta_1 < 0$))\\
 H2: Disp./IoC & Discriminant & 7.52 (df=3, p=0.057) & +1.90 (p=0.971) & 232,800 & Reject (BP margin-call ($\delta_1 > 0$))\\
 H3: Lottery & ActR2 & 0.93 (df=2, p=0.629) & +0.06 (p=0.476) & 202,779 & Fail to reject (lottery amp +)\\
 H3: Lottery & ActSkew & 1.82 (df=2, p=0.402) & +0.15 (p=0.439) & 202,779 & Fail to reject (lottery amp +)\\
 H3: Lottery & MAX12 & 11.29 (df=2, p=0.004) & +1.56 (p=0.060) & 202,779 & Reject (lottery amp +)\\
-H4: Fee Elast. & $D^{SENT}$ & 5.04 (df=4, p=0.283) & +0.82 (p=0.207) & 232,168 & Fail to reject (fee amp +)\\
+H4: Fee Elast. & $D^{\text{SENT}}$ & 5.04 (df=4, p=0.283) & +0.82 (p=0.207) & 232,168 & Fail to reject (fee amp +)\\
 H4: Fee Elast. & $\text{SENT}^\perp$ & 5.14 (df=4, p=0.274) & +0.09 (p=0.465) & 232,168 & Fail to reject (fee amp +)\\
-H4: Fee Elast. & $D^{AAII}$ & 5.15 (df=4, p=0.272) & +1.37 (p=0.085) & 232,168 & Fail to reject (fee amp +)\\
+H4: Fee Elast. & $D^{\text{AAII}}$ & 5.15 (df=4, p=0.272) & +1.37 (p=0.085) & 232,168 & Fail to reject (fee amp +)\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}

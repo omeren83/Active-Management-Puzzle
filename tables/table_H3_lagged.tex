@@ -1,6 +1,6 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H3_lagged}H3 Robustness --- Lagged Sentiment. Same column specification as Table~\ref{tab:H3_regression}, except $D^{SENT}$ is measured at $t-1$ rather than $t$ (\textcite{HuangEtal2015} timing convention).}
+\caption{\label{tab:H3_lagged}H3 Robustness --- Lagged Sentiment. Same column specification as Table~\ref{tab:H3_regression}, except $D^{\text{SENT}}$ is measured at $t-1$ rather than $t$ (\textcite{HuangEtal2015} timing convention).}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{threeparttable}
@@ -10,11 +10,11 @@
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{LOW}$ & 0.0319*** & 0.0316*** & 0.0319*** & 0.0309***\\
+$R^{\text{LOW}}$ & 0.0319*** & 0.0316*** & 0.0319*** & 0.0309***\\
  & (7.93) & (7.85) & (7.91) & (7.63)\\
-$R^{MID}$ & 0.0145*** & 0.0145*** & 0.0145*** & 0.0142***\\
+$R^{\text{MID}}$ & 0.0145*** & 0.0145*** & 0.0145*** & 0.0142***\\
  & (15.67) & (15.68) & (15.70) & (15.40)\\
-$R^{HIGH}$ & 0.0810*** & 0.0815*** & 0.0809*** & 0.0800***\\
+$R^{\text{HIGH}}$ & 0.0810*** & 0.0815*** & 0.0809*** & 0.0800***\\
  & (14.15) & (14.16) & (14.15) & (14.12)\\
 Lottery measure &  & -0.0046 & 0.0013 & 0.0206\\
  &  & (-0.88) & (1.20) & (1.59)\\
@@ -40,7 +40,7 @@ Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=-0.14 (p=0.557) & z=-0.47 (p=0.681) & z
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{SENT}_{t-1}$ replaces $D^{SENT}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\item Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{\text{SENT}}_{t-1}$ replaces $D^{\text{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}

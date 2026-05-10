@@ -7,7 +7,7 @@
 \begin{longtable}[t]{lrrrr}
 \caption{\label{tab:H4_robustness}H4 Robustness --- Yearmo-only Fixed Effects. Same contemporaneous-sentiment specification as Table~\ref{tab:H4_regression}, but with yearmo fixed effects in place of Lipper-category $\times$ yearmo. Identification of expense-ratio slopes now includes between-style variation, providing a cross-check against unobserved style-level confounders (e.g.\ growth funds systematically charging higher fees and attracting different flows).}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{SENT}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{AAII}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,33 +22,33 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{LOW}$ & 0.0323*** & 0.0567*** & 0.0548*** & 0.0552***\\
+$R^{\text{LOW}}$ & 0.0323*** & 0.0567*** & 0.0548*** & 0.0552***\\
  & (9.68) & (8.43) & (9.33) & (8.42)\\
-$R^{MID}$ & 0.0158*** & 0.0192*** & 0.0180*** & 0.0172***\\
+$R^{\text{MID}}$ & 0.0158*** & 0.0192*** & 0.0180*** & 0.0172***\\
  & (17.32) & (8.77) & (9.33) & (7.68)\\
-$R^{HIGH}$ & 0.0779*** & 0.0672*** & 0.0602*** & 0.0570***\\
+$R^{\text{HIGH}}$ & 0.0779*** & 0.0672*** & 0.0602*** & 0.0570***\\
  & (14.48) & (6.23) & (6.45) & (6.40)\\
 Expense ratio & -0.0013* & 0.0013* & 0.0013** & 0.0011\\
  & (-1.75) & (1.86) & (2.12) & (1.43)\\
-$R^{LOW}\times$ Exp.\ ratio &  & -0.0169*** & -0.0174*** & -0.0165***\\
+$R^{\text{LOW}}\times$ Exp.\ ratio &  & -0.0169*** & -0.0174*** & -0.0165***\\
  &  & (-3.62) & (-4.29) & (-3.74)\\
-$R^{MID}\times$ Exp.\ ratio &  & -0.0025 & -0.0024 & -0.0023\\
+$R^{\text{MID}}\times$ Exp.\ ratio &  & -0.0025 & -0.0024 & -0.0023\\
  &  & (-1.36) & (-1.54) & (-1.25)\\
-$R^{HIGH}\times$ Exp.\ ratio &  & 0.0123 & 0.0169** & 0.0171**\\
+$R^{\text{HIGH}}\times$ Exp.\ ratio &  & 0.0123 & 0.0169** & 0.0171**\\
  &  & (1.38) & (2.22) & (2.53)\\
-$R^{LOW}\times$ Sent. &  & -0.0055 & -0.0071 & -0.0033\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0055 & -0.0071 & -0.0033\\
  &  & (-0.48) & (-1.40) & (-0.33)\\
-$R^{MID}\times$ Sent. &  & -0.0062 & -0.0011 & 0.0044\\
+$R^{\text{MID}}\times$ Sent. &  & -0.0062 & -0.0011 & 0.0044\\
  &  & (-1.26) & (-0.68) & (0.99)\\
-$R^{HIGH}\times$ Sent. &  & -0.0209 & -0.0073 & -0.0062\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0209 & -0.0073 & -0.0062\\
  &  & (-1.30) & (-1.23) & (-0.38)\\
 Exp.\ ratio $\times$ Sent. &  & 0.0007 & 0.0000 & 0.0011\\
  &  & (0.76) & (0.04) & (1.08)\\
-$R^{LOW}\times$ Exp.\ $\times$ Sent. &  & -0.0052 & 0.0031 & -0.0035\\
+$R^{\text{LOW}}\times$ Exp.\ $\times$ Sent. &  & -0.0052 & 0.0031 & -0.0035\\
  &  & (-0.65) & (0.78) & (-0.54)\\
-$R^{MID}\times$ Exp.\ $\times$ Sent. &  & 0.0013 & -0.0004 & -0.0010\\
+$R^{\text{MID}}\times$ Exp.\ $\times$ Sent. &  & 0.0013 & -0.0004 & -0.0010\\
  &  & (0.30) & (-0.29) & (-0.25)\\
-$R^{HIGH}\times$ Exp.\ $\times$ Sent. &  & 0.0108 & 0.0007 & 0.0188\\
+$R^{\text{HIGH}}\times$ Exp.\ $\times$ Sent. &  & 0.0108 & 0.0007 & 0.0188\\
  &  & (0.79) & (0.17) & (1.16)\\
 $\log(\text{TNA})$ & -0.0007*** & -0.0007*** & -0.0007*** & -0.0007***\\
  & (-4.68) & (-5.28) & (-5.26) & (-5.22)\\

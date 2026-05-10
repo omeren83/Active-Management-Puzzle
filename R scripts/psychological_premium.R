@@ -333,7 +333,7 @@ threeparttable_note_after_compact <- function(s) {
 }
 
 # --- 7. Build summary table -------------------------------------------------
-seg_label <- c(LOW = "$R^{LOW}$", MID = "$R^{MID}$", HIGH = "$R^{HIGH}$")
+seg_label <- c(LOW = "$R^{\text{LOW}}$", MID = "$R^{\text{MID}}$", HIGH = "$R^{\text{HIGH}}$")
 all_sps <- list(ActR2 = sp_actr2, ActSkew = sp_actskew, MAX12 = sp_max12)
 
 rows <- list()
@@ -361,8 +361,8 @@ rownames(ppf_df) <- NULL
 caption <- "Psychological Premium (Shadow Price) Estimates"
 fn <- paste0(
   "Each row is computed from a separate joint regression of the form ",
-  "$\\\\text{flow}=\\\\beta_q R^q + \\\\delta_q R^q D^{SENT} + ",
-  "\\\\eta\\\\,\\\\text{AS}^z + \\\\phi\\\\,\\\\text{AS}^z D^{SENT} + ",
+  "$\\\\text{flow}=\\\\beta_q R^q + \\\\delta_q R^q D^{\text{SENT}} + ",
+  "\\\\eta\\\\,\\\\text{AS}^z + \\\\phi\\\\,\\\\text{AS}^z D^{\text{SENT}} + ",
   "\\\\text{controls} + \\\\mu_i$, with $\\\\text{AS}^z$ standardised within ",
   "sample. Shadow Price units are rank points per standard deviation of ",
   "the lottery measure. Standard errors via the delta method using the ",

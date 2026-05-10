@@ -1,6 +1,6 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H3_regression}H3: Lottery Demand Hypothesis. Panel regression of monthly proportional fund flows on three candidate activeness/lottery proxies, each interacted with the contemporaneous Baker--Wurgler sentiment regime indicator $D^{SENT}$. ActR2 is $1-R^2$ from the rolling 36-month Carhart regression (\textcite{AmihudGoyenko2013} convention); ActSkew is sample skewness of trailing 36 monthly gross returns; MAX12 is the maximum monthly gross return over the trailing 12 months. Proxy selection methodology is documented in Appendix~G; the predicted null on ActR2's interaction tests the rational-channel restriction, while positive interactions on ActSkew and MAX12 test the behavioural-channel alternative.}
+\caption{\label{tab:H3_regression}H3: Lottery Demand Hypothesis}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{threeparttable}
@@ -10,11 +10,11 @@
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{LOW}$ & 0.0319*** & 0.0316*** & 0.0320*** & 0.0309***\\
+$R^{\text{LOW}}$ & 0.0319*** & 0.0316*** & 0.0320*** & 0.0309***\\
  & (7.93) & (7.87) & (7.95) & (7.64)\\
-$R^{MID}$ & 0.0145*** & 0.0145*** & 0.0145*** & 0.0142***\\
+$R^{\text{MID}}$ & 0.0145*** & 0.0145*** & 0.0145*** & 0.0142***\\
  & (15.67) & (15.66) & (15.73) & (15.42)\\
-$R^{HIGH}$ & 0.0810*** & 0.0815*** & 0.0810*** & 0.0800***\\
+$R^{\text{HIGH}}$ & 0.0810*** & 0.0815*** & 0.0810*** & 0.0800***\\
  & (14.15) & (14.15) & (14.16) & (14.09)\\
 Lottery measure &  & -0.0044 & 0.0012 & 0.0220\\
  &  & (-0.85) & (1.08) & (1.63)\\
@@ -40,7 +40,7 @@ Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=+0.06 (p=0.476) & z=+0.15 (p=0.439) & z
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{LOW}$, $R^{MID}$, $R^{HIGH}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\item Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}

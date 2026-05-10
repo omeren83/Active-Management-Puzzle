@@ -7,7 +7,7 @@
 \begin{longtable}[t]{lrrrr}
 \caption{\label{tab:H4_lagged}H4 Robustness --- Lagged Sentiment. Same specification as Table~\ref{tab:H4_regression}, except sentiment is measured at $t-1$ rather than $t$ (Huang et al.\ 2015 timing convention). ExpRatio is left in levels (it is time-invariant within fund, so lagging is meaningless).}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{SENT}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{AAII}_{t-1}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{\text{AAII}}_{t-1}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,33 +22,33 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{LOW}$ & 0.0316*** & 0.0626*** & 0.0599*** & 0.0549***\\
+$R^{\text{LOW}}$ & 0.0316*** & 0.0626*** & 0.0599*** & 0.0549***\\
  & (9.39) & (8.40) & (10.06) & (9.01)\\
-$R^{MID}$ & 0.0158*** & 0.0170*** & 0.0172*** & 0.0177***\\
+$R^{\text{MID}}$ & 0.0158*** & 0.0170*** & 0.0172*** & 0.0177***\\
  & (17.40) & (7.47) & (8.54) & (8.10)\\
-$R^{HIGH}$ & 0.0788*** & 0.0738*** & 0.0606*** & 0.0550***\\
+$R^{\text{HIGH}}$ & 0.0788*** & 0.0738*** & 0.0606*** & 0.0550***\\
  & (14.77) & (6.41) & (6.60) & (7.03)\\
 Expense ratio & -0.0015* & 0.0014** & 0.0015** & 0.0010\\
  & (-1.85) & (2.10) & (2.40) & (1.54)\\
-$R^{LOW}\times$ Exp.\ ratio &  & -0.0232*** & -0.0226*** & -0.0186***\\
+$R^{\text{LOW}}\times$ Exp.\ ratio &  & -0.0232*** & -0.0226*** & -0.0186***\\
  &  & (-4.19) & (-5.37) & (-4.57)\\
-$R^{MID}\times$ Exp.\ ratio &  & -0.0007 & -0.0017 & -0.0022\\
+$R^{\text{MID}}\times$ Exp.\ ratio &  & -0.0007 & -0.0017 & -0.0022\\
  &  & (-0.39) & (-1.03) & (-1.30)\\
-$R^{HIGH}\times$ Exp.\ ratio &  & 0.0071 & 0.0178** & 0.0214***\\
+$R^{\text{HIGH}}\times$ Exp.\ ratio &  & 0.0071 & 0.0178** & 0.0214***\\
  &  & (0.72) & (2.35) & (3.88)\\
-$R^{LOW}\times$ Sent. &  & -0.0092 & -0.0094 & 0.0281**\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0092 & -0.0094 & 0.0281**\\
  &  & (-0.60) & (-1.50) & (2.17)\\
-$R^{MID}\times$ Sent. &  & 0.0002 & 0.0002 & -0.0021\\
+$R^{\text{MID}}\times$ Sent. &  & 0.0002 & 0.0002 & -0.0021\\
  &  & (0.05) & (0.12) & (-0.53)\\
-$R^{HIGH}\times$ Sent. &  & -0.0399** & -0.0104* & 0.0017\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0399** & -0.0104* & 0.0017\\
  &  & (-2.49) & (-1.74) & (0.11)\\
 Exp.\ ratio $\times$ Sent. &  & 0.0006 & 0.0000 & 0.0031**\\
  &  & (0.42) & (0.06) & (2.02)\\
-$R^{LOW}\times$ Exp.\ $\times$ Sent. &  & 0.0002 & 0.0043 & -0.0235**\\
+$R^{\text{LOW}}\times$ Exp.\ $\times$ Sent. &  & 0.0002 & 0.0043 & -0.0235**\\
  &  & (0.02) & (0.83) & (-2.45)\\
-$R^{MID}\times$ Exp.\ $\times$ Sent. &  & -0.0037 & -0.0016 & 0.0025\\
+$R^{\text{MID}}\times$ Exp.\ $\times$ Sent. &  & -0.0037 & -0.0016 & 0.0025\\
  &  & (-1.03) & (-1.16) & (0.67)\\
-$R^{HIGH}\times$ Exp.\ $\times$ Sent. &  & 0.0300** & 0.0052 & 0.0058\\
+$R^{\text{HIGH}}\times$ Exp.\ $\times$ Sent. &  & 0.0300** & 0.0052 & 0.0058\\
  &  & (2.18) & (1.18) & (0.38)\\
 $\log(\text{TNA})$ & -0.0007*** & -0.0008*** & -0.0008*** & -0.0008***\\
  & (-5.04) & (-6.24) & (-6.17) & (-6.14)\\

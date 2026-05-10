@@ -529,7 +529,7 @@ fn_text <- paste(
   "returns is most severe in unconditional tail sorts, which conditioning on",
   "activeness already attenuates.",
   "Sample: Active funds in the \\textcite{Evans2010}-corrected",
-  "\\texttt{panel\\_incubation}, Jan 1995--Feb 2026; H3 / activeness subsample",
+  "panel\\_incubation, Jan 1995--Feb 2026; H3 / activeness subsample",
   "per flagged\\_funds.xlsx."
 )
 

@@ -6,31 +6,31 @@
 \begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{MD,Det}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{MD,Det}}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{LOW}$ & 0.0304*** & 0.0241*** & 0.0377*** & 0.0257***\\
+$R^{\text{LOW}}$ & 0.0304*** & 0.0241*** & 0.0377*** & 0.0257***\\
  & (8.35) & (5.08) & (7.72) & (4.62)\\
-$R^{MID}$ & 0.0142*** & 0.0128*** & 0.0152*** & 0.0133***\\
+$R^{\text{MID}}$ & 0.0142*** & 0.0128*** & 0.0152*** & 0.0133***\\
  & (16.42) & (11.95) & (11.71) & (11.11)\\
-$R^{HIGH}$ & 0.0800*** & 0.0767*** & 0.0851*** & 0.0788***\\
+$R^{\text{HIGH}}$ & 0.0800*** & 0.0767*** & 0.0851*** & 0.0788***\\
  & (14.70) & (10.96) & (11.49) & (10.03)\\
 State &  & -0.0038** & 0.0025* & -0.0025*\\
  &  & (-2.55) & (1.71) & (-1.73)\\
-$R^{LOW}\times$ State &  & 0.0134* & 0.0011 & 0.0123*\\
+$R^{\text{LOW}}\times$ State &  & 0.0134* & 0.0011 & 0.0123*\\
  &  & (1.94) & (0.16) & (1.70)\\
-$R^{MID}\times$ State &  & 0.0028* & -0.0008 & 0.0024\\
+$R^{\text{MID}}\times$ State &  & 0.0028* & -0.0008 & 0.0024\\
  &  & (1.66) & (-0.44) & (1.36)\\
-$R^{HIGH}\times$ State &  & 0.0068 & 0.0037 & 0.0051\\
+$R^{\text{HIGH}}\times$ State &  & 0.0068 & 0.0037 & 0.0051\\
  &  & (0.71) & (0.38) & (0.52)\\
-$D^{SENT}$ &  &  &  & 0.0042**\\
+$D^{\text{SENT}}$ &  &  &  & 0.0042**\\
  &  &  &  & (2.37)\\
-$R^{LOW}\times D^{SENT}$ &  &  &  & -0.0038\\
+$R^{\text{LOW}}\times D^{\text{SENT}}$ &  &  &  & -0.0038\\
  &  &  &  & (-0.53)\\
-$R^{MID}\times D^{SENT}$ &  &  &  & -0.0013\\
+$R^{\text{MID}}\times D^{\text{SENT}}$ &  &  &  & -0.0013\\
  &  &  &  & (-0.73)\\
-$R^{HIGH}\times D^{SENT}$ &  &  &  & -0.0055\\
+$R^{\text{HIGH}}\times D^{\text{SENT}}$ &  &  &  & -0.0055\\
  &  &  &  & (-0.50)\\
 $\log(\text{TNA})$ & -0.0036*** & -0.0036*** & -0.0050*** & -0.0036***\\
  & (-8.01) & (-7.88) & (-8.00) & (-8.04)\\
@@ -51,7 +51,7 @@ Asymmetry ($z$, 1-sided $p$) & -- & z=-0.58 (p=0.718) & z=+0.21 (p=0.416) & z=-0
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{MD,Det}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{MD,Det}_{t-1}$ and $D^{SENT}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{\text{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{\text{MD,Det}}_{t-1}$ and $D^{\text{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{tablenotes}
 \end{threeparttable}}
 \end{table}
