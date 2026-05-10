@@ -229,7 +229,6 @@ t9_rows <- paste0(
 
 t9_tex <- c(
   "\\begin{table}[H]",
-  "\\small",
   "\\centering",
   "\\caption{Fama--French (2010) Bootstrap: Actual vs.\\ Simulated $t(\\hat{\\alpha})$ Percentiles -- FF Subperiod}",
   "\\label{tab:bootstrap_tails_FF}",
@@ -347,7 +346,6 @@ t11_rows <- vapply(seq_len(nrow(bsw_df)), function(i) {
 
 t11_tex <- c(
   "\\begin{table}[H]",
-  "\\small",
   "\\centering",
   "\\caption{BSW (2010) Four-Way Decomposition: Proportions of Skilled, Unskilled, and Lucky Funds (\\%) -- FF Subperiod}",
   "\\label{tab:bsw_decomposition_FF}",

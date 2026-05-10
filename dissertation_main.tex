@@ -99,7 +99,10 @@
 \usepackage{fontspec}
 \setmainfont{Times New Roman}
 \usepackage{unicode-math}
-\setmathfont{XITS Math}       % best open-licence math companion to TNR
+% STIX Two Math: designed to pair with Times-style serifs at matched weight.
+% Replaces XITS Math, whose italic rendered noticeably heavier than Times
+% italic in the List of Symbols and gave a bolded appearance to math glyphs.
+\setmathfont{STIX Two Math}
 
 % ---- Page geometry ----------------------------------------------------------
 % SBE: left 4 cm; top, right, bottom 2.5 cm. Page size A4.
@@ -234,8 +237,34 @@
 \usepackage{graphicx}
 \usepackage{pdflscape}
 \usepackage{threeparttablex}   % longtable-aware (required for kableExtra longtable+TableNotes)
+% Force tablenotes to span the full text width. Default \TPTminimum is 4em,
+% which makes notes follow the tabular's natural width — too narrow for any
+% table whose data columns are narrow (e.g. the BSW decomposition with six
+% small numeric columns). Setting \TPTminimum=\linewidth gives consistent
+% full-width notes across all tables. Note: \TPTminimum is a macro (not a
+% length register), so \renewcommand — not \setlength.
+\renewcommand{\TPTminimum}{\linewidth}
 \usepackage{makecell}
 \usepackage{colortbl}
+
+% SBE: "A table that appears in the main text must have one double-space
+% above the title of the table and a double-space below the table." The
+% same rule applies to figures. \intextsep controls the vertical separation
+% between an [H]-placed (or default-placed) float and the surrounding text.
+% Default is ~12pt + 2pt minus 4pt; SBE double-space at 12pt body =
+% 24pt baseline. Apply the same value to \floatsep and \textfloatsep so
+% the rule holds for non-[H] floats too.
+\setlength{\intextsep}{24pt plus 4pt minus 4pt}
+\setlength{\floatsep}{24pt plus 4pt minus 4pt}
+\setlength{\textfloatsep}{24pt plus 4pt minus 4pt}
+
+% Uniform table body font size: SBE requires consistency across all tables.
+% Hook applies \footnotesize (10 pt) at the start of every table and
+% longtable environment; per-file size declarations have been stripped.
+% Caption labels remain 12 pt via \captionsetup font=normalsize.
+\usepackage{etoolbox}
+\AtBeginEnvironment{table}{\footnotesize}
+\AtBeginEnvironment{longtable}{\footnotesize}
 
 % kableExtra compatibility aliases
 \makeatletter
@@ -281,7 +310,7 @@
   font            = normalsize,    % 12 pt — SBE requires TNR 12 throughout
   labelfont       = normalfont,    % force non-bold caption label ("Table 1.")
   textfont        = normalfont,    % force non-bold caption text
-  skip            = 8pt,           % gap between caption bottom and table top
+  skip            = 12pt,          % gap between caption bottom and table top (visible separation)
   position        = top,           % caption is ABOVE the table
   width           = \linewidth,    % prevent overflow in threeparttable
   singlelinecheck = false,         % short captions also obey justification (else \centering wrapper centres them)
@@ -292,7 +321,7 @@
   font            = normalsize,    % 12 pt
   labelfont       = normalfont,    % force non-bold caption label ("Figure 1.")
   textfont        = normalfont,    % force non-bold caption text
-  skip            = 8pt,           % gap between figure bottom and caption top
+  skip            = 12pt,          % gap between figure bottom and caption top (visible separation)
   position        = bottom,        % caption is BELOW the figure
   width           = \linewidth,
   singlelinecheck = false,

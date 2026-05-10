@@ -316,7 +316,6 @@ e2_rows <- vapply(seq_len(nrow(bt_car)), make_e2_row, character(1))
 
 e2_tex <- c(
   "\\begin{table}[H]",
-  "\\small",
   "\\centering",
   "\\caption{Bootstrap Percentile Comparison Across Factor Models}",
   "\\label{tab:bootstrap_comparison_robust}",

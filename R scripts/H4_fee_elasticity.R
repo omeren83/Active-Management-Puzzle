@@ -442,8 +442,7 @@ build_h4_table <- function(samp, fe_string,
     caption = caption, label = table_label,
     align = c("l", rep("r", 4)), escape = FALSE, linesep = ""
   ) %>%
-    kable_styling(latex_options = c("repeat_header"),
-                  font_size = 9) %>%
+    kable_styling(latex_options = c("repeat_header")) %>%
     add_header_above(col_headers, escape = FALSE, bold = FALSE) %>%
     row_spec(nrow(body_df), hline_after = TRUE) %>%
     footnote(general = footnote_text, general_title = "",
