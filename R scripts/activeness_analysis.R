@@ -160,49 +160,104 @@ add_stars <- function(val_str, t_stat) {
 
 # kableExtra LaTeX cleanup - identical to portfolio_sorts.R
 clean_latex <- function(x, resize = TRUE, small = FALSE) {
-  x <- gsub("\\\\end[{]threeparttable[}][}]",  "\\\\end{threeparttable}", x)
-  x <- gsub("\\\\end[{]ThreePartTable[}][}]",  "\\\\end{ThreePartTable}", x)
-  x <- gsub("\\\\resizebox[{]\\\\ifdim[^}]*[}][{]![}][{]",
-            "\\\\resizebox{\\\\linewidth}{!}{", x)
-  x <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", x, fixed = TRUE)
-  if (resize && !grepl("resizebox", x, fixed = TRUE)) {
-    if (grepl("ThreePartTable", x, fixed = TRUE)) {
-      x <- sub("(\\\\begin[{]ThreePartTable[}])",
-               "\\\\resizebox{\\\\linewidth}{!}{\n\\1", x)
-      x <- sub("(\\\\end[{]ThreePartTable[}])", "\\1\n}", x)
-    } else if (grepl("threeparttable", x, fixed = TRUE)) {
-      x <- sub("(\\\\begin[{]threeparttable[}])",
-               "\\\\resizebox{\\\\linewidth}{!}{\n\\1", x)
-      x <- sub("(\\\\end[{]threeparttable[}])", "\\1\n}", x)
-    } else {
-      x <- sub("(\\\\begin[{]tabular[}])",
-               "\\\\resizebox{\\\\linewidth}{!}{\n\\1", x)
-      x <- sub("(\\\\end[{]tabular[}])", "\\1\n}", x)
+  # Phase 2.4 SBE consistency pass (May 2026).
+  # Replaces kableExtra's default output with the savebox+minipage pattern
+  # for floating tables, or @{\extracolsep{\fill}} stretched longtable layout.
+  # Args resize/small retained for signature compatibility, no effect now.
+
+  find_brace_end <- function(s, brace_start) {
+    depth <- 0L
+    n <- nchar(s)
+    for (i in brace_start:n) {
+      ch <- substr(s, i, i)
+      if (ch == "{") depth <- depth + 1L
+      else if (ch == "}") {
+        depth <- depth - 1L
+        if (depth == 0L) return(i)
+      }
     }
+    NA_integer_
   }
-  # SBE caption-width fix (Phase 2b in the SBE_needed_fixes audit):
-  # Move \caption inside \begin{threeparttable} so threeparttable constrains
-  # the caption width to the tabular's natural width. kableExtra otherwise
-  # emits \caption BEFORE threeparttable, leaving caption at full \linewidth
-  # and visually overhanging narrower tables. Also strips the redundant
-  # second \centering kableExtra inserts between \caption and threeparttable.
-  # Brace-balanced caption matching via perl regex (handles \label{...} inside).
-  x <- gsub(
-    "\\\\caption\\{((?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*)\\}\\s*\n\\\\centering\\s*\n((?:\\\\resizebox\\{[^{}]*(?:\\{[^{}]*\\}[^{}]*)*\\}\\{[^}]*\\}\\{\\s*\n)?)\\\\begin\\{threeparttable\\}",
-    "\\2\\\\begin{threeparttable}\n\\\\caption{\\1}",
-    x,
-    perl = TRUE
+
+  # Generic kableExtra fixes.
+  x <- gsub("\\\\end[{]threeparttable[}][}]", "\\\\end{threeparttable}", x)
+  x <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", x, fixed = TRUE)
+
+  # ---- Longtable branch (Phase 2.3 stretching + Phase 2.4 12pt gap) -------
+  if (grepl("\\\\begin\\{longtable\\}", x)) {
+    if (!grepl("@\\{\\\\extracolsep\\{\\\\fill\\}\\}", x, perl = TRUE)) {
+      x <- sub(
+        "(\\\\begin\\{longtable\\}(?:\\[[^]]*\\])?)\\{",
+        "\\1{@{\\\\extracolsep{\\\\fill}}",
+        x, perl = TRUE
+      )
+    }
+    cap_pattern <- paste0(
+      "(\\\\caption(?:\\[[^]]*\\])?",
+      "\\{(?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*\\}",
+      ")\\\\\\\\(?!\\[)"
+    )
+    x <- gsub(cap_pattern, "\\1\\\\\\\\[12pt]", x, perl = TRUE)
+    return(x)
+  }
+
+  # ---- Floating-table branch (savebox + minipage) -------------------------
+  cap_anchor <- regexpr("\\\\caption(?=\\{)", x, perl = TRUE)
+  if (cap_anchor == -1) return(x)
+  cap_start <- as.integer(cap_anchor)
+  brace_start <- cap_start + attr(cap_anchor, "match.length")
+  cap_end <- find_brace_end(x, brace_start)
+  if (is.na(cap_end)) return(x)
+  caption_text <- substring(x, cap_start, cap_end)
+
+  tab_m <- regexpr(
+    "(?s)\\\\begin\\{tabular\\}(?:\\[[^]]*\\])?\\{[^}]*\\}.*?\\\\end\\{tabular\\}",
+    x, perl = TRUE
   )
-  # Same transform for the ThreePartTable (longtable) variant used by
-  # portfolio_sorts.R, persistence_testing.R, and activeness_analysis.R.
-  x <- gsub(
-    "\\\\caption\\{((?:[^{}]|\\{(?:[^{}]|\\{[^{}]*\\})*\\})*)\\}\\s*\n\\\\centering\\s*\n((?:\\\\resizebox\\{[^{}]*(?:\\{[^{}]*\\}[^{}]*)*\\}\\{[^}]*\\}\\{\\s*\n)?)\\\\begin\\{ThreePartTable\\}",
-    "\\2\\\\begin{ThreePartTable}\n\\\\caption{\\1}",
-    x,
-    perl = TRUE
+  if (tab_m == -1) return(x)
+  tabular <- substring(x, tab_m, tab_m + attr(tab_m, "match.length") - 1L)
+
+  notes_m <- regexpr(
+    "(?s)\\\\begin\\{tablenotes\\}\\s*\\\\item\\s+(.*?)\\\\end\\{tablenotes\\}",
+    x, perl = TRUE
   )
-  if (small) x <- sub("(\\\\begin\\{table\\}[^\n]*\n)", "\\1\\\\small\n", x)
-  x
+  notes <- ""
+  if (notes_m != -1) {
+    full_block <- substring(x, notes_m, notes_m + attr(notes_m, "match.length") - 1L)
+    inner <- sub("^(?s)\\\\begin\\{tablenotes\\}\\s*\\\\item\\s+", "",
+                 full_block, perl = TRUE)
+    inner <- sub("(?s)\\\\end\\{tablenotes\\}\\s*$", "", inner, perl = TRUE)
+    notes <- trimws(inner)
+  }
+
+  out <- paste0(
+    "\\begin{table}[H]\n",
+    "\\centering\n",
+    "\\sbox{\\tabletempbox}{%\n",
+    "\\footnotesize\n",
+    tabular, "%\n",
+    "}\n",
+    "\\setlength{\\tabletempwidth}{\\wd\\tabletempbox}\n",
+    "\\ifdim\\tabletempwidth>\\linewidth\\setlength{\\tabletempwidth}{\\linewidth}\\fi\n",
+    "\\begin{minipage}{\\tabletempwidth}\n",
+    "\\captionsetup{width=\\linewidth}\n",
+    caption_text, "\n",
+    "\\ifdim\\wd\\tabletempbox>\\linewidth\n",
+    "  \\resizebox{\\linewidth}{!}{\\usebox{\\tabletempbox}}\n",
+    "\\else\n",
+    "  \\usebox{\\tabletempbox}\n",
+    "\\fi\n"
+  )
+  if (nzchar(notes)) {
+    out <- paste0(out,
+      "\\par\\medskip\n",
+      "\\begin{singlespace}\\footnotesize\\noindent\n",
+      notes, "\n",
+      "\\end{singlespace}\n"
+    )
+  }
+  out <- paste0(out, "\\end{minipage}\n\\end{table}\n")
+  out
 }
 
 write_tex <- function(s, fn, resize = TRUE, small = FALSE) {
