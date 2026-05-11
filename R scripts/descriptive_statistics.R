@@ -103,6 +103,8 @@ library(stringr)
 library(e1071)    # for kurtosis()
 library(slider)   # for slide_index_dbl() centred rolling mean
 
+
+
 # =============================================================================
 # 1. HELPERS
 # =============================================================================
@@ -235,6 +237,16 @@ write_tex <- function(latex_str, filename, resize = TRUE, small = FALSE) {
 # =============================================================================
 # 2. TABLE 1: FUND COUNTS BY PANEL AND GROUP
 # =============================================================================
+
+# Guard: Table 1 (Fund Counts) reports the UNIVERSE composition and
+# must use the pre-Step-8c panel snapshots. All other tables in this
+# script use the post-8c (analytical-sample) panels.
+stopifnot(
+  "panel_master_pre8c missing — re-run data_import_and_cleaning.R v1.3+"     = exists("panel_master_pre8c"),
+  "panel_incubation_pre8c missing — re-run data_import_and_cleaning.R v1.3+" = exists("panel_incubation_pre8c"),
+  "panel_trimmed_pre8c missing — re-run data_import_and_cleaning.R v1.3+"    = exists("panel_trimmed_pre8c")
+)
+
 fund_counts <- function(panel, label) {
   panel %>%
     group_by(Ticker, ap_group) %>%
@@ -245,9 +257,9 @@ fund_counts <- function(panel, label) {
 }
 
 counts_raw <- bind_rows(
-  fund_counts(panel_master,     "Master"),
-  fund_counts(panel_incubation, "Incubation-Corrected"),
-  fund_counts(panel_trimmed,    "Trimmed (1995--2023)")
+  fund_counts(panel_master_pre8c,     "Master"),
+  fund_counts(panel_incubation_pre8c, "Incubation-Corrected"),
+  fund_counts(panel_trimmed_pre8c,    "Trimmed (1995--2023)")
 ) %>%
   pivot_wider(names_from = ap_group, values_from = n, values_fill = 0) %>%
   mutate(Total = Active + Passive + Unknown) %>%

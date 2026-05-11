@@ -1,9 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:return_dist}Distribution of Monthly Gross Returns: Active vs.\ Passive Funds}
-\centering
-\resizebox{\linewidth}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{llrrrrrrrrr}
 \toprule
 Panel & Group & $N$ & Mean & VW Mean & Median & SD & $P_{10}$ & $P_{90}$ & Skewness & Ex.\ Kurtosis\\
@@ -20,10 +18,22 @@ Panel & Group & $N$ & Mean & VW Mean & Median & SD & $P_{10}$ & $P_{90}$ & Skewn
 
 \multirow{-2}{*}{\raggedright\arraybackslash Trimmed (1995--2023)} & Passive & 2,660 & 0.535 & 0.535 & 1.094 & 4.797 & -6.083 & 5.982 & -0.117 & 0.7010\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the lagged-TNA-weighted cross-sectional mean return, representing the return earned by a representative invested dollar. Skewness is Pearson's second coefficient: $(\bar{x}-\tilde{x})/s$. Excess kurtosis is the fourth standardised central moment minus 3. Unknown funds are excluded.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
 }
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:return_dist}Distribution of Monthly Gross Returns: Active vs.\ Passive Funds}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the lagged-TNA-weighted cross-sectional mean return, representing the return earned by a representative invested dollar. Skewness is Pearson's second coefficient: $(\bar{x}-\tilde{x})/s$. Excess kurtosis is the fourth standardised central moment minus 3. Unknown funds are excluded.
+\end{singlespace}
+\end{minipage}
 \end{table}
+

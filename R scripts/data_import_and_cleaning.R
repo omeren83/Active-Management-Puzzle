@@ -418,6 +418,17 @@ n_before <- list(
   trimmed    = n_distinct(panel_trimmed$Ticker)
 )
 
+# Snapshot panels BEFORE Entire-Analysis drop, for descriptive
+# Table 4.1 only (universe composition). All downstream analyses
+# continue to use the post-8c panels.
+panel_master_pre8c     <- panel_master
+panel_incubation_pre8c <- panel_incubation
+panel_trimmed_pre8c    <- panel_trimmed
+
+panel_master     <- panel_master     %>% filter(!Ticker %in% tickers_entire)
+panel_incubation <- panel_incubation %>% filter(!Ticker %in% tickers_entire)
+panel_trimmed    <- panel_trimmed    %>% filter(!Ticker %in% tickers_entire)
+
 panel_master     <- panel_master     %>% filter(!Ticker %in% tickers_entire)
 panel_incubation <- panel_incubation %>% filter(!Ticker %in% tickers_entire)
 panel_trimmed    <- panel_trimmed    %>% filter(!Ticker %in% tickers_entire)
