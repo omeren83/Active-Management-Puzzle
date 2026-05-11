@@ -289,11 +289,13 @@
 % same rule applies to figures. \intextsep controls the vertical separation
 % between an [H]-placed (or default-placed) float and the surrounding text.
 % Default is ~12pt + 2pt minus 4pt; SBE double-space at 12pt body =
-% 24pt baseline. Apply the same value to \floatsep and \textfloatsep so
-% the rule holds for non-[H] floats too.
-\setlength{\intextsep}{24pt plus 4pt minus 4pt}
-\setlength{\floatsep}{24pt plus 4pt minus 4pt}
-\setlength{\textfloatsep}{24pt plus 4pt minus 4pt}
+% 24pt baseline. Phase 2.4: bumped to 36pt so the visible gap between a
+% table's notes block (single-spaced 10pt) and the following body text
+% (double-spaced 12pt) is unambiguous — 24pt was too tight against
+% single-spaced notes.
+\setlength{\intextsep}{36pt plus 4pt minus 4pt}
+\setlength{\floatsep}{36pt plus 4pt minus 4pt}
+\setlength{\textfloatsep}{36pt plus 4pt minus 4pt}
 
 % longtable is NOT a float, so the standard \intextsep does not apply. Use
 % \LTpre and \LTpost to enforce the SBE double-space rule above the
@@ -301,7 +303,20 @@
 % multiple pages (kableExtra produces these for the H1--H4, J series,
 % activeness_*, and persistence tables).
 \setlength{\LTpre}{24pt plus 4pt minus 4pt}
-\setlength{\LTpost}{24pt plus 4pt minus 4pt}
+\setlength{\LTpost}{36pt plus 4pt minus 4pt}
+
+% Phase 2.4: force longtables to span \linewidth.
+% Phase 2.3 added @{\extracolsep{\fill}} to every longtable column spec to
+% stretch the table to \linewidth. That mechanism requires the longtable's
+% target width to be defined. Default \LTleft=\LTright=\fill leaves the
+% target width undefined and \extracolsep{\fill} has nothing to stretch
+% against, so the table falls back to natural column widths (narrower than
+% \linewidth), leaving the caption (rendered at \linewidth) visibly wider
+% than the table — the misalignment seen across all longtables in the
+% phase_2_3_errors.pdf render. Pinning both to 0pt makes the target width
+% explicit (= \linewidth) and lets \extracolsep{\fill} actually stretch.
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
 
 % Uniform table body font size: SBE requires consistency across all tables.
 % Hook applies \footnotesize (10 pt) at the start of every table and
@@ -4615,10 +4630,10 @@ and mean alpha per segment.
 
 \begin{table}[htbp]
 \centering
-\caption{Bai--Perron Break Dates, 95\,\% HAC Confidence Intervals, and
-         Regime-Mean Gross Alpha}
-\label{tab:breaktest}
-\small
+% Phase 2.4: same savebox+minipage pattern as all other floating tables —
+% caption left-aligns to table edge, width = table width.
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}{clccc}
 \toprule
 Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
@@ -4653,10 +4668,22 @@ Break & Point Estimate & 95\,\% CI Lower & 95\,\% CI Upper
 \multicolumn{4}{l}{P3: Dec 2011 -- Jan 2026 \hfill (170 months)}
     & $-1.36$ \\
 \bottomrule
-\end{tabular}
-\begin{minipage}{\linewidth}
-\vspace{4pt}
-\footnotesize
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Bai--Perron Break Dates, 95\,\% HAC Confidence Intervals, and
+         Regime-Mean Gross Alpha}
+\label{tab:breaktest}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
 Note: Break dates estimated via \textcite{Bai1998} and
 \textcite{Bai2003} with minimum segment 36 months; optimal break count
 (five) selected by BIC from the \citealt{Andrews1991} supF, meanF, and
@@ -4671,6 +4698,7 @@ partition adopted in Section~\ref{sec:subperiod_panels}; each adopted
 regime has $T \geq 60$ monthly observations, meeting the minimum
 sample requirement for reliable \textcite{FamaFrench2010} bootstrap and
 \textcite{BarrasScailletWermers2010} decomposition.
+\end{singlespace}
 \end{minipage}
 \end{table}
 
