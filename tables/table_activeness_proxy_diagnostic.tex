@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:activeness_proxy}Activeness / Lottery Proxy Diagnostic. Horse race among four candidate H3 regressors. ActR2 = $1-R^2$ from rolling 36-month Carhart regression (Amihud--Goyenko 2013 convention); ActSkew = sample skewness of trailing 36 monthly gross returns; MAX12 = maximum monthly gross return over the trailing 12 months (Bali, Cakici \& Whitelaw 2011 convention adapted to monthly fund data); UpSkew = right-tail conditional skewness of returns above the in-window mean, scaled by upside semi-deviation. All measures lagged one period and standardised. Univariate $t$ from $\text{flow}_{i,t} = \beta\cdot X^z_{i,t-1} + \text{controls}_{i,t-1} + \text{FE} + \varepsilon$ under two FE structures: Lipper $\times$ yearmo (cross-fund identification, the fair comparison) and Ticker + yearmo (within-fund identification, matching the H3 primary spec). Horserace $t$ from a single regression with all four measures simultaneously, Lipper $\times$ yearmo FE. $\alpha_{t+12}$-pred.\ $t$ tests Amihud--Goyenko's (2013) prediction that 1-$R^2$ positively predicts future Carhart alpha; comparison values for the other three measures indicate whether the predictive power is shared across lottery-like characteristics or unique to ActR2.}
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{lrrrrrr}
 \toprule
 Measure & Cov.\ (\%) & $\rho$ vs.\ ActR2 & Univ.\ $t$ (style FE) & Univ.\ $t$ (fund FE) & Horserace $t$ & $\alpha_{t+12}$-pred.\ $t$\\
@@ -12,9 +11,21 @@ ActSkew & 81.6 & 0.071 & 4.82 & 3.04 & 3.70 & -2.64\\
 MAX12 & 93.3 & -0.010 & 4.08 & 3.80 & 2.58 & 5.25\\
 UpSkew & 82.0 & -0.048 & 2.51 & 1.50 & 0.62 & 1.53\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Aligned sample restricted to fund-month observations with all four measures and core controls non-NA. Two-way clustered standard errors on Ticker and calendar month. Coverage in column 2 reports the fraction of fund-months in panel\_reg with the measure non-NA (before alignment).\\ The ``winning'' proxy is identified by (i) high univariate $|t|$ under the FE structure that preserves its dominant variation source, (ii) survival in the horse race conditional on the others, and (iii) consistency with Amihud--Goyenko's (2013) future-alpha prediction.
-\end{tablenotes}
-\end{threeparttable}}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:activeness_proxy}Activeness / Lottery Proxy Diagnostic. Horse race among four candidate H3 regressors. ActR2 = $1-R^2$ from rolling 36-month Carhart regression (Amihud--Goyenko 2013 convention); ActSkew = sample skewness of trailing 36 monthly gross returns; MAX12 = maximum monthly gross return over the trailing 12 months (Bali, Cakici \& Whitelaw 2011 convention adapted to monthly fund data); UpSkew = right-tail conditional skewness of returns above the in-window mean, scaled by upside semi-deviation. All measures lagged one period and standardised. Univariate $t$ from $\text{flow}_{i,t} = \beta\cdot X^z_{i,t-1} + \text{controls}_{i,t-1} + \text{FE} + \varepsilon$ under two FE structures: Lipper $\times$ yearmo (cross-fund identification, the fair comparison) and Ticker + yearmo (within-fund identification, matching the H3 primary spec). Horserace $t$ from a single regression with all four measures simultaneously, Lipper $\times$ yearmo FE. $\alpha_{t+12}$-pred.\ $t$ tests Amihud--Goyenko's (2013) prediction that 1-$R^2$ positively predicts future Carhart alpha; comparison values for the other three measures indicate whether the predictive power is shared across lottery-like characteristics or unique to ActR2.}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Aligned sample restricted to fund-month observations with all four measures and core controls non-NA. Two-way clustered standard errors on Ticker and calendar month. Coverage in column 2 reports the fraction of fund-months in panel\_reg with the measure non-NA (before alignment).\\ The ``winning'' proxy is identified by (i) high univariate $|t|$ under the FE structure that preserves its dominant variation source, (ii) survival in the horse race conditional on the others, and (iii) consistency with Amihud--Goyenko's (2013) future-alpha prediction.
+\end{singlespace}
+\end{minipage}
 \end{table}

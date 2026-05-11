@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H2_contemporaneous}H2 Robustness --- Contemporaneous State Variables. Same four-column specification as Table~\ref{tab:H2_regression}, except margin-debt, PCR, and sentiment regime indicators are measured at time $t$ rather than $t-1$ (Baker-Wurgler 2007 timing convention).}
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
@@ -48,9 +47,21 @@ Joint $\delta_1=\delta_2=\delta_3=0$ ($\chi^2_3$, $p$) & -- & 10.40 (0.015) & 0.
 Main $\delta_1<0$ ($z$, 1-sided $p$) & -- & z=+1.96 (p=0.975) & z=-0.06 (p=0.475) & z=+1.74 (p=0.959)\\
 Asym $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & z=-0.21 (p=0.583) & z=+0.29 (p=0.387) & z=-0.27 (p=0.605)\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are measured contemporaneously: column (2) uses $D^{\text{MD,Det}}_t$, column (3) uses $D^{\text{INV-PCR}}_t$, column (4) is the discriminant with $D^{\text{MD,Det}}_t$ and $D^{\text{SENT}}_t$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
-\end{tablenotes}
-\end{threeparttable}}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:H2_contemporaneous}H2 Robustness --- Contemporaneous State Variables. Same four-column specification as Table~\ref{tab:H2_regression}, except margin-debt, PCR, and sentiment regime indicators are measured at time $t$ rather than $t-1$ (Baker-Wurgler 2007 timing convention).}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are measured contemporaneously: column (2) uses $D^{\text{MD,Det}}_t$, column (3) uses $D^{\text{INV-PCR}}_t$, column (4) is the discriminant with $D^{\text{MD,Det}}_t$ and $D^{\text{SENT}}_t$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\end{singlespace}
+\end{minipage}
 \end{table}

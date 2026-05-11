@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H2_regression}H2: Disposition / Illusion-of-Control Hypothesis}
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
@@ -48,9 +47,21 @@ Joint test ($\chi^2_3$, $p$) & -- & 11.33 (0.010) & 0.49 (0.921) & 7.52 (0.057)\
 Loser-end test ($z$, 1-sided $p$) & -- & z=+2.16 (p=0.984) & z=-0.18 (p=0.429) & z=+1.90 (p=0.971)\\
 Asymmetry ($z$, 1-sided $p$) & -- & z=-0.50 (p=0.693) & z=+0.36 (p=0.359) & z=-0.52 (p=0.700)\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns. State variable in column (2) is $D^{\text{MD,Det}}_t$ (= 1 if the residual of $\log$(MD/MCAP) on a linear time trend is in the top 34\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\text{INV-PCR}}_t$ (= 1 in the bottom 34\% of the CBOE equity put-call ratio: high call-to-put = high illusion of control). Column (4) is the discriminant specification: it includes both $D^{\text{MD,Det}}_t$ and the Baker-Wurgler orthogonalised sentiment regime $D^{\text{SENT}}_t$ (= 1 if SENT$^\perp$ is in the top 34\%) with full rank interactions. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover) included but absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{tablenotes}
-\end{threeparttable}}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:H2_regression}H2: Disposition / Illusion-of-Control Hypothesis}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns. State variable in column (2) is $D^{\text{MD,Det}}_t$ (= 1 if the residual of $\log$(MD/MCAP) on a linear time trend is in the top 34\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\text{INV-PCR}}_t$ (= 1 in the bottom 34\% of the CBOE equity put-call ratio: high call-to-put = high illusion of control). Column (4) is the discriminant specification: it includes both $D^{\text{MD,Det}}_t$ and the Baker-Wurgler orthogonalised sentiment regime $D^{\text{SENT}}_t$ (= 1 if SENT$^\perp$ is in the top 34\%) with full rank interactions. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover) included but absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{singlespace}
+\end{minipage}
 \end{table}

@@ -267,16 +267,22 @@
 \usepackage{makecell}
 \usepackage{colortbl}
 
-% SBE caption-width fix (Phase 2.1): Many tables have caption at full
-% \linewidth while the tabular itself is naturally narrower; the caption
-% then visibly overhangs the table's left/right edges. Wrapping each
-% non-resizebox table in a \sbox{\tabletempbox}{...} measurement then a
-% \begin{minipage}{\wd\tabletempbox} containing caption + table + notes
-% constrains every element to the tabular's natural width, satisfying
-% SBE Part 3.10: "Titles must appear immediately above the table, aligned
-% to the left." \tabletempbox is declared once globally and reused per
-% table (LaTeX compiles linearly so reuse is safe).
+% SBE caption-width fix (Phase 2.2 — comprehensive consistency pass):
+% Every floating table is wrapped uniformly in
+%   \sbox{\tabletempbox}{\footnotesize \begin{tabular}{...}...\end{tabular}}
+%   \setlength{\tabletempwidth}{...}    (capped at \linewidth)
+%   \begin{minipage}{\tabletempwidth}
+%     \captionsetup{width=\linewidth}    (= minipage's \linewidth = \tabletempwidth)
+%     \caption{...}
+%     \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}  (conditional, only scales overflow)
+%     \par\medskip {\footnotesize\noindent ...notes...}
+%   \end{minipage}
+% This guarantees: caption aligned to TABLE's left edge with width = table width;
+% body explicitly at \footnotesize (10pt); table never overflows linewidth;
+% notes wrap to table width. SBE Part 3.10: "Titles must appear immediately
+% above the table, aligned to the left."
 \newsavebox{\tabletempbox}
+\newlength{\tabletempwidth}
 
 % SBE: "A table that appears in the main text must have one double-space
 % above the title of the table and a double-space below the table." The
@@ -353,29 +359,33 @@
 
 \captionsetup[table]{
   labelsep        = periodtwospace,
-  font            = normalsize,    % 12 pt — SBE requires TNR 12 throughout
+  font            = {normalsize, stretch=1},  % 12pt + single-spaced multi-line captions per SBE Part 3.10
   labelfont       = normalfont,    % force non-bold caption label ("Table 1.")
   textfont        = normalfont,    % force non-bold caption text
   skip            = 12pt,          % "separated by a single space from the table" per SBE Labeling guide
   position        = top,           % caption is ABOVE the table
-  width           = \linewidth,    % for resizebox tables, caption at linewidth matches scaled table; for savebox tables, minipage sets a local \linewidth = tabular width
   singlelinecheck = false,
   justification   = raggedright    % left-align caption text per SBE 3.10
+  % NOTE: width= deliberately omitted. Phase 2.2 sets caption width
+  % locally inside each table's minipage via \captionsetup{width=\linewidth}.
+  % Setting width= globally caused \linewidth to be evaluated at preamble
+  % time (= text width) and baked in, defeating the local minipage scope.
 }
 \captionsetup[figure]{
   labelsep        = periodtwospace,
-  font            = normalsize,    % 12 pt
+  font            = {normalsize, stretch=1},  % 12pt + single-spaced multi-line
   labelfont       = normalfont,    % force non-bold caption label ("Figure 1.")
   textfont        = normalfont,    % force non-bold caption text
   skip            = 12pt,
   position        = bottom,        % caption is BELOW the figure
-  width           = \linewidth,
   singlelinecheck = false,
   justification   = raggedright
 }
 % \captionsetup[table] does not propagate to longtable (separate float class).
 % Mirror SBE rules onto longtable so floats and longtables look identical.
-\captionsetup[longtable]{font=normalsize, labelfont=normalfont, textfont=normalfont, width=\linewidth, justification=raggedright, singlelinecheck=false, position=top}
+% Longtables get the SBE single-line gap below caption via `\\[12pt]` after
+% the caption row (applied per-file by phase2_2.py), not via skip=.
+\captionsetup[longtable]{font={normalsize, stretch=1}, labelfont=normalfont, textfont=normalfont, justification=raggedright, singlelinecheck=false, position=top}
 
 % ---- Mathematics ------------------------------------------------------------
 \usepackage{amsmath}

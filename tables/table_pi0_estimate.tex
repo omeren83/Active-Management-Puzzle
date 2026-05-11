@@ -1,18 +1,28 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:pi0_estimate}Aggregate Skill Estimate: Proportion of True Zero-Alpha Active Funds}
-\resizebox{\linewidth}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{>{\raggedright\arraybackslash}p{16em}rrr>{\raggedright\arraybackslash}p{14em}}
 \toprule
 Metric & Estimate & $N$ & $\lambda$ & Interpretation\\
 \midrule
 $\hat{\pi}_0$: Proportion of True Zero-Alpha Active Funds & 78.0\% & 1815 & 0.5 & Heterogeneous skill; majority zero-alpha\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item The proportion of true zero-alpha funds ($\hat{\pi}_0$) is estimated following \textcite{Storey2002} and \textcite{BarrasScailletWermers2010}, using p-values from Newey-West $t$-tests on full-period \textcite{Carhart1997} four-factor alphas. The estimator is $\hat{\pi}_0 = |\{p_i > \lambda\}| \,/\, [N(1-\lambda)]$, where $\lambda = 0.5$ is the standard tuning parameter following \textcite{Storey2002}. Funds with p-values exceeding $\lambda$ are unlikely to have non-zero true alpha; the density of p-values in $(\lambda, 1]$ provides a conservative estimate of the zero-alpha proportion, bounded above at 1. Sample: actively managed funds ($N = 1815$), Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\_funds.xlsx. Passive and Unknown-classified funds are excluded. The four-way decomposition of skilled, unskilled, and lucky fund proportions implied by this estimate is reported in Table~\ref{tab:bsw_decomposition}.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
 }
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:pi0_estimate}Aggregate Skill Estimate: Proportion of True Zero-Alpha Active Funds}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+The proportion of true zero-alpha funds ($\hat{\pi}_0$) is estimated following \textcite{Storey2002} and \textcite{BarrasScailletWermers2010}, using p-values from Newey-West $t$-tests on full-period \textcite{Carhart1997} four-factor alphas. The estimator is $\hat{\pi}_0 = |\{p_i > \lambda\}| \,/\, [N(1-\lambda)]$, where $\lambda = 0.5$ is the standard tuning parameter following \textcite{Storey2002}. Funds with p-values exceeding $\lambda$ are unlikely to have non-zero true alpha; the density of p-values in $(\lambda, 1]$ provides a conservative estimate of the zero-alpha proportion, bounded above at 1. Sample: actively managed funds ($N = 1815$), Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\_funds.xlsx. Passive and Unknown-classified funds are excluded. The four-way decomposition of skilled, unskilled, and lucky fund proportions implied by this estimate is reported in Table~\ref{tab:bsw_decomposition}.
+\end{singlespace}
+\end{minipage}
 \end{table}

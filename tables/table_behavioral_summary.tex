@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:behavioral_summary}Behavioral Hypotheses --- Summary of Primary-Spec Test Statistics}
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{llllrl}
 \toprule
 Hypothesis & State proxy & Joint $\chi^2$ & Headline $z$ (1-sided $p$) & $N$ & Decision\\
@@ -20,9 +19,21 @@ H4: Fee Elast. & $D^{\text{SENT}}$ & 5.04 (df=4, p=0.283) & +0.82 (p=0.207) & 23
 H4: Fee Elast. & $\text{SENT}^\perp$ & 5.14 (df=4, p=0.274) & +0.09 (p=0.465) & 232,168 & Fail to reject (fee amp +)\\
 H4: Fee Elast. & $D^{\text{AAII}}$ & 5.15 (df=4, p=0.272) & +1.37 (p=0.085) & 232,168 & Fail to reject (fee amp +)\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Stars on individual coefficients are reported in the underlying tables. All specifications use the primary-spec aligned sample (contemporaneous state variables; fund FE for H1--H3; Lipper $\times$ yearmo FE for H4) with two-way clustering on Ticker and calendar month (Petersen 2009).
-\end{tablenotes}
-\end{threeparttable}}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:behavioral_summary}Behavioral Hypotheses --- Summary of Primary-Spec Test Statistics}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Stars on individual coefficients are reported in the underlying tables. All specifications use the primary-spec aligned sample (contemporaneous state variables; fund FE for H1--H3; Lipper $\times$ yearmo FE for H4) with two-way clustering on Ticker and calendar month (Petersen 2009).
+\end{singlespace}
+\end{minipage}
 \end{table}

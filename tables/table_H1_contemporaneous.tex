@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H1_contemporaneous}H1 Robustness --- Contemporaneous Sentiment. Same four-column specification as Table~\ref{tab:H1_regression}, except sentiment is measured at time $t$ rather than $t-1$ (Baker-Wurgler 2007 timing convention).}
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
@@ -39,9 +38,21 @@ $R^2$ (within) & 0.026 & 0.026 & 0.027 & 0.026\\
 Joint $\delta_1=\delta_2=\delta_3=0$ ($\chi^2_3$, $p$) & -- & 8.59 (0.035) & 6.89 (0.076) & 9.55 (0.023)\\
 Asymmetry $\delta_3-\delta_1$ ($z$, 1-sided $p$) & -- & z=-0.10 (p=0.539) & z=-0.54 (p=0.705) & z=+1.97 (p=0.025)\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are measured contemporaneously: column (2) uses $D^{\text{SENT}}_t$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t$, column (4) uses $D^{\text{AAII}}_t$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
-\end{tablenotes}
-\end{threeparttable}}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:H1_contemporaneous}H1 Robustness --- Contemporaneous Sentiment. Same four-column specification as Table~\ref{tab:H1_regression}, except sentiment is measured at time $t$ rather than $t-1$ (Baker-Wurgler 2007 timing convention).}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are measured contemporaneously: column (2) uses $D^{\text{SENT}}_t$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t$, column (4) uses $D^{\text{AAII}}_t$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.
+\end{singlespace}
+\end{minipage}
 \end{table}

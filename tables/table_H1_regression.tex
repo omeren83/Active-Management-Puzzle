@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:H1_regression}H1: Sentiment-Convexity Hypothesis}
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
@@ -39,9 +38,21 @@ $R^2$ (within) & 0.028 & 0.028 & 0.028 & 0.028\\
 Joint test ($\chi^2_3$, $p$) & -- & 9.23 (0.026) & 6.92 (0.074) & 11.39 (0.010)\\
 Asymmetry ($z$, 1-sided $p$) & -- & z=+0.10 (p=0.462) & z=-0.29 (p=0.612) & z=+2.11 (p=0.017)\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is the regime dummy $D^{\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler 2007); column (3) is the standardised Baker-Wurgler orthogonalised sentiment index; column (4) is the AAII bull-bear regime dummy. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{tablenotes}
-\end{threeparttable}}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:H1_regression}H1: Sentiment-Convexity Hypothesis}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is the regime dummy $D^{\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler 2007); column (3) is the standardised Baker-Wurgler orthogonalised sentiment index; column (4) is the AAII bull-bear regime dummy. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{singlespace}
+\end{minipage}
 \end{table}

@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:subperiod_perf_aggregate}Aggregate Portfolio Alpha by Group and Sub-Period (\%, Annualised)}
-\resizebox{\linewidth}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{lrrrrrr}
 \toprule
 \multicolumn{3}{c}{ } & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} \\
@@ -51,10 +50,21 @@ Group & $N$ & $T$ & EW & VW & EW & VW\\
 \hspace{1em}Full Sample & 1,836 & 172 & -1.466$^{***}$ & -0.697$^{**}$ & -2.552$^{***}$ & -1.409$^{***}$\\
 \hspace{1em}t(coef) &  &  & (-3.51) & (-2.10) & (-6.16) & (-4.29)\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Annualised \textcite{Carhart1997} four-factor alpha (\%) from portfolio regressions of the monthly aggregate return of each group on the market, size, value, and momentum factors, estimated separately within each sub-period, following \textcite{FamaFrench2010}. EW: equal-weighted; VW: lagged-TNA-weighted $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net = gross $-$ expense/12 \parencite{Carhart1997, Wermers2000}. Newey-West $t$-stats (6-month lag) in parentheses; $^{*}$, $^{**}$, $^{***}$: 10\%, 5\%, 1\%. $N$: unique funds; $T$: months in the regression. Sub-period thresholds (Jan 2006, Oct 2011) from Bai-Perron test (Section D.1). Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
 }
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:subperiod_perf_aggregate}Aggregate Portfolio Alpha by Group and Sub-Period (\%, Annualised)}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Annualised \textcite{Carhart1997} four-factor alpha (\%) from portfolio regressions of the monthly aggregate return of each group on the market, size, value, and momentum factors, estimated separately within each sub-period, following \textcite{FamaFrench2010}. EW: equal-weighted; VW: lagged-TNA-weighted $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net = gross $-$ expense/12 \parencite{Carhart1997, Wermers2000}. Newey-West $t$-stats (6-month lag) in parentheses; $^{*}$, $^{**}$, $^{***}$: 10\%, 5\%, 1\%. $N$: unique funds; $T$: months in the regression. Sub-period thresholds (Jan 2006, Oct 2011) from Bai-Perron test (Section D.1). Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\end{singlespace}
+\end{minipage}
 \end{table}

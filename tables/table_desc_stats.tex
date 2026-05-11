@@ -1,8 +1,7 @@
 \begin{table}[H]
 \centering
-\caption{\label{tab:desc_stats}Descriptive Statistics: Fund Characteristics (Incubation-Corrected Panel)}
-\resizebox{\linewidth}{!}{
-\begin{threeparttable}
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}[t]{llrrrrrr}
 \toprule
 Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
@@ -55,10 +54,21 @@ Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
 
 \multirow{-3}{*}{\raggedright\arraybackslash Gross Sharpe Ratio (annualised)} & Full & 2,483 & 0.443 & 0.499 & 0.334 & 0.032 & 0.753\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Fund-level time-series means are computed first; cross-sectional statistics are then computed across fund-level means. $N$ is the number of funds with at least one valid observation. Expense Ratio and Turnover are point-in-time LSEG static values; Turnover is winsorised at the 1st/99th percentiles cross-sectionally. Flow is the \textcite{SirriTufano1998} measure scaled by lagged TNA (\%), winsorised at 1st/99th percentiles, with December excluded. Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \textcite{Carhart1997} and \textcite{Wermers2000}. Returns and flows are in \%. Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns, $\sqrt{12}\cdot\overline{r^{g}_{i,t}-r^{f}_{t}}/\sigma(r^{g}_{i,t}-r^{f}_{t})$, computed only for funds with at least 24 monthly excess-return observations. \textcite{Evans2010} correction removes the first 36 months of each fund's history. Mean returns are higher than in the Master panel because the 36-month minimum disproportionately eliminates short-lived, poorly performing funds \parencite{Evans2010}. No date trimming applied; sample runs through February 2026.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
 }
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:desc_stats}Descriptive Statistics: Fund Characteristics (Incubation-Corrected Panel)}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Fund-level time-series means are computed first; cross-sectional statistics are then computed across fund-level means. $N$ is the number of funds with at least one valid observation. Expense Ratio and Turnover are point-in-time LSEG static values; Turnover is winsorised at the 1st/99th percentiles cross-sectionally. Flow is the \textcite{SirriTufano1998} measure scaled by lagged TNA (\%), winsorised at 1st/99th percentiles, with December excluded. Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \textcite{Carhart1997} and \textcite{Wermers2000}. Returns and flows are in \%. Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns, $\sqrt{12}\cdot\overline{r^{g}_{i,t}-r^{f}_{t}}/\sigma(r^{g}_{i,t}-r^{f}_{t})$, computed only for funds with at least 24 monthly excess-return observations. \textcite{Evans2010} correction removes the first 36 months of each fund's history. Mean returns are higher than in the Master panel because the 36-month minimum disproportionately eliminates short-lived, poorly performing funds \parencite{Evans2010}. No date trimming applied; sample runs through February 2026.
+\end{singlespace}
+\end{minipage}
 \end{table}
