@@ -1,7 +1,6 @@
 \begin{table}[H]
 \centering
-\begin{threeparttable}
-\caption{\label{tab:subperiod_bsw_decomposition}BSW (2010) Four-Way Decomposition by Sub-Period: Proportions of Skilled, Unskilled, and Lucky Funds (\%)}
+\sbox{\tabletempbox}{%
 \begin{tabular}[t]{rrrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{2}{c}{Observed Tails} & \multicolumn{1}{c}{False Disc.} & \multicolumn{2}{c}{True Proportions} \\
@@ -44,9 +43,12 @@ $\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma
 \hspace{1em}45\% & 60.1 & 5.6 & 13.7 & 46.4 & -8.1\\
 \hspace{1em}50\% & 63.2 & 6.5 & 15.2 & 48.0 & -8.7\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item \textcite{BarrasScailletWermers2010} four-way decomposition, estimated separately within each sub-period. $S^-_\gamma$ ($S^+_\gamma$): fraction of active funds with significantly negative (positive) Newey-West $t(\hat{\alpha})$ at two-sided level $\gamma$, using sub-period \textcite{Carhart1997} alphas; critical values from $N(0,1)$. $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected false discoveries per tail, with $\hat{\pi}_0$ the sub-period \textcite{Storey2002} estimator at $\lambda = 0.5$ (Table~\ref{tab:subperiod_pi0_estimate}). $T^\pm_\gamma = S^\pm_\gamma - F_\gamma$: genuinely unskilled ($-$) or skilled ($+$). The row at $\gamma = 0.20$ gives population-level $\hat{\pi}^-_A$, $\hat{\pi}^+_A$. Negative $T^+_\gamma$ means right-tail significance does not exceed the false-discovery rate. Percentages of the sub-period active-fund universe. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
+}
+\begin{minipage}{\wd\tabletempbox}
+\caption{\label{tab:subperiod_bsw_decomposition}BSW (2010) Four-Way Decomposition by Sub-Period: Proportions of Skilled, Unskilled, and Lucky Funds (\%)}
+\usebox{\tabletempbox}
+\par\medskip
+\footnotesize\noindent \textcite{BarrasScailletWermers2010} four-way decomposition, estimated separately within each sub-period. $S^-_\gamma$ ($S^+_\gamma$): fraction of active funds with significantly negative (positive) Newey-West $t(\hat{\alpha})$ at two-sided level $\gamma$, using sub-period \textcite{Carhart1997} alphas; critical values from $N(0,1)$. $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected false discoveries per tail, with $\hat{\pi}_0$ the sub-period \textcite{Storey2002} estimator at $\lambda = 0.5$ (Table~\ref{tab:subperiod_pi0_estimate}). $T^\pm_\gamma = S^\pm_\gamma - F_\gamma$: genuinely unskilled ($-$) or skilled ($+$). The row at $\gamma = 0.20$ gives population-level $\hat{\pi}^-_A$, $\hat{\pi}^+_A$. Negative $T^+_\gamma$ means right-tail significance does not exceed the false-discovery rate. Percentages of the sub-period active-fund universe. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\end{minipage}
 \end{table}

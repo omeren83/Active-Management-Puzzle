@@ -1,7 +1,6 @@
 \begin{table}[H]
 \centering
-\begin{threeparttable}
-\caption{\label{tab:coverage}Time Series Coverage: Months of Observation per Fund}
+\sbox{\tabletempbox}{%
 \begin{tabular}[t]{lrrrrrr}
 \toprule
 Group & Funds & Min & P25 & Median & P75 & Max\\
@@ -21,9 +20,12 @@ Group & Funds & Min & P25 & Median & P75 & Max\\
 \hspace{1em}Active & 2,041 & 1 & 84 & 194 & 289 & 349\\
 \hspace{1em}Passive & 39 & 3 & 22 & 63 & 89 & 263\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Distribution of monthly observation counts per fund. Unknown funds excluded.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
+}
+\begin{minipage}{\wd\tabletempbox}
+\caption{\label{tab:coverage}Time Series Coverage: Months of Observation per Fund}
+\usebox{\tabletempbox}
+\par\medskip
+\footnotesize\noindent Distribution of monthly observation counts per fund. Unknown funds excluded.
+\end{minipage}
 \end{table}

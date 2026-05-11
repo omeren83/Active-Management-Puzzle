@@ -1,7 +1,6 @@
 \begin{table}[H]
 \centering
-\begin{threeparttable}
-\caption{\label{tab:subperiod_port_agg_alpha}Active vs.\ Passive Aggregate Portfolio Alpha by Sub-Period (\%, Annualised)}
+\sbox{\tabletempbox}{%
 \begin{tabular}[t]{lrrr}
 \toprule
 Portfolio & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$\\
@@ -39,9 +38,12 @@ Portfolio & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}
 \hspace{1em}Passive (VW) & -0.818$^{*}$ & -0.578 & -0.776$^{*}$\\
 \hspace{1em}t(coef) & (-1.93) & (-1.43) & (-1.94)\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Monthly EW and VW aggregate portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models, estimated separately within each sub-period. Alphas annualised ($\times 12$) and expressed as \%. Newey-West $t$-statistics (6-month lag) in parentheses. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
+}
+\begin{minipage}{\wd\tabletempbox}
+\caption{\label{tab:subperiod_port_agg_alpha}Active vs.\ Passive Aggregate Portfolio Alpha by Sub-Period (\%, Annualised)}
+\usebox{\tabletempbox}
+\par\medskip
+\footnotesize\noindent Monthly EW and VW aggregate portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models, estimated separately within each sub-period. Alphas annualised ($\times 12$) and expressed as \%. Newey-West $t$-statistics (6-month lag) in parentheses. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\end{minipage}
 \end{table}

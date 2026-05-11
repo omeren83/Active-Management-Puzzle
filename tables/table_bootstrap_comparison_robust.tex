@@ -1,9 +1,6 @@
 \begin{table}[H]
-\small
 \centering
-\label{tab:bootstrap_comparison_robust}
-\begin{threeparttable}
-\caption{Bootstrap Percentile Comparison Across Factor Models}
+\sbox{\tabletempbox}{%
 \begin{tabular}{rrrrrrr}
 \toprule
  & \multicolumn{3}{c}{Actual $t(\hat{\alpha})$} & \multicolumn{3}{c}{Prob.\ Luck} \\
@@ -18,10 +15,10 @@ Pctile & Carhart & FF6 & C+PSL & Carhart & FF6 & C+PSL \\
  95 & 1.361 & 1.349 & 1.401 & 59.4\% & 50.0\% & 60.5\% \\
  99 & 2.247 & 2.387 & 2.293 & 80.8\% & 82.1\% & 79.5\% \\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\footnotesize
-\item Percentiles of the empirical cross-sectional distribution of Newey--West $t(\hat{\alpha})$ for actively managed funds (``Actual''), paired with Prob.\ Luck: the fraction of the $B = 10{,}000$ \textcite{FamaFrench2010} bootstrap iterations in which the simulated percentile falls below the actual value. Values below 5\% at lower percentiles indicate underperformance inconsistent with the zero-alpha null; values above 95\% at upper percentiles indicate outperformance inconsistent with luck. Entries of 0.0% at lower percentiles indicate that zero out of $B = 10{,}000$ bootstrap iterations produced a simulated $t$-statistic as extreme as the actual value. This is the strongest possible bootstrap statement: actual left-tail performance exceeds the worst-luck scenario across all simulated samples. Entries shown as $<$0.1\% indicate between 0 and 5 iterations out of $B = 10{,}000$ (i.e.\ Prob.\ Luck $\in (0, 0.05)$\%). Bootstrap methodology is identical across specifications: calendar months resampled with replacement, factor model re-estimated on zero-alpha null series, Newey--West HAC standard errors (6-month lag) applied symmetrically to actual and simulated $t$-statistics following the symmetry requirement of \textcite{FamaFrench2010}. \textit{Carhart}: MKT-RF, SMB, HML, MOM. \textit{FF6}: MKT-RF, SMB, HML, RMW, CMA, MOM. \textit{C+PSL}: Carhart plus \textcite{PastorStambaugh2003} traded liquidity. Sample: Dec 1994--Feb 2026, performance-comparison subsample per flagged\_funds.xlsx for Carhart and FF6; Dec 1994--Dec 2024, performance-comparison subsample per flagged\_funds.xlsx for C+PSL.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
+}
+\begin{minipage}{\wd\tabletempbox}
+\caption{Bootstrap Percentile Comparison Across Factor Models}
+\usebox{\tabletempbox}
+\end{minipage}
 \end{table}

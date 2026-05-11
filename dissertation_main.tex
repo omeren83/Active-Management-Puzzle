@@ -267,6 +267,17 @@
 \usepackage{makecell}
 \usepackage{colortbl}
 
+% SBE caption-width fix (Phase 2.1): Many tables have caption at full
+% \linewidth while the tabular itself is naturally narrower; the caption
+% then visibly overhangs the table's left/right edges. Wrapping each
+% non-resizebox table in a \sbox{\tabletempbox}{...} measurement then a
+% \begin{minipage}{\wd\tabletempbox} containing caption + table + notes
+% constrains every element to the tabular's natural width, satisfying
+% SBE Part 3.10: "Titles must appear immediately above the table, aligned
+% to the left." \tabletempbox is declared once globally and reused per
+% table (LaTeX compiles linearly so reuse is safe).
+\newsavebox{\tabletempbox}
+
 % SBE: "A table that appears in the main text must have one double-space
 % above the title of the table and a double-space below the table." The
 % same rule applies to figures. \intextsep controls the vertical separation
@@ -345,26 +356,22 @@
   font            = normalsize,    % 12 pt — SBE requires TNR 12 throughout
   labelfont       = normalfont,    % force non-bold caption label ("Table 1.")
   textfont        = normalfont,    % force non-bold caption text
-  skip            = 12pt,          % gap between caption bottom and table top (visible separation)
+  skip            = 12pt,          % "separated by a single space from the table" per SBE Labeling guide
   position        = top,           % caption is ABOVE the table
-  singlelinecheck = false,         % short captions also obey justification (else \centering wrapper centres them)
-  justification   = raggedright    % left-align caption text to table left edge
-  % NOTE: width= intentionally not set. With \caption{} placed INSIDE the
-  % threeparttable environment in each table file, threeparttable measures
-  % the tabular's natural width and constrains the caption to match it.
-  % Setting width=\linewidth would override this and force every caption
-  % to span the full text width regardless of the table's actual width.
+  width           = \linewidth,    % for resizebox tables, caption at linewidth matches scaled table; for savebox tables, minipage sets a local \linewidth = tabular width
+  singlelinecheck = false,
+  justification   = raggedright    % left-align caption text per SBE 3.10
 }
 \captionsetup[figure]{
   labelsep        = periodtwospace,
   font            = normalsize,    % 12 pt
   labelfont       = normalfont,    % force non-bold caption label ("Figure 1.")
   textfont        = normalfont,    % force non-bold caption text
-  skip            = 12pt,          % gap between figure bottom and caption top (visible separation)
+  skip            = 12pt,
   position        = bottom,        % caption is BELOW the figure
+  width           = \linewidth,
   singlelinecheck = false,
   justification   = raggedright
-  % NOTE: width= intentionally not set. See [table] block above.
 }
 % \captionsetup[table] does not propagate to longtable (separate float class).
 % Mirror SBE rules onto longtable so floats and longtables look identical.

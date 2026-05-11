@@ -1,7 +1,6 @@
 \begin{table}[H]
 \centering
-\begin{threeparttable}
-\caption{\label{tab:fund_counts}Fund Sample Composition by Panel}
+\sbox{\tabletempbox}{%
 \begin{tabular}[t]{lrrrr}
 \toprule
 Panel & Active & Passive & Unknown & Total\\
@@ -10,9 +9,12 @@ Master & 2,270 & 53 & 974 & 3,297\\
 Incubation-Corrected & 2,127 & 39 & 708 & 2,874\\
 Trimmed (1995--2023) & 2,041 & 39 & 708 & 2,788\\
 \bottomrule
-\end{tabular}
-\begin{tablenotes}
-\item Active and Passive classifications use the \textit{Actively Managed} field from LSEG static data. Unknown funds are excluded from all regression analyses. The Incubation-Corrected panel removes the first 36 months of each fund's return history following \textcite{Evans2010}. The Trimmed panel additionally restricts the sample to 1995--2023.
-\end{tablenotes}
-\end{threeparttable}
+\end{tabular}%
+}
+\begin{minipage}{\wd\tabletempbox}
+\caption{\label{tab:fund_counts}Fund Sample Composition by Panel}
+\usebox{\tabletempbox}
+\par\medskip
+\footnotesize\noindent Active and Passive classifications use the \textit{Actively Managed} field from LSEG static data. Unknown funds are excluded from all regression analyses. The Incubation-Corrected panel removes the first 36 months of each fund's return history following \textcite{Evans2010}. The Trimmed panel additionally restricts the sample to 1995--2023.
+\end{minipage}
 \end{table}
