@@ -174,13 +174,13 @@ out$Lipper_Source[out$Lipper_Source   == ""] <- NA
 cat("=== Classification Summary ===\n")
 
 total       <- nrow(out)
-n_lseg      <- sum(grepl("^LSEG_Direct", out$Lipper_Source, na.rm = TRUE))
-n_bench     <- sum(grepl("^Benchmark_Map", out$Lipper_Source, na.rm = TRUE))
-n_both      <- sum(grepl("^Derived_McapStrat", out$Lipper_Source, na.rm = TRUE))
-n_mcap      <- sum(grepl("^Derived_McapOnly", out$Lipper_Source, na.rm = TRUE))
-n_strat     <- sum(grepl("^Derived_StratOnly", out$Lipper_Source, na.rm = TRUE))
-n_unres     <- sum(grepl("^Unresolvable", out$Lipper_Source, na.rm = TRUE))
-n_classified <- sum(!is.na(out$Lipper_Category))
+n_lseg      <- sum(grepl("^LSEG_Direct",       out$Lipper_Source), na.rm = TRUE)
+n_bench     <- sum(grepl("^Benchmark_Map",     out$Lipper_Source), na.rm = TRUE)
+n_both      <- sum(grepl("^Derived_McapStrat", out$Lipper_Source), na.rm = TRUE)
+n_mcap      <- sum(grepl("^Derived_McapOnly",  out$Lipper_Source), na.rm = TRUE)
+n_strat     <- sum(grepl("^Derived_StratOnly", out$Lipper_Source), na.rm = TRUE)
+n_unres     <- sum(grepl("^Unresolvable",      out$Lipper_Source), na.rm = TRUE)
+n_classified <- n_lseg + n_bench + n_both + n_mcap + n_strat
 
 cat(sprintf("  Total funds              : %d\n", total))
 cat(sprintf("  Classified (total)       : %d (%.1f%%)\n",

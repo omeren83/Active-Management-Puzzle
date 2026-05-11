@@ -282,13 +282,21 @@ latex_t1 <- counts_raw %>%
       "field from LSEG static data. Unknown funds are excluded from all",
       "regression analyses. The Incubation-Corrected panel removes the first",
       "36 months of each fund's return history following \\\\textcite{Evans2010}.",
-      "The Trimmed panel additionally restricts the sample to 1995--2023."
+      "The Trimmed panel additionally restricts the sample to 1995--2023.",
+      "Counts reflect the cleaned data universe before analytical-scope",
+      "exclusions documented in Section~\\\\ref{sec:panel_construction}",
+      "(passive index, leveraged, sector-only, and structural-alt strategies",
+      "tagged in flagged\\\\_funds.xlsx as Entire-Analysis exclusions): 394, 348,",
+      "and 338 additional share classes are dropped from the Master,",
+      "Incubation-Corrected, and Trimmed panels respectively, yielding",
+      "analytical samples of 3,297 / 2,874 / 2,788. Per-hypothesis sample",
+      "sizes (further restricted by the Perf-Comparison and H3 flag columns)",
+      "are reported in each subsequent table."
     ),
     general_title  = "",
     escape         = FALSE,
     threeparttable = TRUE
   )
-
 write_tex(latex_t1, "table_fund_counts.tex", resize = FALSE)
 
 # =============================================================================

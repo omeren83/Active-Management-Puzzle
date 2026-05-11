@@ -110,23 +110,23 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE    # data_import + flow_calculation
-RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
+RUN_PHASE_B_ALPHA         <- TRUE   # alpha_estimation + aggregate_alphas
 RUN_PHASE_C_REPORTING     <- TRUE   # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
-RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
-RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
-RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis
-RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
-RUN_PHASE_I_BEHAVIORAL    <- FALSE   # behavioral_state_variables (NEW)
-RUN_PHASE_J_PANEL_REG     <- FALSE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
-RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
+RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
+RUN_PHASE_E_SUBPERIODS    <- TRUE    # structural_break_test + subperiod_analysis
+RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
+RUN_PHASE_G_ACTIVENESS    <- TRUE   # activeness_analysis
+RUN_PHASE_H_FACTOR_ROBUST <- TRUE   # alpha_estimation_robust + build_robust_tables
+RUN_PHASE_I_BEHAVIORAL    <- TRUE   # behavioral_state_variables (NEW)
+RUN_PHASE_J_PANEL_REG     <- TRUE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
+RUN_UTILITY_LIPPER        <- TRUE   # build_lipper_category (rarely re-run)
 
 # Phase J sub-toggle: force re-running panel_regressions_setup.R even if
 # panel_reg.rds is on disk. Default FALSE = use cached panel_reg.rds when
 # upstream session objects are not available. Set TRUE when upstream panels
 # (panel_incubation, behavioral_state_vars) have changed since the last
 # setup run, so the cached panel_reg.rds is stale.
-FORCE_PANEL_SETUP         <- FALSE
+FORCE_PANEL_SETUP         <- TRUE
 
 # Stop on first error (TRUE) or keep going and report failures at end (FALSE)
 STOP_ON_ERROR <- TRUE

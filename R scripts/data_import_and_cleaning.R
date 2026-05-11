@@ -554,17 +554,37 @@ print(summary(panel_trimmed$ret_gross_raw))
 # =============================================================================
 # 11. SUMMARY
 # =============================================================================
-summarise_panel <- function(panel, label) {
+summarise_panel <- function(panel, label, panel_pre8c = NULL) {
   cat("\n---", label, "---\n")
   cat("Dimensions   :", nrow(panel), "rows x", ncol(panel), "columns\n")
   cat("Date range   :", format(min(panel$date)), "to", format(max(panel$date)), "\n")
-  cat("Unique funds :", n_distinct(panel$Ticker), "\n")
-  cat("  Active     :", n_distinct(panel$Ticker[panel$ap_group == "Active"]),   "\n")
-  cat("  Passive    :", n_distinct(panel$Ticker[panel$ap_group == "Passive"]),  "\n")
-  cat("  Unknown    :", n_distinct(panel$Ticker[panel$ap_group == "Unknown"]),  "\n")
-  cat("  excluded_perf : ", n_distinct(panel$Ticker[panel$excluded_perf]), "\n")
-  cat("  excluded_h3   : ", n_distinct(panel$Ticker[panel$excluded_h3]),   "\n")
+  
+  # If a pre-8c snapshot is supplied, report both universe and analytical counts
+  if (!is.null(panel_pre8c)) {
+    n_universe   <- n_distinct(panel_pre8c$Ticker)
+    n_analytical <- n_distinct(panel$Ticker)
+    cat("Unique funds : ", n_analytical, " analytical / ", n_universe,
+        " universe (Step 8c dropped ", n_universe - n_analytical, ")\n", sep = "")
+    cat("  Universe   :",
+        n_distinct(panel_pre8c$Ticker[panel_pre8c$ap_group == "Active"]),  "Active /",
+        n_distinct(panel_pre8c$Ticker[panel_pre8c$ap_group == "Passive"]), "Passive /",
+        n_distinct(panel_pre8c$Ticker[panel_pre8c$ap_group == "Unknown"]), "Unknown\n")
+    cat("  Analytical :",
+        n_distinct(panel$Ticker[panel$ap_group == "Active"]),  "Active /",
+        n_distinct(panel$Ticker[panel$ap_group == "Passive"]), "Passive /",
+        n_distinct(panel$Ticker[panel$ap_group == "Unknown"]), "Unknown\n")
+  } else {
+    cat("Unique funds :", n_distinct(panel$Ticker), "\n")
+    cat("  Active     :", n_distinct(panel$Ticker[panel$ap_group == "Active"]),  "\n")
+    cat("  Passive    :", n_distinct(panel$Ticker[panel$ap_group == "Passive"]), "\n")
+    cat("  Unknown    :", n_distinct(panel$Ticker[panel$ap_group == "Unknown"]), "\n")
+  }
+  
+  cat("  Tagged (retained in panel, filtered downstream):\n")
+  cat("    excluded_perf flag : ", n_distinct(panel$Ticker[panel$excluded_perf]), "\n")
+  cat("    excluded_h3 flag   : ", n_distinct(panel$Ticker[panel$excluded_h3]),   "\n")
   cat("Unique dates :", n_distinct(panel$date), "\n")
+  
   obs_dist <- panel %>%
     group_by(Ticker) %>%
     summarise(n = n(), .groups = "drop") %>%
@@ -574,6 +594,6 @@ summarise_panel <- function(panel, label) {
       "| max =", max(obs_dist), "\n")
 }
 
-summarise_panel(panel_master,     "PANEL MASTER (no corrections)")
-summarise_panel(panel_incubation, "PANEL INCUBATION (Evans 36m filter)")
-summarise_panel(panel_trimmed,    "PANEL TRIMMED (Evans + 1995-2023)")
+summarise_panel(panel_master,     "PANEL MASTER (post-Step-8c analytical)",     panel_master_pre8c)
+summarise_panel(panel_incubation, "PANEL INCUBATION (Evans 36m + post-Step-8c)", panel_incubation_pre8c)
+summarise_panel(panel_trimmed,    "PANEL TRIMMED (Evans + 1995-2023 + post-Step-8c)", panel_trimmed_pre8c)

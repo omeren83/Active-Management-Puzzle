@@ -2362,8 +2362,8 @@ statistics of fund characteristics on the incubation-corrected panel.
 The mean monthly gross return for active funds (0.887\%) and passive
 funds (0.695\%) differ materially in the analytical sample, consistent with the
 expectation that gross-of-fee performance differences between active
-and passive managers are small in magnitude. % AUDIT_FLAG: the 19bp gap and direction (active > passive) reflect the residual nature of the post-Step-8c passive sample (N=39); cross-group comparison is no longer meaningful. The mean monthly net
-return is materially lower for active funds (0.786\%) than for passive
+and passive managers are small in magnitude. % AUDIT_FLAG: the 19bp gap and direction (active > passive) reflect the residual nature of the post-Step-8c passive sample (N=39); cross-group comparison is no longer meaningful. 
+The mean monthly net return is materially lower for active funds (0.786\%) than for passive
 funds (0.652\%), reflecting the approximately 50-basis-point monthly
 fee differential (active expense ratio 1.08\%, passive 0.58\%). The
 log total net assets distribution is similar across active and
@@ -2383,8 +2383,8 @@ across active and passive (active median 0.525, passive median
 analytical sample reflecting the small residual passive count
 (N$=28$); pre-fee risk-adjusted performance is materially higher
 on the surviving active universe.
-% AUDIT_FLAG: the original narrative "fees, not pre-fee Sharpe, drive the gap" no longer holds on this sample. The mean cross-sectional moments
-documented here are higher than in the master panel (reported in
+% AUDIT_FLAG: the original narrative "fees, not pre-fee Sharpe, drive the gap" no longer holds on this sample. 
+The mean cross-sectional moments documented here are higher than in the master panel (reported in
 Appendix~\ref{app:alt_panels}, Table~\ref{tab:desc_stats_master})
 because the Evans 36-month filter disproportionately removes
 short-lived, poorly performing funds from the working sample. This is
@@ -2746,8 +2746,8 @@ welfare-relevant units.
 \noindent Table~\ref{tab:port_fee_alpha} reports the fee-quintile
 results. The active equal-weighted Q5--Q1 spread is $-1.115\%$ per
 annum (significant at 1\%), and the value-weighted spread is similarly
-negative and significant. % AUDIT_FLAG: this is a finding REVERSAL --- the previous narrative claimed a flat gross-fee gradient consistent with BG(2004); the current data show a significantly negative gross-fee gradient that is INCONSISTENT with the simple BG(2004) equilibrium and instead reinforces the activeness/fee/alpha negative correlation documented in Section~\ref{sec:activeness}. The narrative below needs to be reconsidered. On net returns, however, the fee gradient is
-mechanically negative by construction (high-fee funds carry a larger
+negative and significant. % AUDIT_FLAG: this is a finding REVERSAL --- the previous narrative claimed a flat gross-fee gradient consistent with BG(2004); the current data show a significantly negative gross-fee gradient that is INCONSISTENT with the simple BG(2004) equilibrium and instead reinforces the activeness/fee/alpha negative correlation documented in Section~\ref{sec:activeness}. The narrative below needs to be reconsidered. 
+On net returns, however, the fee gradient is mechanically negative by construction (high-fee funds carry a larger
 fee deduction), and the implied net Q5--Q1 spread is approximately
 $-1.5\%$ per annum --- the welfare-relevant cost of fee differentials
 to investors who allocate capital across the fee distribution.
@@ -2811,13 +2811,33 @@ in the value-weighted Net panel, the spread is more substantially
 positive ($+1.248\%$ per annum, statistically insignificant).
 % AUDIT_FLAG: this is a finding REVERSAL --- previous narrative claimed negative net-alpha spreads with closet indexers outperforming. Current data show positive (insignificant) spreads with most-active funds (Q5) slightly outperforming closet indexers (Q1) on net. The interpretation must be rewritten: results are now closer to \textcite{AmihudGoyenko2013} positive-gradient prediction (though insignificant) than to the closet-indexer-outperformance narrative.
 
-The interpretation is more nuanced than originally posited: high-activeness
-funds carry higher fees AND higher gross alphas, with the net spread
-turning positive (though insignificant) on the current sample. % AUDIT_FLAG: previous text below ("investors are paying a premium for activeness that destroys risk-adjusted value") is no longer supported by the data; recommend rewriting this paragraph and the chapter motivation that depends on it. and motivates the
-behavioral interpretation of Chapter~\ref{ch:behavioral}: the
-question is no longer whether activeness predicts alpha (the answer
-is approximately ``no'' net of fees) but why investors continue to
-pay for it.
+The interpretation that emerges is more nuanced than a simple behavioral
+premium story would predict. High-activeness funds carry both higher fees
+AND higher gross alphas; the two effects approximately cancel on net,
+leaving the Q5--Q1 net-alpha spread statistically indistinguishable from
+zero in both equal- and value-weighted aggregations. The cross-sectional
+activeness sort is therefore consistent with the \textcite{BerkGreen2004}
+equilibrium prediction at the activeness margin: fees and gross alphas
+are jointly priced such that net-of-fee differences are arbitraged away
+on average. The data do not, on this sort, supply independent
+cross-sectional evidence that investors pay a premium for activeness
+that destroys risk-adjusted value.
+
+This negative cross-sectional result does not, however, dissolve the
+broader puzzle. The aggregate equal-weighted active fund still
+underperforms its factor benchmark by $-1.366\%$ per annum net of fees
+(Section~\ref{sec:aggregate_performance}); the BSW decomposition still
+identifies a genuinely unskilled mass of approximately 21\% with no
+detectable skilled mass (Section~\ref{sec:fdr_results}); loser
+persistence remains robust (Section~\ref{sec:persistence}); and the
+Bai--Perron regime shift at September~2011 still marks a material
+deterioration in active managerial performance
+(Section~\ref{sec:subperiod}). The behavioral chapter that follows
+therefore investigates the channels of investor decision-making that
+produce continued allocation to active funds in aggregate, conditional
+on a body of empirical evidence in which the cross-sectional activeness
+margin is approximately rational but the aggregate, time-series, and
+tail evidence remain materially adverse.
 
 \input{tables/table_activeness_alpha_te}
 
@@ -2948,8 +2968,8 @@ The economic interpretation in prior versions was that activeness amplifies the 
 effect. In the highest activeness tercile, the D10 alpha is $-0.186\%$
 per month --- comparable to the unconditional
 Panel-A D10 of $-0.189\%$.
-% AUDIT_FLAG: the asymmetric-amplification finding REVERSES on this sample. Previously T3 D10 was 50\% more negative than unconditional D10; now they are essentially equal. The T3 D1-D10 spread (0.211) is also no longer statistically significant. The narrative below ("asymmetric amplification", "bridges activeness and behavioral chapters") needs substantial rewriting --- the loser persistence is now NOT amplified by activeness in this sample. Winner persistence remains undetectable
-across all three terciles. The pattern is consistent with the
+% AUDIT_FLAG: the asymmetric-amplification finding REVERSES on this sample. Previously T3 D10 was 50\% more negative than unconditional D10; now they are essentially equal. The T3 D1-D10 spread (0.211) is also no longer statistically significant. The narrative below ("asymmetric amplification", "bridges activeness and behavioral chapters") needs substantial rewriting --- the loser persistence is now NOT amplified by activeness in this sample. 
+Winner persistence remains undetectable across all three terciles. The pattern is consistent with the
 \textcite{AmihudGoyenko2013} prediction that activeness predicts
 gross alpha (the D1 point estimate improves modestly from T1 to T3),
 but it is the loser persistence that is the dominant signal. The
