@@ -103,6 +103,72 @@
 % Replaces XITS Math, whose italic rendered noticeably heavier than Times
 % italic in the List of Symbols and gave a bolded appearance to math glyphs.
 \setmathfont{STIX Two Math}
+% =============================================================================
+% PHASE 3.A PATCH 1 — Math typography fix
+% Date: 11 May 2026
+%
+% Insert this block IMMEDIATELY AFTER the existing line:
+%   \setmathfont{STIX Two Math}
+% in the preamble of dissertation_main.tex.
+%
+% DO NOT remove or modify any existing preamble lines. This is purely additive.
+% =============================================================================
+
+% -----------------------------------------------------------------------------
+% Math-Roman font correction.
+%
+% Problem (chunk 5.A residual, R1 in master log):
+%   With unicode-math + STIX Two Math, the macro \mathrm{...} dispatches to
+%   \symrm{...}, which renders using STIX Two Math's Roman alphabet. That
+%   alphabet is visibly HEAVIER than the surrounding Times New Roman text font,
+%   producing the "subscripts look bold" perception flagged across the List of
+%   Symbols, Eq. (3.1), Eq. (3.4), Fig. 4.2 area, body pp. 51, 52, 72, 93, 94,
+%   155, 180, and 41 enumerated tables.
+%
+% Fix:
+%   Globally redefine \mathrm{...} to expand to \text{...}. The \text{} macro
+%   switches to the surrounding text font (Times New Roman) at the math size,
+%   producing the same upright Roman glyphs the rest of the thesis uses.
+%
+% Effect:
+%   - Existing \mathrm{MKT}, \mathrm{SMB}, \mathrm{HML}, \mathrm{MOM},
+%     \mathrm{LOW}, \mathrm{MID}, \mathrm{HIGH}, \mathrm{SENT}, \mathrm{AAII},
+%     \mathrm{MD,Det}, \mathrm{INV-PCR}, \mathrm{TNA}, \mathrm{Flow},
+%     \mathrm{Age}, \mathrm{sd}, \mathrm{gross}, \mathrm{net}, etc. all
+%     render in Times Roman, matching surrounding text.
+%   - Tables that already use \text{...} are unaffected.
+%   - Operator names emitted via \operatorname{} and \DeclareMathOperator{}
+%     are NOT affected (they use \mathop, not \mathrm).
+%
+% No per-file edits required. Math content, math sizing, math italic for
+% Greek/variables, sub/superscript spacing — all unchanged.
+% -----------------------------------------------------------------------------
+\AtBeginDocument{%
+  \renewcommand{\mathrm}[1]{\text{#1}}%
+}
+
+% -----------------------------------------------------------------------------
+% Defensive: ensure equation tags reach the right margin even under ragged2e.
+%
+% Problem (problem #2 in handoff list):
+%   Eq. (3.1) and Eq. (3.4) tags appear pushed in from the right margin in
+%   the rendered PDF. Most likely cause: equation content approaches or
+%   slightly exceeds \textwidth, forcing the \eqno into a position that
+%   doesn't reach the page-right edge cleanly. Patches 2 and 3 below break
+%   these two equations across lines via multline; this preamble line is a
+%   safety net for any OTHER displayed equation that might have the same
+%   symptom.
+% -----------------------------------------------------------------------------
+\makeatletter
+% \@eqnnum is the kernel macro that places equation numbers. The standard
+% definition is already right-aligned; this explicit redefinition guarantees
+% it isn't perturbed by any package loaded above.
+\def\@eqnnum{{\normalfont\normalcolor\hfill(\theequation)}}
+\makeatother
+
+% =============================================================================
+% END PHASE 3.A PATCH 1
+% =============================================================================
 
 % ---- Page geometry ----------------------------------------------------------
 % SBE: left 4 cm; top, right, bottom 2.5 cm. Page size A4.
@@ -1822,12 +1888,41 @@ actually drive period-over-period asset growth.
 
 \noindent Fund-level alpha is estimated via the \textcite{Carhart1997}
 four-factor regression on monthly gross excess returns:
-\begin{equation}
-r^g_{i,t} - r^f_t = \alpha_i + \beta^{\mathrm{MKT}}_i (\mathrm{MKT}_t - r^f_t)
-+ \beta^{\mathrm{SMB}}_i \mathrm{SMB}_t + \beta^{\mathrm{HML}}_i \mathrm{HML}_t
-+ \beta^{\mathrm{MOM}}_i \mathrm{MOM}_t + \varepsilon_{i,t}.
+% =============================================================================
+% PHASE 3.A PATCH 2 — Eq. (3.1) Carhart four-factor regression
+% Date: 11 May 2026
+%
+% LOCATION in dissertation_main.tex:
+%   Inside \section{Alpha estimation: The Carhart four-factor model}
+%   The block currently starts with:
+%     \begin{equation}
+%       r^g_{i,t} - r^f_t = \alpha_i + \beta^{\mathrm{MKT}}_i ...
+%       \label{eq:carhart}
+%     \end{equation}
+%
+% ACTION:
+%   REPLACE the existing \begin{equation}...\end{equation} block (currently
+%   one line of math) with the multline version below.
+%
+% WHY:
+%   (a) The full Carhart factor expansion approaches the right margin and the
+%       (3.1) tag therefore doesn't visibly reach the right edge.
+%   (b) Using \text{} explicitly (rather than relying on Patch 1's \mathrm
+%       redirect) makes the source self-documenting for the next maintainer.
+%   Multline breaks the math across two lines and forces the equation tag to
+%   the right margin of the LAST line.
+% =============================================================================
+
+\begin{multline}
+r^g_{i,t} - r^f_t = \alpha_i + \beta^{\text{MKT}}_i \bigl(\text{MKT}_t - r^f_t\bigr)
++ \beta^{\text{SMB}}_i \, \text{SMB}_t + \beta^{\text{HML}}_i \, \text{HML}_t \\
++ \beta^{\text{MOM}}_i \, \text{MOM}_t + \varepsilon_{i,t}.
 \label{eq:carhart}
-\end{equation}
+\end{multline}
+
+% =============================================================================
+% END PHASE 3.A PATCH 2
+% =============================================================================
 The regression is estimated by ordinary least squares with
 \textcite{NeweyWest1987} heteroskedasticity- and autocorrelation-
 consistent standard errors at a six-month lag, following the
@@ -2112,13 +2207,40 @@ are formally specified as follows.
 flow--performance convexity documented by \textcite{SirriTufano1998}.
 The specification is the Sirri--Tufano piecewise rank regression
 augmented with sentiment-regime interactions:
-\begin{equation}
-\mathrm{Flow}_{i,t} = \beta_{\mathrm{LOW}} R^{\mathrm{LOW}}_{i,t-12}
-+ \beta_{\mathrm{MID}} R^{\mathrm{MID}}_{i,t-12}
-+ \beta_{\mathrm{HIGH}} R^{\mathrm{HIGH}}_{i,t-12}
-+ \delta_q R^q_{i,t-12} D^{\mathrm{SENT}}_t + X_{i,t} \gamma + \mu_i + \varepsilon_{i,t},
+% =============================================================================
+% PHASE 3.A PATCH 3 — Eq. (3.4) Sirri-Tufano + Sentiment specification (H1)
+% Date: 11 May 2026
+%
+% LOCATION in dissertation_main.tex:
+%   Inside \subsection{H1: Sentiment-convexity hypothesis} (label
+%   \label{sec:H1_method}). The block currently starts with:
+%     \begin{equation}
+%       \mathrm{Flow}_{i,t} = \beta_{\mathrm{LOW}} R^{\mathrm{LOW}}_{i,t-12} ...
+%       \label{eq:H1}
+%     \end{equation}
+%
+% ACTION:
+%   REPLACE the existing \begin{equation}...\end{equation} block with the
+%   multline version below.
+%
+% WHY:
+%   Equation has six rank-segment-and-interaction terms plus controls; in
+%   rendered PDF it stretches across or past the right margin, leaving (3.4)
+%   tag pushed in. Multline breaks at the natural boundary between rank-level
+%   terms and rank-by-sentiment interaction terms.
+% =============================================================================
+
+\begin{multline}
+\text{Flow}_{i,t} = \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12}
++ \beta_{\text{MID}} R^{\text{MID}}_{i,t-12}
++ \beta_{\text{HIGH}} R^{\text{HIGH}}_{i,t-12} \\
++ \delta_q R^{q}_{i,t-12} D^{\text{SENT}}_t + X_{i,t} \gamma + \mu_i + \varepsilon_{i,t},
 \label{eq:H1}
-\end{equation}
+\end{multline}
+
+% =============================================================================
+% END PHASE 3.A PATCH 3
+% =============================================================================
 where $R^q$ is the Sirri--Tufano rank-segment for $q \in \{\mathrm{LOW},
 \mathrm{MID}, \mathrm{HIGH}\}$, the controls $X_{i,t}$ include
 $\log(\mathrm{TNA}_{i,t-1})$, $\log(\mathrm{Age}_{i,t})$, the trailing
