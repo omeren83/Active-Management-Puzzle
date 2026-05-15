@@ -1,0 +1,75 @@
+\begin{table}[H]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\begin{tabular}[t]{llrrrrrr}
+\toprule
+Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
+\midrule
+ & Active & 2,270 & 0.855 & 0.895 & 0.455 & 0.534 & 1.157\\
+
+ & Passive & 337 & 0.819 & 0.917 & 0.606 & 0.243 & 1.244\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Gross Return (\%, monthly)} & Full & 3,581 & 0.628 & 0.832 & 0.798 & -0.124 & 1.145\\
+\cmidrule{1-8}
+ & Active & 2,220 & 0.772 & 0.811 & 0.362 & 0.438 & 1.075\\
+
+ & Passive & 325 & 0.777 & 0.890 & 0.573 & 0.241 & 1.213\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Net Return (\%, monthly)} & Full & 3,428 & 0.552 & 0.747 & 0.777 & -0.171 & 1.068\\
+\cmidrule{1-8}
+ & Active & 2,257 & 4.237 & 4.371 & 2.503 & 0.970 & 7.273\\
+
+ & Passive & 321 & 4.863 & 4.943 & 2.434 & 1.746 & 7.726\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Log TNA (USD millions)} & Full & 3,382 & 3.767 & 3.828 & 2.599 & 0.432 & 7.047\\
+\cmidrule{1-8}
+ & Active & 2,212 & 0.856 & 0.252 & 2.199 & -0.835 & 3.174\\
+
+ & Passive & 316 & 1.579 & 0.846 & 4.568 & -0.880 & 4.125\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Proportional Flow (\% of TNA, monthly)} & Full & 3,274 & 0.721 & 0.226 & 3.239 & -1.232 & 3.430\\
+\cmidrule{1-8}
+ & Active & 2,220 & 1.077 & 1.000 & 0.655 & 0.590 & 1.510\\
+
+ & Passive & 325 & 0.497 & 0.260 & 0.557 & 0.030 & 1.456\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Expense Ratio (\%)} & Full & 3,428 & 1.269 & 1.040 & 7.366 & 0.450 & 1.750\\
+\cmidrule{1-8}
+ & Active & 2,187 & 63.973 & 43.000 & 85.114 & 11.030 & 122.000\\
+
+ & Passive & 318 & 50.960 & 16.000 & 120.915 & 2.496 & 92.000\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Turnover (\%)} & Full & 3,371 & 75.795 & 48.000 & 105.647 & 10.000 & 156.000\\
+\cmidrule{1-8}
+ & Active & 2,270 & 219.286 & 230.000 & 121.168 & 48.900 & 375.000\\
+
+ & Passive & 337 & 184.383 & 178.000 & 118.848 & 35.200 & 358.000\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Months of Coverage} & Full & 3,581 & 175.152 & 143.000 & 124.810 & 29.000 & 375.000\\
+\cmidrule{1-8}
+ & Active & 2,206 & 0.510 & 0.518 & 0.217 & 0.313 & 0.729\\
+
+ & Passive & 313 & 0.493 & 0.550 & 0.338 & 0.122 & 0.807\\
+
+\multirow{-3}{*}{\raggedright\arraybackslash Gross Sharpe Ratio (annualised)} & Full & 3,313 & 0.392 & 0.479 & 0.370 & -0.086 & 0.720\\
+\bottomrule
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:desc_stats_master}Descriptive Statistics: Master Panel (No Corrections)}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Fund-level time-series means are computed first; cross-sectional statistics are then computed across fund-level means. $N$ is the number of funds with at least one valid observation. Expense Ratio and Turnover are point-in-time LSEG static values; Turnover is winsorised at the 1st/99th percentiles cross-sectionally. Flow is the \textcite{SirriTufano1998} measure scaled by lagged TNA (\%), winsorised at 1st/99th percentiles, with December excluded. Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \textcite{Carhart1997} and \textcite{Wermers2000}. Returns and flows are in \%. Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns, $\sqrt{12}\cdot\overline{r^{g}_{i,t}-r^{f}_{t}}/\sigma(r^{g}_{i,t}-r^{f}_{t})$, computed only for funds with at least 24 monthly excess-return observations. No incubation correction or date trimming applied; full cleaned sample December 1994--February 2026.
+\end{singlespace}
+\end{minipage}
+\end{table}
+

@@ -1071,7 +1071,7 @@ pack_tab <- data.frame(
 )
 
 fn_text <- paste(
-  "\\textcite{KosowskiEtal2006} bootstrap persistence test on 36-month formation,",
+  "\\textcite{KosowskiTimmermannWermersWhite2006} bootstrap persistence test on 36-month formation,",
   "12-month holding non-overlapping cohorts, ranked by formation-period",
   "\\textcite{Carhart1997} four-factor alpha $t$-statistic (Newey-West, 3-month",
   "lag) except Panel B, which ranks by raw alpha as a robustness check.",

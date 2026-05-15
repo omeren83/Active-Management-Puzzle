@@ -1,0 +1,39 @@
+\begin{table}[H]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\begin{tabular}[t]{llrrrrrrrrr}
+\toprule
+Panel & Group & $N$ & Mean & VW Mean & Median & SD & $P_{10}$ & $P_{90}$ & Skewness & Ex.\ Kurtosis\\
+\midrule
+ & Active & 495,510 & 0.889 & 0.846 & 1.240 & 5.019 & -5.613 & 6.715 & -0.070 & 0.6933\\
+
+\multirow{-2}{*}{\raggedright\arraybackslash Master} & Passive & 61,800 & 0.867 & 1.010 & 1.320 & 5.061 & -5.886 & 6.719 & -0.090 & 0.6816\\
+\cmidrule{1-11}
+ & Active & 425,622 & 0.900 & 0.848 & 1.255 & 4.983 & -5.604 & 6.707 & -0.071 & 0.5887\\
+
+\multirow{-2}{*}{\raggedright\arraybackslash Incubation-Corrected} & Passive & 51,422 & 0.918 & 1.015 & 1.365 & 5.006 & -5.816 & 6.730 & -0.089 & 0.5801\\
+\cmidrule{1-11}
+ & Active & 383,313 & 0.862 & 0.763 & 1.225 & 5.086 & -5.743 & 6.785 & -0.071 & 0.6253\\
+
+\multirow{-2}{*}{\raggedright\arraybackslash Trimmed (1995--2023)} & Passive & 45,783 & 0.859 & 0.879 & 1.308 & 5.126 & -6.005 & 6.873 & -0.088 & 0.5870\\
+\bottomrule
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{\label{tab:return_dist}Distribution of Monthly Gross Returns: Active vs.\ Passive Funds}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the lagged-TNA-weighted cross-sectional mean return, representing the return earned by a representative invested dollar. Skewness is Pearson's second coefficient: $(\bar{x}-\tilde{x})/s$. Excess kurtosis is the fourth standardised central moment minus 3. Unknown funds are excluded.
+\end{singlespace}
+\end{minipage}
+\end{table}
+
