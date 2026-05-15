@@ -1,67 +1,57 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{\label{tab:H2_lagged}H2 Robustness --- Lagged State Variables}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{MD,Det}}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{MD,Det}}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{\text{LOW}}$ & 0.0304*** & 0.0241*** & 0.0377*** & 0.0257***\\
- & (8.35) & (5.08) & (7.72) & (4.62)\\
-$R^{\text{MID}}$ & 0.0142*** & 0.0128*** & 0.0152*** & 0.0133***\\
- & (16.42) & (11.95) & (11.71) & (11.11)\\
-$R^{\text{HIGH}}$ & 0.0800*** & 0.0767*** & 0.0851*** & 0.0788***\\
- & (14.70) & (10.96) & (11.49) & (10.03)\\
-State &  & -0.0038** & 0.0025* & -0.0025*\\
- &  & (-2.55) & (1.71) & (-1.73)\\
-$R^{\text{LOW}}\times$ State &  & 0.0134* & 0.0011 & 0.0123*\\
- &  & (1.94) & (0.16) & (1.70)\\
-$R^{\text{MID}}\times$ State &  & 0.0028* & -0.0008 & 0.0024\\
- &  & (1.66) & (-0.44) & (1.36)\\
-$R^{\text{HIGH}}\times$ State &  & 0.0068 & 0.0037 & 0.0051\\
- &  & (0.71) & (0.38) & (0.52)\\
-$D^{\text{SENT}}$ &  &  &  & 0.0042**\\
- &  &  &  & (2.37)\\
-$R^{\text{LOW}}\times D^{\text{SENT}}$ &  &  &  & -0.0038\\
- &  &  &  & (-0.53)\\
-$R^{\text{MID}}\times D^{\text{SENT}}$ &  &  &  & -0.0013\\
+$R^{	ext{LOW}}$ & 0.0309*** & 0.0245*** & 0.0383*** & 0.0259***\\
+ & (8.31) & (5.03) & (7.65) & (4.52)\\
+$R^{	ext{MID}}$ & 0.0142*** & 0.0129*** & 0.0152*** & 0.0135***\\
+ & (16.18) & (11.80) & (11.41) & (11.01)\\
+$R^{	ext{HIGH}}$ & 0.0810*** & 0.0775*** & 0.0862*** & 0.0795***\\
+ & (14.55) & (10.81) & (11.34) & (9.87)\\
+State &  & -0.0038** & 0.0026* & -0.0026*\\
+ &  & (-2.54) & (1.71) & (-1.72)\\
+$R^{	ext{LOW}}\times$ State &  & 0.0137* & 0.0012 & 0.0126*\\
+ &  & (1.92) & (0.16) & (1.69)\\
+$R^{	ext{MID}}\times$ State &  & 0.0027 & -0.0008 & 0.0023\\
+ &  & (1.59) & (-0.46) & (1.30)\\
+$R^{	ext{HIGH}}\times$ State &  & 0.0073 & 0.0038 & 0.0056\\
+ &  & (0.74) & (0.38) & (0.55)\\
+$D^{	ext{SENT}}$ &  &  &  & 0.0042**\\
+ &  &  &  & (2.34)\\
+$R^{	ext{LOW}}\times D^{	ext{SENT}}$ &  &  &  & -0.0035\\
+ &  &  &  & (-0.48)\\
+$R^{	ext{MID}}\times D^{	ext{SENT}}$ &  &  &  & -0.0014\\
  &  &  &  & (-0.73)\\
-$R^{\text{HIGH}}\times D^{\text{SENT}}$ &  &  &  & -0.0055\\
- &  &  &  & (-0.50)\\
-$\log(\text{TNA})$ & -0.0036*** & -0.0036*** & -0.0050*** & -0.0036***\\
- & (-8.01) & (-7.88) & (-8.00) & (-8.04)\\
-$\log(\text{Age})$ & -0.0108*** & -0.0109*** & -0.0134*** & -0.0110***\\
- & (-7.73) & (-7.77) & (-6.36) & (-7.93)\\
-Return volatility & -0.0245 & -0.0258 & -0.1036*** & -0.0329\\
- & (-0.98) & (-1.03) & (-2.84) & (-1.29)\\
-Style flow & 0.1018*** & 0.1019*** & 0.1038*** & 0.0973***\\
- & (3.60) & (3.60) & (2.89) & (3.45)\\
+$R^{	ext{HIGH}}\times D^{	ext{SENT}}$ &  &  &  & -0.0053\\
+ &  &  &  & (-0.47)\\
+$\log(\text{TNA})$ & -0.0039*** & -0.0039*** & -0.0054*** & -0.0039***\\
+ & (-8.26) & (-8.13) & (-8.20) & (-8.29)\\
+$\log(\text{Age})$ & -0.0109*** & -0.0111*** & -0.0136*** & -0.0112***\\
+ & (-7.78) & (-7.82) & (-6.41) & (-7.99)\\
+Return volatility & -0.0260 & -0.0272 & -0.1072*** & -0.0345\\
+ & (-1.03) & (-1.08) & (-2.92) & (-1.35)\\
+Style flow & 0.0997*** & 0.0997*** & 0.1009*** & 0.0953***\\
+ & (3.57) & (3.57) & (2.83) & (3.42)\\
 \midrule
 Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 232,800 & 232,800 & 168,488 & 232,800\\
-$R^2$ (within) & 0.028 & 0.028 & 0.031 & 0.028\\
-Joint test ($\chi^2_3$, $p$) & -- & 10.54 (0.015) & 0.27 (0.966) & 7.93 (0.047)\\
-Loser-end test ($z$, 1-sided $p$) & -- & z=+1.94 (p=0.974) & z=+0.16 (p=0.564) & z=+1.70 (p=0.955)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=-0.58 (p=0.718) & z=+0.21 (p=0.416) & z=-0.59 (p=0.723)\\
+$R^2$ (within) & 0.027 & 0.027 & 0.030 & 0.027\\
+Joint test ($\chi^2_3$, $p$) & -- & 10.31 (0.016) & 0.28 (0.963) & 7.79 (0.051)\\
+Loser-end test ($z$, 1-sided $p$) & -- & z=+1.92 (p=0.973) & z=+0.16 (p=0.564) & z=+1.69 (p=0.954)\\
+Asymmetry ($z$, 1-sided $p$) & -- & z=-0.54 (p=0.707) & z=+0.21 (p=0.417) & z=-0.56 (p=0.712)\\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{\label{tab:H2_lagged}H2 Robustness --- Lagged State Variables. Same four-column specification as Table~\ref{tab:H2_regression}, except margin-debt, PCR, and sentiment regime indicators are measured at time $t-1$ rather than $t$ (Huang et al.\ 2015 timing convention).}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{\text{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{\text{MD,Det}}_{t-1}$ and $D^{\text{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{	ext{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{	ext{MD,Det}}_{t-1}$ and $D^{	ext{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{tablenotes}
+\end{threeparttable}}
 \end{table}

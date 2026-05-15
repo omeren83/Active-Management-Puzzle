@@ -1,67 +1,57 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{\label{tab:H2_regression}H2: Disposition / Illusion-of-Control Hypothesis}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{\text{LOW}}$ & 0.0304*** & 0.0237*** & 0.0386*** & 0.0260***\\
- & (8.35) & (5.09) & (7.87) & (5.11)\\
-$R^{\text{MID}}$ & 0.0142*** & 0.0129*** & 0.0152*** & 0.0140***\\
- & (16.42) & (12.21) & (12.12) & (11.76)\\
-$R^{\text{HIGH}}$ & 0.0800*** & 0.0758*** & 0.0852*** & 0.0783***\\
- & (14.70) & (10.61) & (11.84) & (9.83)\\
-State &  & -0.0033** & 0.0003 & -0.0019\\
- &  & (-2.25) & (0.20) & (-1.38)\\
-$R^{\text{LOW}}\times$ State &  & 0.0144** & -0.0011 & 0.0128*\\
- &  & (2.16) & (-0.18) & (1.90)\\
-$R^{\text{MID}}\times$ State &  & 0.0026 & -0.0010 & 0.0017\\
- &  & (1.54) & (-0.56) & (0.98)\\
-$R^{\text{HIGH}}\times$ State &  & 0.0087 & 0.0032 & 0.0066\\
- &  & (0.90) & (0.32) & (0.67)\\
-$D^{\text{SENT}}$ &  &  &  & 0.0049***\\
- &  &  &  & (2.77)\\
-$R^{\text{LOW}}\times D^{\text{SENT}}$ &  &  &  & -0.0058\\
- &  &  &  & (-0.78)\\
-$R^{\text{MID}}\times D^{\text{SENT}}$ &  &  &  & -0.0031*\\
- &  &  &  & (-1.75)\\
-$R^{\text{HIGH}}\times D^{\text{SENT}}$ &  &  &  & -0.0071\\
- &  &  &  & (-0.67)\\
-$\log(\text{TNA})$ & -0.0036*** & -0.0036*** & -0.0049*** & -0.0036***\\
- & (-8.01) & (-7.89) & (-7.90) & (-8.04)\\
-$\log(\text{Age})$ & -0.0108*** & -0.0106*** & -0.0136*** & -0.0107***\\
- & (-7.73) & (-7.53) & (-6.25) & (-7.56)\\
-Return volatility & -0.0245 & -0.0238 & -0.0966*** & -0.0307\\
- & (-0.98) & (-0.95) & (-2.59) & (-1.21)\\
-Style flow & 0.1018*** & 0.1017*** & 0.1016*** & 0.0977***\\
- & (3.60) & (3.59) & (2.75) & (3.46)\\
+$R^{	ext{LOW}}$ & 0.0309*** & 0.0240*** & 0.0394*** & 0.0261***\\
+ & (8.31) & (5.02) & (7.81) & (5.00)\\
+$R^{	ext{MID}}$ & 0.0142*** & 0.0131*** & 0.0153*** & 0.0142***\\
+ & (16.18) & (12.08) & (11.82) & (11.66)\\
+$R^{	ext{HIGH}}$ & 0.0810*** & 0.0764*** & 0.0865*** & 0.0789***\\
+ & (14.55) & (10.45) & (11.75) & (9.70)\\
+State &  & -0.0033** & 0.0003 & -0.0020\\
+ &  & (-2.25) & (0.23) & (-1.39)\\
+$R^{	ext{LOW}}\times$ State &  & 0.0148** & -0.0013 & 0.0133*\\
+ &  & (2.15) & (-0.20) & (1.91)\\
+$R^{	ext{MID}}\times$ State &  & 0.0025 & -0.0009 & 0.0016\\
+ &  & (1.46) & (-0.53) & (0.89)\\
+$R^{	ext{HIGH}}\times$ State &  & 0.0095 & 0.0027 & 0.0074\\
+ &  & (0.96) & (0.27) & (0.73)\\
+$D^{	ext{SENT}}$ &  &  &  & 0.0049***\\
+ &  &  &  & (2.74)\\
+$R^{	ext{LOW}}\times D^{	ext{SENT}}$ &  &  &  & -0.0054\\
+ &  &  &  & (-0.71)\\
+$R^{	ext{MID}}\times D^{	ext{SENT}}$ &  &  &  & -0.0032*\\
+ &  &  &  & (-1.77)\\
+$R^{	ext{HIGH}}\times D^{	ext{SENT}}$ &  &  &  & -0.0070\\
+ &  &  &  & (-0.65)\\
+$\log(\text{TNA})$ & -0.0039*** & -0.0039*** & -0.0053*** & -0.0039***\\
+ & (-8.26) & (-8.15) & (-8.11) & (-8.29)\\
+$\log(\text{Age})$ & -0.0109*** & -0.0108*** & -0.0138*** & -0.0108***\\
+ & (-7.78) & (-7.58) & (-6.31) & (-7.61)\\
+Return volatility & -0.0260 & -0.0253 & -0.1001*** & -0.0323\\
+ & (-1.03) & (-1.00) & (-2.66) & (-1.26)\\
+Style flow & 0.0997*** & 0.0995*** & 0.0988*** & 0.0956***\\
+ & (3.57) & (3.56) & (2.71) & (3.43)\\
 \midrule
 Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 232,800 & 232,800 & 168,488 & 232,800\\
-$R^2$ (within) & 0.028 & 0.028 & 0.031 & 0.028\\
-Joint test ($\chi^2_3$, $p$) & -- & 11.33 (0.010) & 0.49 (0.921) & 7.52 (0.057)\\
-Loser-end test ($z$, 1-sided $p$) & -- & z=+2.16 (p=0.984) & z=-0.18 (p=0.429) & z=+1.90 (p=0.971)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=-0.50 (p=0.693) & z=+0.36 (p=0.359) & z=-0.52 (p=0.700)\\
+$R^2$ (within) & 0.027 & 0.027 & 0.030 & 0.027\\
+Joint test ($\chi^2_3$, $p$) & -- & 11.24 (0.010) & 0.44 (0.931) & 7.52 (0.057)\\
+Loser-end test ($z$, 1-sided $p$) & -- & z=+2.15 (p=0.984) & z=-0.20 (p=0.420) & z=+1.91 (p=0.972)\\
+Asymmetry ($z$, 1-sided $p$) & -- & z=-0.46 (p=0.676) & z=+0.33 (p=0.371) & z=-0.48 (p=0.685)\\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{\label{tab:H2_regression}H2: Disposition / Illusion-of-Control Hypothesis}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns. State variable in column (2) is $D^{\text{MD,Det}}_t$ (= 1 if the residual of $\log$(MD/MCAP) on a linear time trend is in the top 34\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\text{INV-PCR}}_t$ (= 1 in the bottom 34\% of the CBOE equity put-call ratio: high call-to-put = high illusion of control). Column (4) is the discriminant specification: it includes both $D^{\text{MD,Det}}_t$ and the Baker-Wurgler orthogonalised sentiment regime $D^{\text{SENT}}_t$ (= 1 if SENT$^\perp$ is in the top 34\%) with full rank interactions. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover) included but absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{	ext{LOW}}$, $R^{	ext{MID}}$, $R^{	ext{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns. State variable in column (2) is $D^{	ext{MD,Det}}_t$ (= 1 if the residual of $\log$(MD/MCAP) on a linear time trend is in the top 34\%, following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); column (3) is $D^{\text{INV-PCR}}_t$ (= 1 in the bottom 34\% of the CBOE equity put-call ratio: high call-to-put = high illusion of control). Column (4) is the discriminant specification: it includes both $D^{	ext{MD,Det}}_t$ and the Baker-Wurgler orthogonalised sentiment regime $D^{	ext{SENT}}_t$ (= 1 if SENT$^\perp$ is in the top 34\%) with full rank interactions. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover) included but absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{tablenotes}
+\end{threeparttable}}
 \end{table}

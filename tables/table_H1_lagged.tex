@@ -1,58 +1,48 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{\label{tab:H1_lagged}H1 Robustness --- Lagged Sentiment}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{\text{AAII}}_{t-1}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{	ext{AAII}}_{t-1}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{\text{LOW}}$ & 0.0304*** & 0.0327*** & 0.0306*** & 0.0304***\\
- & (8.35) & (8.01) & (8.45) & (7.94)\\
-$R^{\text{MID}}$ & 0.0142*** & 0.0147*** & 0.0142*** & 0.0141***\\
- & (16.42) & (15.65) & (16.53) & (14.83)\\
-$R^{\text{HIGH}}$ & 0.0800*** & 0.0817*** & 0.0800*** & 0.0781***\\
- & (14.70) & (13.77) & (14.80) & (13.43)\\
-Sentiment &  & 0.0053*** & 0.0025*** & 0.0012\\
- &  & (2.97) & (3.51) & (0.72)\\
-$R^{\text{LOW}}\times$ Sent. &  & -0.0092 & -0.0053* & 0.0003\\
- &  & (-1.30) & (-1.76) & (0.04)\\
-$R^{\text{MID}}\times$ Sent. &  & -0.0024 & -0.0009 & 0.0002\\
- &  & (-1.32) & (-1.21) & (0.11)\\
-$R^{\text{HIGH}}\times$ Sent. &  & -0.0078 & -0.0042 & 0.0096\\
- &  & (-0.73) & (-0.94) & (0.94)\\
-$\log(\text{TNA})$ & -0.0036*** & -0.0037*** & -0.0037*** & -0.0036***\\
- & (-8.01) & (-8.10) & (-8.14) & (-8.03)\\
-$\log(\text{Age})$ & -0.0108*** & -0.0112*** & -0.0119*** & -0.0105***\\
- & (-7.73) & (-8.06) & (-8.20) & (-7.26)\\
-Return volatility & -0.0245 & -0.0335 & -0.0310 & -0.0238\\
- & (-0.98) & (-1.31) & (-1.22) & (-0.96)\\
-Style flow & 0.1018*** & 0.0979*** & 0.0968*** & 0.1008***\\
- & (3.60) & (3.49) & (3.45) & (3.58)\\
+$R^{	ext{LOW}}$ & 0.0309*** & 0.0332*** & 0.0311*** & 0.0309***\\
+ & (8.31) & (7.95) & (8.41) & (7.89)\\
+$R^{	ext{MID}}$ & 0.0142*** & 0.0148*** & 0.0142*** & 0.0142***\\
+ & (16.18) & (15.42) & (16.28) & (14.60)\\
+$R^{	ext{HIGH}}$ & 0.0810*** & 0.0827*** & 0.0810*** & 0.0789***\\
+ & (14.55) & (13.63) & (14.65) & (13.26)\\
+Sentiment &  & 0.0054*** & 0.0025*** & 0.0013\\
+ &  & (2.96) & (3.49) & (0.71)\\
+$R^{	ext{LOW}}\times$ Sent. &  & -0.0091 & -0.0052* & 0.0003\\
+ &  & (-1.25) & (-1.69) & (0.05)\\
+$R^{	ext{MID}}\times$ Sent. &  & -0.0024 & -0.0009 & 0.0001\\
+ &  & (-1.30) & (-1.18) & (0.07)\\
+$R^{	ext{HIGH}}\times$ Sent. &  & -0.0079 & -0.0044 & 0.0106\\
+ &  & (-0.71) & (-0.96) & (1.00)\\
+$\log(\text{TNA})$ & -0.0039*** & -0.0040*** & -0.0040*** & -0.0039***\\
+ & (-8.26) & (-8.34) & (-8.38) & (-8.28)\\
+$\log(\text{Age})$ & -0.0109*** & -0.0114*** & -0.0120*** & -0.0106***\\
+ & (-7.78) & (-8.12) & (-8.27) & (-7.31)\\
+Return volatility & -0.0260 & -0.0351 & -0.0326 & -0.0253\\
+ & (-1.03) & (-1.37) & (-1.27) & (-1.01)\\
+Style flow & 0.0997*** & 0.0959*** & 0.0949*** & 0.0985***\\
+ & (3.57) & (3.46) & (3.43) & (3.54)\\
 \midrule
 Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 232,800 & 232,800 & 232,800 & 232,800\\
-$R^2$ (within) & 0.028 & 0.028 & 0.028 & 0.028\\
-Joint test ($\chi^2_3$, $p$) & -- & 4.68 (0.196) & 6.36 (0.095) & 1.12 (0.771)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=+0.11 (p=0.455) & z=+0.20 (p=0.421) & z=+0.67 (p=0.252)\\
+$R^2$ (within) & 0.027 & 0.027 & 0.027 & 0.027\\
+Joint test ($\chi^2_3$, $p$) & -- & 4.53 (0.209) & 6.19 (0.103) & 1.27 (0.736)\\
+Asymmetry ($z$, 1-sided $p$) & -- & z=+0.09 (p=0.463) & z=+0.14 (p=0.444) & z=+0.71 (p=0.239)\\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{\label{tab:H1_lagged}H1 Robustness --- Lagged Sentiment. Same four-column specification as Table~\ref{tab:H1_regression}, except sentiment is measured at time $t-1$ rather than $t$ (Huang et al.\ 2015 timing convention).}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{\text{SENT}}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{\text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{	ext{SENT}}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{	ext{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{tablenotes}
+\end{threeparttable}}
 \end{table}

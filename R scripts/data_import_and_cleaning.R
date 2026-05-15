@@ -1,12 +1,35 @@
 # =============================================================================
-# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.2
+# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.3
+#
+# v1.3 changes vs v1.2 (filter-methodology revision, May 2026):
+#   - flagged_funds.xlsx ledger updated: PASSIVE_INDEX (313 funds, formerly
+#     Tier 0) and H3_EXCLUDED (90 funds, formerly Tier 2) flags retired.
+#     Passive index funds now survive Step 8c and appear in descriptive
+#     statistics, aggregate alpha, portfolio sorts, and flow figures.
+#     Equity Income / Specialty Diversified / Specialty Miscellaneous
+#     categories (formerly H3_EXCLUDED) rejoin H3 and activeness analyses.
+#     Rationale: PASSIVE_INDEX was over-exclusion -- the active-vs-passive
+#     performance contrast central to the puzzle requires the full passive
+#     universe in descriptive and aggregate tables. H3_EXCLUDED's original
+#     justification (Cremers-Petajisto 2009 benchmark-misassignment) applied
+#     to active share, not to the 1-R^2 proxy used here, which is computed
+#     from Carhart factors only and is invariant to fund-specific benchmark
+#     assignment. Both groups remain absent from active-only analyses via
+#     pre-existing ap_group == "Active" guards in the relevant scripts.
+#   - SECTOR_FUND (149) and COVERED_CALL_OVERLAY (6) remain in the H3-only
+#     scope; SECTOR_FUND rationale rewritten to attribute inflation of H3
+#     lottery proxies to Carhart factor orthogonality rather than to
+#     benchmark misassignment. See flagged_funds.xlsx Legend sheet.
+#   - No code change in this script. The Step 8c wiring is identical; only
+#     the workbook contents change. Header counts in Step 8c documentation
+#     updated below.
 #
 # v1.2 changes:
 #   - Step 8c added: applies the flagged_funds.xlsx exclusion ledger.
 #       (a) "Exclude from Entire Analysis" tickers are dropped from all three
 #           panels at source. This subsumes the prior DATA_ERROR_TICKERS
-#           hardcode and adds PASSIVE_INDEX, GLOBAL_MANDATE, EM_MANDATE,
-#           LONG_SHORT, BEAR_MARKET, MARKET_NEUTRAL exclusions.
+#           hardcode and adds GLOBAL_MANDATE, EM_MANDATE, LONG_SHORT,
+#           BEAR_MARKET, MARKET_NEUTRAL, DATA_ERROR exclusions.
 #       (b) Two boolean flag columns are added to surviving observations:
 #             excluded_perf  TRUE for funds in the "Exclude from Perf
 #                            Comparison" sheet (used by aggregate alphas,
@@ -30,12 +53,14 @@
 #
 # v1.1 changes (retained):
 #   - Step 8b: leveraged / derivative-based passive fund exclusion.
-#     Mostly redundant given Step 8c (PASSIVE_INDEX in flagged_funds.xlsx
-#     covers the universe), but retained as a defensive net for any
-#     inverse / 2x / 3x products that might be missed from the workbook.
-#     Pure Style Rydex retention list also retained but is now of no effect
-#     because RYAVX, RYZAX, RYAZX, RYWAX, RYAWX are flagged as PASSIVE_INDEX
-#     in flagged_funds.xlsx and thereby excluded by Step 8c.
+#     Retained as a defensive name-pattern net for inverse / 2x / 3x
+#     products. Note: as of v1.3 PASSIVE_INDEX is no longer in the workbook,
+#     so the bulk of passive funds now SURVIVE Step 8c. The keyword filter
+#     here still removes leveraged products by name pattern, regardless of
+#     workbook contents. The Pure Style Rydex retention list (RYAVX, RYZAX,
+#     RYAZX, RYWAX, RYAWX) is now a no-op since no PASSIVE_INDEX flag exists
+#     to override; those funds pass through to the active/passive panel and
+#     are classified by their LSEG ap_group label.
 #
 # Produces three panels:
 #   panel_master      - no incubation correction, no date trimming
@@ -295,7 +320,7 @@ print(table(panel_trimmed$ap_group, useNA = "always"))
 
 # =============================================================================
 # 8b. EXCLUDE LEVERAGED / DERIVATIVE-BASED PRODUCTS FROM PASSIVE UNIVERSE
-#     [Largely redundant after v1.2 Step 8c but retained as defensive net]
+#     [Defensive name-pattern net; load-bearing as of v1.3]
 #
 #     Background: daily-reset leveraged mutual funds (Rydex, ProFunds,
 #     Direxion) are classified as passive by LSEG (Actively_Managed_New = N)
@@ -305,10 +330,13 @@ print(table(panel_trimmed$ap_group, useNA = "always"))
 #     holding periods (Avellaneda & Zhang, 2010).
 #
 #     Diagnostic: 30 passive funds with Turnover > 200% were identified; all
-#     confirmed as leveraged/derivative products on manual review. Most appear
-#     in flagged_funds.xlsx with the BEAR_MARKET or PASSIVE_INDEX flag and
-#     are therefore caught by Step 8c. This step remains as a name-pattern
-#     defensive layer for any leveraged products not yet in the workbook.
+#     confirmed as leveraged/derivative products on manual review. The
+#     BEAR_MARKET flag in flagged_funds.xlsx catches the inverse / bear
+#     subset at Step 8c. As of v1.3 the PASSIVE_INDEX flag is retired, so
+#     the leveraged-long products (Rydex Ultra, ProFunds Ultra, Direxion
+#     Bull 1.x/2x/3x) are no longer caught at source by Step 8c and rely
+#     on the name-pattern filter below. The keyword list is therefore
+#     load-bearing, not merely defensive.
 #
 #     References: Avellaneda & Zhang (2010, SIAM J. Financial Math.);
 #     Cremers & Petajisto (2009, RFS); Amihud & Goyenko (2013, RFS).
@@ -327,11 +355,17 @@ LEVERAGED_KEYWORDS <- paste(
 )
 
 # Note: ACTIVE_MISLABELLED and PURE_STYLE_RETAIN constants removed in v1.2.
-# Both are now superseded by flagged_funds.xlsx in Step 8c:
-#   - MOJAX, GENDX are flagged PASSIVE_INDEX in Entire Analysis (excluded)
-#   - RYAVX/RYZAX/RYAZX/RYWAX/RYAWX (Pure Style) are also flagged PASSIVE_INDEX
-#     in flagged_funds.xlsx and therefore excluded. The user-curated workbook
-#     supersedes the previous explicit-retention logic.
+# As of v1.3, with PASSIVE_INDEX retired from flagged_funds.xlsx:
+#   - MOJAX, GENDX (LSEG-flagged "Active" but functionally pure index trackers)
+#     are no longer in any exclusion sheet. They pass through to the analysis
+#     panel classified by their LSEG ap_group label. Their downstream effect
+#     is small (low fund count, low TNA share) and falls within the noise
+#     of LSEG classification accuracy.
+#   - RYAVX/RYZAX/RYAZX/RYWAX/RYAWX (Pure Style Rydex passives) similarly
+#     pass through, classified ap_group == "Passive" by LSEG, and contribute
+#     to the passive cohort in descriptive and aggregate tables.
+# The user-curated workbook continues to govern Step 8c; the v1.2 inline
+# retention logic remains superseded.
 
 exclude_leveraged <- function(panel) {
   panel %>%
@@ -359,30 +393,41 @@ cat("  Removed             :", n_pass_before - n_pass_after, "\n")
 #     flagged_funds.xlsx is the canonical, user-curated exclusion workbook.
 #     It encodes the dissertation's three-tier scope discipline:
 #
-#       (i)  Exclude from Entire Analysis  (438 funds): dropped at source.
-#            Includes PASSIVE_INDEX (passives), GLOBAL_MANDATE / EM_MANDATE
-#            (non-US), LONG_SHORT, MARKET_NEUTRAL, BEAR_MARKET (violate the
-#            long-only assumption), and DATA_ERROR (the two confirmed LSEG
-#            errors QWVOX, VALLCEN).
+#       (i)  Exclude from Entire Analysis  (125 funds, v1.3): dropped at
+#            source. Covers GLOBAL_MANDATE / EM_MANDATE (non-US), LONG_SHORT,
+#            MARKET_NEUTRAL, BEAR_MARKET (violate the long-only assumption),
+#            and DATA_ERROR (the two confirmed LSEG errors QWVOX, VALLCEN).
+#            v1.3 note: PASSIVE_INDEX (313 funds, formerly the bulk of this
+#            tier) has been retired; passive index funds now survive Step 8c
+#            and appear in descriptive, aggregate, and portfolio-sort
+#            tables. Active-only analyses (alpha estimation, bootstrap,
+#            persistence, H1-H4) are unaffected because they apply their
+#            own ap_group == "Active" guards downstream.
 #
-#       (ii) Exclude from Perf Comparison  (585 funds): NOT dropped here.
-#            Tagged on the surviving panel with excluded_perf = TRUE so
-#            that aggregate-alpha, bootstrap, FDR, persistence, sub-period,
-#            robust factor model, and portfolio-sort scripts can apply
-#            filter(!excluded_perf). This is the FF (2010)-style restriction
-#            to diversified long-only funds with style-matched benchmarks
-#            for performance comparison.
+#       (ii) Exclude from Perf Comparison  (292 funds, v1.3): NOT dropped
+#            here. Tagged on the surviving panel with excluded_perf = TRUE
+#            so that aggregate-alpha, bootstrap, FDR, persistence,
+#            sub-period, robust factor model, and portfolio-sort scripts
+#            can apply filter(!excluded_perf). After PASSIVE_INDEX retirement
+#            this sheet is dominated by SECTOR_FUND (169) and the long-short
+#            / market-neutral / global-mandate residuals.
 #
-#       (iii) Exclude from H3 Only  (245 funds): tagged with excluded_h3 = TRUE.
-#            For H3 (lottery demand) and the activeness proxy, where Cremers
-#            and Petajisto (2009) require unambiguous size/style benchmarks.
-#            The composite excluded_h3 column is the union of "Exclude from
-#            H3 Only" and SECTOR_FUND-tagged funds in the Perf Comparison
-#            sheet (sector funds are excluded from both performance and H3).
+#       (iii) Exclude from H3 Only  (155 funds, v1.3): tagged with
+#            excluded_h3 = TRUE. As of v1.3 contains SECTOR_FUND (149) and
+#            COVERED_CALL_OVERLAY (6) only. H3_EXCLUDED (90 funds in
+#            Equity Income / Specialty Diversified / Specialty Miscellaneous
+#            Lipper categories) was retired: its original Cremers-Petajisto
+#            (2009) benchmark-misassignment rationale applied to active
+#            share, but the activeness proxy used here is 1-R^2 from a
+#            Carhart four-factor regression (Amihud-Goyenko 2013), which
+#            does not use any fund-specific benchmark. The composite
+#            excluded_h3 column is the union of "Exclude from H3 Only" and
+#            SECTOR_FUND-tagged funds in the Perf Comparison sheet (sector
+#            funds are excluded from both performance and H3).
 #
 #     Behavioral H1/H2/H4 panel regressions need no further filter beyond
 #     what is applied at source by (i): they run on the full surviving
-#     universe (~3,326 funds pre-Evans).
+#     active universe (SUBSET = "active" in panel_regressions_setup.R).
 #
 #     This block subsumes the prior DATA_ERROR_TICKERS hardcode.
 # =============================================================================

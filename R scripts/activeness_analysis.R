@@ -1,14 +1,35 @@
 # =============================================================================
-# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.2
+# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.3
+#
+# v1.3 changes vs v1.2 (filter-methodology revision, May 2026):
+#   No code change. flagged_funds.xlsx ledger updated upstream: H3_EXCLUDED
+#   flag retired from "Exclude from H3 Only" (90 funds across the Equity
+#   Income, Specialty Diversified, and Specialty/Miscellaneous Lipper
+#   categories rejoin the activeness sample). Rationale: the H3_EXCLUDED
+#   tag was originally justified by Cremers and Petajisto (2009) on the
+#   ground that funds lacking unambiguous size/style benchmarks contaminate
+#   active-share measurement. The activeness proxies used here -- 1-R^2
+#   from a Carhart four-factor regression (Amihud-Goyenko 2013) and
+#   tracking error against the fund's assigned benchmark -- are conceptually
+#   distinct: 1-R^2 does not use any fund-specific benchmark at all, and
+#   tracking error already has its own SECTOR_FUND guard. The benchmark-
+#   misassignment argument therefore does not justify dropping these
+#   categories from the activeness analyses.
+#   The post-revision !excluded_h3 universe contains SECTOR_FUND (149) and
+#   COVERED_CALL_OVERLAY (6) only; see v1.2 enumeration below for the
+#   superseded composition.
 #
 # v1.2 changes vs v1.1 (Family D pre-defense audit):
 #   - H3 / activeness subsample filter wired in at the panel-prep stage.
 #     Per data_import_and_cleaning.R v1.2 Step 8c, the activeness scripts
 #     must restrict to the !excluded_h3 subsample so that funds in the
-#     "Exclude from H3 Only" sheet of flagged_funds.xlsx (Equity Income,
-#     Specialty Diversified, Specialty/Miscellaneous, sector funds, covered-
-#     call overlays) do not contaminate the activeness measures or the
-#     quintile cutoffs.
+#     "Exclude from H3 Only" sheet of flagged_funds.xlsx do not contaminate
+#     the activeness measures or the quintile cutoffs.
+#     [Legacy v1.2 note, SUPERSEDED by v1.3: under the original ledger this
+#     sheet listed Equity Income, Specialty Diversified, Specialty/
+#     Miscellaneous, sector funds, and covered-call overlays. The first
+#     three categories were retired in v1.3; only sector and covered-call
+#     funds remain.]
 #     Implementation:
 #       (i)  An h3_eligible Ticker lookup is built from panel_incubation %>%
 #            filter(!excluded_h3) %>% distinct(Ticker) at the start of

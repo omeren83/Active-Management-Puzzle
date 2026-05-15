@@ -1,69 +1,59 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{\label{tab:H2_robustness}H2 Robustness --- Style $\times$ Time Fixed Effects}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{\text{LOW}}$ & 0.0313*** & 0.0245*** & 0.0363*** & 0.0261***\\
- & (9.29) & (5.89) & (7.86) & (5.47)\\
-$R^{\text{MID}}$ & 0.0158*** & 0.0140*** & 0.0177*** & 0.0155***\\
- & (17.37) & (12.93) & (13.74) & (12.72)\\
-$R^{\text{HIGH}}$ & 0.0786*** & 0.0759*** & 0.0846*** & 0.0773***\\
- & (14.75) & (11.04) & (11.98) & (9.98)\\
-$R^{\text{LOW}}\times$ State &  & 0.0141** & 0.0011 & 0.0129**\\
- &  & (2.23) & (0.19) & (2.02)\\
-$R^{\text{MID}}\times$ State &  & 0.0037** & -0.0010 & 0.0025\\
- &  & (2.15) & (-0.55) & (1.41)\\
-$R^{\text{HIGH}}\times$ State &  & 0.0058 & 0.0019 & 0.0047\\
- &  & (0.62) & (0.19) & (0.48)\\
-$R^{\text{LOW}}\times D^{\text{SENT}}$ &  &  &  & -0.0038\\
- &  &  &  & (-0.54)\\
-$R^{\text{MID}}\times D^{\text{SENT}}$ &  &  &  & -0.0041**\\
- &  &  &  & (-2.32)\\
-$R^{\text{HIGH}}\times D^{\text{SENT}}$ &  &  &  & -0.0042\\
- &  &  &  & (-0.40)\\
-$\log(\text{TNA})$ & -0.0007*** & -0.0007*** & -0.0011*** & -0.0007***\\
- & (-5.09) & (-5.08) & (-6.97) & (-5.10)\\
+$R^{	ext{LOW}}$ & 0.0318*** & 0.0249*** & 0.0371*** & 0.0263***\\
+ & (9.26) & (5.82) & (7.83) & (5.38)\\
+$R^{	ext{MID}}$ & 0.0159*** & 0.0142*** & 0.0178*** & 0.0157***\\
+ & (17.19) & (12.86) & (13.50) & (12.66)\\
+$R^{	ext{HIGH}}$ & 0.0796*** & 0.0764*** & 0.0861*** & 0.0778***\\
+ & (14.59) & (10.87) & (11.89) & (9.83)\\
+$R^{	ext{LOW}}\times$ State &  & 0.0146** & 0.0009 & 0.0134**\\
+ &  & (2.23) & (0.15) & (2.04)\\
+$R^{	ext{MID}}\times$ State &  & 0.0036** & -0.0010 & 0.0024\\
+ &  & (2.07) & (-0.53) & (1.33)\\
+$R^{	ext{HIGH}}\times$ State &  & 0.0068 & 0.0015 & 0.0056\\
+ &  & (0.70) & (0.14) & (0.57)\\
+$R^{	ext{LOW}}\times D^{	ext{SENT}}$ &  &  &  & -0.0035\\
+ &  &  &  & (-0.49)\\
+$R^{	ext{MID}}\times D^{	ext{SENT}}$ &  &  &  & -0.0042**\\
+ &  &  &  & (-2.34)\\
+$R^{	ext{HIGH}}\times D^{	ext{SENT}}$ &  &  &  & -0.0042\\
+ &  &  &  & (-0.39)\\
+$\log(\text{TNA})$ & -0.0008*** & -0.0008*** & -0.0012*** & -0.0008***\\
+ & (-5.39) & (-5.38) & (-7.21) & (-5.40)\\
 $\log(\text{Age})$ & -0.0032*** & -0.0032*** & -0.0029*** & -0.0032***\\
- & (-8.15) & (-8.14) & (-6.36) & (-8.14)\\
-Expense ratio & -0.0015* & -0.0015* & -0.0023*** & -0.0015*\\
- & (-1.87) & (-1.85) & (-2.90) & (-1.82)\\
+ & (-7.99) & (-7.98) & (-6.21) & (-7.99)\\
+Expense ratio & -0.0016* & -0.0016* & -0.0024*** & -0.0016*\\
+ & (-1.91) & (-1.89) & (-2.94) & (-1.86)\\
 Load dummy & 0.0001 & 0.0001 & -0.0003 & 0.0001\\
- & (0.15) & (0.13) & (-0.47) & (0.12)\\
-Return volatility & -0.1348*** & -0.1379*** & -0.2306*** & -0.1365***\\
- & (-4.63) & (-4.74) & (-5.84) & (-4.72)\\
+ & (0.13) & (0.12) & (-0.48) & (0.10)\\
+Return volatility & -0.1346*** & -0.1376*** & -0.2321*** & -0.1362***\\
+ & (-4.54) & (-4.66) & (-5.77) & (-4.63)\\
 Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
- & (-0.90) & (-0.91) & (-0.44) & (-0.91)\\
-Style flow & 0.0005 & 0.0000 & 0.0328 & -0.0007\\
- & (0.00) & (0.00) & (0.15) & (-0.00)\\
+ & (-0.81) & (-0.82) & (-0.34) & (-0.83)\\
+Style flow & 0.0652 & 0.0648 & 0.1174 & 0.0641\\
+ & (0.41) & (0.40) & (0.55) & (0.40)\\
 \midrule
 FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 232,751 & 232,751 & 168,492 & 232,751\\
-$R^2$ (within) & 0.024 & 0.024 & 0.027 & 0.024\\
-Joint test ($\chi^2_3$, $p$) & -- & 15.00 (0.002) & 0.30 (0.959) & 10.05 (0.018)\\
-Loser-end test ($z$, 1-sided $p$) & -- & z=+2.23 (p=0.987) & z=+0.19 (p=0.576) & z=+2.02 (p=0.978)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=-0.75 (p=0.774) & z=+0.06 (p=0.475) & z=-0.72 (p=0.765)\\
+$R^2$ (within) & 0.023 & 0.023 & 0.026 & 0.023\\
+Joint test ($\chi^2_3$, $p$) & -- & 14.94 (0.002) & 0.28 (0.963) & 10.09 (0.018)\\
+Loser-end test ($z$, 1-sided $p$) & -- & z=+2.23 (p=0.987) & z=+0.15 (p=0.560) & z=+2.04 (p=0.979)\\
+Asymmetry ($z$, 1-sided $p$) & -- & z=-0.69 (p=0.754) & z=+0.04 (p=0.482) & z=-0.67 (p=0.748)\\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{\label{tab:H2_robustness}H2 Robustness --- Style $\times$ Time Fixed Effects. Same contemporaneous-state specification as Table~\ref{tab:H2_regression}, but with Lipper-category $\times$ yearmo two-way fixed effects in place of fund fixed effects. Identification shifts from within-fund to within-style-month variation, absorbing aggregate flow-flood and risk-on confounders.}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-Sample, dependent variable, rank construction, and column specifications identical to Table~\ref{tab:H2_regression}. State main effects (and $D^{\text{SENT}}_t$ in col 4) are absorbed by the Lipper $\times$ yearmo fixed effects and do not appear in the table; time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The robustness of $\delta^{MD}_1>0$ across both identification strategies points toward a margin-call alternative (Brunnermeier \& Pedersen 2009) rather than disposition psychology. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\item Sample, dependent variable, rank construction, and column specifications identical to Table~\ref{tab:H2_regression}. State main effects (and $D^{	ext{SENT}}_t$ in col 4) are absorbed by the Lipper $\times$ yearmo fixed effects and do not appear in the table; time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The robustness of $\delta^{MD}_1>0$ across both identification strategies points toward a margin-call alternative (Brunnermeier \& Pedersen 2009) rather than disposition psychology. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{tablenotes}
+\end{threeparttable}}
 \end{table}

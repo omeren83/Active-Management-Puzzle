@@ -1,60 +1,50 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{LOW}$ & 0.0312*** & 0.0309*** & 0.0315*** & 0.0302***\\
- & (8.60) & (8.31) & (8.59) & (8.23)\\
-$R^{MID}$ & 0.0157*** & 0.0157*** & 0.0158*** & 0.0154***\\
- & (16.46) & (16.46) & (16.67) & (16.04)\\
-$R^{HIGH}$ & 0.0786*** & 0.0790*** & 0.0782*** & 0.0775***\\
- & (13.95) & (14.07) & (13.91) & (13.95)\\
-Lottery measure &  & -0.0010 & 0.0025*** & 0.0280**\\
- &  & (-0.32) & (2.59) & (2.05)\\
-Lottery $\times$ Sent. &  & 0.0008 & 0.0039** & 0.0144\\
- &  & (0.16) & (2.13) & (0.53)\\
-$\log(\text{TNA})$ & -0.0006*** & -0.0006*** & -0.0006*** & -0.0006***\\
- & (-4.39) & (-4.42) & (-4.42) & (-4.37)\\
-$\log(\text{Age})$ & -0.0031*** & -0.0032*** & -0.0032*** & -0.0032***\\
- & (-7.81) & (-7.83) & (-7.90) & (-7.81)\\
+$R^{	ext{LOW}}$ & 0.0319*** & 0.0315*** & 0.0321*** & 0.0308***\\
+ & (9.02) & (8.69) & (8.99) & (8.63)\\
+$R^{	ext{MID}}$ & 0.0159*** & 0.0159*** & 0.0160*** & 0.0156***\\
+ & (16.50) & (16.50) & (16.71) & (16.08)\\
+$R^{	ext{HIGH}}$ & 0.0781*** & 0.0784*** & 0.0776*** & 0.0768***\\
+ & (13.95) & (14.02) & (13.91) & (13.92)\\
+Lottery measure &  & -0.0011 & 0.0026*** & 0.0299**\\
+ &  & (-0.37) & (2.70) & (2.17)\\
+Lottery $\times$ Sent. &  & 0.0008 & 0.0041** & 0.0176\\
+ &  & (0.16) & (2.17) & (0.63)\\
+$\log(\text{TNA})$ & -0.0006*** & -0.0006*** & -0.0007*** & -0.0006***\\
+ & (-4.48) & (-4.51) & (-4.52) & (-4.45)\\
+$\log(\text{Age})$ & -0.0032*** & -0.0032*** & -0.0032*** & -0.0032***\\
+ & (-7.95) & (-7.96) & (-8.03) & (-7.94)\\
 Expense ratio & -0.0014 & -0.0014 & -0.0015 & -0.0014\\
- & (-1.53) & (-1.48) & (-1.60) & (-1.49)\\
+ & (-1.56) & (-1.51) & (-1.64) & (-1.52)\\
 Load dummy & 0.0002 & 0.0002 & 0.0003 & 0.0002\\
- & (0.43) & (0.41) & (0.54) & (0.43)\\
-Return volatility & -0.1355*** & -0.1349*** & -0.1416*** & -0.1783***\\
- & (-4.55) & (-4.54) & (-4.74) & (-5.32)\\
+ & (0.41) & (0.40) & (0.53) & (0.41)\\
+Return volatility & -0.1385*** & -0.1380*** & -0.1444*** & -0.1849***\\
+ & (-4.60) & (-4.59) & (-4.79) & (-5.47)\\
 Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
- & (-0.90) & (-0.89) & (-0.83) & (-0.88)\\
-Style flow & -2.0172*** & -2.0174*** & -2.0017*** & -2.0097***\\
- & (-3.37) & (-3.37) & (-3.35) & (-3.36)\\
+ & (-0.88) & (-0.87) & (-0.82) & (-0.86)\\
+Style flow & -1.9843*** & -1.9844*** & -1.9674*** & -1.9759***\\
+ & (-3.39) & (-3.39) & (-3.37) & (-3.37)\\
 \midrule
 FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
-$N$ & 202,740 & 202,740 & 202,740 & 202,740\\
-$R^2$ (within) & 0.030 & 0.030 & 0.030 & 0.030\\
-Joint test ($\chi^2_2$, $p$) & -- & 0.11 (0.948) & 19.56 ($<\!0.001$) & 7.19 (0.027)\\
-Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=+0.16 (p=0.438) & z=+2.13 (p=0.017) & z=+0.53 (p=0.298)\\
+$N$ & 211,995 & 211,995 & 211,995 & 211,995\\
+$R^2$ (within) & 0.029 & 0.029 & 0.029 & 0.029\\
+Joint test ($\chi^2_2$, $p$) & -- & 0.13 (0.935) & 20.74 ($<\!0.001$) & 8.36 (0.015)\\
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=+0.16 (p=0.437) & z=+2.17 (p=0.015) & z=+0.63 (p=0.263)\\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects. Same contemporaneous-sentiment specification as Table~\ref{tab:H3_regression}, but with Lipper-category $\times$ yearmo two-way fixed effects in place of fund fixed effects. Identification shifts from within-fund to within-style-month variation, absorbing aggregate flow-flood and risk-on confounders.}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{SENT}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{	ext{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{tablenotes}
+\end{threeparttable}}
 \end{table}

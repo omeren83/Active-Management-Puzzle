@@ -1,16 +1,32 @@
-# psychological_premium.R                                              v1.2
+# psychological_premium.R                                              v1.3
 # =============================================================================
+# v1.3 changes (filter-methodology revision, May 2026):
+#   No code change. flagged_funds.xlsx ledger updated upstream: H3_EXCLUDED
+#   flag retired from "Exclude from H3 Only" (90 funds in Equity Income,
+#   Specialty Diversified, and Specialty/Miscellaneous Lipper categories
+#   rejoin the Shadow Price / Psychological Premium sample). Rationale: the
+#   lottery proxies (ActR2, ActSkew, MAX12) entering the joint H1+H3
+#   estimation are factor-residual or return-moment measures that do not
+#   consume a fund-specific size/style benchmark, so the Cremers-Petajisto
+#   (2009) benchmark-misassignment argument that motivated H3_EXCLUDED in
+#   v1.2 does not apply. Mirrors the v2.2 fix in H3_lottery_demand.R. The
+#   filter(!excluded_h3) call below still fires; it now removes sector
+#   funds and covered-call overlays only.
+#
 # v1.2 changes (Family E pre-defense audit):
 #   - filter(!excluded_h3) added to the panel-prep stage. The Shadow Price /
 #     Psychological Premium is identified jointly with H1 + H3 channels and
 #     uses the same lottery proxies (ActR2, ActSkew, MAX12) as H3, so it
 #     shares H3's identification scope: the !excluded_h3 subsample of
-#     flagged_funds.xlsx Step 8c. Without this restriction, sector funds,
-#     covered-call overlays, and Lipper categories without unambiguous
-#     size-style benchmarks would contaminate the activeness measures and
-#     therefore the Shadow Price estimates. Mirrors the v2.1 fix in
-#     H3_lottery_demand.R. Requires panel_regressions_setup.R v1.3+, which
-#     preserves the excluded_h3 flag column in panel_reg.
+#     flagged_funds.xlsx Step 8c.
+#     [Legacy v1.2 note, SUPERSEDED by v1.3: under the original ledger this
+#     filter also dropped Equity Income, Specialty Diversified, and
+#     Specialty/Miscellaneous funds on Cremers-Petajisto (2009) benchmark-
+#     misassignment grounds. v1.3 retires that flag; only sector funds and
+#     covered-call overlays remain in scope.]
+#     Mirrors the v2.1 fix in H3_lottery_demand.R. Requires
+#     panel_regressions_setup.R v1.3+, which preserves the excluded_h3 flag
+#     column in panel_reg.
 #   - Sample-source phrasing added to the table footnote.
 #
 # v1.1 changes (May 2026):

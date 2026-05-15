@@ -1,5 +1,17 @@
 # =============================================================================
-# DESCRIPTIVE STATISTICS - LATEX TABLE OUTPUT (v2.4 - BSW citation correction)
+# DESCRIPTIVE STATISTICS - LATEX TABLE OUTPUT (v2.5 - PASSIVE_INDEX retirement)
+#
+# v2.5 changes vs v2.4 (filter-methodology revision, May 2026):
+#   No code change. flagged_funds.xlsx ledger updated upstream: PASSIVE_INDEX
+#   flag retired from "Exclude from Entire Analysis" (313 funds) and "Exclude
+#   from Perf Comparison" (293 funds). The post-Step-8c panel now carries
+#   ~290 passive funds (vs ~28-39 under v1.2), so the Active vs Passive rows
+#   in Tables 2-4, the return-distribution rows in Table 3, and the
+#   fund-flows series in Figure 1 now describe the full US domestic passive
+#   index-fund universe rather than a small residual cohort. Caption text
+#   and footnotes are unchanged; the methodology section (Chapter 3) is the
+#   single source of truth for the exclusion framework. See v2.3 note below
+#   for the legacy state.
 #
 # v2.4 changes vs v2.3 (Family C audit follow-on):
 #   Table 2 footnote BSW citation corrected. The net-return-derivation
@@ -19,11 +31,14 @@
 #   - Compatibility with data_import_and_cleaning.R v1.2: panels now carry
 #     excluded_perf and excluded_h3 boolean columns from Step 8c. This script
 #     does not need to filter them - it describes the analysis universe as
-#     produced by the cleaning pipeline. Users should be aware that the
-#     "Active vs Passive" rows in Tables 2-4 will show zero passives because
-#     PASSIVE_INDEX-flagged funds are dropped at source by Step 8c. If you
-#     want to describe pre-Step-8c counts you must reconstruct from raw data
-#     (or read the historical lipper.xlsx separately for Table 1 only).
+#     produced by the cleaning pipeline.
+#     [Legacy v2.3 note, SUPERSEDED by v2.5: under the v1.2 ledger, Tables
+#     2-4 showed a near-zero Passive count (~28-39) because the
+#     PASSIVE_INDEX flag dropped the bulk of passives at source. As of v2.5
+#     PASSIVE_INDEX has been retired from flagged_funds.xlsx; the passive
+#     cohort now appears at its full ~290-fund size in this script's
+#     outputs. The Table 1 pre-8c snapshot remains the full universe and
+#     is unaffected by either ledger revision.]
 #
 # v2.2 changes vs v2.1:
 #   (1) Added annualised gross Sharpe ratio (fund-level time-series Sharpe,

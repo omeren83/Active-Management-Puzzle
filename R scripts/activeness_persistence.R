@@ -1,5 +1,17 @@
 # =============================================================================
-# ACTIVENESS-CONDITIONED PERSISTENCE                                        v1.1
+# ACTIVENESS-CONDITIONED PERSISTENCE                                        v1.2
+#
+# v1.2 changes vs v1.1 (filter-methodology revision, May 2026):
+#   No code change. flagged_funds.xlsx ledger updated upstream: H3_EXCLUDED
+#   flag retired from "Exclude from H3 Only" (90 funds in Equity Income,
+#   Specialty Diversified, and Specialty/Miscellaneous Lipper categories
+#   rejoin the activeness-conditioned persistence sample). Rationale: the
+#   activeness measure used here -- formation-window 1-R^2 from a Carhart
+#   four-factor regression (Amihud and Goyenko 2013) -- does not consume
+#   any fund-specific benchmark, so the Cremers-Petajisto (2009) benchmark-
+#   misassignment argument that motivated the H3_EXCLUDED tag does not
+#   apply. The post-revision !excluded_h3 universe contains SECTOR_FUND
+#   (149) and COVERED_CALL_OVERLAY (6) only.
 #
 # v1.1 changes vs v1.0 (Family D pre-defense audit):
 #   - H3 / activeness subsample filter added at the panel-prep stage:
@@ -8,8 +20,12 @@
 #     restrict to the !excluded_h3 subsample so that the formation-window
 #     1-R^2 measure and the within-cohort tercile breakpoints are not
 #     contaminated by funds in the "Exclude from H3 Only" sheet of
-#     flagged_funds.xlsx (Equity Income, Specialty Diversified,
-#     Specialty/Miscellaneous, sector funds, covered-call overlays).
+#     flagged_funds.xlsx.
+#     [Legacy v1.1 note, SUPERSEDED by v1.2: under the original ledger this
+#     sheet listed Equity Income, Specialty Diversified, Specialty/
+#     Miscellaneous, sector funds, and covered-call overlays. The first
+#     three categories were retired in v1.2; only sector and covered-call
+#     funds remain in scope.]
 #   - Sample-source sentence in fn_text footnote updated to append
 #     "H3 / activeness subsample per flagged\_funds.xlsx".
 #

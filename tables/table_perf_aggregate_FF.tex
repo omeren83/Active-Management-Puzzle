@@ -1,40 +1,30 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{Aggregate Portfolio Alpha by Group (\%, Annualised) -- Fama--French (2010) Subperiod}
+\label{tab:perf_aggregate_FF}
+\begin{threeparttable}
 \begin{tabular}{lrrrrrr}
 \toprule
  & & & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} \\
 \cmidrule(lr){4-5} \cmidrule(lr){6-7}
 Group & $N$ & $T$ & EW & VW & EW & VW \\
 \midrule
-Active & 805 & 141 & -0.707 & -0.582 & -1.764$^{**}$ & -1.255$^{*}$ \\
-t(coef) & & & (-0.97) & (-0.83) & (-2.45) & (-1.83) \\
-Passive & 25 & 133 & -1.315$^{*}$ & -0.505 & -1.996$^{***}$ & -1.001$^{**}$ \\
-t(coef) & & & (-1.77) & (-1.22) & (-2.65) & (-2.43) \\
-Unknown & 387 & 141 & -3.665$^{***}$ & -5.549$^{***}$ & -5.644$^{***}$ & -6.800$^{***}$ \\
+Active & 805 & 141 & -0.705 & -0.581 & -1.761$^{**}$ & -1.253$^{*}$ \\
+t(coef) & & & (-0.97) & (-0.83) & (-2.44) & (-1.83) \\
+Passive & 118 & 141 & -0.195 & 0.285 & -0.644 & 0.158 \\
+t(coef) & & & (-0.36) & (0.86) & (-1.20) & (0.48) \\
+Unknown & 387 & 141 & -3.662$^{***}$ & -5.549$^{***}$ & -5.639$^{***}$ & -6.800$^{***}$ \\
 t(coef) & & & (-5.07) & (-3.68) & (-8.12) & (-4.42) \\
 \midrule
-Active + Passive & 830 & 141 & -0.710 & -0.582 & -1.759$^{**}$ & -1.255$^{*}$ \\
-t(coef) & & & (-0.99) & (-0.83) & (-2.46) & (-1.83) \\
-Full Sample & 1,217 & 141 & -1.424$^{**}$ & -0.594 & -2.699$^{***}$ & -1.271$^{*}$ \\
-t(coef) & & & (-2.04) & (-0.85) & (-3.91) & (-1.85) \\
+Active + Passive & 923 & 141 & -0.669 & -0.453 & -1.666$^{**}$ & -1.017$^{*}$ \\
+t(coef) & & & (-0.96) & (-0.77) & (-2.42) & (-1.74) \\
+Full Sample & 1,310 & 141 & -1.341$^{**}$ & -0.460 & -2.560$^{***}$ & -1.029$^{*}$ \\
+t(coef) & & & (-1.97) & (-0.78) & (-3.82) & (-1.75) \\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{Aggregate Portfolio Alpha by Group (\%, Annualised) -- Fama--French (2010) Subperiod}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-Annualised \textcite{Carhart1997} four-factor alpha (\%) from regressing the monthly aggregate portfolio return of each group on the market, size, value, and momentum factors, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio (each fund alive in month $t$ contributes $1/N_t$). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net returns are computed as gross returns less one-twelfth of the static annual expense ratio each month, following \textcite{Carhart1997} and \textcite{Wermers2000}. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $N$: unique funds contributing to the portfolio series; $T$: number of monthly observations in the regression. The Active + Passive row aggregates only the two classified groups. Sample: Jan 1995--Sep 2006 (Fama--French 2010 subperiod), performance-comparison subsample per flagged\_funds.xlsx. The subperiod is the maximum overlap between this study's data window (Dec 1994 onwards) and the \textcite{FamaFrench2010} sample (Jan 1984--Sep 2006), enabling direct comparison with their Tables I--III.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item Annualised \textcite{Carhart1997} four-factor alpha (\%) from regressing the monthly aggregate portfolio return of each group on the market, size, value, and momentum factors, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio (each fund alive in month $t$ contributes $1/N_t$). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net returns are computed as gross returns less one-twelfth of the static annual expense ratio each month, following \textcite{Carhart1997} and \textcite{Wermers2000}. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $N$: unique funds contributing to the portfolio series; $T$: number of monthly observations in the regression. The Active + Passive row aggregates only the two classified groups. Sample: Jan 1995--Sep 2006 (Fama--French 2010 subperiod), performance-comparison subsample per flagged\_funds.xlsx. The subperiod is the maximum overlap between this study's data window (Dec 1994 onwards) and the \textcite{FamaFrench2010} sample (Jan 1984--Sep 2006), enabling direct comparison with their Tables I--III.
+\end{tablenotes}
+\end{threeparttable}
 \end{table}

@@ -1,56 +1,46 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{\label{tab:H3_regression}H3: Lottery Demand Hypothesis}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-$R^{\text{LOW}}$ & 0.0319*** & 0.0316*** & 0.0320*** & 0.0309***\\
- & (7.93) & (7.87) & (7.95) & (7.64)\\
-$R^{\text{MID}}$ & 0.0145*** & 0.0145*** & 0.0145*** & 0.0142***\\
- & (15.67) & (15.66) & (15.73) & (15.42)\\
-$R^{\text{HIGH}}$ & 0.0810*** & 0.0815*** & 0.0810*** & 0.0800***\\
- & (14.15) & (14.15) & (14.16) & (14.09)\\
-Lottery measure &  & -0.0044 & 0.0012 & 0.0220\\
- &  & (-0.85) & (1.08) & (1.63)\\
-Sentiment &  & 0.0029*** & 0.0029** & 0.0001\\
- &  & (2.92) & (2.27) & (0.05)\\
-Lottery $\times$ Sent. &  & 0.0003 & 0.0003 & 0.0332\\
- &  & (0.06) & (0.15) & (1.56)\\
-$\log(\text{TNA})$ & -0.0030*** & -0.0031*** & -0.0031*** & -0.0031***\\
- & (-6.94) & (-7.09) & (-7.14) & (-7.17)\\
-$\log(\text{Age})$ & -0.0111*** & -0.0116*** & -0.0115*** & -0.0123***\\
- & (-7.32) & (-7.68) & (-7.61) & (-7.95)\\
-Return volatility & -0.0265 & -0.0413 & -0.0275 & -0.0818**\\
- & (-0.96) & (-1.45) & (-0.95) & (-2.46)\\
-Style flow & 0.1462*** & 0.1355*** & 0.1375*** & 0.1387***\\
- & (3.11) & (2.88) & (2.96) & (2.92)\\
+$R^{	ext{LOW}}$ & 0.0326*** & 0.0320*** & 0.0327*** & 0.0315***\\
+ & (8.29) & (8.16) & (8.29) & (7.98)\\
+$R^{	ext{MID}}$ & 0.0146*** & 0.0146*** & 0.0146*** & 0.0143***\\
+ & (15.58) & (15.57) & (15.64) & (15.32)\\
+$R^{	ext{HIGH}}$ & 0.0805*** & 0.0812*** & 0.0805*** & 0.0795***\\
+ & (14.09) & (14.13) & (14.11) & (14.03)\\
+Lottery measure &  & -0.0065 & 0.0011 & 0.0224*\\
+ &  & (-1.28) & (1.05) & (1.66)\\
+Sentiment &  & 0.0029*** & 0.0030** & 0.0002\\
+ &  & (3.01) & (2.33) & (0.07)\\
+Lottery $\times$ Sent. &  & -0.0001 & 0.0004 & 0.0326\\
+ &  & (-0.02) & (0.25) & (1.54)\\
+$\log(\text{TNA})$ & -0.0032*** & -0.0033*** & -0.0033*** & -0.0033***\\
+ & (-7.22) & (-7.36) & (-7.39) & (-7.43)\\
+$\log(\text{Age})$ & -0.0113*** & -0.0118*** & -0.0116*** & -0.0125***\\
+ & (-7.56) & (-7.97) & (-7.84) & (-8.21)\\
+Return volatility & -0.0219 & -0.0390 & -0.0225 & -0.0774**\\
+ & (-0.80) & (-1.37) & (-0.78) & (-2.33)\\
+Style flow & 0.1555*** & 0.1448*** & 0.1465*** & 0.1483***\\
+ & (3.47) & (3.23) & (3.31) & (3.28)\\
 \midrule
 Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
-$N$ & 202,779 & 202,779 & 202,779 & 202,779\\
-$R^2$ (within) & 0.032 & 0.033 & 0.033 & 0.033\\
-Joint test ($\chi^2_2$, $p$) & -- & 0.93 (0.629) & 1.82 (0.402) & 11.29 (0.004)\\
-Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=+0.06 (p=0.476) & z=+0.15 (p=0.439) & z=+1.56 (p=0.060)\\
+$N$ & 212,033 & 212,033 & 212,033 & 212,033\\
+$R^2$ (within) & 0.031 & 0.032 & 0.032 & 0.032\\
+Joint test ($\chi^2_2$, $p$) & -- & 2.25 (0.325) & 1.95 (0.378) & 11.33 (0.003)\\
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=-0.02 (p=0.506) & z=+0.25 (p=0.400) & z=+1.54 (p=0.062)\\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{\label{tab:H3_regression}H3: Lottery Demand Hypothesis}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\item Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{	ext{LOW}}$, $R^{	ext{MID}}$, $R^{	ext{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{tablenotes}
+\end{threeparttable}}
 \end{table}

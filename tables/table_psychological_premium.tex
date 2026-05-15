@@ -1,38 +1,28 @@
 \begin{table}[H]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\caption{\label{tab:psychological_premium}Psychological Premium (Shadow Price) Estimates}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
 \begin{tabular}[t]{llrrrr}
 \toprule
 Lottery & Segment & SP$_{\text{low}}$ [SE] & SP$_{\text{high}}$ [SE] & Diff [SE] & $p$ (1-sided)\\
 \midrule
-ActR2 & $R^{\text{LOW}}$ & 0.011 [0.014] & 0.018 [0.025] & 0.007 [0.024] & 0.620\\
-ActR2 & $R^{\text{MID}}$ & 0.024 [0.031] & 0.036 [0.046] & 0.012 [0.044] & 0.604\\
-ActR2 & $R^{\text{HIGH}}$ & 0.005 [0.006] & 0.005 [0.006] & 0.001 [0.007] & 0.534\\
+ActR2 & $R^{	ext{LOW}}$ & 0.016 [0.014] & 0.029 [0.026] & 0.013 [0.025] & 0.694\\
+ActR2 & $R^{	ext{MID}}$ & 0.036 [0.030] & 0.059 [0.047] & 0.023 [0.045] & 0.694\\
+ActR2 & $R^{	ext{HIGH}}$ & 0.007 [0.006] & 0.008 [0.006] & 0.001 [0.006] & 0.580\\
 \midrule
-ActSkew & $R^{\text{LOW}}$ & -0.014 [0.013] & -0.024 [0.031] & -0.011 [0.032] & 0.368\\
-ActSkew & $R^{\text{MID}}$ & -0.031 [0.029] & -0.051 [0.058] & -0.020 [0.061] & 0.372\\
-ActSkew & $R^{\text{HIGH}}$ & -0.006 [0.006] & -0.007 [0.009] & -0.001 [0.010] & 0.441\\
+ActSkew & $R^{	ext{LOW}}$ & -0.013 [0.013] & -0.026 [0.030] & -0.013 [0.031] & 0.335\\
+ActSkew & $R^{	ext{MID}}$ & -0.029 [0.029] & -0.056 [0.057] & -0.027 [0.061] & 0.328\\
+ActSkew & $R^{	ext{HIGH}}$ & -0.006 [0.006] & -0.008 [0.009] & -0.002 [0.010] & 0.405\\
 \midrule
-MAX12 & $R^{\text{LOW}}$ & -0.022 [0.014] & -0.106 [0.054] & -0.084 [0.055] & 0.061\\
-MAX12 & $R^{\text{MID}}$ & -0.048 [0.032] & -0.221 [0.073] & -0.173 [0.078] & 0.013**\\
-MAX12 & $R^{\text{HIGH}}$ & -0.009 [0.006] & -0.031 [0.010] & -0.022 [0.011] & 0.027*\\
+MAX12 & $R^{	ext{LOW}}$ & -0.022 [0.014] & -0.101 [0.050] & -0.079 [0.050] & 0.056\\
+MAX12 & $R^{	ext{MID}}$ & -0.049 [0.031] & -0.219 [0.072] & -0.170 [0.076] & 0.013**\\
+MAX12 & $R^{	ext{HIGH}}$ & -0.009 [0.006] & -0.030 [0.010] & -0.021 [0.011] & 0.030*\\
 \bottomrule
-\end{tabular}%
-}
-\setlength{\tabletempwidth}{\wd\tabletempbox}
-\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
-\begin{minipage}{\tabletempwidth}
-\captionsetup{width=\linewidth}
-\caption{\label{tab:psychological_premium}Psychological Premium (Shadow Price) Estimates}
-\ifdim\wd\tabletempbox>\linewidth
-  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
-\else
-  \usebox{\tabletempbox}
-\fi
-\par\medskip
-\begin{singlespace}\footnotesize\noindent
-Each row is computed from a separate joint regression of the form $\text{flow}=\beta_q R^q + \delta_q R^q D^{\text{SENT}} + \eta\,\text{AS}^z + \phi\,\text{AS}^z D^{\text{SENT}} + \text{controls} + \mu_i$, with $\text{AS}^z$ standardised within sample. Shadow Price units are rank points per standard deviation of the lottery measure. Standard errors via the delta method using the joint coefficient covariance from the underlying regression; clustered two-way on Ticker and yearmo. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. \smallskip \textit{Conversion to alpha basis points.} To express the premium in welfare-relevant units, the rank-to-alpha mapping is calibrated using the equal-weighted Carhart four-factor alpha spread between the top and bottom momentum quintiles of the Active panel (Table~12, $Q5-Q1=2.23\%$ p.a.). With a midpoint-to-midpoint rank distance of $0.8$, this implies approximately 279 basis points of annual Carhart alpha per rank-point. Applying this conversion at the middle rank segment, the MAX12 premium is approximately 14 basis points of annual alpha per standard deviation at low-sentiment regimes ($|\text{SP}_{\text{low}}|\times 279\approx 0.049\times 279$) and approximately 58 basis points per standard deviation at high-sentiment regimes ($|\text{SP}_{\text{high}}|\times 279\approx 0.208\times 279$). The conversion uses Jegadeesh--Titman momentum sorts as the closest available rank-alpha mapping in the dissertation; the within-Lipper-category mapping that drives the H1--H4 panel regressions is conceptually similar but slightly attenuated, so the quoted basis-point figures should be read as orders of magnitude rather than precise estimates. \smallskip Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{singlespace}
-\end{minipage}
+\end{tabular}
+\begin{tablenotes}
+\item Each row is computed from a separate joint regression of the form $\text{flow}=\beta_q R^q + \delta_q R^q D^{	ext{SENT}} + \eta\,\text{AS}^z + \phi\,\text{AS}^z D^{	ext{SENT}} + \text{controls} + \mu_i$, with $\text{AS}^z$ standardised within sample. Shadow Price units are rank points per standard deviation of the lottery measure. Standard errors via the delta method using the joint coefficient covariance from the underlying regression; clustered two-way on Ticker and yearmo. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. \smallskip \textit{Conversion to alpha basis points.} To express the premium in welfare-relevant units, the rank-to-alpha mapping is calibrated using the equal-weighted Carhart four-factor alpha spread between the top and bottom momentum quintiles of the Active panel (Table~12, $Q5-Q1=2.23\%$ p.a.). With a midpoint-to-midpoint rank distance of $0.8$, this implies approximately 279 basis points of annual Carhart alpha per rank-point. Applying this conversion at the middle rank segment, the MAX12 premium is approximately 14 basis points of annual alpha per standard deviation at low-sentiment regimes ($|\text{SP}_{\text{low}}|\times 279\approx 0.049\times 279$) and approximately 58 basis points per standard deviation at high-sentiment regimes ($|\text{SP}_{\text{high}}|\times 279\approx 0.208\times 279$). The conversion uses Jegadeesh--Titman momentum sorts as the closest available rank-alpha mapping in the dissertation; the within-Lipper-category mapping that drives the H1--H4 panel regressions is conceptually similar but slightly attenuated, so the quoted basis-point figures should be read as orders of magnitude rather than precise estimates. \smallskip Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{tablenotes}
+\end{threeparttable}}
 \end{table}

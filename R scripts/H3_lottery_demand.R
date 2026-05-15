@@ -1,14 +1,34 @@
-# H3_lottery_demand.R                                                  v2.1
+# H3_lottery_demand.R                                                  v2.2
 # =============================================================================
+# v2.2 changes vs v2.1 (filter-methodology revision, May 2026):
+#   No code change. flagged_funds.xlsx ledger updated upstream: H3_EXCLUDED
+#   flag retired from "Exclude from H3 Only" (90 funds in Equity Income,
+#   Specialty Diversified, and Specialty/Miscellaneous Lipper categories
+#   rejoin the H3 lottery-demand sample). Rationale: the H3 lottery proxies
+#   used here -- ActR2 (1 - rolling Carhart R^2 per Amihud-Goyenko 2013),
+#   ActSkew (36m rolling skewness of gross returns), and MAX12 (trailing
+#   12-month max gross return) -- are all computed without reference to a
+#   fund-specific size/style benchmark. The original v2.1 motivation for
+#   the H3_EXCLUDED flag was Cremers and Petajisto's (2009) benchmark-
+#   misassignment argument, which applies to the active-share measure but
+#   not to factor-residual or return-moment lottery proxies. The argument
+#   was therefore inappropriately transposed; v2.2 corrects this by
+#   retaining the original-Lipper variation as legitimate sample
+#   heterogeneity. The post-revision !excluded_h3 universe contains
+#   SECTOR_FUND (149, mandate-driven factor orthogonality inflates all
+#   three proxies) and COVERED_CALL_OVERLAY (6, mechanically suppressed
+#   right tail) only.
+#
 # v2.1 changes vs v2.0 (Family E pre-defense audit):
 #   - filter(!excluded_h3) added to the panel-prep stage. Per
 #     data_import_and_cleaning.R Step 8c (flagged_funds.xlsx ledger), H3
-#     lottery-demand identification requires the !excluded_h3 subsample so
-#     that Equity Income / Specialty Diversified / Specialty-Miscellaneous
-#     funds (Lipper categories without unambiguous size-style benchmarks),
-#     sector funds, and covered-call overlays do not contaminate the
-#     activeness/lottery proxies. Mirrors the convention already applied in
-#     activeness_analysis.R v1.2 and activeness_persistence.R v1.1.
+#     lottery-demand identification restricts to the !excluded_h3 subsample.
+#     [Legacy v2.1 note, SUPERSEDED by v2.2: under the original ledger this
+#     also dropped Equity Income, Specialty Diversified, and Specialty/
+#     Miscellaneous funds on Cremers-Petajisto (2009) grounds. v2.2 retires
+#     those categories from the workbook; the !excluded_h3 filter still
+#     fires here, but it now removes sector funds and covered-call overlays
+#     only.]
 #     Requires panel_regressions_setup.R v1.3+, which preserves the
 #     excluded_h3 flag column in panel_reg.
 #   - Sample-source phrasing added to fn_primary, fn_lagged, fn_robust:
