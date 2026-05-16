@@ -91,7 +91,8 @@ MIN_OBS <- 24L
 
 fmt <- function(x, d = 3) {
   ifelse(is.na(x) | is.nan(x), "--",
-         formatC(round(as.numeric(x), d), format = "f", digits = d))
+         formatC(round(as.numeric(x), d), format = "f", digits = d,
+                 big.mark = ","))
 }
 
 wm <- function(x, w) {
@@ -234,7 +235,7 @@ write_tex <- function(s, fn, resize = TRUE, small = FALSE) {
 # Append a note paragraph AFTER \end{longtable} (not inside the body).
 longtable_note <- function(s, note, n_cols) {
   note_para <- paste0(
-    "{\\footnotesize\\noindent\\textit{Note:} ", note, "}\n\n"
+    "{\\footnotesize\\noindent\\textit{Note:} ", note, "}\n\\par\\medskip\n\n"
   )
   parts <- strsplit(s, "\\end{longtable}", fixed = TRUE)[[1]]
   paste0(parts[1], "\\end{longtable}\n", note_para,
@@ -615,7 +616,7 @@ fn_d1 <- paste(
   # Previously \\\\textit produced \\textit in the file, which LaTeX reads as
   # a line-break (\\) followed by literal text "textit{...}" — visible artefact.
   "equal-weighted \\textit{gross} excess return,",
-  "$\\sqrt{12}\\cdot\\overline{r^{EW,g}_{q,t}-r^{f}_{t}}/\\sigma(r^{EW,g}_{q,t}-r^{f}_{t})$.",
+  "$\\sqrt{12}\\cdot\\overline{r^{\\text{EW,g}}_{q,t}-r^{f}_{t}}/\\sigma(r^{\\text{EW,g}}_{q,t}-r^{f}_{t})$.",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
   "performance-comparison subsample per flagged\\_funds.xlsx."
 )

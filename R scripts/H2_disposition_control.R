@@ -409,6 +409,12 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
   tex <- as.character(ktab)
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
   tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
+  # T2.10: inject \setlength{\tabcolsep}{3pt} INSIDE the \resizebox group
+  # so the natural table width is narrower; scale_down compression minimised
+  # (group-scoped, no leakage to surrounding document).
+  tex <- gsub("\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{",
+              "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{\\setlength{\\tabcolsep}{3pt}",
+              tex, fixed = TRUE)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 
@@ -464,7 +470,7 @@ fn_robust <- paste0(
   "effects and do not appear in the table; time-invariant controls (expense ",
   "ratio, load dummy, turnover) are now identified because there is no fund ",
   "FE. Standard errors two-way clustered on Ticker and calendar month ",
-  "(Petersen 2009). The robustness of $\\\\delta^{MD}_1>0$ across both ",
+  "(Petersen 2009). The robustness of $\\\\delta^{\\\\text{MD}}_1>0$ across both ",
   "identification strategies points toward a margin-call alternative ",
   "(Brunnermeier \\\\& Pedersen 2009) rather than disposition psychology. ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",

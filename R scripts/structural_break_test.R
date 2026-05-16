@@ -373,8 +373,7 @@ if (has_breaks) {
                colour = "#C0392B", linetype = "dashed", linewidth = 0.65) +
     geom_text(data = break_label_df,
               aes(x = as.Date(estimate), y = Inf, label = label),
-              colour = "#C0392B", size = 2.8, vjust = 1.5, hjust = -0.08,
-              fontface = "bold")
+              colour = "#C0392B", size = 2.8, vjust = 1.5, hjust = -0.08)
 }
 
 ggsave(OUTPUT_FIG, plot = p_break, width = 8.5, height = 4.8, dpi = 300)

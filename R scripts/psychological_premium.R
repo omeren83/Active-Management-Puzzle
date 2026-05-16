@@ -31,8 +31,8 @@
 #
 # v1.1 changes (May 2026):
 #   - Footnote expanded with alpha-basis-points conversion paragraph for
-#     Table 23. Calibration: EW Carhart alpha Q5-Q1 spread of 2.23% p.a.
-#     across midpoint-to-midpoint rank distance 0.8 = 279 bps per rank-point.
+#     Table 23. Calibration: EW Carhart alpha Q5-Q1 spread of 2.150% p.a.
+#     across midpoint-to-midpoint rank distance 0.8 = 269 bps per rank-point.
 #     Worked example: MAX12 R_MID, low/high sentiment = 14 / 58 bps per SD.
 #     Sourced from Table 12 (Active EW, Momentum); see fn variable below.
 # =============================================================================
@@ -390,15 +390,15 @@ fn <- paste0(
   "in welfare-relevant units, the rank-to-alpha mapping is calibrated ",
   "using the equal-weighted Carhart four-factor alpha spread between the ",
   "top and bottom momentum quintiles of the Active panel (Table~12, ",
-  "$Q5-Q1=2.23\\\\%$ p.a.). With a midpoint-to-midpoint rank distance of ",
-  "$0.8$, this implies approximately 279 basis points of annual Carhart ",
+  "$Q5-Q1=2.150\\\\%$ p.a.). With a midpoint-to-midpoint rank distance of ",
+  "$0.8$, this implies approximately 269 basis points of annual Carhart ",
   "alpha per rank-point. Applying this conversion at the middle rank ",
-  "segment, the MAX12 premium is approximately 14 basis points of annual ",
+  "segment, the MAX12 premium is approximately 13 basis points of annual ",
   "alpha per standard deviation at low-sentiment regimes ",
-  "($|\\\\text{SP}_{\\\\text{low}}|\\\\times 279\\\\approx 0.049\\\\times 279$) ",
-  "and approximately 58 basis points per standard deviation at ",
+  "($|\\\\text{SP}_{\\\\text{low}}|\\\\times 269\\\\approx 0.049\\\\times 269$) ",
+  "and approximately 59 basis points per standard deviation at ",
   "high-sentiment regimes ",
-  "($|\\\\text{SP}_{\\\\text{high}}|\\\\times 279\\\\approx 0.208\\\\times 279$). ",
+  "($|\\\\text{SP}_{\\\\text{high}}|\\\\times 269\\\\approx 0.219\\\\times 269$). ",
   "The conversion uses Jegadeesh--Titman momentum sorts as the closest ",
   "available rank-alpha mapping in the dissertation; the ",
   "within-Lipper-category mapping that drives the H1--H4 panel ",

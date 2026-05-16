@@ -110,15 +110,15 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- FALSE    # data_import + flow_calculation
-RUN_PHASE_B_ALPHA         <- TRUE   # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- TRUE   # alpha_reporting + descriptive_statistics
+RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
+RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
 RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
 RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
 RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
 RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis
 RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
 RUN_PHASE_I_BEHAVIORAL    <- FALSE   # behavioral_state_variables (NEW)
-RUN_PHASE_J_PANEL_REG     <- FALSE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
+RUN_PHASE_J_PANEL_REG     <- TRUE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
 RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
 
 # Phase J sub-toggle: force re-running panel_regressions_setup.R even if
@@ -211,6 +211,92 @@ require_session_object <- function(obj_name, needed_by) {
   }
   TRUE
 }
+
+# =============================================================================
+# PRE-FLIGHT INTEGRITY CHECK
+# Verifies each pipeline script's first content line matches its expected
+# topic. Catches silent corruption like the 15 May 2026 incident, where
+# descriptive_statistics.R content was accidentally saved into
+# aggregate_alphas.R during a copy-paste, producing a clean-looking pipeline
+# run with stale aggregate_alphas.xlsx (Table 4.5, Table F.1, Fig 2 all
+# reported pre-v1.3 numbers).
+#
+# Keyword matching is case-sensitive and uses fixed strings; if a script's
+# header convention changes, update the SCRIPT_INTEGRITY map below.
+# Set RUN_INTEGRITY_CHECK <- FALSE in the config block to disable.
+# =============================================================================
+if (!exists("RUN_INTEGRITY_CHECK")) RUN_INTEGRITY_CHECK <- TRUE
+
+SCRIPT_INTEGRITY <- c(
+  "data_import_and_cleaning.R"    = "FUND DATA IMPORT",
+  "flow_calculation.R"            = "FUND FLOW",
+  "alpha_estimation.R"            = "ALPHA ESTIMATION",
+  "alpha_estimation_robust.R"     = "ROBUSTNESS ALPHA",
+  "aggregate_alphas.R"            = "AGGREGATE PORTFOLIO ALPHAS",
+  "alpha_reporting.R"             = "PERFORMANCE REPORTING",
+  "descriptive_statistics.R"      = "DESCRIPTIVE STATISTICS",
+  "portfolio_sorts.R"             = "PORTFOLIO SORTS",
+  "persistence_testing.R"         = "PERSISTENCE TESTING",
+  "activeness_analysis.R"         = "ACTIVENESS ANALYSIS",
+  "activeness_persistence.R"      = "ACTIVENESS-CONDITIONED PERSISTENCE",
+  "subperiod_analysis.R"          = "SUB-PERIOD ANALYSIS",
+  "structural_break_test.R"       = "STRUCTURAL BREAK",
+  "FF_comparison.R"               = "FAMA-FRENCH",
+  "build_ff_tables_manual.R"      = "MANUAL FF TABLES",
+  "build_robust_tables.R"         = "ROBUST APPENDIX",
+  "build_lipper_category.R"       = "LIPPER CATEGORY",
+  "panel_regressions_setup.R"     = "panel_regressions_setup",
+  "panel_regressions_reporting.R" = "panel_regressions_reporting",
+  "behavioral_state_variables.R"  = "behavioral_state_variables",
+  "H1_sentiment_convexity.R"      = "H1_sentiment_convexity",
+  "H2_disposition_control.R"      = "H2_disposition_control",
+  "H3_lottery_demand.R"           = "H3_lottery_demand",
+  "H4_fee_elasticity.R"           = "H4_fee_elasticity",
+  "psychological_premium.R"       = "psychological_premium"
+)
+
+verify_pipeline_integrity <- function(scripts_dir = SCRIPTS_DIR,
+                                      expected    = SCRIPT_INTEGRITY) {
+  fails   <- character(0)
+  checked <- 0L
+  for (script in names(expected)) {
+    path <- file.path(scripts_dir, script)
+    if (!file.exists(path)) next     # tolerate missing optional scripts
+    checked <- checked + 1L
+    lines <- readLines(path, n = 10, warn = FALSE)
+    # First non-empty, non-border (===) content line.
+    content_lines <- lines[!grepl("^# *=+ *$|^ *$|^# *$", lines)]
+    if (length(content_lines) == 0L) {
+      fails <- c(fails,
+                 sprintf("  %s -> no content header found in first 10 lines", script))
+      next
+    }
+    keyword       <- expected[[script]]
+    first_content <- content_lines[1]
+    if (!grepl(keyword, first_content, fixed = TRUE)) {
+      fails <- c(fails, sprintf(
+        "  %s\n      expected keyword: '%s'\n      found header:     %s",
+        script, keyword, trimws(sub("^# ", "", first_content))
+      ))
+    }
+  }
+  if (length(fails) > 0L) {
+    stop(
+      "\n\n*** PIPELINE INTEGRITY CHECK FAILED ***\n",
+      "The following script(s) have content not matching their expected\n",
+      "purpose. This usually means a file was overwritten with content\n",
+      "from another script (silent clobber, no error at save time).\n",
+      "Fix the file(s) before re-running the pipeline.\n\n",
+      paste(fails, collapse = "\n\n"),
+      "\n"
+    )
+  }
+  cat(sprintf("\n[OK] Pipeline integrity check: %d/%d scripts verified.\n",
+              checked, length(expected)))
+  invisible(TRUE)
+}
+
+if (RUN_INTEGRITY_CHECK) verify_pipeline_integrity()
 
 pipeline_start <- Sys.time()
 

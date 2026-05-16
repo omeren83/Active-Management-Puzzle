@@ -363,6 +363,12 @@ build_h3_table <- function(samp, fe_string, state_var,
   tex <- as.character(ktab)
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
   tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
+  # T2.10: inject \setlength{\tabcolsep}{3pt} INSIDE the \resizebox group
+  # so the natural table width is narrower; scale_down compression minimised
+  # (group-scoped, no leakage to surrounding document).
+  tex <- gsub("\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{",
+              "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{\\setlength{\\tabcolsep}{3pt}",
+              tex, fixed = TRUE)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 

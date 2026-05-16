@@ -241,8 +241,7 @@ e1_rows <- c(
 e1_tex <- c(
   "\\begin{table}[H]",
   "\\centering",
-  "\\caption{Pooled Alpha Comparison Across Factor Models (\\%, Annualised)}",
-  "\\label{tab:alpha_comparison_robust}",
+  "\\caption{Pooled Alpha Comparison Across Factor Models (\\%, Annualised)\\label{tab:alpha_comparison_robust}}",
   "\\begin{threeparttable}",
   "\\begin{tabular}{llrrrrrr}",
   "\\toprule",
@@ -317,8 +316,7 @@ e2_rows <- vapply(seq_len(nrow(bt_car)), make_e2_row, character(1))
 e2_tex <- c(
   "\\begin{table}[H]",
   "\\centering",
-  "\\caption{Bootstrap Percentile Comparison Across Factor Models}",
-  "\\label{tab:bootstrap_comparison_robust}",
+  "\\caption{Bootstrap Percentile Comparison Across Factor Models\\label{tab:bootstrap_comparison_robust}}",
   "\\begin{threeparttable}",
   "\\begin{tabular}{rrrrrrr}",
   "\\toprule",
@@ -410,8 +408,7 @@ e3_rows <- c(
 e3_tex <- c(
   "\\begin{table}[H]",
   "\\centering",
-  "\\caption{BSW (2010) Decomposition Comparison at $\\gamma^* = 0.20$}",
-  "\\label{tab:bsw_comparison_robust}",
+  "\\caption{BSW (2010) Decomposition Comparison at $\\gamma^* = 0.20$\\label{tab:bsw_comparison_robust}}",
   "\\begin{threeparttable}",
   "\\begin{tabular}{lrrrrrr}",
   "\\toprule",

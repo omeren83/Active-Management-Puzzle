@@ -131,7 +131,7 @@ if (!is.null(H2_models)) {
     if (is.null(tt)) next
     state_lbl <- switch(
       key,
-      "t2" = "$D^{MD,Det}$",
+      "t2" = "$D^{\text{MD,Det}}$",
       "t3" = "$D^{\\text{INV-PCR}}$",
       "t4" = "Discriminant"
     )

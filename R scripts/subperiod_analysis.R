@@ -324,6 +324,7 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
     "\\centering\n",
     "\\sbox{\\tabletempbox}{%\n",
     "\\footnotesize\n",
+    "\\setlength{\\tabcolsep}{4pt}%\n",   # T2.10: tighter column padding inside sbox; reduces natural width below \linewidth so \resizebox is rarely triggered
     tabular, "%\n",
     "}\n",
     "\\setlength{\\tabletempwidth}{\\wd\\tabletempbox}\n",
@@ -894,9 +895,9 @@ fn_d3 <- paste(
   "percentile falls below the actual value; values below 5\\\\% at lower",
   "percentiles indicate underperformance unlikely to be explained by luck alone.",
   "Newey-West standard errors with a 6-month lag are used throughout.",
-  paste0("Active fund counts: P1 $N = ", n_active_bs_vec[1],
-         "$; P2 $N = ", n_active_bs_vec[2],
-         "$; P3 $N = ", n_active_bs_vec[3], "$."),
+  paste0("Active fund counts: P1 $N = ", formatC(n_active_bs_vec[1], format = "d", big.mark = ","),
+         "$; P2 $N = ", formatC(n_active_bs_vec[2], format = "d", big.mark = ","),
+         "$; P3 $N = ", formatC(n_active_bs_vec[3], format = "d", big.mark = ","), "$."),
   "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
@@ -954,7 +955,7 @@ pi0_data <- data.frame(
     paste0(r$label, " (", r$window, ")")),
   Estimate       = sapply(results, function(r)
     paste0(formatC(r$pi_0 * 100, format = "f", digits = 1), "\\%")),
-  N              = sapply(results, function(r) as.character(r$pi_0_n)),
+  N              = sapply(results, function(r) formatC(r$pi_0_n, format = "d", big.mark = ",")),
   Lambda         = formatC(LAMBDA_STOREY, format = "f", digits = 1),
   Interpretation = sapply(results, function(r) interp_pi0(r$pi_0)),
   stringsAsFactors = FALSE

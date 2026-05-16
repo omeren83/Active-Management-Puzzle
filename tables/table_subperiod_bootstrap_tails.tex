@@ -2,6 +2,7 @@
 \centering
 \sbox{\tabletempbox}{%
 \footnotesize
+\setlength{\tabcolsep}{4pt}%
 \begin{tabular}[t]{rrrr>{\raggedright\arraybackslash}p{13em}}
 \toprule
 Percentile & Actual $t(\hat{\alpha})$ & Sim.\ Mean & Prob.\ Luck & Interpretation\\
@@ -47,7 +48,7 @@ Percentile & Actual $t(\hat{\alpha})$ & Sim.\ Mean & Prob.\ Luck & Interpretatio
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Bootstrap procedure follows \textcite{FamaFrench2010}, applied separately within each sub-period. For each fund, estimated monthly alpha is subtracted from the excess return series to construct a zero-alpha null return. In each of $B = 10{,}000$ bootstrap iterations, calendar months (within the sub-period window) are resampled with replacement, preserving cross-sectional factor return dependence. The \textcite{Carhart1997} four-factor model is re-estimated on each resampled series. \textit{Actual} $t(\hat{\alpha})$: percentile of the empirical $t$-statistic distribution across active funds in the sub-period. \textit{Sim.\ Mean}: average of that percentile across all iterations. \textit{Prob.\ Luck}: fraction of iterations in which the simulated percentile falls below the actual value; values below 5\% at lower percentiles indicate underperformance unlikely to be explained by luck alone. Newey-West standard errors with a 6-month lag are used throughout. Active fund counts: P1 $N = 762$; P2 $N = 1100$; P3 $N = 1798$. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+Bootstrap procedure follows \textcite{FamaFrench2010}, applied separately within each sub-period. For each fund, estimated monthly alpha is subtracted from the excess return series to construct a zero-alpha null return. In each of $B = 10{,}000$ bootstrap iterations, calendar months (within the sub-period window) are resampled with replacement, preserving cross-sectional factor return dependence. The \textcite{Carhart1997} four-factor model is re-estimated on each resampled series. \textit{Actual} $t(\hat{\alpha})$: percentile of the empirical $t$-statistic distribution across active funds in the sub-period. \textit{Sim.\ Mean}: average of that percentile across all iterations. \textit{Prob.\ Luck}: fraction of iterations in which the simulated percentile falls below the actual value; values below 5\% at lower percentiles indicate underperformance unlikely to be explained by luck alone. Newey-West standard errors with a 6-month lag are used throughout. Active fund counts: P1 $N = 762$; P2 $N = 1,100$; P3 $N = 1,798$. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

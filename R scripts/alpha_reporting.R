@@ -321,7 +321,8 @@ longtable_note_after <- function(s, note) {
     "\\end{longtable}\n",
     "\\begin{minipage}{0.92\\linewidth}\n",
     "\\footnotesize\\textit{Note:} ", note, "\n",
-    "\\end{minipage}\n"
+    "\\end{minipage}\n",
+    "\\par\\medskip\n"
   )
   sub("\\end{longtable}", replacement, s, fixed = TRUE)
 }
@@ -754,7 +755,7 @@ pi0_str <- paste0(formatC(pi_0_val * 100, format = "f", digits = 1), "\\\\%")
 pi0_table <- data.frame(
   Metric         = "$\\hat{\\pi}_0$: Proportion of True Zero-Alpha Active Funds",
   Estimate       = pi0_pct,
-  N_Funds        = as.character(total_n),
+  N_Funds        = formatC(total_n, format = "d", big.mark = ","),
   Lambda         = formatC(lambda, format = "f", digits = 1),
   Interpretation = interp
 )
@@ -772,7 +773,7 @@ fn_t10 <- paste(
   "Funds with p-values exceeding $\\\\lambda$ are unlikely to have non-zero true alpha;",
   "the density of p-values in $(\\\\lambda, 1]$ provides a conservative estimate",
   "of the zero-alpha proportion, bounded above at 1.",
-  paste0("Sample: actively managed funds ($N = ", total_n, "$),"),
+  paste0("Sample: actively managed funds ($N = ", formatC(total_n, format = "d", big.mark = ","), "$),"),
   "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx.",
   "Passive and Unknown-classified funds are excluded.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
@@ -873,7 +874,7 @@ fn_t10b <- paste(
   "The Storey estimator is conservative: it overestimates $\\\\hat{\\\\pi}_0$",
   "when truly skilled funds exist, so $T^+_\\\\gamma$ values are lower bounds.",
   "All quantities are percentages of the active-fund universe.",
-  paste0("Sample: $N = ", total_n, "$ actively managed funds,"),
+  paste0("Sample: $N = ", formatC(total_n, format = "d", big.mark = ","), "$ actively managed funds,"),
   "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx; Passive and Unknown funds excluded."
 )
 

@@ -157,7 +157,7 @@ fmt_p <- function(p) {
 # Append \textit{Notes:} paragraph after \end{longtable}
 longtable_note <- function(s, note) {
   note_para <- paste0(
-    "{\\footnotesize\\noindent\\textit{Notes:} ", note, "}\n\n"
+    "{\\footnotesize\\noindent\\textit{Notes:} ", note, "}\n\\par\\medskip\n\n"
   )
   parts <- strsplit(s, "\\end{longtable}", fixed = TRUE)[[1]]
   paste0(parts[1], "\\end{longtable}\n", note_para,

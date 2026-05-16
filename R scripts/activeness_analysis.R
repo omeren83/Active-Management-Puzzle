@@ -148,7 +148,8 @@ FULLPER_FILE  <- "alpha_fullperiod.xlsx"
 
 fmt <- function(x, d = 3) {
   ifelse(is.na(x) | is.nan(x), "--",
-         formatC(round(as.numeric(x), d), format = "f", digits = d))
+         formatC(round(as.numeric(x), d), format = "f", digits = d,
+                 big.mark = ","))
 }
 
 # Weighted mean with NA handling
@@ -289,7 +290,7 @@ write_tex <- function(s, fn, resize = TRUE, small = FALSE) {
 # Footnote paragraph after \end{longtable} - identical to portfolio_sorts.R
 longtable_note <- function(s, note, n_cols) {
   note_para <- paste0(
-    "{\\footnotesize\\noindent\\textit{Note:} ", note, "}\n\n"
+    "{\\footnotesize\\noindent\\textit{Note:} ", note, "}\n\\par\\medskip\n\n"
   )
   parts <- strsplit(s, "\\end{longtable}", fixed = TRUE)[[1]]
   paste0(parts[1], "\\end{longtable}\n", note_para,
@@ -1171,8 +1172,8 @@ fn_mr <- paste(
   "recentered by subtracting its full-sample Carhart alpha, imposing",
   "$\\\\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern",
   "when the corresponding p-value is small.",
-  "$\\\\alpha_{Q1}$, $\\\\alpha_{Q5}$, and",
-  "$\\\\alpha_{Q5}-\\\\alpha_{Q1}$ are annualised Carhart alphas (\\\\%).",
+  "$\\\\alpha_{\\\\text{Q1}}$, $\\\\alpha_{\\\\text{Q5}}$, and",
+  "$\\\\alpha_{\\\\text{Q5}}-\\\\alpha_{\\\\text{Q1}}$ are annualised Carhart alphas (\\\\%).",
   "$J_{\\\\uparrow}$ and $J_{\\\\downarrow}$ are reported in annualised \\\\%",
   "terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\\\\%,",
   "5\\\\%, 1\\\\%. Implementation follows the recentering procedure of",
@@ -1192,9 +1193,9 @@ mr_kable <- mr_display_no_sort %>%
     caption   = "Patton-Timmermann Monotonic Relation Test for Activeness Quintile Alphas",
     label     = "activeness_monotonicity",
     col.names = c("Panel",
-                  "$\\alpha_{Q1}$",
-                  "$\\alpha_{Q5}$",
-                  "$\\alpha_{Q5}-\\alpha_{Q1}$",
+                  "$\\alpha_{\\text{Q1}}$",
+                  "$\\alpha_{\\text{Q5}}$",
+                  "$\\alpha_{\\text{Q5}}-\\alpha_{\\text{Q1}}$",
                   "$J_{\\uparrow}$",
                   "$p_{\\uparrow}$",
                   "$J_{\\downarrow}$",

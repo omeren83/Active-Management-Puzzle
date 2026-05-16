@@ -118,7 +118,7 @@
 % Math-Roman font correction.
 %
 % Problem (chunk 5.A residual, R1 in master log):
-%   With unicode-math + STIX Two Math, the macro \mathrm{...} dispatches to
+%   With unicode-math + STIX Two Math, the macro \text{...} dispatches to
 %   \symrm{...}, which renders using STIX Two Math's Roman alphabet. That
 %   alphabet is visibly HEAVIER than the surrounding Times New Roman text font,
 %   producing the "subscripts look bold" perception flagged across the List of
@@ -126,15 +126,15 @@
 %   155, 180, and 41 enumerated tables.
 %
 % Fix:
-%   Globally redefine \mathrm{...} to expand to \text{...}. The \text{} macro
+%   Globally redefine \text{...} to expand to \text{...}. The \text{} macro
 %   switches to the surrounding text font (Times New Roman) at the math size,
 %   producing the same upright Roman glyphs the rest of the thesis uses.
 %
 % Effect:
-%   - Existing \mathrm{MKT}, \mathrm{SMB}, \mathrm{HML}, \mathrm{MOM},
-%     \mathrm{LOW}, \mathrm{MID}, \mathrm{HIGH}, \mathrm{SENT}, \mathrm{AAII},
-%     \mathrm{MD,Det}, \mathrm{INV-PCR}, \mathrm{TNA}, \mathrm{Flow},
-%     \mathrm{Age}, \mathrm{sd}, \mathrm{gross}, \mathrm{net}, etc. all
+%   - Existing \text{MKT}, \text{SMB}, \text{HML}, \text{MOM},
+%     \text{LOW}, \text{MID}, \text{HIGH}, \text{SENT}, \text{AAII},
+%     \text{MD,Det}, \text{INV-PCR}, \text{TNA}, \text{Flow},
+%     \text{Age}, \text{sd}, \text{gross}, \text{net}, etc. all
 %     render in Times Roman, matching surrounding text.
 %   - Tables that already use \text{...} are unaffected.
 %   - Operator names emitted via \operatorname{} and \DeclareMathOperator{}
@@ -332,6 +332,22 @@
 \renewcommand{\TPTminimum}{\linewidth}
 \usepackage{makecell}
 \usepackage{colortbl}
+
+% ---- Widow / orphan / page-break control (SBE §14 non-acceptance triggers) --
+% \widowpenalty: penalty for orphan line at top of page (last line of paragraph
+% rendered alone above the next page). \clubpenalty: penalty for widow line at
+% bottom of page (first line of paragraph rendered alone below the previous
+% page break). 10000 is the maximum LaTeX honours; both prevent the SBE §14
+% rejection-grade single-line-at-page-edge defects.
+\widowpenalty=10000
+\clubpenalty=10000
+
+% \needspace: reserve a minimum amount of vertical space before a section
+% heading, forcing a page break if insufficient. Used to guard against
+% sub-heading orphans (heading alone at page bottom with one body line, then
+% break) per SBE §14. Applied at \section{Data sources and sample construction}
+% in Chapter 3.
+\usepackage{needspace}
 
 % SBE caption-width fix (Phase 2.2 — comprehensive consistency pass):
 % Every floating table is wrapped uniformly in
@@ -632,19 +648,21 @@ has been approved by:
 
 \vspace{0.5in}
 
+\noindent Assoc.\ Prof.\ Ali Coşkun \hfill \underline{\hspace{3in}}
+
+\vspace{0.5in}
+
 \noindent Assoc.\ Prof.\ Cenk Cevat Karahan \hfill \underline{\hspace{3in}}
 
 \vspace{0.5in}
 
+\noindent Assist.\ Prof.\ Emrah Ahi \hfill \underline{\hspace{3in}}
+
+\noindent (External Member)
+
+\vspace{0.5in}
+
 \noindent Assist.\ Prof.\ Han Özsöylev \hfill \underline{\hspace{3in}}
-
-\vspace{0.5in}
-
-\noindent [Committee Member 4 --- Title and Full Name] \hfill \underline{\hspace{3in}}
-
-\vspace{0.5in}
-
-\noindent [External Member 5 --- Title and Full Name] \hfill \underline{\hspace{3in}}
 
 \noindent (External Member)
 
@@ -713,12 +731,12 @@ attributes and benchmark total-return series from the Department's LSEG
 Workspace subscription. Performance is estimated using the
 \textcite{Carhart1997} four-factor model with Newey--West heteroskedasticity-
 and autocorrelation-consistent standard errors. The pooled equal-weighted net
-alpha for active funds is $-1.24\%$ per annum (significant at 1\%); the
-value-weighted analogue is $-0.86\%$, smaller in absolute terms and consistent
+alpha for active funds is $-1.361\%$ per annum (significant at 1\%); the
+value-weighted analogue is $-0.900\%$, smaller in absolute terms and consistent
 with the rational equilibrium prediction. The \textcite{FamaFrench2010}
 calendar-month bootstrap rejects the zero-skill null in the left tail at all
 percentiles below the median; the \textcite{BarrasScailletWermers2010}
-false-discovery decomposition implies a 78.0\% population mass of zero-alpha
+false-discovery decomposition implies a 77.8\% population mass of zero-alpha
 funds, 21.1\% genuinely unskilled, and no detectable genuinely skilled mass.
 A \textcite{Bai1998,Bai2003} structural break test identifies a regime shift
 in September 2011 after which alpha generation collapses. Four behavioral
@@ -759,15 +777,15 @@ kapsayan bir panel kullanılmıştır. Fon düzeyindeki zaman serileri Boğaziç
 Workspace aboneliğinden elde edilmiştir. Performans, Newey--West
 otokorelasyon-tutarlı standart hatalarıyla \textcite{Carhart1997} dört faktör
 modeli kullanılarak tahmin edilmiştir. Aktif fonların eşit ağırlıklı net
-alfası yıllık $-1.24\%$ (\%1 düzeyinde anlamlı); değer ağırlıklı analoğu
-$-0.86\%$ olup, mutlak değerce daha küçük ve rasyonel denge öngörüsüyle
+alfası yıllık $-1.361\%$ (\%1 düzeyinde anlamlı); değer ağırlıklı analoğu
+$-0.900\%$ olup, mutlak değerce daha küçük ve rasyonel denge öngörüsüyle
 tutarlıdır. \textcite{FamaFrench2010} takvim ayı bootstrap'ı, sıfır beceri
 boş hipotezini sol kuyrukta medyan altındaki tüm yüzdelik dilimlerde
 reddetmektedir; \textcite{BarrasScailletWermers2010} yanlış keşif
-ayrıştırması, fonların \%78.0'unun sıfır alfa, \%21.1'ünün gerçekten
+ayrıştırması, fonların \%77.8'unun sıfır alfa, \%21.1'ünün gerçekten
 beceriksiz olduğunu, anlamlı pozitif kuyrukta ise tespit edilebilir gerçek
 beceri kütlesinin bulunmadığını göstermektedir. \textcite{Bai1998,Bai2003}
-yapısal kırılma testi Kasım 2011'de, alfa üretiminin çöktüğü bir rejim
+yapısal kırılma testi Eylül 2011'de, alfa üretiminin çöktüğü bir rejim
 değişimini saptamıştır. Dört davranışsal hipotez test edilmiştir. Yatırımcı
 duyarlılığı, kontrol yanılsaması ile ilişkili kredili mevduat rejimleri ve
 çekiliş tercihi (12 aylık azami aylık getiri ile vekâleten ölçülmüştür)
@@ -831,10 +849,10 @@ critical attention of my thesis advisor, Prof.\ Vedat Akgiray. He has the rare
 capacity to push a draft towards the question that actually matters and to do
 so without ever displacing the student's own argument; the empirical core of
 this work is materially better for it. I am grateful to my committee members,
-Prof.\ Han Özsöylev and Assoc.\ Prof.\ Cenk Cevat Karahan, whose readings
+Assist.\ Prof.\ Han Özsöylev and Assoc.\ Prof.\ Cenk Cevat Karahan, whose readings
 sharpened both the behavioral interpretation in Chapter 5 and the
 econometric specification of the panel regressions. Particular thanks are
-owed to Prof.\ Özsöylev for raising the factor-model question that became
+owed to Assist.\ Prof.\ Özsöylev for raising the factor-model question that became
 Appendix~I; the dissertation is more honest for having had to answer it.
 
 The Department of Management at Boğaziçi University provided the Bloomberg
@@ -875,8 +893,13 @@ omitted per SBE.]}
 \clearpage
 
 % --- List of Figures ---------------------------------------------------------
-\listoffigures
-\clearpage
+% T3.3: SBE Part 4 (p.24) only requires a List of Figures when the document
+% contains five or more figures. The present manuscript contains four figures
+% (4.1, 4.2, 4.3, H.1), below the inclusion threshold. The List of Figures is
+% therefore suppressed per SBE convention. Restore by uncommenting if a fifth
+% figure is added in a later revision.
+% \listoffigures
+% \clearpage
 
 % --- Abbreviations -----------------------------------------------------------
 % SBE Part 4 page-order table (p.24): "ABBREVIATIONS" (not "List of Abbreviations").
@@ -957,28 +980,28 @@ $F_\gamma$                      & Expected false-discovery fraction per tail: $\
 $\gamma^*$                      & Main-text significance threshold; $\gamma^* = 0.20$ \\
 $\lambda$                       & Storey tuning parameter; $\lambda = 0.5$ \\
 $B$                             & Bootstrap iteration count; $B = 10{,}000$ \\
-$\mathrm{MKT}-\mathrm{Rf}$      & Market excess return factor \\
-$\mathrm{SMB}$                  & Small minus big (size) factor \\
-$\mathrm{HML}$                  & High minus low (value) factor \\
-$\mathrm{MOM}$                  & Momentum factor \\
-$\mathrm{RMW}$                  & Robust minus weak (profitability) factor \\
-$\mathrm{CMA}$                  & Conservative minus aggressive (investment) factor \\
-$\mathrm{LIQ}_V$                & Pástor--Stambaugh traded liquidity factor \\
+$\text{MKT}-\text{Rf}$      & Market excess return factor \\
+$\text{SMB}$                  & Small minus big (size) factor \\
+$\text{HML}$                  & High minus low (value) factor \\
+$\text{MOM}$                  & Momentum factor \\
+$\text{RMW}$                  & Robust minus weak (profitability) factor \\
+$\text{CMA}$                  & Conservative minus aggressive (investment) factor \\
+$\text{LIQ}_V$                & Pástor--Stambaugh traded liquidity factor \\
 $R^2$                           & Coefficient of determination \\
 $1-R^2$                         & Idiosyncratic variance share (activeness proxy) \\
-$\mathrm{TE}_i$                 & Annualised tracking error of fund $i$ \\
-$D^{\mathrm{SENT}}$             & Baker--Wurgler high-sentiment regime indicator \\
-$\mathrm{SENT}^{\perp}$         & Orthogonalised Baker--Wurgler sentiment index \\
-$D^{\mathrm{AAII}}$             & AAII bull--bear regime indicator \\
-$D^{\mathrm{MD,Det}}$           & Detrended margin-debt regime indicator \\
-$D^{\mathrm{INV\text{-}PCR}}$   & Inverse put--call ratio regime indicator \\
-$R^{\mathrm{LOW}}_{i,t}$        & Sirri--Tufano fractional rank, low segment \\
-$R^{\mathrm{MID}}_{i,t}$        & Sirri--Tufano fractional rank, mid segment \\
-$R^{\mathrm{HIGH}}_{i,t}$       & Sirri--Tufano fractional rank, high segment \\
+$\text{TE}_i$                 & Annualised tracking error of fund $i$ \\
+$D^{\text{SENT}}$             & Baker--Wurgler high-sentiment regime indicator \\
+$\text{SENT}^{\perp}$         & Orthogonalised Baker--Wurgler sentiment index \\
+$D^{\text{AAII}}$             & AAII bull--bear regime indicator \\
+$D^{\text{MD,Det}}$           & Detrended margin-debt regime indicator \\
+$D^{\text{INV\text{-}PCR}}$   & Inverse put--call ratio regime indicator \\
+$R^{\text{LOW}}_{i,t}$        & Sirri--Tufano fractional rank, low segment \\
+$R^{\text{MID}}_{i,t}$        & Sirri--Tufano fractional rank, mid segment \\
+$R^{\text{HIGH}}_{i,t}$       & Sirri--Tufano fractional rank, high segment \\
 $\delta_q$                      & Sentiment $\times$ rank-segment interaction (segment $q$) \\
-$\mathrm{ActR2}_i$              & Time-series mean of $1-R^2$ for fund $i$ \\
-$\mathrm{ActSkew}_i$            & Sample skewness of trailing 36 monthly gross returns \\
-$\mathrm{MAX12}_i$              & Maximum monthly gross return over trailing 12 months \\
+$\text{ActR2}_i$              & Time-series mean of $1-R^2$ for fund $i$ \\
+$\text{ActSkew}_i$            & Sample skewness of trailing 36 monthly gross returns \\
+$\text{MAX12}_i$              & Maximum monthly gross return over trailing 12 months \\
 \end{longtable}
 
 \clearpage
@@ -1022,12 +1045,12 @@ direction. This is the fact most often documented in the empirical
 literature. The second, less often emphasised, is that the puzzle's location
 in the cross-section is asymmetric. When fund returns are aggregated into a
 single value-weighted portfolio, the resulting net alpha is small in
-magnitude --- in the present sample, $-0.86\%$ per annum, statistically
+magnitude --- in the present sample, $-0.900\%$ per annum, statistically
 significant at the 5\% level but economically modest --- because the
 capital-weighted distribution is dominated by a handful of large, low-cost,
 moderately-active funds whose alpha lies near zero. When fund returns are
 aggregated equal-weighted, by contrast, the resulting net alpha is
-$-1.24\%$ per annum, materially worse and statistically significant at 1\%.
+$-1.361\%$ per annum, materially worse and statistically significant at 1\%.
 The gap between the value-weighted and equal-weighted alphas thus locates
 the puzzle: it lives in the cross-sectional heterogeneity, not in the
 representative dollar invested. This locational fact will play a central
@@ -1149,7 +1172,7 @@ from a persistently negative regime ($\bar{\alpha} = -1.39\%$ per annum,
 October 2011--January 2026). The post-break regime is characterised by a
 collapse in the Storey $\hat{\pi}_0$ estimate from approximately 81\% to
 60.8\% and a corresponding rise in the genuinely unskilled mass
-$T^-_{\gamma^*}$ from approximately 11\% to 35.5\% --- the strongest single piece
+$T^-_{\gamma^*}$ from approximately 11\% to 35.4\% --- the strongest single piece
 of regime-specific evidence in the dissertation.
 
 Third, the dissertation introduces a unified four-hypothesis behavioral
@@ -1168,10 +1191,10 @@ which the marginal rate of substitution between performance rank and the
 lottery proxy implied by the flow indifference condition is converted into
 welfare-relevant alpha basis points using the momentum-quintile
 rank-to-alpha mapping documented in Section~\ref{sec:portfolio_sorts}. The
-implied premium for the maximum-return lottery proxy is approximately 14
+implied premium for the maximum-return lottery proxy is approximately 13
 basis points of annual alpha per standard deviation under low-sentiment
-regimes and approximately 58 basis points under high-sentiment regimes ---
-a 4.2-fold amplification consistent with the
+regimes and approximately 59 basis points under high-sentiment regimes ---
+a 4.5-fold amplification consistent with the
 \textcite{BakerWurgler2006,BakerWurgler2007} sentiment-modulation channel.
 
 \section{Structure of the dissertation}
@@ -1630,6 +1653,7 @@ in Appendix~\ref{app:data_cleaning}; this chapter focuses on the
 methodological choices that drive the empirical results in the chapters
 that follow.
 
+\needspace{4\baselineskip}
 \section{Data sources and sample construction}
 \label{sec:data_sources}
 
@@ -1762,19 +1786,19 @@ score 1 (default placeholder).
 \label{sec:public_data}
 
 \noindent Factor returns are drawn from Kenneth French's data library:
-the market excess return ($\mathrm{MKT} - \mathrm{Rf}$), the small-minus-big
-size factor ($\mathrm{SMB}$), the high-minus-low value factor
-($\mathrm{HML}$), the robust-minus-weak profitability factor
-($\mathrm{RMW}$), the conservative-minus-aggressive investment factor
-($\mathrm{CMA}$), and the momentum factor ($\mathrm{MOM}$). The Carhart
+the market excess return ($\text{MKT} - \text{Rf}$), the small-minus-big
+size factor ($\text{SMB}$), the high-minus-low value factor
+($\text{HML}$), the robust-minus-weak profitability factor
+($\text{RMW}$), the conservative-minus-aggressive investment factor
+($\text{CMA}$), and the momentum factor ($\text{MOM}$). The Carhart
 four-factor specification used in the main analysis combines
-$\mathrm{MKT} - \mathrm{Rf}$, $\mathrm{SMB}$, $\mathrm{HML}$, and
-$\mathrm{MOM}$. The Fama--French six-factor specification used in the
-robustness analysis of Appendix~\ref{app:robustness} adds $\mathrm{RMW}$
-and $\mathrm{CMA}$. The Carhart\,$+$\,Pástor--Stambaugh liquidity
-specification adds the traded liquidity factor $\mathrm{LIQ}_V$ from the
+$\text{MKT} - \text{Rf}$, $\text{SMB}$, $\text{HML}$, and
+$\text{MOM}$. The Fama--French six-factor specification used in the
+robustness analysis of Appendix~\ref{app:robustness} adds $\text{RMW}$
+and $\text{CMA}$. The Carhart\,$+$\,Pástor--Stambaugh liquidity
+specification adds the traded liquidity factor $\text{LIQ}_V$ from the
 Pástor--Stambaugh data series at the University of Chicago Booth
-repository \parencite{PastorStambaugh2003}. The $\mathrm{LIQ}_V$ series
+repository \parencite{PastorStambaugh2003}. The $\text{LIQ}_V$ series
 extends through December 2024 in its current release; the
 Carhart\,$+$\,PSL specification is therefore estimated on a slightly
 shorter window than the Carhart and FF6 specifications. The
@@ -1848,14 +1872,15 @@ descriptive statistics of Section~\ref{sec:descriptive} for completeness.
 reinvestment but is published gross of fees at the share-class
 level, in the convention adopted by most non-CRSP databases. Monthly
 gross returns are computed as
-$r^{\mathrm{gross}}_{i,t} = \mathrm{Index}_{i,t} / \mathrm{Index}_{i,t-1} - 1$
+$r^{\text{gross}}_{i,t} = \text{Index}_{i,t} / \text{Index}_{i,t-1} - 1$
 from the cleaned and frozen-tail-trimmed gross total-return index
 series. Net returns are derived from the gross series by subtracting
 one-twelfth of the static annual expense ratio per month, following
 the convention adopted by \textcite{BarrasScailletWermers2010}:
-\[
-r^{\mathrm{net}}_{i,t} = r^{\mathrm{gross}}_{i,t} - \mathrm{ExpenseRatio}_i / 12.
-\]
+\begin{equation}
+\label{eq:net_return}
+r^{\text{net}}_{i,t} = r^{\text{gross}}_{i,t} - \text{ExpenseRatio}_i / 12.
+\end{equation}
 This convention is the opposite direction to the CRSP-based pipeline of
 \textcite{FamaFrench2010}, where the database supplies net returns and
 gross returns are constructed by adding back the realised expense.
@@ -1875,8 +1900,8 @@ factor model regressions of Section~\ref{sec:alpha_estimation}, which
 isolates managerial skill before fees and avoids contamination of the
 gross-alpha estimate by fee variation.
 
-The unwinsorised raw return series ($r^{\mathrm{gross,raw}}$,
-$r^{\mathrm{net,raw}}$) are retained on the panel alongside the
+The unwinsorised raw return series ($r^{\text{gross,raw}}$,
+$r^{\text{net,raw}}$) are retained on the panel alongside the
 winsorised series for use in the construction of the proportional fund
 flow variable described in Section~\ref{sec:flow_calculation}; the
 Sirri--Tufano flow identity is an accounting relationship that becomes
@@ -1896,7 +1921,7 @@ four-factor regression on monthly gross excess returns:
 %   Inside \section{Alpha estimation: The Carhart four-factor model}
 %   The block currently starts with:
 %     \begin{equation}
-%       r^g_{i,t} - r^f_t = \alpha_i + \beta^{\mathrm{MKT}}_i ...
+%       r^g_{i,t} - r^f_t = \alpha_i + \beta^{\text{MKT}}_i ...
 %       \label{eq:carhart}
 %     \end{equation}
 %
@@ -1953,7 +1978,7 @@ inconsistent estimator of the value-weighted aggregate when fund-level
 $\beta$ heterogeneity is correlated with fund size. Equal-weighted (EW)
 portfolio returns assign weight $1/N_t$ to each fund alive in month $t$;
 value-weighted (VW) portfolio returns assign weight
-$\mathrm{TNA}_{i,t-1} / \sum_j \mathrm{TNA}_{j,t-1}$ to fund $i$ in
+$\text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$ to fund $i$ in
 month $t$, using lagged total net assets to avoid contemporaneous
 endogeneity.
 
@@ -1977,8 +2002,8 @@ the autocorrelation already present in rolling-window estimates.
 \noindent Proportional fund flow is computed at the share-class level
 following \textcite{SirriTufano1998} as
 \begin{equation}
-\mathrm{Flow}_{i,t} = \frac{\mathrm{TNA}_{i,t} - \mathrm{TNA}_{i,t-1}
-\cdot (1 + r^{\mathrm{net}}_{i,t})}{\mathrm{TNA}_{i,t-1}},
+\text{Flow}_{i,t} = \frac{\text{TNA}_{i,t} - \text{TNA}_{i,t-1}
+\cdot (1 + r^{\text{net}}_{i,t})}{\text{TNA}_{i,t-1}},
 \label{eq:flow}
 \end{equation}
 which expresses the percentage growth in total net assets in month $t$
@@ -1986,7 +2011,7 @@ that is not attributable to capital appreciation. The numerator is the
 dollar flow into the fund; division by lagged TNA produces the
 proportional flow expressed as a fraction of the fund's prior-month
 asset base. The construction uses the unwinsorised raw return series
-$r^{\mathrm{net,raw}}$ to preserve the accounting identity; substituting
+$r^{\text{net,raw}}$ to preserve the accounting identity; substituting
 the winsorised series would introduce systematic bias in the months
 where genuine extreme returns occur.
 
@@ -2010,9 +2035,9 @@ year frequency as the cross-sectional rank of the fund's trailing
 12-month gross return within its Lipper category, scaled to lie in
 $[0, 1]$. The piecewise-linear specification of \textcite{SirriTufano1998}
 partitions the rank into three segments,
-$R^{\mathrm{LOW}} = \min(\mathrm{rank}, 0.20)$,
-$R^{\mathrm{MID}} = \min(\max(\mathrm{rank} - 0.20, 0), 0.60)$, and
-$R^{\mathrm{HIGH}} = \max(\mathrm{rank} - 0.80, 0)$, which together sum
+$R^{\text{LOW}} = \min(\text{rank}, 0.20)$,
+$R^{\text{MID}} = \min(\max(\text{rank} - 0.20, 0), 0.60)$, and
+$R^{\text{HIGH}} = \max(\text{rank} - 0.80, 0)$, which together sum
 to the unconditional rank. The piecewise specification permits the
 slope of the flow--rank relationship to differ across the bottom 20\%,
 the middle 60\%, and the top 20\% of fund performance, identifying the
@@ -2123,7 +2148,7 @@ Section~\ref{sec:break_test_results}.
 \label{sec:activeness_methodology}
 
 \noindent Two activeness measures are used in the cross-sectional and
-panel analyses. The primary measure is $\mathrm{ActR2}_i$, defined as
+panel analyses. The primary measure is $\text{ActR2}_i$, defined as
 the time-series mean of $1 - R^2_{i,t}$ from the rolling 36-month
 Carhart regression that produces the rolling alpha series of
 Section~\ref{sec:rolling_alphas}. Following
@@ -2134,9 +2159,10 @@ to the fund's idiosyncratic active deviation from a passive
 factor-mimicking portfolio. The robustness measure is the annualised
 tracking error of fund gross returns against the fund's assigned
 benchmark index,
-\[
-\mathrm{TE}_i = \sqrt{12} \cdot \mathrm{sd}\bigl(r^{\mathrm{gross}}_{i,t} - r_{b(i),t}\bigr),
-\]
+\begin{equation}
+\label{eq:tracking_error}
+\text{TE}_i = \sqrt{12} \cdot \text{sd}\bigl(r^{\text{gross}}_{i,t} - r_{b(i),t}\bigr),
+\end{equation}
 following the interpretation of \textcite{CremersPetajisto2009}. The
 holdings-based Active Share measure of
 \textcite{CremersPetajisto2009} is not constructible from the data
@@ -2174,20 +2200,20 @@ Section~\ref{sec:persistence} and Table~\ref{tab:persistence}.
 \noindent The behavioral state variables used in the H1--H4 panel
 regressions of Chapter~\ref{ch:behavioral} are constructed at monthly
 frequency for the December 1994--December 2023 window of the trimmed
-panel. The Baker--Wurgler sentiment index ($\mathrm{SENT}^{\perp}$ in
+panel. The Baker--Wurgler sentiment index ($\text{SENT}^{\perp}$ in
 the orthogonalised variant) is downloaded from Jeffrey Wurgler's
 website at NYU Stern; the corresponding regime indicator
-$D^{\mathrm{SENT}}_t$ takes value one in the top tercile of the
+$D^{\text{SENT}}_t$ takes value one in the top tercile of the
 orthogonalised sentiment distribution following the
 \textcite{BakerWurgler2007} timing convention. The AAII bull--bear
 spread is downloaded from the AAII member sentiment survey; the
-regime indicator $D^{\mathrm{AAII}}_t$ takes value one in the top
+regime indicator $D^{\text{AAII}}_t$ takes value one in the top
 tercile of the bull-minus-bear spread distribution. The FINRA margin
 debt series is detrended via the Hamilton filter
-\parencite{Hamilton2018}, and the regime indicator $D^{\mathrm{MD,Det}}_t$
+\parencite{Hamilton2018}, and the regime indicator $D^{\text{MD,Det}}_t$
 takes value one in the top tercile of the detrended series. The CBOE
 inverse put--call ratio (1$/$put--call) is the basis for
-$D^{\mathrm{INV\text{-}PCR}}_t$ in the same fashion. Each indicator
+$D^{\text{INV\text{-}PCR}}_t$ in the same fashion. Each indicator
 is constructed contemporaneously with the dependent flow variable,
 following the \textcite{BakerWurgler2007} timing recommendation; the
 robustness check of Appendix~\ref{app:behavioral_robustness} re-estimates
@@ -2215,7 +2241,7 @@ augmented with sentiment-regime interactions:
 %   Inside \subsection{H1: Sentiment-convexity hypothesis} (label
 %   \label{sec:H1_method}). The block currently starts with:
 %     \begin{equation}
-%       \mathrm{Flow}_{i,t} = \beta_{\mathrm{LOW}} R^{\mathrm{LOW}}_{i,t-12} ...
+%       \text{Flow}_{i,t} = \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12} ...
 %       \label{eq:H1}
 %     \end{equation}
 %
@@ -2241,12 +2267,12 @@ augmented with sentiment-regime interactions:
 % =============================================================================
 % END PHASE 3.A PATCH 3
 % =============================================================================
-where $R^q$ is the Sirri--Tufano rank-segment for $q \in \{\mathrm{LOW},
-\mathrm{MID}, \mathrm{HIGH}\}$, the controls $X_{i,t}$ include
-$\log(\mathrm{TNA}_{i,t-1})$, $\log(\mathrm{Age}_{i,t})$, the trailing
+where $R^q$ is the Sirri--Tufano rank-segment for $q \in \{\text{LOW},
+\text{MID}, \text{HIGH}\}$, the controls $X_{i,t}$ include
+$\log(\text{TNA}_{i,t-1})$, $\log(\text{Age}_{i,t})$, the trailing
 36-month return volatility, and the contemporaneous Lipper-category
 average flow, and $\mu_i$ is a fund fixed effect. The auxiliary
-hypothesis is the asymmetry test $\delta_{\mathrm{HIGH}} > \delta_{\mathrm{LOW}}$,
+hypothesis is the asymmetry test $\delta_{\text{HIGH}} > \delta_{\text{LOW}}$,
 expressing the prediction that sentiment amplifies inflows to winners
 more than it amplifies outflows from losers. Standard errors are
 clustered two-way on fund and calendar month
@@ -2257,17 +2283,17 @@ clustered two-way on fund and calendar month
 
 \noindent H2 distinguishes between two competing predictions about the
 loser-segment slope. The disposition / illusion-of-control prediction
-of \textcite{ShefrinStatman1985} is $\delta^{\mathrm{IoC}}_{\mathrm{LOW}} > 0$
+of \textcite{ShefrinStatman1985} is $\delta^{\text{IoC}}_{\text{LOW}} > 0$
 under high margin-debt regimes (a positive interaction coefficient
 indicates that high margin debt amplifies retention of losers, since
-the loser-segment slope $\beta_{\mathrm{LOW}}$ is positive in the
+the loser-segment slope $\beta_{\text{LOW}}$ is positive in the
 benchmark Sirri--Tufano regression). The
 \textcite{BrunnermeierPedersen2009} margin-call alternative predicts
 the opposite sign on the same coefficient: high margin debt should
 amplify forced redemptions of losers, generating
-$\delta^{\mathrm{IoC}}_{\mathrm{LOW}} < 0$. The specification follows
-Equation~\ref{eq:H1} with $D^{\mathrm{MD,Det}}$ in place of
-$D^{\mathrm{SENT}}$. Robustness checks substitute the inverse
+$\delta^{\text{IoC}}_{\text{LOW}} < 0$. The specification follows
+Equation~\ref{eq:H1} with $D^{\text{MD,Det}}$ in place of
+$D^{\text{SENT}}$. Robustness checks substitute the inverse
 put--call ratio regime indicator and a discriminant version that
 includes both indicators jointly.
 
@@ -2277,17 +2303,17 @@ includes both indicators jointly.
 \noindent H3 predicts that high-sentiment regimes amplify investor
 demand for lottery-like funds. The specification regresses flow on
 three candidate lottery proxies, each interacted with the sentiment
-regime indicator: $\mathrm{ActR2}$ (the rational-channel control),
-$\mathrm{ActSkew}$ (sample skewness of trailing 36 monthly gross
-returns, the full-distribution lottery measure), and $\mathrm{MAX12}$
+regime indicator: $\text{ActR2}$ (the rational-channel control),
+$\text{ActSkew}$ (sample skewness of trailing 36 monthly gross
+returns, the full-distribution lottery measure), and $\text{MAX12}$
 (the maximum monthly gross return over the trailing 12 months, the
 right-tail-only measure). Each proxy is standardised within sample
 and lagged one month. The proxy validation procedure that selects
 these three from the four candidates considered is documented in
 Appendix~\ref{app:proxy_validation}. The behavioral prediction is a
 positive interaction between the lottery proxy and the sentiment
-indicator for $\mathrm{ActSkew}$ and $\mathrm{MAX12}$, with the
-expected sign on $\mathrm{ActR2}$ either zero (the rational
+indicator for $\text{ActSkew}$ and $\text{MAX12}$, with the
+expected sign on $\text{ActR2}$ either zero (the rational
 benchmark) or positive (the
 \textcite{AmihudGoyenko2013} alpha-prediction channel).
 
@@ -2302,8 +2328,8 @@ should not depend on fee level: the triple interactions
 $\delta^F$ and $\delta^F_q$ should be jointly zero. The behavioral
 alternative permits heterogeneity in fee sensitivity across rank
 segments; the specification therefore includes the full triple
-interaction structure $R^q_{i,t-12} \times \mathrm{ExpRatio}_i \times
-D^{\mathrm{SENT}}_t$ together with all lower-order terms. The
+interaction structure $R^q_{i,t-12} \times \text{ExpRatio}_i \times
+D^{\text{SENT}}_t$ together with all lower-order terms. The
 specification uses Lipper-category $\times$ year-month fixed effects in
 place of fund fixed effects to absorb both the sentiment main effect
 (which is otherwise collinear with the time-invariant fund effect) and
@@ -2360,30 +2386,33 @@ post-launch window that the Evans (2010) correction excludes.
 \noindent Table~\ref{tab:desc_stats} reports the cross-sectional summary
 statistics of fund characteristics on the incubation-corrected panel.
 The mean monthly gross return for active funds (0.887\%) and passive
-funds (0.695\%) differ materially in the analytical sample, consistent with the
+funds (0.924\%) are similar in the analytical sample, consistent with the
 expectation that gross-of-fee performance differences between active
-and passive managers are small in magnitude. % AUDIT_FLAG: the 19bp gap and direction (active > passive) reflect the residual nature of the post-Step-8c passive sample (N=39); cross-group comparison is no longer meaningful. 
-The mean monthly net return is materially lower for active funds (0.786\%) than for passive
-funds (0.652\%), reflecting the approximately 50-basis-point monthly
-fee differential (active expense ratio 1.08\%, passive 0.58\%). The
+and passive managers are small in magnitude.
+The mean monthly net return is materially lower for active funds (0.787\%) than for passive
+funds (0.882\%), reflecting the approximately 58-basis-point annual
+fee differential (active expense ratio 1.08\%, passive 0.50\%), which
+translates to roughly 5 basis points per month. The
 log total net assets distribution is similar across active and
 passive, with active funds carrying a median of approximately \$107
-million and passive funds a median of approximately \$43 million.
-% AUDIT_FLAG: the active median is approximately unchanged but the passive median collapsed because the post-Step-8c passive residual (N=35--39) excludes the large index funds (PASSIVE_INDEX flag); the narrative below about \$205M passives concentrating flows no longer applies to this subsample.
+million and passive funds a median of approximately \$213 million,
+the latter reflecting the concentration of capital in a small number of
+large index-fund vehicles.
 
 \input{tables/table_desc_stats}
 
 \noindent The proportional flow distribution is centered near zero for
-both groups (active median $-0.33\%$ per month, passive median
-$-0.34\%$ per month), with the cross-sectional standard deviation
+both groups (active median $-0.32\%$ per month, passive median
+$+0.01\%$ per month), with the cross-sectional standard deviation
 above 2\% per month indicating substantial heterogeneity in flow
 experience across funds. The annualised gross Sharpe ratio is similar
 across active and passive (active median 0.525, passive median
-0.176), however the active--passive Sharpe gap inverts in the current
-analytical sample reflecting the small residual passive count
-(N$=28$); pre-fee risk-adjusted performance is materially higher
-on the surviving active universe.
-% AUDIT_FLAG: the original narrative "fees, not pre-fee Sharpe, drive the gap" no longer holds on this sample. 
+0.550): pre-fee risk-adjusted performance is essentially identical on
+the two universes, with the passive cohort marginally ahead. The
+material net-return shortfall of active funds therefore reflects the
+fee differential rather than a gap in gross risk-adjusted skill, a
+pattern consistent with the equilibrium reading of Berk and Green
+(2004).
 The mean cross-sectional moments documented here are higher than in the master panel (reported in
 Appendix~\ref{app:alt_panels}, Table~\ref{tab:desc_stats_master})
 because the Evans 36-month filter disproportionately removes
@@ -2429,10 +2458,10 @@ which is robust to imbalance.
     Average monthly proportional fund flows for actively and passively
     managed domestic-equity mutual funds in the U.S.\ universe. For each
     group, the bold line is the 12-month centred rolling mean of the
-    cross-sectional equal-weighted average of $\mathrm{Flow}_{i,t}$, the
+    cross-sectional equal-weighted average of $\text{Flow}_{i,t}$, the
     \textcite{SirriTufano1998} proportional flow defined as
-    $\mathrm{Flow}_{i,t} = (\mathrm{TNA}_{i,t} - \mathrm{TNA}_{i,t-1}
-    (1+R_{i,t})) / \mathrm{TNA}_{i,t-1}$, scaled by lagged TNA and
+    $\text{Flow}_{i,t} = (\text{TNA}_{i,t} - \text{TNA}_{i,t-1}
+    (1+R_{i,t})) / \text{TNA}_{i,t-1}$, scaled by lagged TNA and
     winsorised at the 1st and 99th percentiles, with December
     observations excluded. The faint line is the raw monthly
     cross-sectional mean. Active funds are shown in dark blue (solid),
@@ -2459,9 +2488,9 @@ Section~\ref{sec:subperiod} identifies in the same time window.
 
 \noindent Table~\ref{tab:perf_aggregate} reports the central
 performance result of the dissertation. The aggregate equal-weighted
-gross Carhart alpha for active funds is $-0.291\%$ per annum
-($t = -0.66$), statistically indistinguishable from zero; the
-value-weighted analogue is $-0.191\%$ ($t = -0.49$), also
+gross Carhart alpha for active funds is $-0.288\%$ per annum
+($t = -0.65$), statistically indistinguishable from zero; the
+value-weighted analogue is $-0.189\%$ ($t = -0.49$), also
 indistinguishable from zero. The active-passive gross-alpha
 differential is therefore small, consistent with the standard
 finding that active and passive managers generate similar
@@ -2470,9 +2499,9 @@ risk-adjusted returns before costs.
 \input{tables/table_perf_aggregate}
 
 \noindent The picture changes when fees are deducted. The aggregate
-equal-weighted net Carhart alpha for active funds is $-1.366\%$ per
-annum ($t = -3.13$, significant at 1\%); the value-weighted analogue
-is $-0.904\%$ per annum ($t = -2.37$, significant at 5\%). Two
+equal-weighted net Carhart alpha for active funds is $-1.361\%$ per
+annum ($t = -3.11$, significant at 1\%); the value-weighted analogue
+is $-0.900\%$ per annum ($t = -2.35$, significant at 5\%). Two
 features of this result merit emphasis. First, the equal-weighted
 estimate is materially worse than the value-weighted estimate, with a
 gap of approximately 46 basis points per annum. The gap quantifies
@@ -2483,7 +2512,7 @@ small underperforming funds drives the equal-weighted mean. This
 pattern is consistent with the \textcite{BerkGreen2004} prediction
 that competitive flow is responsive to expected gross alpha, so that
 size and skill are correlated in equilibrium. Second, the
-value-weighted net alpha of $-0.904\%$ per annum, while statistically
+value-weighted net alpha of $-0.900\%$ per annum, while statistically
 significant, is economically modest --- well within the range of
 estimates reported by \textcite{FamaFrench2010} on their 1984--2006
 sample (where the corresponding figure was approximately $-1\%$
@@ -2494,9 +2523,9 @@ itself informative: it suggests that the rational equilibrium of
 capital-weighted distribution.
 
 The unknown-AM group exhibits materially worse performance than either
-active or passive: equal-weighted net alpha of $-4.850\%$ per annum
-($t = -6.54$, significant at 1\%) and value-weighted net alpha of
-$-4.133\%$ ($t = -3.26$, significant at 1\%). The unknown-AM
+active or passive: equal-weighted net alpha of $-4.844\%$ per annum
+($t = -6.53$, significant at 1\%) and value-weighted net alpha of
+$-4.126\%$ ($t = -3.26$, significant at 1\%). The unknown-AM
 classification corresponds to share classes for which Bloomberg's
 active management flag was not populated; manual inspection of fund
 names confirms that the group consists predominantly of small,
@@ -2595,14 +2624,15 @@ Chapter~\ref{ch:discussion} and Appendix~\ref{app:subperiod}.
 
 \noindent Table~\ref{tab:pi0_estimate} reports the
 \textcite{Storey2002} estimator of the population proportion of
-zero-alpha active funds. On the incubation-corrected panel,
-$\hat{\pi}_0 = 78.0\%$ at the standard tuning parameter $\lambda =
-0.5$. The interpretation is that approximately three quarters of
-active funds in the sample have a true alpha that is statistically
-indistinguishable from zero. The estimate is conservative in the
-\textcite{BarrasScailletWermers2010} sense: it overestimates the true
-zero-alpha proportion when truly skilled funds exist, providing a
-lower bound on the genuinely skilled mass.
+zero-alpha active funds (Equation~\ref{eq:storey}). On the
+incubation-corrected panel, $\hat{\pi}_0 = 77.8\%$ at the standard
+tuning parameter $\lambda = 0.5$. The interpretation is that
+approximately three quarters of active funds in the sample have a
+true alpha that is statistically indistinguishable from zero. The
+estimate is conservative in the \textcite{BarrasScailletWermers2010}
+sense: it overestimates the true zero-alpha proportion when truly
+skilled funds exist, providing a lower bound on the genuinely
+skilled mass.
 
 \input{tables/table_pi0_estimate}
 
@@ -2655,7 +2685,7 @@ main-text threshold $\gamma^* = 0.20$, the observed left-tail
 significance fraction is $S^-_{\gamma^*} = 28.9\%$ and the right-tail
 fraction is $S^+_{\gamma^*} = 5.8\%$. The expected false-discovery
 fraction per tail is $F_{\gamma^*} = \hat{\pi}_0 \cdot \gamma^* / 2 =
-0.780 \cdot 0.10 = 7.8\%$. The genuinely unskilled mass is therefore
+0.778 \cdot 0.10 = 7.8\%$. The genuinely unskilled mass is therefore
 $T^-_{\gamma^*} = 28.9\% - 7.8\% = 21.1\%$, and the genuinely skilled
 mass is $T^+_{\gamma^*} = 5.8\% - 7.8\% = -2.0\%$.
 
@@ -2720,7 +2750,7 @@ in equilibrium net of momentum exposure.
 \input{tables/table_port_mom_alpha}
 
 \noindent Table~\ref{tab:port_mom_alpha} reports the momentum-quintile
-results. The active equal-weighted Q5--Q1 spread is $+2.154\%$ per
+results. The active equal-weighted Q5--Q1 spread is $+2.150\%$ per
 annum, sizable in magnitude. The momentum gradient is monotonically
 increasing across all five quintiles in both equal-weighted and
 value-weighted aggregations, with Q1 consistently the worst performer
@@ -2732,7 +2762,7 @@ with the cross-sectional momentum effect documented by
 value-weighted aggregation, indicating that the effect is not driven
 by small funds.
 
-The Q5--Q1 momentum spread of $+2.154\%$ per annum is used in
+The Q5--Q1 momentum spread of $+2.150\%$ per annum is used in
 Section~\ref{sec:ppf} to calibrate the rank-to-alpha conversion
 underlying the Psychological Premium Framework. With a midpoint-to-midpoint
 rank distance of 0.8 across the five quintiles, the conversion is
@@ -2744,12 +2774,17 @@ welfare-relevant units.
 \input{tables/table_port_fee_alpha}
 
 \noindent Table~\ref{tab:port_fee_alpha} reports the fee-quintile
-results. The active equal-weighted Q5--Q1 spread is $-1.115\%$ per
-annum (significant at 1\%), and the value-weighted spread is similarly
-negative and significant. % AUDIT_FLAG: this is a finding REVERSAL --- the previous narrative claimed a flat gross-fee gradient consistent with BG(2004); the current data show a significantly negative gross-fee gradient that is INCONSISTENT with the simple BG(2004) equilibrium and instead reinforces the activeness/fee/alpha negative correlation documented in Section~\ref{sec:activeness}. The narrative below needs to be reconsidered. 
-On net returns, however, the fee gradient is mechanically negative by construction (high-fee funds carry a larger
-fee deduction), and the implied net Q5--Q1 spread is approximately
-$-1.5\%$ per annum --- the welfare-relevant cost of fee differentials
+results. The active equal-weighted Q5--Q1 spread is $-1.112\%$ per
+annum (significant at 1\%); the value-weighted analogue is $+0.816\%$,
+statistically insignificant. The equal-weighted result is consistent
+with a negative cross-sectional fee--alpha gradient on the
+broad cross-section of small to mid-sized funds, while the
+value-weighted analogue --- dominated by a small number of
+large high-fee active funds with idiosyncratically strong recent
+performance --- carries no statistically detectable sign.
+On net returns, the fee gradient is mechanically negative by construction (high-fee funds carry a larger
+fee deduction), and the implied equal-weighted net Q5--Q1 spread is approximately
+$-1.7\%$ per annum --- the welfare-relevant cost of fee differentials
 to investors who allocate capital across the fee distribution.
 
 \section{Activeness and the cross-section of fund alphas}
@@ -2806,10 +2841,9 @@ factor-model alpha and factor loadings by activeness quintile, where
 activeness is the rolling-window $1-R^2$ measure of
 \textcite{AmihudGoyenko2013}. The headline result is the Q5--Q1
 spread on net alpha: in the equal-weighted Net panel, the spread is
-modestly positive ($+0.093\%$ per annum, statistically insignificant);
+modestly positive ($+0.142\%$ per annum, statistically insignificant);
 in the value-weighted Net panel, the spread is more substantially
-positive ($+1.248\%$ per annum, statistically insignificant).
-% AUDIT_FLAG: this is a finding REVERSAL --- previous narrative claimed negative net-alpha spreads with closet indexers outperforming. Current data show positive (insignificant) spreads with most-active funds (Q5) slightly outperforming closet indexers (Q1) on net. The interpretation must be rewritten: results are now closer to \textcite{AmihudGoyenko2013} positive-gradient prediction (though insignificant) than to the closet-indexer-outperformance narrative.
+positive ($+1.326\%$ per annum, statistically insignificant).
 
 The interpretation that emerges is more nuanced than a simple behavioral
 premium story would predict. High-activeness funds carry both higher fees
@@ -2825,7 +2859,7 @@ that destroys risk-adjusted value.
 
 This negative cross-sectional result does not, however, dissolve the
 broader puzzle. The aggregate equal-weighted active fund still
-underperforms its factor benchmark by $-1.366\%$ per annum net of fees
+underperforms its factor benchmark by $-1.361\%$ per annum net of fees
 (Section~\ref{sec:aggregate_performance}); the BSW decomposition still
 identifies a genuinely unskilled mass of approximately 21\% with no
 detectable skilled mass (Section~\ref{sec:fdr_results}); loser
@@ -2843,15 +2877,19 @@ tail evidence remain materially adverse.
 
 \noindent Table~\ref{tab:activeness_alpha_te} reports the
 corresponding sort using the tracking-error robustness measure. The
-qualitative pattern is similar: the Q5--Q1 net-alpha spread is
-modestly negative, reinforcing the conclusion of the $1-R^2$ sort
-that the most active funds underperform closet indexers net of fees.
-The point estimates differ slightly from those in the $1-R^2$ sort,
-which is expected given the methodological distinction between the
-two measures noted by \textcite{CremersPetajisto2009} (tracking
-error conflates factor exposure with security selection in a way
-that $1-R^2$ does not). The qualitative agreement across the two
-measures is the central robustness finding of this section.
+qualitative pattern is broadly consistent with the $1-R^2$ sort: the
+equal-weighted Q5--Q1 net-alpha spread is small in magnitude
+($+0.432\%$ per annum, statistically insignificant), while the
+value-weighted analogue is materially positive ($+1.937\%$ per annum,
+significant at 5\%) and driven by a small number of high-tracking-error
+funds with strong recent performance. The point estimates differ from
+those of the $1-R^2$ sort, which is expected given the methodological
+distinction between the two measures noted by
+\textcite{CremersPetajisto2009} (tracking error conflates factor
+exposure with security selection in a way that $1-R^2$ does not).
+The qualitative agreement on the equal-weighted result --- a
+statistically indistinguishable activeness premium net of fees --- is
+the central robustness finding of this section.
 
 \input{tables/table_activeness_monotonicity}
 
@@ -2872,18 +2910,19 @@ return series recentered by subtracting its full-sample Carhart
 alpha, imposing $\alpha_q = 0$ for all $q$), and tests whether the
 gradient is monotone in either direction.
 
-For the net-alpha panels, the headline statistic is $p_\downarrow$
-(monotonically decreasing). On the equal-weighted net panel for
-$1-R^2$ activeness, $p_\downarrow$ is small enough to provide direct
-formal support for monotone decreasing alpha across activeness
-quintiles, complementing the Q5--Q1 endpoint difference with
-gradient-level inference. The MR test result locates the negative
-activeness premium in the cross-section: activeness quintiles 2, 3,
-and 4 carry alphas materially worse than Q1 closet indexers, and
-materially better (or equal) to the worst-performing Q5. The
-behavioral implication is reinforced: the cross-sectional evidence
-is consistent with investors paying a premium for activeness across
-the full distribution, not merely at the extremes.
+On the net-alpha panels, the MR test fails to reject the null of no
+monotone gradient for either activeness measure: under $1-R^2$
+activeness, the equal-weighted net $p_\downarrow$ is $0.210$ and the
+value-weighted net $p_\downarrow$ is $0.738$; under tracking-error
+activeness, the equal-weighted net $p_\downarrow$ is $0.950$ and the
+value-weighted net $p_\downarrow$ is $0.991$. None is statistically
+significant at conventional thresholds, and the same is true of the
+$p_\uparrow$ alternatives. The MR test therefore corroborates the
+endpoint evidence: the cross-section of net-of-fee alpha exhibits no
+detectable monotone gradient across the activeness distribution,
+consistent with the Berk--Green equilibrium reading at the
+activeness margin and inconsistent with a simple monotone behavioral
+premium story.
 
 \section{Performance persistence}
 \label{sec:persistence}
@@ -2911,11 +2950,11 @@ test on 36-month formation, 12-month holding non-overlapping
 cohort-period Carhart alphas. The full-sample Panel A documents that
 the bottom decile (D10, lowest formation $t(\hat{\alpha})$) carries a
 holding-period Carhart alpha of $-0.189\%$ per month
-($t = -3.50$, $p < 0.001$ parametric, $p_{LB} = 0.143$ left-tail
+($t = -3.49$, $p < 0.001$ parametric, $p_{LB} = 0.143$ left-tail
 bootstrap), while the top decile (D1, highest formation
 $t(\hat{\alpha})$) carries a holding-period alpha statistically
-indistinguishable from zero ($-0.057\%$, $t = -1.14$). The D1$-$D10
-spread of $0.132\%$ per month ($t = 1.71$) is significant at 10\%
+indistinguishable from zero ($-0.052\%$, $t = -1.06$). The D1$-$D10
+spread of $0.136\%$ per month ($t = 1.79$) is significant at 10\%
 parametrically and reflects the magnitude of the persistence asymmetry.
 
 The persistence pattern is consistent with the
@@ -2954,30 +2993,33 @@ $10 \times 3$ bivariate sort. Within each cohort, funds are
 partitioned into three terciles by formation-window $1-R^2$ (cohort-
 local, computed within the same 36-month window used to rank fund
 alphas), and within each tercile into ten alpha-decile portfolios.
-The headline finding is the asymmetric amplification of persistence
-along the activeness dimension. In the lowest activeness tercile T1
-(closet indexers), the D1$-$D10 alpha spread is $-0.008\%$ per
+The headline finding concerns the cross-tercile pattern of within-tercile
+persistence spreads. In the lowest activeness tercile T1
+(closet indexers), the D1$-$D10 alpha spread is $-0.014\%$ per
 month, statistically indistinguishable from zero --- formation rank
 carries no information among the least-active funds. In the middle
-activeness tercile T2, the spread widens to $+0.155\%$ ($t = 1.87$,
-significant at 10\%). In the highest activeness tercile T3, the spread
-reaches $+0.211\%$ ($t = 1.19$, not statistically significant on this
-sample, annualised approximately $2.5\%$).
+activeness tercile T2, the spread widens to $+0.172\%$ ($t = 2.26$,
+significant at 5\%). In the highest activeness tercile T3, the spread
+reaches $+0.300\%$ ($t = 1.83$, significant at 10\%, annualised
+approximately $3.6\%$).
 
-The economic interpretation in prior versions was that activeness amplifies the loser
-effect. In the highest activeness tercile, the D10 alpha is $-0.186\%$
-per month --- comparable to the unconditional
-Panel-A D10 of $-0.189\%$.
-% AUDIT_FLAG: the asymmetric-amplification finding REVERSES on this sample. Previously T3 D10 was 50\% more negative than unconditional D10; now they are essentially equal. The T3 D1-D10 spread (0.211) is also no longer statistically significant. The narrative below ("asymmetric amplification", "bridges activeness and behavioral chapters") needs substantial rewriting --- the loser persistence is now NOT amplified by activeness in this sample. 
-Winner persistence remains undetectable across all three terciles. The pattern is consistent with the
+The pattern is that formation-rank information becomes more useful
+as funds become more active. The T1 (closet-indexer) population
+exhibits no predictability between past and future relative
+performance; the T2 and T3 (more-active) populations exhibit
+detectable persistence in the D1$-$D10 spread. In the highest
+activeness tercile, the D10 alpha is $-0.221\%$ per month
+($t = -1.63$), slightly worse than the unconditional Panel-A D10 of
+$-0.189\%$, while T3 D1 carries a small positive point estimate
+($+0.080\%$) that is statistically indistinguishable from zero. The
+within-tercile spreads are therefore driven jointly by D1 winners
+performing modestly better and D10 losers performing modestly worse
+as activeness rises. The pattern is consistent with the
 \textcite{AmihudGoyenko2013} prediction that activeness predicts
-gross alpha (the D1 point estimate improves modestly from T1 to T3),
-but it is the loser persistence that is the dominant signal. The
-finding bridges the activeness chapter and the behavioral chapter:
-the funds with the strongest behavioral lottery characteristics ---
-the high-activeness, high-fee, high-volatility tail of the
-distribution --- are precisely the ones that exhibit the most
-severe persistent underperformance in subsequent holding periods.
+gross alpha at the extremes, and bridges the activeness chapter and
+the behavioral chapter: the funds with the strongest activeness
+characteristics are the ones whose past performance carries the
+most forecastable signal for subsequent holding periods.
 
 \section{Sub-period analysis}
 \label{sec:subperiod}
@@ -3016,9 +3058,9 @@ sub-period are reported in Appendix~\ref{app:subperiod}.
 
 The sub-period evidence is the strongest single piece of regime-specific
 evidence in the dissertation. The Storey $\hat{\pi}_0$ estimate
-collapses from approximately 82\% in P1 to 60.8\% in P3, with the
+collapses from approximately 81\% in P1 to 60.8\% in P3, with the
 genuinely unskilled mass $T^-_{\gamma^*}$ rising correspondingly from
-approximately 11\% to 35.5\%. The structural meaning of this change ---
+approximately 11\% to 35.4\%. The structural meaning of this change ---
 whether it reflects passive competition compressing active margins,
 post-Global-Financial-Crisis algorithmic trading eliminating
 cross-sectional alpha opportunities, or selection effects from fund
@@ -3033,8 +3075,8 @@ entry/exit dynamics --- is taken up in Chapter~\ref{ch:discussion}.
 \noindent The empirical chapters preceding this one establish three facts
 that constrain any behavioral interpretation of the active management
 puzzle. First, the equal-weighted net alpha for active funds is
-materially negative ($-1.366\%$ per annum) while the value-weighted
-analogue is smaller in magnitude ($-0.904\%$); the puzzle is located in
+materially negative ($-1.361\%$ per annum) while the value-weighted
+analogue is smaller in magnitude ($-0.900\%$); the puzzle is located in
 the cross-section. Second, the
 \textcite{BarrasScailletWermers2010} false-discovery decomposition
 identifies a population unskilled mass of approximately 21\% (at $\gamma^*=20\%$) with no
@@ -3072,20 +3114,20 @@ evidence.
 \label{sec:panel_spec}
 
 \noindent The dependent variable is the calculated proportional fund
-flow $\mathrm{Flow}_{i,t}$ defined in Equation~\ref{eq:flow},
+flow $\text{Flow}_{i,t}$ defined in Equation~\ref{eq:flow},
 winsorised at the 1st/99th percentile and excluding December
 observations. The principal regressor is the lagged Sirri--Tufano
 fractional rank within Lipper category, partitioned into three
 piecewise segments
-$R^{\mathrm{LOW}}_{i,t-12}$,
-$R^{\mathrm{MID}}_{i,t-12}$, and
-$R^{\mathrm{HIGH}}_{i,t-12}$. The 12-month lag of the rank ensures
+$R^{\text{LOW}}_{i,t-12}$,
+$R^{\text{MID}}_{i,t-12}$, and
+$R^{\text{HIGH}}_{i,t-12}$. The 12-month lag of the rank ensures
 that flow at month $t$ responds to performance through end of month
 $t-12$, consistent with the \textcite{SirriTufano1998} timing
 convention and with the empirical observation that flow responses
 take time to materialise after performance information becomes
-available. Controls $X_{i,t}$ include $\log(\mathrm{TNA}_{i,t-1})$,
-$\log(\mathrm{Age}_{i,t})$, the trailing 36-month return volatility,
+available. Controls $X_{i,t}$ include $\log(\text{TNA}_{i,t-1})$,
+$\log(\text{Age}_{i,t})$, the trailing 36-month return volatility,
 and the contemporaneous Lipper-category mean flow (a within-style
 demand control). The contemporaneous category mean flow is the
 strongest single predictor of fund-level flow and absorbs the
@@ -3093,8 +3135,8 @@ aggregate flow shocks within style that would otherwise be omitted-
 variable bias for the H1--H3 hypotheses.
 
 The aligned regression sample after the lag, fund-fixed-effect, and
-state-variable joins comprises approximately 235{,}000 fund-month
-observations on 1{,}735 unique funds across 22 Lipper styles,
+state-variable joins comprises approximately 233{,}000 fund-month
+observations on 1{,}713 unique funds across 22 Lipper styles,
 spanning January 1995 through December 2023 (the trimmed panel
 date cap). Robustness specifications under the
 Lipper-category $\times$ year-month fixed-effect structure are
@@ -3107,26 +3149,27 @@ state-variable variants are reported there as well.
 \noindent H1 predicts that high-sentiment regimes amplify the
 flow--performance convexity. The hypothesis is rejected only if the
 sentiment-rank-segment interactions $\delta_q$ are jointly zero
-across $q \in \{\mathrm{LOW}, \mathrm{MID}, \mathrm{HIGH}\}$.
+across $q \in \{\text{LOW}, \text{MID}, \text{HIGH}\}$.
 Table~\ref{tab:H1_regression} reports the panel regression results under three
 sentiment proxies: the Baker--Wurgler high-sentiment regime indicator
-$D^{\mathrm{SENT}}$, the orthogonalised continuous Baker--Wurgler
-sentiment $\mathrm{SENT}^{\perp}$, and the AAII bull-minus-bear
-spread regime indicator $D^{\mathrm{AAII}}$.
+$D^{\text{SENT}}$, the orthogonalised continuous Baker--Wurgler
+sentiment $\text{SENT}^{\perp}$, and the AAII bull-minus-bear
+spread regime indicator $D^{\text{AAII}}$.
 
 \input{tables/table_H1_regression}
 
-\noindent The joint $\chi^2_3$ test of $\delta_{\mathrm{LOW}} =
-\delta_{\mathrm{MID}} = \delta_{\mathrm{HIGH}} = 0$ rejects the rational null at 5\%
+\noindent The joint $\chi^2_3$ test of $\delta_{\text{LOW}} =
+\delta_{\text{MID}} = \delta_{\text{HIGH}} = 0$ rejects the rational null at 5\%
 significance under the Baker--Wurgler regime indicator
-($\chi^2 = 9.23$, $p = 0.026$). The asymmetry test
-$\delta_{\mathrm{HIGH}} > \delta_{\mathrm{LOW}}$ produces a
+($\chi^2 = 9.13$, $p = 0.028$). The asymmetry test
+$\delta_{\text{HIGH}} > \delta_{\text{LOW}}$ produces a
 one-sided $z$-statistic close to zero under the Baker--Wurgler proxy
-($z = +0.10$). Under the
+($z = +0.06$). Under the
 AAII regime indicator the asymmetry test is significant at 5\%
-($z = +2.11$, $p = 0.017$), with $\delta_{\mathrm{HIGH}}$ materially
-larger than $\delta_{\mathrm{LOW}}$. Under the orthogonalised
-continuous Baker--Wurgler sentiment, the joint test is marginal,
+($z = +2.11$, $p = 0.018$), with $\delta_{\text{HIGH}}$ materially
+larger than $\delta_{\text{LOW}}$. Under the orthogonalised
+continuous Baker--Wurgler sentiment, the joint test is marginal
+($\chi^2 = 6.92$, $p = 0.074$),
 which is expected: orthogonalising sentiment against macro controls
 removes the regime-shift component that the discrete indicators
 preserve.
@@ -3168,14 +3211,14 @@ attenuate the loser-segment outflow.
 
 \noindent Table~\ref{tab:H2_regression} reports the panel regression results
 under three competing state-variable proxies: the detrended
-margin-debt regime indicator $D^{\mathrm{MD,Det}}$, the inverse
-put-call ratio regime indicator $D^{\mathrm{INV\text{-}PCR}}_t$,
+margin-debt regime indicator $D^{\text{MD,Det}}$, the inverse
+put-call ratio regime indicator $D^{\text{INV\text{-}PCR}}_t$,
 and a discriminant specification that includes both regime
 indicators. Under the headline margin-debt proxy, the loser-segment
 interaction
-$\delta^{\mathrm{IoC}}_{\mathrm{LOW}}$
+$\delta^{\text{IoC}}_{\text{LOW}}$
 is significantly positive
-($z = +2.16$, the one-sided $p$-value for the Brunnermeier-Pedersen
+($z = +2.15$, the one-sided $p$-value for the Brunnermeier-Pedersen
 prediction is $0.984$). The result rejects the
 \textcite{ShefrinStatman1985} disposition prediction in favour of
 the \textcite{BrunnermeierPedersen2009} margin-call alternative.
@@ -3210,10 +3253,10 @@ finding.
 demand for funds with lottery-like return distributions. The
 specification regresses fund flow on three candidate lottery
 proxies, each interacted with the sentiment regime indicator:
-$\mathrm{ActR2}$ (the rational alpha-prediction channel of
-\textcite{AmihudGoyenko2013}), $\mathrm{ActSkew}$ (sample skewness
+$\text{ActR2}$ (the rational alpha-prediction channel of
+\textcite{AmihudGoyenko2013}), $\text{ActSkew}$ (sample skewness
 of the trailing 36 monthly gross returns, the full-distribution
-lottery measure), and $\mathrm{MAX12}$ (the maximum monthly gross
+lottery measure), and $\text{MAX12}$ (the maximum monthly gross
 return over the trailing 12 months, the right-tail-only measure
 following \textcite{BaliCakiciWhitelaw2011} and the fund-level
 extension of \textcite{ChengEtal2025}). Each proxy is standardised
@@ -3232,13 +3275,14 @@ any lottery proxy, providing the benchmark coefficients. Columns
 interacted with the Baker--Wurgler sentiment regime indicator.
 
 The headline finding is the asymmetric pattern across the three
-proxies. The $\mathrm{ActR2}$ joint $\chi^2_2 = 2.25$
+proxies. The $\text{ActR2}$ joint $\chi^2_2 = 2.25$
 ($p = 0.325$) is not statistically significant, and the
 sentiment-amplification $z$-statistic is also indistinguishable
-from zero ($z = +0.06$).
-% AUDIT_FLAG: this is a finding REVERSAL --- the $\mathrm{ActR2}$ proxy is no longer significant in either the joint test or the asymmetry direction. The previous "rational channel embedded in the data" narrative no longer applies; the proxy simply does not detect a signal in either direction on this sample.
+from zero ($z = -0.02$). The $\text{ActR2}$ proxy detects no
+signal in either the joint test or the asymmetry direction on
+the current sample.
 
-The $\mathrm{ActSkew}$ joint $\chi^2_2 = 1.82$ ($p = 0.402$) is
+The $\text{ActSkew}$ joint $\chi^2_2 = 1.95$ ($p = 0.378$) is
 not statistically significant. Sample skewness of the trailing
 36 monthly returns is therefore not a detectably exploited
 characteristic in flow decisions. This is consistent with the
@@ -3246,9 +3290,9 @@ characteristic in flow decisions. This is consistent with the
 is concentrated on extreme tail outcomes rather than on the
 overall skewness of the return distribution.
 
-The $\mathrm{MAX12}$ joint $\chi^2_2 = 11.29$ ($p = 0.004$) is
+The $\text{MAX12}$ joint $\chi^2_2 = 11.33$ ($p = 0.003$) is
 significant at 1\%, and the directional asymmetry test produces
-$z = +1.56$ ($p = 0.060$ one-sided, marginally significant), consistent with the H3
+$z = +1.54$ ($p = 0.062$ one-sided, marginally significant), consistent with the H3
 behavioral prediction. High-sentiment regimes amplify flow into
 funds with extreme realised maximum returns, and the magnitude of
 the amplification is statistically detectable on the panel. The
@@ -3263,8 +3307,15 @@ the \textcite{ChengEtal2025} fund-level extension that establishes
 the same channel in the mutual fund flow domain.
 
 The Lipper-category $\times$ year-month fixed-effect and lagged state-variable robustness checks
-(Appendix~\ref{app:behavioral_robustness}) corroborate the directional $\mathrm{MAX12}$ pattern
-at marginal significance. % AUDIT_FLAG: specific robustness-check numbers (p=0.004 LC×month, ActSkew z=+1.92/p=0.027, ActR2 p=0.883, lagged z=+1.83) need verification against the current $H3_lagged$ and $H3_robustness$ tables before defense.
+(Appendix~\ref{app:behavioral_robustness}) corroborate the directional $\text{MAX12}$ pattern
+at marginal significance. Under the lagged-sentiment specification,
+$\text{MAX12}$ joint $\chi^2_2 = 10.72$ ($p = 0.005$) with $z = +1.58$
+($p = 0.057$); under the Lipper $\times$ yearmo fixed-effect
+specification, $\text{ActSkew}$ becomes statistically significant
+($\chi^2_2 = 20.74$, $p < 0.001$; $z = +2.17$, $p = 0.015$) while
+$\text{MAX12}$ retains a 5\% joint test ($\chi^2_2 = 8.36$,
+$p = 0.015$). $\text{ActR2}$ remains insignificant under both
+robustness specifications.
 
 \section{H4: Fee elasticity}
 \label{sec:H4}
@@ -3283,17 +3334,20 @@ investors fail to minimise fees among otherwise-identical S\&P 500
 index funds. The behavioral prediction is therefore a non-zero
 joint $\chi^2$ on the triple interactions.
 
+\begingroup
+\captionsetup{font=footnotesize, justification=raggedright, singlelinecheck=false}  % T2.11: match caption size to longtable body (\fontsize{9}{11}) and left-align
 \input{tables/table_H4_regression}
+\endgroup
 
 \noindent Table~\ref{tab:H4_regression} reports the H4 regression under three
 sentiment proxies. The joint $\chi^2_4$ test of the triple-interaction
 restriction is statistically insignificant under all three proxies:
-$\chi^2 = 5.04$ ($p = 0.283$) under the Baker-Wurgler high-sentiment
-regime indicator, $\chi^2 = 5.14$ ($p = 0.274$) under the
-orthogonalised continuous sentiment, and $\chi^2 = 5.15$ ($p =
-0.272$) under the AAII regime indicator. The
+$\chi^2 = 4.45$ ($p = 0.349$) under the Baker-Wurgler high-sentiment
+regime indicator, $\chi^2 = 4.46$ ($p = 0.347$) under the
+orthogonalised continuous sentiment, and $\chi^2 = 5.17$ ($p =
+0.270$) under the AAII regime indicator. The
 headline $\delta^F$-related $z$-statistic is similarly indistinguishable
-from zero in the headline specification ($z = +0.82$).
+from zero in the headline specification ($z = +0.74$).
 
 H4 is therefore consistent with the \textcite{BerkGreen2004}
 rational null. The empirical signature of behavioral fee
@@ -3312,12 +3366,12 @@ signature in H1, H2, and H3 rather than in fee processing per se;
 the puzzle is in the convexity, the loser segment, and the lottery
 proxy, not in fee-level inattention. Third, one specific lower-order
 interaction merits comment for completeness: the
-$\phi_{\mathrm{HIGH}}$ coefficient ($R^{\mathrm{HIGH}} \times
-\mathrm{ExpRatio}$) is positive, which would on its face suggest
+$\phi_{\text{HIGH}}$ coefficient ($R^{\text{HIGH}} \times
+\text{ExpRatio}$) is positive, which would on its face suggest
 that higher-fee winners attract more flow. The total marginal fee
 effect at a typical winner (rank 0.85) is $-0.0017 + 0.0156 \times
 0.05 = -0.0009$, however --- still negative. The
-$\phi_{\mathrm{HIGH}}$ coefficient does not threaten H4 because the
+$\phi_{\text{HIGH}}$ coefficient does not threaten H4 because the
 triple interactions $\delta^F_q$, which test whether this pattern
 intensifies with sentiment, are uniformly insignificant. The
 mechanism implied is the fee-as-quality-signal channel of
@@ -3329,7 +3383,7 @@ heuristic rather than a fee-blindness story.
 \section{The psychological premium framework}
 \label{sec:ppf}
 
-\noindent The H3 finding that $\mathrm{MAX12}$ amplifies flow into
+\noindent The H3 finding that $\text{MAX12}$ amplifies flow into
 high-sentiment regimes carries an implication beyond the
 hypothesis test itself: investors are revealed to be willing to
 sacrifice expected return for incremental lottery exposure, and the
@@ -3349,17 +3403,18 @@ given segment is computed as the ratio of the partial derivative
 of flow with respect to the lottery proxy to the partial derivative
 of flow with respect to the rank within that segment, evaluated at
 the population mean of the controls:
-\[
-\mathrm{MRS}_q = -\left.\frac{\partial \mathrm{Flow} / \partial \mathrm{Lottery}}{\partial \mathrm{Flow} / \partial R^q}\right|_{X = \bar{X}}.
-\]
+\begin{equation}
+\label{eq:mrs}
+\text{MRS}_q = -\left.\frac{\partial \text{Flow} / \partial \text{Lottery}}{\partial \text{Flow} / \partial R^q}\right|_{X = \bar{X}}.
+\end{equation}
 Third, the marginal rate of substitution is converted into alpha
 basis points using the rank-to-alpha mapping documented in the
 momentum-quintile sort of Section~\ref{sec:portfolio_sorts}. The
-Q5--Q1 momentum spread is $+2.154\%$ per annum on the active
+Q5--Q1 momentum spread is $+2.150\%$ per annum on the active
 equal-weighted Carhart alpha, with a midpoint-to-midpoint rank
 distance of $0.8$ across the five quintiles, implying a conversion
 rate of $269$ basis points per rank-point. Multiplying the
-$\mathrm{MRS}_q$ by $269$ yields the implied alpha sacrifice in
+$\text{MRS}_q$ by $269$ yields the implied alpha sacrifice in
 basis points.
 
 \input{tables/table_psychological_premium}
@@ -3367,21 +3422,21 @@ basis points.
 \noindent Table~\ref{tab:psychological_premium} reports the
 psychological premium estimates for the three lottery proxies
 across the three rank segments and across the two sentiment
-regimes. The headline finding is the $\mathrm{MAX12}$
+regimes. The headline finding is the $\text{MAX12}$
 amplification at the middle rank segment. Under the low-sentiment
-regime, the $\mathrm{MAX12}$ middle-rank shadow price is $-0.049$
+regime, the $\text{MAX12}$ middle-rank shadow price is $-0.049$
 rank-points per standard deviation of lottery exposure ---
 implying that investors at the middle rank segment are willing to
 sacrifice approximately $0.049 \times 269 \approx 13$ basis points
 of annual Carhart alpha for one standard deviation of lottery
 exposure. Under the high-sentiment regime, the same shadow price
-is $-0.208$, implying a sacrifice of approximately $0.208 \times
-269 \approx 56$ basis points. The high-sentiment amplification
-factor is approximately $4.2\times$, statistically significant at
-5\% (one-sided $p = 0.012$).
+is $-0.219$, implying a sacrifice of approximately $0.219 \times
+269 \approx 59$ basis points. The high-sentiment amplification
+factor is approximately $4.5\times$, statistically significant at
+5\% (one-sided $p = 0.013$).
 
-The economic magnitude merits emphasis. A 58-basis-point annual
-alpha sacrifice for one standard deviation of $\mathrm{MAX12}$
+The economic magnitude merits emphasis. A 59-basis-point annual
+alpha sacrifice for one standard deviation of $\text{MAX12}$
 exposure is approximately the difference between an active fund's
 gross alpha and a passive benchmark on the present sample. Under
 the high-sentiment regime, in other words, investors are revealed
@@ -3446,10 +3501,10 @@ separate treatment.
 \label{sec:bg_accepted}
 
 \noindent The value-weighted net Carhart alpha for active funds on
-the December 1994--February 2026 sample is $-0.904\%$ per annum, an
+the December 1994--February 2026 sample is $-0.900\%$ per annum, an
 estimate that is statistically significant at 5\% but economically
 modest in magnitude. The corresponding equal-weighted estimate is
-$-1.366\%$ per annum, a 46-basis-point gap that quantifies the
+$-1.361\%$ per annum, a 46-basis-point gap that quantifies the
 locational interpretation of the puzzle introduced in
 Section~\ref{sec:motivation}. The fact that the value-weighted
 alpha is small, while the equal-weighted alpha is materially worse,
@@ -3464,7 +3519,7 @@ investors is reliably negative on the same data.
 
 The dissertation does not test the Berk--Green equilibrium directly
 in dollar terms; the value-weighted Carhart alpha estimate of
-$-0.904\%$ reported here is consistent with, but does not formally
+$-0.900\%$ reported here is consistent with, but does not formally
 estimate, the dollar-value framework of
 \textcite{BerkVanBinsbergen2015}. What the present sample
 contributes is the demonstration that the equal-weighted /
@@ -3530,12 +3585,12 @@ empirical implication is that behavioral signatures in the loser
 segment are more naturally read as margin-driven rather than as
 disposition-driven on aggregate flow data.
 
-The H3 lottery-demand channel via $\mathrm{MAX12}$ is the most
+The H3 lottery-demand channel via $\text{MAX12}$ is the most
 economically consequential of the three. The Psychological
 Premium Framework estimates a high-sentiment shadow price of 58
 basis points of annual Carhart alpha per standard deviation of
-$\mathrm{MAX12}$ exposure, against a low-sentiment shadow price of
-14 basis points --- a 4.2-fold amplification. The economic
+$\text{MAX12}$ exposure, against a low-sentiment shadow price of
+13 basis points --- a 4.5-fold amplification. The economic
 magnitude is on the order of the entire risk-adjusted value-add
 gap between active and passive management on the present sample.
 The behavioral interpretation is that investors, particularly
@@ -3552,10 +3607,10 @@ gross alpha series for active funds. The pre-break regime
 (2006--Sep 2011) carries regime-mean alpha $+0.74\%$ per annum; the
 post-break regime (Oct 2011--2026) carries regime-mean alpha
 $-1.39\%$ per annum, a 210-basis-point shift. The Storey
-$\hat{\pi}_0$ estimate falls from approximately 82\% in the
+$\hat{\pi}_0$ estimate falls from approximately 81\% in the
 pre-break regime to 60.8\% in the post-break regime, with the
 genuinely unskilled mass $T^-_{\gamma^*}$ rising from approximately 11\%
-to 35.5\%. This regime shift is the strongest single piece of
+to 35.4\%. This regime shift is the strongest single piece of
 regime-specific evidence in the dissertation.
 
 Three competing readings of the regime shift are consistent with
@@ -3663,8 +3718,8 @@ Fourth, the Psychological Premium Framework converts the H3
 empirical evidence into welfare-relevant alpha basis points, and
 documents that high-sentiment regimes amplify the implied
 psychological premium by a factor of approximately 4.2. The
-high-sentiment estimate of 58 basis points per standard deviation
-of $\mathrm{MAX12}$ exposure is on the order of the entire
+high-sentiment estimate of 59 basis points per standard deviation
+of $\text{MAX12}$ exposure is on the order of the entire
 risk-adjusted value-add gap between active and passive management
 on the present sample, and provides the most economically tractable
 expression of the active management puzzle that the dissertation
@@ -3697,14 +3752,20 @@ analogue.
 Third, the benchmark assignment for the activeness/tracking-error
 measure carries inferred-confidence assignments for approximately
 37\% of funds, with confidence scores below 5 in the workbook
-documentation. The most heavily inferred funds (sector, equity
-income, specialty, covered-call) are excluded from the H3 active
-share analysis under the H3-exclusion flag in the sample-membership
-matrix; the activeness primary measure is the $1-R^2$ from the
+documentation. Sector and covered-call-overlay funds are excluded
+from H3 (via the \texttt{SECTOR\_FUND} and
+\texttt{COVERED\_CALL\_OVERLAY} flags in the sample-membership
+matrix) on theoretical grounds independent of benchmark inference
+quality. Equity-income and specialty-diversified funds, which had
+been excluded from H3 in earlier draft versions on benchmark-
+misassignment grounds, are now retained in the H3 regressions
+because the primary activeness measure is the $1-R^2$ from the
 Carhart factor regression, which does not use the assigned
-benchmark. The benchmark inference quality is therefore not
-load-bearing on the headline activeness findings, but it is a
-limitation of the tracking-error robustness analysis specifically.
+benchmark; they are excluded only from the tracking-error
+robustness sort when no \texttt{Benchmark\_Code} is available. The
+benchmark inference quality is therefore not load-bearing on the
+headline activeness findings, but it is a limitation of the
+tracking-error robustness analysis specifically.
 
 Fourth, the panel is unbalanced and exhibits material attrition.
 Funds that exit the sample during the observation window are
@@ -3749,10 +3810,10 @@ aggregate sentiment regimes: H1 sentiment-convexity, H2 margin-debt
 amplification of loser-segment outflows, and H3 lottery demand
 each generate detectable empirical signatures consistent with
 behavioral prediction. The Psychological Premium Framework
-quantifies the implied behavioral price as approximately 14 basis
+quantifies the implied behavioral price as approximately 13 basis
 points of annual Carhart alpha per standard deviation of
-$\mathrm{MAX12}$ exposure under low-sentiment regimes and 58 basis
-points under high-sentiment regimes, a 4.2-fold amplification that
+$\text{MAX12}$ exposure under low-sentiment regimes and 59 basis
+points under high-sentiment regimes, a 4.5-fold amplification that
 locates the puzzle's economic magnitude in the lottery-demand
 channel.
 
@@ -3762,8 +3823,8 @@ channel.
 \noindent The principal empirical findings are as follows.
 
 First, the equal-weighted net Carhart alpha for active funds is
-$-1.366\%$ per annum (significant at 1\%); the value-weighted
-analogue is $-0.904\%$ (significant at 5\%). The 46-basis-point
+$-1.361\%$ per annum (significant at 1\%); the value-weighted
+analogue is $-0.900\%$ (significant at 5\%). The 46-basis-point
 gap between the two estimates locates the active management puzzle
 in the cross-sectional heterogeneity rather than in the
 representative dollar.
@@ -3773,7 +3834,7 @@ rejects the zero-skill null in the left tail of the empirical
 $t$-statistic distribution at all percentiles below the median,
 with right-tail consistency above the median. The
 \textcite{BarrasScailletWermers2010} false-discovery decomposition
-implies a population zero-alpha mass of approximately 78.0\%, a
+implies a population zero-alpha mass of approximately 77.8\%, a
 genuinely unskilled mass of 21.1\%, and no detectable genuinely
 skilled mass at the standard $\gamma^* = 0.20$ threshold.
 
@@ -3782,8 +3843,8 @@ shift in September 2011 (95\% Newey--West HAC confidence interval:
 March 2011--December 2011) after which active fund alpha generation
 collapses from a regime-mean of $+0.74\%$ per annum to $-1.39\%$
 per annum. The post-break regime exhibits a Storey
-$\hat{\pi}_0$ collapse from 82\% to 60.8\% and a corresponding rise
-in the genuinely unskilled mass to 35.5\%.
+$\hat{\pi}_0$ collapse from 81\% to 60.8\% and a corresponding rise
+in the genuinely unskilled mass to 35.4\%.
 
 Fourth, of the four behavioral hypotheses tested, three (H1, H2 in
 its margin-call rather than disposition reading, and H3) generate
@@ -3795,10 +3856,10 @@ the behavioral channels operate principally on the cross-section.
 
 Fifth, the Psychological Premium Framework converts the H3
 findings into welfare-relevant alpha basis points: a high-sentiment
-shadow price of 58 basis points per standard deviation of
-$\mathrm{MAX12}$ exposure, against a low-sentiment shadow price of
-14 basis points. The high-sentiment amplification factor is
-approximately 4.2$\times$ and is statistically significant at 5\%.
+shadow price of 59 basis points per standard deviation of
+$\text{MAX12}$ exposure, against a low-sentiment shadow price of
+13 basis points. The high-sentiment amplification factor is
+approximately 4.5$\times$ and is statistically significant at 5\%.
 
 \section{Policy and practical implications}
 \label{sec:implications}
@@ -3826,8 +3887,8 @@ like return distributions --- are the ones that exhibit the most
 severe persistent underperformance in subsequent holding periods.
 Investors who select funds on the basis of recent extreme positive
 returns are, on the present evidence, paying a behavioral premium
-of approximately 58 basis points of annual Carhart alpha per
-standard deviation of $\mathrm{MAX12}$ exposure during high-
+of approximately 59 basis points of annual Carhart alpha per
+standard deviation of $\text{MAX12}$ exposure during high-
 sentiment regimes, and that premium is unlikely to be recovered.
 
 For regulators, the dissertation suggests that fee disclosure
@@ -4065,7 +4126,7 @@ audit baseline.
 \label{sec:winsorisation}
 
 \noindent Monthly percentage returns, computed as
-$r_{i,t} = \mathrm{Index}_{i,t} / \mathrm{Index}_{i,t-1} - 1$ from the
+$r_{i,t} = \text{Index}_{i,t} / \text{Index}_{i,t-1} - 1$ from the
 gross and net total-return index levels, are winsorised at the
 1st/99th percentiles across all fund-month observations. Winsorisation
 is standard practice in the mutual fund literature to address extreme
@@ -4074,11 +4135,11 @@ anomalies, and residual data errors that survive earlier cleaning
 steps. The 1st/99th percentile threshold is the modal choice in the
 literature and is applied symmetrically to both tails.
 
-The unwinsorised raw returns ($r^{\mathrm{gross,raw}}$,
-$r^{\mathrm{net,raw}}$) are retained on the panel alongside the
+The unwinsorised raw returns ($r^{\text{gross,raw}}$,
+$r^{\text{net,raw}}$) are retained on the panel alongside the
 winsorised series. This is necessary because the
-\textcite{SirriTufano1998} flow identity --- $\mathrm{Flow}_t =
-\mathrm{TNA}_t - \mathrm{TNA}_{t-1} (1 + R_t)$ --- is an accounting
+\textcite{SirriTufano1998} flow identity --- $\text{Flow}_t =
+\text{TNA}_t - \text{TNA}_{t-1} (1 + R_t)$ --- is an accounting
 identity, not a statistical model. Substituting a winsorised return
 into this identity would produce fictitious asset growth and
 systematically biased flow estimates in months when genuine extreme
@@ -4288,10 +4349,15 @@ classification across share classes is applied. Second, Lipper
 category labels that appear in the LSEG Category field but do not
 correspond to the twelve standard size-style categories (for example,
 Equity Income Funds, Real Estate Funds, Science \& Technology Funds)
-are retained as-is. These funds are excluded from H3 by the
-H3\_EXCLUDED flag in the sample-membership matrix
-documented in Appendix~\ref{app:benchmark}, but appear in H1, H2, and
-H4 with their LSEG-supplied label forming their peer group. Third,
+are retained as-is. Sector-mandated and covered-call-overlay funds
+in this residual group are excluded from H3 by the
+\texttt{SECTOR\_FUND} and \texttt{COVERED\_CALL\_OVERLAY} flags
+respectively in the sample-membership matrix
+documented in Appendix~\ref{app:benchmark}; the remaining
+non-standard-category funds (Equity Income, Specialty Diversified,
+Specialty/Miscellaneous) are retained in H3 with their LSEG-supplied
+label forming their peer group, and appear in H1, H2, and H4
+analyses on the same basis. Third,
 the script merges the Lipper\_Category column from the
 output workbook into the static sheet of the master fund-data
 workbook, making the classification available to all downstream R
@@ -4401,10 +4467,13 @@ benchmark direct map to recognised index family), 902 at score 5
 Fund\_Strategy), 387 at score 3 (partial inference from one
 field), and 101 at score 1 (default Russell 3000 placeholder).
 Approximately 37\% of assignments carry confidence $\leq 5$
-(inferred). The most heavily inferred funds --- sector, equity
-income, specialty --- are excluded from the H3 active share analysis
-under the H3\_EXCLUDED or SECTOR\_FUND flags
-documented in Section~\ref{sec:sample_membership}, and the primary
+(inferred). Sector-mandated funds in the heavily inferred group are
+excluded from the H3 active share analysis under the
+\texttt{SECTOR\_FUND} flag
+documented in Section~\ref{sec:sample_membership}, while
+equity-income and specialty-diversified funds (which had been
+excluded under the retired \texttt{H3\_EXCLUDED} flag in earlier
+draft versions) are retained in the H3 regressions, and the primary
 activeness measure ($1-R^2$ from the Carhart factor regression) does
 not use the assigned benchmark at all. The benchmark inference
 quality is therefore not load-bearing on the headline activeness
@@ -4486,27 +4555,79 @@ affects only 10 funds and is immaterial to the aggregate results.
 \label{sec:sample_membership}
 
 \noindent The flagged\_funds.xlsx workbook organises sample
-membership across three exclusion scopes. The Exclude from
-Entire Analysis sheet (439 funds) covers passive index funds, funds
-with non-U.S.\ benchmarks (global, EM), long/short, bear market,
-market-neutral strategies, and the two confirmed data-error funds.
-The Exclude from H3 Only sheet (246 funds) covers sector
-funds, equity-income, specialty, and covered-call-overlay funds,
-which retain validity for H1/H2/H4 (full-sample flow regressions)
-but lack unambiguous size-style benchmarks for the activeness/tracking-
-error component of H3. The Exclude from Performance
-Comparison sheet (586 funds) covers the H3 set plus a slightly
-different boundary on sector funds for the Carhart-alpha tables, to
-avoid contamination of fund-level alphas by benchmark-mismatched
-sector funds.
+membership across three exclusion scopes that segregate funds by
+the analytical context in which their inclusion is methodologically
+defensible. The workbook is curated alongside the data pipeline
+and superseded its prior structure with the v1.3 filter revision
+of May 2026, which retired two flags that had been over-restrictive
+on inspection: \texttt{PASSIVE\_INDEX} (which had previously
+excluded the 313 Bloomberg-classified passive index trackers from
+the entire analysis on the rationale that they are not active
+funds, but which over-restricted the descriptive panel and removed
+the active-vs-passive performance benchmark that motivates the
+puzzle in the first place) and \texttt{H3\_EXCLUDED} (which had
+previously excluded 90 funds in the Equity Income, Specialty
+Diversified, and Specialty-Miscellaneous Lipper categories from the
+H3 analysis on \textcite{CremersPetajisto2009} benchmark-misassignment
+grounds, but whose rationale does not apply to the
+\textcite{AmihudGoyenko2013} $1-R^2$ proxy actually used in this
+dissertation, which is computed from a Carhart regression with no
+fund-specific benchmark). The retired flags are documented here for
+completeness and because their pre-retirement scopes appear in the
+provenance records of earlier draft tables.
 
-The implied hypothesis sample sizes (pre-Evans, pre-cleaning) are:
-H1/H2/H4 sample, 3{,}328 funds; H3 sample, 3{,}083 funds; performance
-comparison sample, 3{,}179 funds. Application of the Evans 36-month
-filter reduces these counts by approximately 50--70 funds each (varies
-by fund inception date distribution within sample). The
-post-Evans/post-cleaning incubation panel reports 2{,}170 active funds
-in Table~\ref{tab:fund_counts}.
+The three current scopes are as follows. The \emph{Exclude from
+Entire Analysis} sheet (125 funds in the current workbook) covers
+funds whose strategy or mandate places them outside the
+domestic-equity active-management scope of the dissertation:
+non-U.S.\ benchmarks (36 \texttt{GLOBAL\_MANDATE} plus 2 combined
+\texttt{EM\_MANDATE}/\texttt{GLOBAL\_MANDATE} and 1 combined
+\texttt{GLOBAL\_MANDATE}/\texttt{LONG\_SHORT}), long-short strategies
+(31 \texttt{LONG\_SHORT} pure plus the combinations noted above),
+market-neutral strategies (26 \texttt{MARKET\_NEUTRAL}), bear-market
+or inverse strategies (7 \texttt{BEAR\_MARKET} pure plus 20 combined
+\texttt{BEAR\_MARKET}/\texttt{PASSIVE\_INDEX} legacy combinations
+retained because the bear-market designation remains binding), and
+two confirmed LSEG data-error funds (\texttt{DATA\_ERROR}).
+
+The \emph{Exclude from H3 Only} sheet (155 funds) covers
+sector-mandated funds (149 \texttt{SECTOR\_FUND}) and covered-call
+overlay funds (6 \texttt{COVERED\_CALL\_OVERLAY}). Sector mandates
+mechanically inflate the $1-R^2$ activeness proxy because the
+Carhart four-factor model does not span sector-specific return
+variance, so the resulting high $1-R^2$ values reflect mandate-driven
+factor orthogonality rather than active manager discretion (see
+\textcite{KacperczykSialmZheng2008}). Covered-call overlay strategies
+mechanically truncate the right tail of the return distribution,
+producing return distributions opposite in character to the lottery
+profile that H3 is designed to test. Both classes of fund retain
+validity for the H1, H2, and H4 panel regressions (which condition
+on the Sirri--Tufano performance rank but not on the activeness or
+lottery proxies) and therefore appear in the H1/H2/H4 analytical
+sample.
+
+The \emph{Exclude from Performance Comparison} sheet (292 funds)
+covers the Entire-Analysis set (propagated as a superset) plus a
+sector-fund extension (169 \texttt{SECTOR\_FUND} funds; two of which
+are also \texttt{GLOBAL\_MANDATE} and so already excluded from the
+entire analysis). The performance-comparison set is the subsample
+on which the Section~\ref{sec:aggregate_performance} portfolio-level
+alpha estimates and the Section~\ref{sec:fdr_results} bootstrap and
+BSW decompositions are computed; the wider sector-fund exclusion is
+necessary because the aggregate active portfolio is constructed
+without separating sector funds, and unconditional pooling would
+otherwise contaminate the fund-level alpha distribution with
+benchmark-mismatched sector-fund alphas.
+
+The implied current hypothesis sample sizes (post-Evans, post-cleaning
+incubation panel, active funds only) are as follows: the H1/H2/H4
+active regression sample contains 2{,}127 unique funds (of which
+1{,}713 are aligned with all panel-regression controls); the H3
+active regression sample contains 1{,}594 unique active funds (out
+of 2{,}970 H3-eligible tickers across all classification groups);
+and the performance-comparison active sample contains 1{,}815 unique
+funds. These counts reconcile with the analytical-sample totals
+reported in the footnote to Table~\ref{tab:fund_counts}.
 
 % --- Appendix D --------------------------------------------------------------
 \chapter{ACTIVENESS AND LOTTERY PROXY VALIDATION}
@@ -4514,16 +4635,16 @@ in Table~\ref{tab:fund_counts}.
 
 \noindent This appendix documents the construction and validation of
 the four candidate activeness/lottery proxies considered for the H3
-panel regressions of Chapter~\ref{ch:behavioral}: $\mathrm{ActR2}$,
-$\mathrm{ActSkew}$, $\mathrm{MAX12}$, and the unconditional 36-month
-return realised volatility ($\mathrm{Vol36}$). The proxy validation
+panel regressions of Chapter~\ref{ch:behavioral}: $\text{ActR2}$,
+$\text{ActSkew}$, $\text{MAX12}$, and the unconditional 36-month
+return realised volatility ($\text{Vol36}$). The proxy validation
 procedure selects three proxies for the H3 horse race and excludes
 the fourth.
 
 \section{Construction}
 \label{sec:proxy_construction}
 
-\noindent $\mathrm{ActR2}_i$ is the time-series mean of $1 - R^2_{i,t}$
+\noindent $\text{ActR2}_i$ is the time-series mean of $1 - R^2_{i,t}$
 from the rolling 36-month Carhart regression that produces the rolling
 alpha series of Section~\ref{sec:rolling_alphas}. Following
 \textcite{AmihudGoyenko2013}, a higher value indicates that a larger
@@ -4532,13 +4653,13 @@ factor benchmark and is therefore attributable to the fund's
 idiosyncratic active deviation from a passive factor-mimicking
 portfolio.
 
-$\mathrm{ActSkew}_i$ is the cross-sectional sample skewness of the
+$\text{ActSkew}_i$ is the cross-sectional sample skewness of the
 fund's trailing 36 monthly gross returns. The measure captures the
 full-distribution lottery character: a positively skewed return
 series reflects right-tail mass that lottery-preferring investors
 should value, conditional on mean and variance.
 
-$\mathrm{MAX12}_i$ is the maximum monthly gross return over the
+$\text{MAX12}_i$ is the maximum monthly gross return over the
 trailing 12 months, following the stock-level construction of
 \textcite{BaliCakiciWhitelaw2011} and the fund-level extension of
 \textcite{ChengEtal2025}. The measure captures the right-tail-only
@@ -4547,7 +4668,7 @@ positive return that lottery-preferring investors should value
 disproportionately under cumulative prospect theory probability
 weighting.
 
-$\mathrm{Vol36}_i$ is the annualised standard deviation of the
+$\text{Vol36}_i$ is the annualised standard deviation of the
 fund's trailing 36 monthly gross returns. The measure is a
 candidate lottery proxy because high return volatility is one
 empirical correlate of high lottery-like character in equity
@@ -4571,27 +4692,27 @@ correlation with the Carhart 4-factor full-period alpha (a sanity
 check that the proxy is not mechanically equivalent to alpha).
 
 The diagnostic test that distinguishes among the four candidates is
-the cross-sectional correlation with $\mathrm{ActR2}$. A high
+the cross-sectional correlation with $\text{ActR2}$. A high
 correlation indicates that the candidate proxy is essentially a
 re-statement of the rational-channel activeness signal of
 \textcite{AmihudGoyenko2013} rather than a distinct behavioral
-signal. $\mathrm{Vol36}$ exhibits cross-sectional correlation with
-$\mathrm{ActR2}$ in excess of 0.85, indicating that volatility and
+signal. $\text{Vol36}$ exhibits cross-sectional correlation with
+$\text{ActR2}$ in excess of 0.85, indicating that volatility and
 unexplained variance share are essentially the same construct on the
-present panel; $\mathrm{Vol36}$ is therefore excluded from the
-horse race to avoid colinearity. $\mathrm{ActSkew}$ and
-$\mathrm{MAX12}$ exhibit modest cross-sectional correlation with
-$\mathrm{ActR2}$ (in the 0.20--0.40 range) and are retained as
+present panel; $\text{Vol36}$ is therefore excluded from the
+horse race to avoid colinearity. $\text{ActSkew}$ and
+$\text{MAX12}$ exhibit modest cross-sectional correlation with
+$\text{ActR2}$ (in the 0.20--0.40 range) and are retained as
 distinct lottery-character measures.
 
 The selected three-proxy horse race (Table~\ref{tab:H3_regression}) reports
-$\mathrm{ActR2}$, $\mathrm{ActSkew}$, and $\mathrm{MAX12}$. The
-empirical finding is that $\mathrm{MAX12}$ is the proxy that
+$\text{ActR2}$, $\text{ActSkew}$, and $\text{MAX12}$. The
+empirical finding is that $\text{MAX12}$ is the proxy that
 generates a behaviorally consistent sentiment-amplification
-signature; $\mathrm{ActSkew}$ is statistically null in the headline
+signature; $\text{ActSkew}$ is statistically null in the headline
 fund-FE specification but recovers significance under the more
 demanding Lipper $\times$ year-month FE robustness; and
-$\mathrm{ActR2}$ recovers a rational-channel signal (negative
+$\text{ActR2}$ recovers a rational-channel signal (negative
 sentiment interaction) consistent with the
 \textcite{AmihudGoyenko2013} prediction.
 
@@ -4693,14 +4814,39 @@ sample, consistent with the post-2011 regime-shift evidence of
 Section~\ref{sec:subperiod} (the post-break increase in genuinely
 unskilled mass pulls the full-period $\hat{\pi}_0$ estimate
 downward relative to the pre-break-only sub-sample).
+Table~\ref{tab:perf_aggregate_FF} reports the aggregate net Carhart
+alpha on the FF subperiod, Table~\ref{tab:bootstrap_tails_FF} the
+calendar-month bootstrap percentiles,
+Table~\ref{tab:pi0_estimate_FF} the Storey $\hat{\pi}_0$ estimate,
+Table~\ref{tab:bsw_decomposition_FF} the BSW four-way decomposition,
+and Table~\ref{tab:port_agg_alpha_FF} the active-versus-passive
+aggregate-portfolio alpha on the same subperiod.
 
-Differences in point estimates between this appendix and Tables I--III
-of \textcite{FamaFrench2010} reflect the methodological choices noted
-above (LSEG-based vs.\ CRSP-based data; Evans-based vs.\
-NASD-ticker-based incubation correction; net-of-fee derivation
-direction). The qualitative invariance of the bootstrap pattern
-across the two samples is the central robustness finding of this
-appendix.
+\section{Limitations of the replication}
+\label{sec:ff_limitations}
+
+\noindent Differences in point estimates between this appendix and
+Tables I--III of \textcite{FamaFrench2010} reflect three
+methodological choices that diverge from the FF (2010) protocol and
+should be borne in mind when comparing magnitudes. First, the
+present sample uses LSEG total-return data rather than the CRSP
+mutual fund database used by FF (2010); the two sources differ in
+their treatment of share-class consolidation, fee-waiver
+adjustments, and back-fill correction, and small differences in
+fund-level returns can compound into 10--30 basis point differences
+in aggregate alpha estimates over a decade-long window. Second,
+incubation correction in this dissertation uses the
+\textcite{Evans2010} 36-month age proxy, whereas FF (2010) use the
+NASD ticker creation date; the two filters select different sets of
+incubation-eligible funds. Third, net returns in the present sample
+are computed by deducting one-twelfth of the static annual expense
+ratio from each fund's monthly gross return (following Carhart 1997
+and Wermers 2000), whereas CRSP-based studies typically use the
+fund-reported net return series directly. The qualitative
+invariance of the bootstrap pattern across the two samples ---
+left-tail rejection of the zero-skill null with right-tail
+consistency --- is the central robustness finding of this appendix
+and is independent of these point-estimate differences.
 
 % --- Appendix H --------------------------------------------------------------
 \chapter{SUB-PERIOD (BAI--PERRON) ANALYSIS}
@@ -4871,8 +5017,8 @@ requirement for reliable bootstrap inference.
 
 \noindent The headline regime-shift evidence is concentrated in the
 P3 panel. The Storey $\hat{\pi}_0$ estimate falls from approximately
-82\% in P1 to 60.8\% in P3, with the genuinely unskilled mass
-$T^-_{\gamma^*}$ rising correspondingly from approximately 11\% to 35.5\%.
+81\% in P1 to 60.8\% in P3, with the genuinely unskilled mass
+$T^-_{\gamma^*}$ rising correspondingly from approximately 11\% to 35.4\%.
 The bootstrap rejection of the zero-skill null in the left tail is
 preserved in each regime but is sharply intensified in P3, with the
 empirical $t$-statistic distribution shifted further left and the
@@ -4888,12 +5034,12 @@ in its post-Global-Financial-Crisis manifestation.
 \noindent This appendix re-estimates the core performance results
 under two alternative factor-model specifications: the
 \textcite{FamaFrench2015} five-factor model augmented with momentum
-(FF6: $\mathrm{MKT} - \mathrm{Rf}$, $\mathrm{SMB}$, $\mathrm{HML}$,
-$\mathrm{RMW}$, $\mathrm{CMA}$, $\mathrm{MOM}$) and the Carhart
+(FF6: $\text{MKT} - \text{Rf}$, $\text{SMB}$, $\text{HML}$,
+$\text{RMW}$, $\text{CMA}$, $\text{MOM}$) and the Carhart
 four-factor model augmented with the
 \textcite{PastorStambaugh2003} traded liquidity factor (Carhart$+$PSL:
-$\mathrm{MKT} - \mathrm{Rf}$, $\mathrm{SMB}$, $\mathrm{HML}$,
-$\mathrm{MOM}$, $\mathrm{LIQ}_V$). The robustness exercise is
+$\text{MKT} - \text{Rf}$, $\text{SMB}$, $\text{HML}$,
+$\text{MOM}$, $\text{LIQ}_V$). The robustness exercise is
 confined to the full-period pooled alpha, bootstrap, and BSW
 decomposition components; the rolling-alpha series, flow--performance
 regressions, and sub-period analyses are not re-estimated under
@@ -4938,29 +5084,55 @@ but the guard is in place.
 \input{tables/table_bsw_comparison_robust}
 
 \noindent The headline robustness finding is that the active-management
-puzzle survives qualitatively under FF6 and Carhart$+$PSL. Pooled EW
-net alpha remains negative under both specifications; VW net alpha
-remains modestly negative; and the BSW decomposition remains within
-the $\gamma^* = 0.20$ range documented in the main text. Indeed, the
-puzzle strengthens under FF6: the median fund alpha is more
-negative under FF6 than under Carhart, the Storey $\hat{\pi}_0$
-estimate falls slightly, and the genuinely unskilled mass
-$T^-_{\gamma^*}$ rises by approximately 1.5 percentage points. The
-intuition is that the additional FF5 factors (RMW, CMA) absorb some
-of the cross-sectional return variation that was previously captured
-by Carhart-residual alpha, and that the additional return absorbed
-disproportionately benefits funds with neutral exposures to RMW and
-CMA. The Carhart$+$PSL specification produces results within a few
-basis points of the Carhart specification, indicating that traded
-liquidity exposure is not a material missing-factor explanation for
-the puzzle.
+puzzle survives qualitatively under FF6 and Carhart$+$PSL, and indeed
+\emph{strengthens} under FF6.
+Table~\ref{tab:alpha_comparison_robust} reports the pooled
+equal-weighted alpha estimates side by side
+across the three specifications;
+Table~\ref{tab:bootstrap_comparison_robust} reports the
+\textcite{FamaFrench2010} calendar-month bootstrap percentile
+comparison on the active-fund $t(\hat{\alpha})$ distribution; and
+Table~\ref{tab:bsw_comparison_robust} reports the
+\textcite{BarrasScailletWermers2010} four-way decomposition at the
+canonical $\gamma^* = 0.20$ threshold. Pooled EW net alpha is
+$-2.12\%$ per annum under Carhart, $-2.25\%$ under FF6, and
+$-2.06\%$ under Carhart$+$PSL --- all materially negative and
+statistically significant. The BSW decomposition is the most
+informative single statistic: at $\gamma^* = 0.20$, the genuinely
+unskilled mass $T^-_{\gamma^*}$ stands at $21.0\%$ under Carhart,
+rises to $28.2\%$ under FF6 (a $7.2$-percentage-point increase), and
+falls marginally to $20.6\%$ under Carhart$+$PSL. The Storey
+$\hat{\pi}_0$ estimate moves from $77.6\%$ (Carhart) to $66.0\%$
+under FF6 (an $11.6$-percentage-point drop) and to $76.4\%$ under
+Carhart$+$PSL (essentially unchanged). The two effects --- a lower
+$\hat{\pi}_0$ and a higher $T^-_{\gamma^*}$ under FF6 --- are
+complementary: as the model absorbs more of the cross-sectional
+return variance into factor exposure, the residual mass that the
+estimator attributes to genuine zero-alpha behaviour shrinks, and a
+larger fraction of the cross-section is identified as genuinely
+unskilled rather than indistinguishable-from-zero.
+
+The intuition is that the additional FF5 factors (RMW, CMA) absorb
+cross-sectional return variation that was previously captured by
+Carhart-residual alpha, with the absorbed return disproportionately
+benefiting funds with neutral exposures to RMW and CMA --- which
+shifts the relative position of underperforming funds in the
+cross-section toward the significantly-negative tail. The
+Carhart$+$PSL specification produces pooled-alpha and BSW estimates
+within $1$--$2$ percentage points of the Carhart specification,
+indicating that traded liquidity exposure is not a material
+missing-factor explanation for the puzzle. The genuinely skilled
+mass $T^+_{\gamma^*}$ remains marginally negative across all three
+specifications, consistent with the no-detectable-skill reading of
+the main-text findings.
 
 The robustness evidence supports the dissertation's main empirical
-argument under three of the most natural alternative factor-model
+argument under all three of the most natural alternative factor-model
 specifications. The defensive position is that the puzzle is not
 factor-model specific: it survives the addition of the FF5
-profitability and investment factors and the Pástor--Stambaugh
-liquidity factor.
+profitability and investment factors (where it materially
+strengthens) and the \textcite{PastorStambaugh2003} liquidity factor
+(where it is essentially unchanged).
 
 % --- Appendix J --------------------------------------------------------------
 \chapter{BEHAVIORAL HYPOTHESIS ROBUSTNESS CHECKS}
@@ -4988,14 +5160,17 @@ endogenous flow response into the regime-indicator coefficient.
 
 \input{tables/table_H3_lagged}
 
+\begingroup
+\captionsetup{font=footnotesize, justification=raggedright, singlelinecheck=false}  % T2.11: match caption size to longtable body (\fontsize{9}{11}) and left-align
 \input{tables/table_H4_lagged}
+\endgroup
 
 \noindent The qualitative findings of the headline specifications are
 preserved under the one-month-lagged state variables. H1's
 sentiment-convexity asymmetry test produces a $z$-statistic in the
 same direction as the headline result. H2's margin-call channel
 preserves its directional sign under the lagged state. H3's
-$\mathrm{MAX12}$ amplification result is statistically significant
+$\text{MAX12}$ amplification result is statistically significant
 ($z = +1.83$). H4's joint $\chi^2$ test on the triple interactions
 is statistically insignificant under the lagged state, consistent
 with the rational null. The lagged-state robustness therefore
@@ -5022,20 +5197,25 @@ alternative identification.
 
 \input{tables/table_H3_robustness}
 
+\begingroup
+\captionsetup{font=footnotesize, justification=raggedright, singlelinecheck=false}  % T2.11: match caption size to longtable body (\fontsize{9}{11}) and left-align
 \input{tables/table_H4_robustness}
+\endgroup
 
 \noindent The qualitative findings of the headline specifications
 are confirmed under the Lipper $\times$ year-month fixed-effect
 structure. H1's sentiment-convexity asymmetry is preserved. H2's
-margin-call channel is preserved. H3's $\mathrm{MAX12}$ result is
-strengthened ($p = 0.004$); $\mathrm{ActSkew}$ recovers significance
-under the more demanding fixed-effect structure
-($z = +1.92$, $p = 0.027$); $\mathrm{ActR2}$ becomes statistically
-null ($p = 0.883$), consistent with the rational-channel reading of
-the headline negative interaction rather than a robust behavioral
-signal. H4's joint $\chi^2$ test remains statistically
-insignificant. The Lipper $\times$ year-month robustness therefore
-confirms that the H1--H3 behavioral signatures and the H4 rational
-null are not artifacts of the fund fixed-effect identification.
+margin-call channel is preserved. H3's $\text{MAX12}$ joint test
+remains significant at 5\% ($\chi^2_2 = 8.36$, $p = 0.015$);
+$\text{ActSkew}$ becomes significant under the more demanding
+fixed-effect structure ($\chi^2_2 = 20.74$, $p < 0.001$;
+$z = +2.17$, $p = 0.015$); $\text{ActR2}$ remains statistically
+null ($\chi^2_2 = 0.13$, $p = 0.935$), consistent with the
+rational-channel reading of the headline negative interaction
+rather than a robust behavioral signal. H4's joint $\chi^2$ test
+remains statistically insignificant. The Lipper $\times$ year-month
+robustness therefore confirms that the H1--H3 behavioral signatures
+and the H4 rational null are not artifacts of the fund fixed-effect
+identification.
 
 \end{document}
