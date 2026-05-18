@@ -161,7 +161,7 @@ fmt_p <- function(p) {
 # matches Table 4.8 (BSW decomposition) caption style per SBE convention.
 longtable_note <- function(s, note) {
   note_para <- paste0(
-    "\\vspace{-0.5\\baselineskip}\n",
+    "\\vspace{-\\baselineskip}\n",
     "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
     "\\end{singlespace}\n\n"
   )
