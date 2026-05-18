@@ -2142,6 +2142,167 @@ is omitted for this secondary conditional test; the full bootstrap
 machinery is reserved for the unconditional persistence test of
 Section~\ref{sec:persistence} and Table~\ref{tab:persistence}.
 
+\section{Persistence testing methodology}
+\label{sec:persistence_design}
+
+\noindent Performance persistence is evaluated with two complementary methods
+that share an identical formation and holding period design, enabling direct
+comparison of inference across methodologies. The first, following
+\textcite{Carhart1997}, uses parametric inference on the pooled holding-period
+alphas of decile portfolios formed on past performance rank. The second, following
+\textcite{KosowskiTimmermannWermersWhite2006} (KTWW), augments the same portfolio
+framework with a cross-sectional bootstrap that replaces parametric $t$-tests with
+empirically calibrated null distributions, correcting for the non-normality and
+cross-sectional heterogeneity documented in mutual fund return distributions.
+Both methods are applied over the full sample and separately within each of the
+three Bai--Perron structural regimes identified in
+Section~\ref{sec:subperiod_methodology}.
+
+The formation period is set to 36 months and the holding period to 12 months,
+the standard choices in the persistence literature that directly replicate the
+design of \textcite{Carhart1997} and \textcite{KosowskiTimmermannWermersWhite2006}.
+A 36-month formation window provides sufficient observations to estimate Carhart
+four-factor loadings and alphas with reasonable precision;
+\textcite{KosowskiTimmermannWermersWhite2006} show that shortening the formation
+window to 12 months substantially increases non-normality in the alpha distribution
+of ranked portfolios. A 12-month holding period is the universal standard in the
+persistence literature \parencite{Carhart1997,BollenBusse2005} and avoids
+conflating momentum effects with genuine managerial skill persistence.
+
+Formation and holding windows are non-overlapping and do not share calendar months.
+Ranking date k uses the 36 months ending at the close of year k, with the
+subsequent 12 calendar months constituting holding period k. The cohort at
+ranking date $k$ comprises all active funds in the \textcite{Evans2010} corrected
+panel with at least 24 monthly return observations during the formation window,
+using gross returns throughout for consistency with the main bootstrap analysis.
+Seven complete, non-overlapping cohorts are available over the full sample
+(January~1995 -- February~2026); a partial eighth cohort whose holding window
+covers only January and February~2026 is excluded from inference. The seven
+retained cohorts yield 84 pooled monthly portfolio return observations per decile
+for the full-sample analysis.
+
+The formation-period ranking signal is the t-statistic of the formation-period
+Carhart alpha, $t(\hat{\alpha}_i)$, estimated with Newey--West standard errors
+at a three-month lag. Ranking by $t(\hat{\alpha}_i)$ rather than by the raw
+alpha normalises for estimation precision, reducing the influence of
+high-volatility funds whose extreme alpha estimates are more likely to reflect
+sampling noise than genuine skill \parencite{KosowskiTimmermannWermersWhite2006}.
+Raw-alpha ranking is implemented as a robustness check (Panel~B of
+Table~\ref{tab:persistence}). At each ranking date, all eligible funds are sorted
+into ten deciles by $t(\hat{\alpha}_i)$, with Decile~1 (D1) containing the
+highest-ranked funds and Decile~10 (D10) the lowest. Equal-weighted portfolios
+are formed within each decile; funds that exit during the 12-month holding
+period are included through their last available return and the portfolio is
+rebalanced proportionally among surviving members
+\parencite{Carhart1997,KosowskiTimmermannWermersWhite2006}. This treatment
+prevents survivorship bias from attenuating the negative alpha estimates of
+the bottom decile.
+
+For parametric inference, monthly equal-weighted holding-period returns for
+decile $d$ are pooled across all cohorts $k = 1, \ldots, K$ to form a time
+series of $T_d = 12 \times K$ monthly observations. The Carhart four-factor
+model is estimated on this pooled series:
+\begin{equation}
+  R^d_t - RF_t \;=\; \alpha^d + \beta^d\,\mathit{MKT\_RF}_t
+    + s^d\,\mathit{SMB}_t + h^d\,\mathit{HML}_t
+    + p^d\,\mathit{MOM}_t + u^d_t
+  \label{eq:persistence_pooled}
+\end{equation}
+% AFTER
+where $t(\hat{\alpha}^d) = \hat{\alpha}^d /
+\mathrm{SE}_{\mathrm{NW}}(\hat{\alpha}^d)$ and
+$\mathrm{SE}_{\mathrm{NW}}$ denotes Newey--West standard errors with
+a 12-month lag truncation. Pooling across cohorts rather than estimating
+cohort-by-cohort is a deliberate design choice: with only 12 monthly
+observations per cohort, cohort-level estimation of a five-parameter model
+is unreliable. The key assumption --- that factor loadings are sufficiently
+stationary across cohorts within a structural regime --- is addressed in the
+sub-period panels, which pool only within each Bai--Perron regime.
+
+The KTWW bootstrap replaces parametric inference with an empirically calibrated
+null. For each fund $i$ in cohort $k$, holding-period residuals are computed by
+projecting actual holding-period returns onto the Carhart factors using
+formation-period loadings:
+\begin{equation}
+  \hat{\varepsilon}^{\mathrm{hold}}_{it} = r_{it}
+    - \hat{\beta}_i\,\mathit{MKT\_RF}_t
+    - \hat{s}_i\,\mathit{SMB}_t
+    - \hat{h}_i\,\mathit{HML}_t
+    - \hat{p}_i\,\mathit{MOM}_t.
+  \label{eq:ktww_resid}
+\end{equation}
+Using formation-period loadings rather than re-estimating them from the
+holding period is essential: the null is conditioned on each fund's known
+risk profile as of the ranking date. In each of B = 10{,}000 iterations,
+a resample is drawn with replacement from each fund's holding-period
+residuals; the same draw index is applied to all funds alive in the same
+calendar month, preserving the empirical cross-sectional correlation structure
+\parencite{KosowskiTimmermannWermersWhite2006}. Zero-alpha pseudo-returns are
+then constructed as:
+\begin{equation}
+  r^b_{it} = \hat{\beta}_i\,\mathit{MKT\_RF}_t
+    + \hat{s}_i\,\mathit{SMB}_t
+    + \hat{h}_i\,\mathit{HML}_t
+    + \hat{p}_i\,\mathit{MOM}_t
+    + \hat{\varepsilon}^b_{it}.
+  \label{eq:ktww_pseudo}
+\end{equation}
+By omitting the intercept, the null of zero true alpha is imposed by
+construction while factor realisations remain actual, not resampled.
+Equal-weighted pseudo decile portfolio returns are pooled across cohorts
+and the Carhart model re-estimated; the bootstrapped t-statistic
+$t(\hat{\alpha}^{d,b})$ is recorded. % AFTER
+Left-tail bootstrap $p$-values,
+\begin{equation}
+  p_{\mathrm{LB}}(d) = \frac{1}{B}\sum_{b=1}^{B}
+    \mathbf{1}\!\left[t(\hat{\alpha}^{d,b}) 
+    t(\hat{\alpha}^{d,\mathrm{actual}})\right],
+  \label{eq:boot_pval_persist}
+\end{equation}
+test for persistent underperformance; right-tail $p$-values test for
+persistent outperformance.
+The Jarque--Bera statistic is reported for each decile portfolio; where it
+rejects at the 5\% level the bootstrap p-values constitute the valid
+inferential basis and the parametric results are reported for
+comparability only.
+
+The sub-period panels restrict cohorts to within-regime windows.
+Panel~C of Table~\ref{tab:persistence} pools the two cohorts whose
+holding windows fall within P1 (pre-2006); Panel~D pools the single
+cohort whose formation and holding windows both fall within P2
+(January~2006 -- September~2011); Panel~E pools the two cohorts
+whose holding windows fall within P3 (October~2011 onwards). Panel~F
+reports a cross-regime test using the two cohorts whose formation
+windows straddle a regime boundary: Cohort~3 (formation
+January~2003 -- December~2005, holding January~2006 -- December~2006,
+spanning the P1/P2 break) and Cohort~5 (formation
+January~2011 -- December~2013, holding January~2014 -- December~2014,
+spanning the P2/P3 break). This cross-regime design tests whether
+the regime transitions identified in Section~\ref{sec:subperiod}
+amplify the persistence asymmetry by exposing formation-period losers
+to the deteriorating alpha environment of the subsequent structural
+regime.
+
+The activeness-conditioned persistence extension of
+Table~\ref{tab:activeness_persistence} applies an identical cohort
+structure, formation window, and pooled holding-period regression,
+adding only an activeness pre-sort. At each ranking date, funds are
+first partitioned into three terciles by their cohort-local formation-window
+$1-R^2$ --- computed within the same 36-month window used to estimate
+$t(\hat{\alpha}_i)$, so that no forward-looking information enters the
+classification --- and then within each tercile into ten alpha deciles
+by $t(\hat{\alpha}_i)$. Tercile breakpoints are computed cross-sectionally
+within each cohort's eligible fund universe to avoid look-ahead
+contamination. This $10 \times 3$ bivariate sort bridges the
+activeness analysis of Section~\ref{sec:activeness} and the persistence
+results: if activeness amplifies the persistence asymmetry
+asymmetrically at the loser tail, the behavioral narrative of
+disproportionate capital retention in active underperformers is
+materially sharpened. Bootstrap inference is omitted from the
+activeness-conditioned table; parametric Newey--West $t$-statistics
+are reported at a 12-month lag, consistent with the primary persistence
+table.
+
 \section{Behavioral state variables}
 \label{sec:state_variables}
 
@@ -2926,6 +3087,10 @@ the \textcite{BerkGreen2004} model, be inconsistent with the
 rational equilibrium because investors should rationally arbitrage
 predictable performance away.
 
+The test design --- formation and holding period windows, cohort structure,
+decile construction, and the KTWW bootstrap null --- is described in
+Section~\ref{sec:persistence_design}.
+
 \begin{landscape}
 \lscapenumtrue
 \pagestyle{lscapeblank}%
@@ -2971,7 +3136,7 @@ materially negative; the asymmetry of persistence is therefore not
 an artifact of any single regime. Panel F reports the cross-regime
 persistence test on cohorts straddling regime boundaries; the
 persistence asymmetry is amplified in this configuration, with the
-D1$-$D10 spread reaching $+0.287\%$ per month (significant at 1\%) --- evidence that the
+D1$-$D10 spread reaching +0.287\% per month (significant at 1\%) --- evidence that the
 regime-shift evidence of Section~\ref{sec:subperiod} is
 behaviorally identified rather than merely statistical.
 
@@ -2980,28 +3145,28 @@ behaviorally identified rather than merely statistical.
 Table~\ref{tab:activeness_persistence} extends the
 persistence analysis along the activeness dimension, using a
 $10 \times 3$ bivariate sort. Within each cohort, funds are
-partitioned into three terciles by formation-window $1-R^2$ (cohort-
-local, computed within the same 36-month window used to rank fund
+partitioned into three terciles by formation-window $1-R^2$ (cohort-local, 
+computed within the same 36-month window used to rank fund
 alphas), and within each tercile into ten alpha-decile portfolios.
 The headline finding concerns the cross-tercile pattern of within-tercile
 persistence spreads. In the lowest activeness tercile T1
-(closet indexers), the D1$-$D10 alpha spread is $-0.014\%$ per
+(closet indexers), the D1-D10 alpha spread is -0.014\% per
 month, statistically indistinguishable from zero --- formation rank
 carries no information among the least-active funds. In the middle
-activeness tercile T2, the spread widens to $+0.172\%$ ($t = 2.26$,
+activeness tercile T2, the spread widens to +0.172\% (t = 2.26,
 significant at 5\%). In the highest activeness tercile T3, the spread
-reaches $+0.300\%$ ($t = 1.83$, significant at 10\%, annualised
-approximately $3.6\%$).
+reaches +0.300\% (t = 1.83, significant at 10\%, annualised
+approximately 3.6\%).
 
 The pattern is that formation-rank information becomes more useful
 as funds become more active. The T1 (closet-indexer) population
 exhibits no predictability between past and future relative
 performance; the T2 and T3 (more-active) populations exhibit
-detectable persistence in the D1$-$D10 spread. In the highest
-activeness tercile, the D10 alpha is $-0.221\%$ per month
-($t = -1.63$), slightly worse than the unconditional Panel-A D10 of
-$-0.189\%$, while T3 D1 carries a small positive point estimate
-($+0.080\%$) that is statistically indistinguishable from zero. The
+detectable persistence in the D1-D10 spread. In the highest
+activeness tercile, the D10 alpha is -0.221\% per month
+(t = -1.63), slightly worse than the unconditional Panel-A D10 of
+-0.189\%, while T3 D1 carries a small positive point estimate
+(+0.080\%) that is statistically indistinguishable from zero. The
 within-tercile spreads are therefore driven jointly by D1 winners
 performing modestly better and D10 losers performing modestly worse
 as activeness rises. The pattern is consistent with the
@@ -3030,7 +3195,7 @@ single pre-2006 regime (P1) for the sub-period analysis.
 The fourth break, at September 2011 with a tight 95\% Newey--West HAC
 confidence interval of March 2011--December 2011, marks the largest
 single regime-mean shift in the sample: the regime-mean alpha drops
-from $+0.74\%$ per annum in the 2006--Sep 2011 segment to $-1.39\%$
+from +0.74\% per annum in the 2006--Sep 2011 segment to -1.39\%
 per annum in the Oct 2011--2026 segment, a swing of approximately 210
 basis points. The fifth break, at January 2023 with a wider confidence
 interval of August 2021--February 2025, marks a further intensification
@@ -3040,9 +3205,9 @@ pooled with the Oct~2011-onward segment in the sub-period analysis.
 
 The three-regime partition adopted for the sub-period bootstrap and
 BSW analyses is therefore: P1 (December 1996--December 2005, 109
-months, regime-mean $+0.05\%$), P2 (January 2006--September 2011,
-69 months, regime-mean $+0.74\%$), and P3 (October 2011--January
-2026, 172 months, regime-mean $-1.39\%$). Each regime has $T \geq
+months, regime-mean +0.05\%), P2 (January 2006--September 2011,
+69 months, regime-mean +0.74\%), and P3 (October 2011--January
+2026, 172 months, regime-mean -1.39\%). Each regime has $T \geq
 60$ monthly observations. The full bootstrap and BSW results by
 sub-period are reported in Appendix~\ref{app:subperiod}.
 
@@ -3065,16 +3230,15 @@ entry/exit dynamics --- is taken up in Chapter~\ref{ch:discussion}.
 \noindent The empirical chapters preceding this one establish three facts
 that constrain any behavioral interpretation of the active management
 puzzle. First, the equal-weighted net alpha for active funds is
-materially negative ($-1.361\%$ per annum) while the value-weighted
-analogue is smaller in magnitude ($-0.900\%$); the puzzle is located in
+materially negative (-1.361\% per annum) while the value-weighted
+analogue is smaller in magnitude (-0.900\%); the puzzle is located in
 the cross-section. Second, the
 \textcite{BarrasScailletWermers2010} false-discovery decomposition
 identifies a population unskilled mass of approximately 21\% (at $\gamma^*=20\%$) with no
 detectable population skilled mass, and a Bai--Perron structural break
 at September 2011 that materially intensifies the unskilled
-proportion in the post-break regime. Third, activeness predicts worse
-risk-adjusted returns net of fees in the cross-section, and amplifies
-loser persistence in the longitudinal dimension. These facts jointly
+proportion in the post-break regime. 
+Third, activeness does not predict significantly different risk-adjusted returns net of fees in the cross-section — the gross alpha premium associated with higher activeness is approximately offset by higher fees, consistent with Berk and Green (2004) equilibrium pricing at the activeness margin. These facts jointly
 falsify the simple ``investors are paying for skill'' interpretation:
 investors are paying a premium for activeness that destroys
 risk-adjusted value, and the channel of that mistake must be
@@ -4787,7 +4951,6 @@ heterogeneity.
 
 \input{tables/table10b_bsw_decomposition_FF}
 
-\input{tables/table_port_agg_alpha_FF}
 
 \section{Comparison with Fama and French (2010)}
 \label{sec:ff_comparison}
