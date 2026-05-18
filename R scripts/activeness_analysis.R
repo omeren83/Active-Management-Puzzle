@@ -296,7 +296,7 @@ write_tex <- function(s, fn, resize = TRUE, small = FALSE) {
 longtable_note <- function(s, note, n_cols) {
   note_para <- paste0(
     "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
-    "\\end{singlespace}\n\n"
+    "\\end{singlespace}\\par\\vspace{24pt}\n\n"
   )
   parts <- strsplit(s, "\\end{longtable}", fixed = TRUE)[[1]]
   paste0(parts[1], "\\end{longtable}\n", note_para,

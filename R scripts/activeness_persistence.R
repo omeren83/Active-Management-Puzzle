@@ -162,7 +162,7 @@ fmt_p <- function(p) {
 longtable_note <- function(s, note) {
   note_para <- paste0(
     "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
-    "\\end{singlespace}\n\n"
+    "\\end{singlespace}\\par\\vspace{24pt}\n\n"
   )
   parts <- strsplit(s, "\\end{longtable}", fixed = TRUE)[[1]]
   paste0(parts[1], "\\end{longtable}\n", note_para,

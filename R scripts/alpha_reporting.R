@@ -322,7 +322,7 @@ longtable_note_after <- function(s, note) {
     "\\begin{minipage}{0.92\\linewidth}\n",
     "\\footnotesize\\textit{Note:} ", note, "\n",
     "\\end{minipage}\n",
-    "\\par\\medskip\n"
+    "\\par\\vspace{24pt}\n"
   )
   sub("\\end{longtable}", replacement, s, fixed = TRUE)
 }
