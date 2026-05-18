@@ -3,9 +3,12 @@ cd "D:\TEZ"
 git status
 
 git add -A  
-git commit -m 'Phase B complete: threeparttable_note_after() across 10 scripts; Patches 1-3; bold/texttt sweeps; alpha_reporting v8.5'
+git commit -m 'spacing between table and caption fixed'
 git push
 
 PULL
 cd /d "D:\TEZ"
 git pull
+
+
+git pull --rebase

@@ -161,7 +161,6 @@ fmt_p <- function(p) {
 # matches Table 4.8 (BSW decomposition) caption style per SBE convention.
 longtable_note <- function(s, note) {
   note_para <- paste0(
-    "\\vspace{-\\baselineskip}\n",
     "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
     "\\end{singlespace}\n\n"
   )
@@ -173,8 +172,10 @@ longtable_note <- function(s, note) {
 
 # Wrap longtable in footnotesize + tight tabcolsep for portrait fit
 wrap_lt_small <- function(s, tabcolsep = "4pt") {
+  # \setlength{\LTpost}{0pt} is scoped to the brace group, neutralizing the
+  # 36pt \LTpost set globally in the preamble for this table only.
   opener <- paste0("{\\setlength{\\tabcolsep}{", tabcolsep,
-                   "}\\footnotesize\n\\begin{longtable}")
+                   "}\\setlength{\\LTpost}{0pt}\\footnotesize\n\\begin{longtable}")
   parts_open <- strsplit(s, "\\begin{longtable}", fixed = TRUE)[[1]]
   s <- paste0(parts_open[1], opener,
               if (length(parts_open) > 1) parts_open[2] else "")

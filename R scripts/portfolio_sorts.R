@@ -239,7 +239,6 @@ write_tex <- function(s, fn, resize = TRUE, small = FALSE) {
 # matches Table 4.8 (BSW decomposition) caption style per SBE convention.
 longtable_note <- function(s, note, n_cols) {
   note_para <- paste0(
-    "\\vspace{-\\baselineskip}\n",
     "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
     "\\end{singlespace}\n\n"
   )
@@ -257,8 +256,12 @@ longtable_note <- function(s, note, n_cols) {
 # defeated by the enclosing {\footnotesize} scope — visible as a 9 pt caption
 # in the compiled PDF. This fix is self-contained: no manual post-edit needed.
 wrap_lt_small <- function(s, tabcolsep = "3pt") {
+  # \setlength{\LTpost}{0pt} is scoped to the brace group, neutralizing the
+  # 36pt \LTpost set globally in the preamble for this table only. Without
+  # this, the post-longtable gap eats ~36pt that the note can't absorb.
   opener <- paste0(
-    "{\\setlength{\\tabcolsep}{", tabcolsep, "}\\footnotesize\n",
+    "{\\setlength{\\tabcolsep}{", tabcolsep, "}",
+    "\\setlength{\\LTpost}{0pt}\\footnotesize\n",
     "\\captionsetup{font=normalsize}\\begin{longtable}"   # ← caption override
   )
   parts_open <- strsplit(s, "\\begin{longtable}", fixed = TRUE)[[1]]
