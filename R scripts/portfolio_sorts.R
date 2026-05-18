@@ -233,9 +233,15 @@ write_tex <- function(s, fn, resize = TRUE, small = FALSE) {
 }
 
 # Append a note paragraph AFTER \end{longtable} (not inside the body).
+# Format mirrors clean_latex() floating-table branch: \begin{singlespace}
+# wrapper ensures the note renders single-spaced (the document default is
+# \doublespacing via setspace). No "Note:" prefix and no \textit{} wrapping —
+# matches Table 4.8 (BSW decomposition) caption style per SBE convention.
 longtable_note <- function(s, note, n_cols) {
   note_para <- paste0(
-    "{\\footnotesize\\noindent\\textit{Note:} ", note, "}\n\\par\\medskip\n\n"
+    "\\par\\medskip\n",
+    "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
+    "\\end{singlespace}\n\n"
   )
   parts <- strsplit(s, "\\end{longtable}", fixed = TRUE)[[1]]
   paste0(parts[1], "\\end{longtable}\n", note_para,
@@ -565,7 +571,7 @@ make_char_panel <- function(port_df, grp) {
     group_by(quintile) %>%
     summarise(
       N_Avg    = fmt(mean(n_funds,            na.rm = TRUE), 0),
-      Mean_TNA = fmt(mean(mean_tna,           na.rm = TRUE), 1),
+      Mean_TNA = fmt(mean(mean_tna,           na.rm = TRUE), 0),
       Mean_ER  = fmt(mean(mean_er,            na.rm = TRUE), 2),
       Mean_Turn= fmt(mean(mean_turn,          na.rm = TRUE), 1),
       EW_Gross = fmt(mean(ret_ew_gross * 100, na.rm = TRUE)),
@@ -853,10 +859,12 @@ build_alpha_table <- function(alpha_df, sort_name, cap, lab, fn_text) {
 # Shared footnote: updated to reflect (a) beta t-stats now shown,
 # (b) RF omission for spreads, (c) significance stars.
 fn_base <- paste(
-  "\\textcite{Carhart1997} four-factor time-series regressions on monthly portfolio returns.",
-  "Alphas annualised ($\\times 12$, \\%). Q5$-$Q1: long-short spread; the risk-free",
-  "rate is omitted from the spread return because it cancels in the self-financing",
-  "construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$.",
+  "Monthly EW and VW portfolio returns regressed on CAPM, Fama-French",
+  "three-factor, and \\textcite{Carhart1997} four-factor models.",
+  "Alphas annualised ($\\times 12$, \\%). Q5$-$Q1: long-short spread;",
+  "the risk-free rate is omitted from the spread return because it",
+  "cancels in the self-financing construction:",
+  "$(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$.",
   "EW: equal-weighted; VW: lagged-TNA-weighted.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\% respectively.",

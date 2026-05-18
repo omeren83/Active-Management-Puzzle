@@ -154,10 +154,16 @@ fmt_p <- function(p) {
   formatC(round(as.numeric(p), 3), format = "f", digits = 3)
 }
 
-# Append \textit{Notes:} paragraph after \end{longtable}
+# Append a note paragraph AFTER \end{longtable} (not inside the body).
+# Format mirrors clean_latex() floating-table branch: \begin{singlespace}
+# wrapper ensures the note renders single-spaced (the document default is
+# \doublespacing via setspace). No "Notes:" prefix and no \textit{} wrapping —
+# matches Table 4.8 (BSW decomposition) caption style per SBE convention.
 longtable_note <- function(s, note) {
   note_para <- paste0(
-    "{\\footnotesize\\noindent\\textit{Notes:} ", note, "}\n\\par\\medskip\n\n"
+    "\\par\\medskip\n",
+    "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
+    "\\end{singlespace}\n\n"
   )
   parts <- strsplit(s, "\\end{longtable}", fixed = TRUE)[[1]]
   paste0(parts[1], "\\end{longtable}\n", note_para,
