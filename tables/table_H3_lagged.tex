@@ -3,7 +3,6 @@
 \caption{\label{tab:H3_lagged}H3 Robustness --- Lagged Sentiment}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\setlength{\tabcolsep}{3pt}
-\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
@@ -39,8 +38,9 @@ Joint test ($\chi^2_2$, $p$) & -- & 3.02 (0.221) & 1.47 (0.481) & 10.72 (0.005)\
 Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=-0.29 (p=0.613) & z=-0.40 (p=0.656) & z=+1.58 (p=0.057)\\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{	ext{SENT}}_{t-1}$ replaces $D^{	ext{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{tablenotes}
-\end{threeparttable}}
+
 \end{table}
+\begin{singlespace}\footnotesize\noindent
+Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{	ext{SENT}}_{t-1}$ replaces $D^{	ext{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{singlespace}
+

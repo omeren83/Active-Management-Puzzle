@@ -3,7 +3,6 @@
 \caption{\label{tab:H2_lagged}H2 Robustness --- Lagged State Variables}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\setlength{\tabcolsep}{3pt}
-\begin{threeparttable}
 \begin{tabular}[t]{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{MD,Det}}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
@@ -50,8 +49,9 @@ Loser-end test ($z$, 1-sided $p$) & -- & z=+1.92 (p=0.973) & z=+0.16 (p=0.564) &
 Asymmetry ($z$, 1-sided $p$) & -- & z=-0.54 (p=0.707) & z=+0.21 (p=0.417) & z=-0.56 (p=0.712)\\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{	ext{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{	ext{MD,Det}}_{t-1}$ and $D^{	ext{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{tablenotes}
-\end{threeparttable}}
+
 \end{table}
+\begin{singlespace}\footnotesize\noindent
+Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{	ext{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{	ext{MD,Det}}_{t-1}$ and $D^{	ext{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{singlespace}
+

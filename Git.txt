@@ -3,7 +3,7 @@ cd "D:\TEZ"
 git status
 
 git add -A  
-git commit -m 'spacing between table and caption fixed'
+git commit -m 'overflowing tables fixed'
 git push
 
 PULL

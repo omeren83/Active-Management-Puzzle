@@ -270,7 +270,7 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
 
   # Generic kableExtra fixes.
   x <- gsub("\\\\end[{]threeparttable[}][}]", "\\\\end{threeparttable}", x)
-  x <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", x, fixed = TRUE)
+  x <- gsub("\\begin{table}[!h]", "\\begin{table}[!htbp]", x, fixed = TRUE)
 
   # ---- Longtable branch (Phase 2.3 stretching + Phase 2.4 12pt gap) -------
   if (grepl("\\\\begin\\{longtable\\}", x)) {
@@ -307,20 +307,20 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
   tabular <- substring(x, tab_m, tab_m + attr(tab_m, "match.length") - 1L)
 
   notes_m <- regexpr(
-    "(?s)\\\\begin\\{tablenotes\\}\\s*\\\\item\\s+(.*?)\\\\end\\{tablenotes\\}",
+    "(?s)\\\\begin\\{tablenotes\\}.*?\\\\item\\s+(.*?)\\\\end\\{tablenotes\\}",
     x, perl = TRUE
   )
   notes <- ""
   if (notes_m != -1) {
     full_block <- substring(x, notes_m, notes_m + attr(notes_m, "match.length") - 1L)
-    inner <- sub("^(?s)\\\\begin\\{tablenotes\\}\\s*\\\\item\\s+", "",
+    inner <- sub("^(?s)\\\\begin\\{tablenotes\\}.*?\\\\item\\s+", "",
                  full_block, perl = TRUE)
     inner <- sub("(?s)\\\\end\\{tablenotes\\}\\s*$", "", inner, perl = TRUE)
     notes <- trimws(inner)
   }
 
   out <- paste0(
-    "\\begin{table}[H]\n",
+    "\\begin{table}[!htbp]\n",
     "\\centering\n",
     "\\sbox{\\tabletempbox}{%\n",
     "\\footnotesize\n",

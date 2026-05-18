@@ -218,7 +218,7 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
 
   # Generic kableExtra fixes.
   x <- gsub("\\\\end[{]threeparttable[}][}]", "\\\\end{threeparttable}", x)
-  x <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", x, fixed = TRUE)
+  x <- gsub("\\begin{table}[!h]", "\\begin{table}[!htbp]", x, fixed = TRUE)
 
   # ---- Longtable branch (Phase 2.3 stretching + Phase 2.4 12pt gap) -------
   if (grepl("\\\\begin\\{longtable\\}", x)) {
@@ -255,20 +255,20 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
   tabular <- substring(x, tab_m, tab_m + attr(tab_m, "match.length") - 1L)
 
   notes_m <- regexpr(
-    "(?s)\\\\begin\\{tablenotes\\}\\s*\\\\item\\s+(.*?)\\\\end\\{tablenotes\\}",
+    "(?s)\\\\begin\\{tablenotes\\}.*?\\\\item\\s+(.*?)\\\\end\\{tablenotes\\}",
     x, perl = TRUE
   )
   notes <- ""
   if (notes_m != -1) {
     full_block <- substring(x, notes_m, notes_m + attr(notes_m, "match.length") - 1L)
-    inner <- sub("^(?s)\\\\begin\\{tablenotes\\}\\s*\\\\item\\s+", "",
+    inner <- sub("^(?s)\\\\begin\\{tablenotes\\}.*?\\\\item\\s+", "",
                  full_block, perl = TRUE)
     inner <- sub("(?s)\\\\end\\{tablenotes\\}\\s*$", "", inner, perl = TRUE)
     notes <- trimws(inner)
   }
 
   out <- paste0(
-    "\\begin{table}[H]\n",
+    "\\begin{table}[!htbp]\n",
     "\\centering\n",
     "\\sbox{\\tabletempbox}{%\n",
     "\\footnotesize\n",
@@ -316,13 +316,16 @@ longtable_note <- function(s, note, n_cols) {
 # columns to span 97% of textwidth regardless of content, producing visible
 # whitespace between narrow numeric columns (Table B.1 symptom). Placing the
 # note outside lets the longtable size to its natural content width.
+#
+# Caption format matches Tables 4.9-4.18: no italic "Note:" prefix,
+# \begin{singlespace} wrapper for single-line spacing under the doublespaced
+# document default, footnotesize body, no enclosing minipage (paragraph
+# flows naturally and breaks across pages if needed).
 longtable_note_after <- function(s, note) {
   replacement <- paste0(
     "\\end{longtable}\n",
-    "\\begin{minipage}{0.92\\linewidth}\n",
-    "\\footnotesize\\textit{Note:} ", note, "\n",
-    "\\end{minipage}\n",
-    "\\par\\vspace{24pt}\n"
+    "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
+    "\\end{singlespace}\n"
   )
   sub("\\end{longtable}", replacement, s, fixed = TRUE)
 }
@@ -356,9 +359,14 @@ threeparttable_note_after <- function(s) {
 # longtable positioning that kableExtra preserves but which callers may
 # want to enforce explicitly when a previous wrapper altered it).
 wrap_lt_small <- function(s, tabcolsep = "3pt") {
+  # \setlength{\LTpost}{0pt} is scoped to the brace group, neutralizing the
+  # 36pt \LTpost set globally in the preamble for this table only — gives a
+  # tight gap between the longtable and its caption paragraph (matches
+  # Tables 4.9-4.18).
   opener <- paste0("{\\setlength{\\tabcolsep}{", tabcolsep,
                    "}\\setlength{\\LTleft}{\\fill}",
                    "\\setlength{\\LTright}{\\fill}",
+                   "\\setlength{\\LTpost}{0pt}",
                    "\\footnotesize\n\\begin{longtable}")
   parts_open <- strsplit(s, "\\begin{longtable}", fixed = TRUE)[[1]]
   s <- paste0(parts_open[1], opener,

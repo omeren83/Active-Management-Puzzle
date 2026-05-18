@@ -226,7 +226,10 @@ fn <- paste0(
 # Phase B helper: extract tablenotes from a threeparttable float and re-emit
 # them AFTER \end{table} as a flowing paragraph (NOT a minipage).
 threeparttable_note_after_compact <- function(s) {
-  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  # FIX: (?s) modifier so '.' matches newlines; tablenotes block always spans
+  # multiple lines so the previous regex silently failed and left the note
+  # trapped inside the float environment, causing page-bottom overflow.
+  note_rx <- "(?s)\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
   nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
   if (!length(nb)) return(s)
   ni <- nb
@@ -238,8 +241,13 @@ threeparttable_note_after_compact <- function(s) {
   s <- gsub(note_rx, "", s, perl = TRUE)
   s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
   s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  # New caption format: matches Tables 4.9-4.18 style — drop italic Note:,
+  # wrap in singlespace so the note renders single-spaced despite document's
+  # \doublespacing default.
   sub("\\end{table}",
-      paste0("\\end{table}\n{\\footnotesize\\noindent\\textit{Note:} ", ni, "\\par}\n"),
+      paste0("\\end{table}\n",
+             "\\begin{singlespace}\\footnotesize\\noindent\n", ni, "\n",
+             "\\end{singlespace}\n"),
       s, fixed = TRUE)
 }
 
