@@ -336,7 +336,7 @@ clean_latex <- function(x, resize = TRUE, small = FALSE) {
 # matches Table 4.8 (BSW decomposition) caption style per SBE convention.
 longtable_note <- function(s, note) {
   note_para <- paste0(
-    "\\par\\medskip\n",
+    "\\vspace{-0.5\\baselineskip}\n",
     "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
     "\\end{singlespace}\n\n"
   )
