@@ -169,7 +169,7 @@ threeparttable_note_after_compact <- function(s) {
   ni <- trimws(ni)
   s <- gsub(note_rx, "", s, perl = TRUE)
   s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
-  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  s <- gsub("\\\\end\\{threeparttable\\}\\s*\n?", "", s)
   # New caption format: matches Tables 4.9-4.18 style — drop italic Note:,
   # wrap in singlespace so the note renders single-spaced despite document's
   # \doublespacing default.
