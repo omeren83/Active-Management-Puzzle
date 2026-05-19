@@ -487,7 +487,7 @@ fn_primary <- paste0(
   "All lower-order interaction coefficients ($R^q\\\\times$ Sent.\\\\ and ",
   "$R^q\\\\times$ Exp.\\\\ ratio) are reported alongside the headline triple ",
   "interactions to support full interpretation. Sentiment regimes follow ",
-  "Baker-Wurgler (2007) construction: $D^{\\text{SENT}}_t$ is the top-34\\\\% indicator ",
+  "Baker-Wurgler (2007) construction: $D^{\\\\text{SENT}}_t$ is the top-34\\\\% indicator ",
   "for orthogonalised sentiment; column (3) substitutes the standardised ",
   "continuous index; column (4) substitutes the AAII bull-bear regime dummy. ",
   "ExpRatio is the time-invariant fund expense ratio (decimal). Lipper-",
@@ -532,10 +532,10 @@ fn_robust <- paste0(
   "at source."
 )
 
-hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}_{t-1}$" = 1,
-                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\\text{AAII}}_{t-1}$" = 1)
-hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}$" = 1,
-                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\\text{AAII}}$" = 1)
+hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\\\\text{SENT}}_{t-1}$" = 1,
+                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\\\\text{AAII}}_{t-1}$" = 1)
+hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\\\\text{SENT}}$" = 1,
+                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\\\\text{AAII}}$" = 1)
 
 # --- 6. Estimate specifications ---------------------------------------------
 H4_primary <- build_h4_table(

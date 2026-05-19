@@ -388,8 +388,8 @@ rownames(ppf_df) <- NULL
 caption <- "Psychological Premium (Shadow Price) Estimates"
 fn <- paste0(
   "Each row is computed from a separate joint regression of the form ",
-  "$\\\\text{flow}=\\\\beta_q R^q + \\\\delta_q R^q D^{\\text{SENT}} + ",
-  "\\\\eta\\\\,\\\\text{AS}^z + \\\\phi\\\\,\\\\text{AS}^z D^{\\text{SENT}} + ",
+  "$\\\\text{flow}=\\\\beta_q R^q + \\\\delta_q R^q D^{\\\\text{SENT}} + ",
+  "\\\\eta\\\\,\\\\text{AS}^z + \\\\phi\\\\,\\\\text{AS}^z D^{\\\\text{SENT}} + ",
   "\\\\text{controls} + \\\\mu_i$, with $\\\\text{AS}^z$ standardised within ",
   "sample. Shadow Price units are rank points per standard deviation of ",
   "the lottery measure. Standard errors via the delta method using the ",

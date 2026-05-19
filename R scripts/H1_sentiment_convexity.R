@@ -371,10 +371,10 @@ cap_primary <- "H1: Sentiment-Convexity Hypothesis"
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
-  "Performance segments $R^{\\text{LOW}}$, $R^{\\text{MID}}$, $R^{\\text{HIGH}}$ are constructed from ",
+  "Performance segments $R^{\\\\text{LOW}}$, $R^{\\\\text{MID}}$, $R^{\\\\text{HIGH}}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
   "gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is ",
-  "the regime dummy $D^{\\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised ",
+  "the regime dummy $D^{\\\\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised ",
   "sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler ",
   "2007); column (3) is the standardised Baker-Wurgler orthogonalised ",
   "sentiment index; column (4) is the AAII bull-bear regime dummy. All ",
@@ -392,9 +392,9 @@ cap_lagged <- "H1 Robustness --- Lagged Sentiment"
 fn_lagged <- paste0(
   "Same sample, dependent variable, controls, and identification strategy as ",
   "Table~\\\\ref{tab:H1_regression}. Sentiment proxies are lagged one period: ",
-  "column (2) uses $D^{\\text{SENT}}_{t-1}$, column (3) uses the standardised ",
+  "column (2) uses $D^{\\\\text{SENT}}_{t-1}$, column (3) uses the standardised ",
   "Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses ",
-  "$D^{\\text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and ",
+  "$D^{\\\\text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and ",
   "calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
@@ -417,10 +417,10 @@ fn_robust <- paste0(
   "at source."
 )
 
-hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}_{t-1}$" = 1,
-                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\\text{AAII}}_{t-1}$" = 1)
-hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}$" = 1,
-                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\\text{AAII}}$" = 1)
+hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\\\\text{SENT}}_{t-1}$" = 1,
+                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\\\\text{AAII}}_{t-1}$" = 1)
+hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\\\\text{SENT}}$" = 1,
+                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\\\\text{AAII}}$" = 1)
 
 # --- 6. Estimate three specifications ----------------------------------------
 H1_primary <- build_h1_table(
