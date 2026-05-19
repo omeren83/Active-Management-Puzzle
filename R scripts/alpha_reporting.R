@@ -322,10 +322,20 @@ longtable_note <- function(s, note, n_cols) {
 # document default, footnotesize body, no enclosing minipage (paragraph
 # flows naturally and breaks across pages if needed).
 longtable_note_after <- function(s, note) {
+  # Phase 2.8 (19 May 2026): \vspace*{36pt} after \end{singlespace} enforces
+  # SBE double-space below the notes block, matching the \LTpost=36pt that
+  # applies natively to longtable+ThreePartTable (H1-H4 series). Without this,
+  # the wrap_lt_small brace group has \LTpost=0pt (notes flush to table) and
+  # there is no other vertical-space mechanism between \end{singlespace} and
+  # the following body paragraph --- visible gap was a single line, not
+  # double-spaced as SBE requires. \vspace* is unconditional (not removed at
+  # page-top); 36pt matches \intextsep/\textfloatsep set in dissertation_main
+  # preamble line 393-395.
   replacement <- paste0(
     "\\end{longtable}\n",
     "\\begin{singlespace}\\footnotesize\\noindent\n", note, "\n",
-    "\\end{singlespace}\n"
+    "\\end{singlespace}\n",
+    "\\vspace*{36pt}\n"
   )
   sub("\\end{longtable}", replacement, s, fixed = TRUE)
 }

@@ -266,9 +266,9 @@ build_h3_table <- function(samp, fe_string, state_var,
   acc <- function(name) { force(name); function(mod) get_coef(mod, name) }
 
   body_specs <- list(
-    list(label = "$R^{\text{LOW}}$",  accs = list(acc("R_LOW"),  acc("R_LOW"),  acc("R_LOW"),  acc("R_LOW"))),
-    list(label = "$R^{\text{MID}}$",  accs = list(acc("R_MID"),  acc("R_MID"),  acc("R_MID"),  acc("R_MID"))),
-    list(label = "$R^{\text{HIGH}}$", accs = list(acc("R_HIGH"), acc("R_HIGH"), acc("R_HIGH"), acc("R_HIGH"))),
+    list(label = "$R^{\\text{LOW}}$",  accs = list(acc("R_LOW"),  acc("R_LOW"),  acc("R_LOW"),  acc("R_LOW"))),
+    list(label = "$R^{\\text{MID}}$",  accs = list(acc("R_MID"),  acc("R_MID"),  acc("R_MID"),  acc("R_MID"))),
+    list(label = "$R^{\\text{HIGH}}$", accs = list(acc("R_HIGH"), acc("R_HIGH"), acc("R_HIGH"), acc("R_HIGH"))),
     list(label = "Lottery measure",
          accs = list(blank_acc, acc("ActR2"), acc("ActSkew"), acc("MAX12")))
   )
@@ -376,6 +376,11 @@ build_h3_table <- function(samp, fe_string, state_var,
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
   # No-op for longtable output (CamelCase \begin{TableNotes}). Retained.
   tex <- threeparttable_note_after_compact(tex)
+  # Phase 2.8: tighten tabcolsep + stretch columns to linewidth.
+  # See H1_sentiment_convexity.R for rationale.
+  tex <- sub("\\begin{longtable}[t]{",
+             "\\setlength{\\tabcolsep}{3pt}\\begin{longtable}[t]{@{\\extracolsep{\\fill}}",
+             tex, fixed = TRUE)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 
@@ -390,7 +395,7 @@ fn_primary <- paste0(
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
   "All lottery proxies lagged one period and winsorised at the 1st/99th ",
   "percentiles of the pooled distribution (ActR2 naturally bounded). ",
-  "Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ retained as ",
+  "Performance segments $R^{\\text{LOW}}$, $R^{\\text{MID}}$, $R^{\\text{HIGH}}$ retained as ",
   "nuisance controls so H3 conditions on the H1 channel. Time-invariant ",
   "fund characteristics (expense ratio, load dummy, turnover) absorbed by ",
   "fund fixed effects. Standard errors two-way clustered on Ticker and ",
@@ -407,8 +412,8 @@ fn_primary <- paste0(
 cap_lagged <- "H3 Robustness --- Lagged Sentiment"
 fn_lagged <- paste0(
   "Same sample, dependent variable, lottery measures, and identification ",
-  "strategy as Table~\\\\ref{tab:H3_regression}. $D^{\text{SENT}}_{t-1}$ replaces ",
-  "$D^{\text{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on ",
+  "strategy as Table~\\\\ref{tab:H3_regression}. $D^{\\text{SENT}}_{t-1}$ replaces ",
+  "$D^{\\text{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on ",
   "Ticker and calendar month. ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
@@ -418,7 +423,7 @@ fn_lagged <- paste0(
 cap_robust <- "H3 Robustness --- Style $\\times$ Time Fixed Effects"
 fn_robust <- paste0(
   "Same sample, dependent variable, and lottery measure construction as ",
-  "Table~\\\\ref{tab:H3_regression}. Sentiment regime $D^{\text{SENT}}$ remains ",
+  "Table~\\\\ref{tab:H3_regression}. Sentiment regime $D^{\\text{SENT}}$ remains ",
   "contemporaneous. The state main effect ($\\\\gamma$) is absorbed by the ",
   "Lipper $\\\\times$ yearmo fixed effects and so does not appear in the ",
   "table. Time-invariant controls (expense ratio, load dummy, turnover) ",

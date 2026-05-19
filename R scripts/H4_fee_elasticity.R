@@ -310,30 +310,30 @@ build_h4_table <- function(samp, fe_string,
   # STATE main effect is absorbed by Lipper x yearmo FE (or yearmo FE in the
   # FE-robustness spec) and so does not appear in any column.
   row_specs <- list(
-    list(parts = "R_LOW",   label = "$R^{\text{LOW}}$"),
-    list(parts = "R_MID",   label = "$R^{\text{MID}}$"),
-    list(parts = "R_HIGH",  label = "$R^{\text{HIGH}}$"),
+    list(parts = "R_LOW",   label = "$R^{\\text{LOW}}$"),
+    list(parts = "R_MID",   label = "$R^{\\text{MID}}$"),
+    list(parts = "R_HIGH",  label = "$R^{\\text{HIGH}}$"),
     list(parts = "ExpRatio", label = "Expense ratio"),
     list(parts = "R_LOW_EXP",
-         label = "$R^{\text{LOW}}\\times$ Exp.\\ ratio"),
+         label = "$R^{\\text{LOW}}\\times$ Exp.\\ ratio"),
     list(parts = "R_MID_EXP",
-         label = "$R^{\text{MID}}\\times$ Exp.\\ ratio"),
+         label = "$R^{\\text{MID}}\\times$ Exp.\\ ratio"),
     list(parts = "R_HIGH_EXP",
-         label = "$R^{\text{HIGH}}\\times$ Exp.\\ ratio"),
+         label = "$R^{\\text{HIGH}}\\times$ Exp.\\ ratio"),
     list(parts = "R_LOW_STATE",
-         label = "$R^{\text{LOW}}\\times$ Sent."),
+         label = "$R^{\\text{LOW}}\\times$ Sent."),
     list(parts = "R_MID_STATE",
-         label = "$R^{\text{MID}}\\times$ Sent."),
+         label = "$R^{\\text{MID}}\\times$ Sent."),
     list(parts = "R_HIGH_STATE",
-         label = "$R^{\text{HIGH}}\\times$ Sent."),
+         label = "$R^{\\text{HIGH}}\\times$ Sent."),
     list(parts = "EXP_STATE",
          label = "Exp.\\ ratio $\\times$ Sent."),
     list(parts = "R_LOW_EXP_STATE",
-         label = "$R^{\text{LOW}}\\times$ Exp.\\ $\\times$ Sent."),
+         label = "$R^{\\text{LOW}}\\times$ Exp.\\ $\\times$ Sent."),
     list(parts = "R_MID_EXP_STATE",
-         label = "$R^{\text{MID}}\\times$ Exp.\\ $\\times$ Sent."),
+         label = "$R^{\\text{MID}}\\times$ Exp.\\ $\\times$ Sent."),
     list(parts = "R_HIGH_EXP_STATE",
-         label = "$R^{\text{HIGH}}\\times$ Exp.\\ $\\times$ Sent."),
+         label = "$R^{\\text{HIGH}}\\times$ Exp.\\ $\\times$ Sent."),
     list(parts = "log_TNA",  label = "$\\log(\\text{TNA})$"),
     list(parts = "log_Age",  label = "$\\log(\\text{Age})$"),
     list(parts = "LoadDummy", label = "Load dummy"),
@@ -463,6 +463,15 @@ build_h4_table <- function(samp, fe_string,
   # output changes format in future versions.
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
   tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
+  # Phase 2.8 (19 May 2026): tighten tabcolsep + stretch columns to linewidth.
+  # Brings H4 into alignment-parity with the H1/H2/H3 longtables converted in
+  # Phase 2.7. Without @{\extracolsep{\fill}}, columns sit at natural width
+  # (less than \linewidth), so the caption (rendered at \linewidth) appears
+  # wider than the table. \setlength{\tabcolsep}{3pt} keeps total width within
+  # \linewidth on the lagged / Style x Time-FE specs that have widest labels.
+  tex <- sub("\\begin{longtable}[t]{",
+             "\\setlength{\\tabcolsep}{3pt}\\begin{longtable}[t]{@{\\extracolsep{\\fill}}",
+             tex, fixed = TRUE)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 
@@ -478,7 +487,7 @@ fn_primary <- paste0(
   "All lower-order interaction coefficients ($R^q\\\\times$ Sent.\\\\ and ",
   "$R^q\\\\times$ Exp.\\\\ ratio) are reported alongside the headline triple ",
   "interactions to support full interpretation. Sentiment regimes follow ",
-  "Baker-Wurgler (2007) construction: $D^{\text{SENT}}_t$ is the top-34\\\\% indicator ",
+  "Baker-Wurgler (2007) construction: $D^{\\text{SENT}}_t$ is the top-34\\\\% indicator ",
   "for orthogonalised sentiment; column (3) substitutes the standardised ",
   "continuous index; column (4) substitutes the AAII bull-bear regime dummy. ",
   "ExpRatio is the time-invariant fund expense ratio (decimal). Lipper-",
@@ -523,10 +532,10 @@ fn_robust <- paste0(
   "at source."
 )
 
-hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\text{SENT}}_{t-1}$" = 1,
-                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\text{AAII}}_{t-1}$" = 1)
-hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\text{SENT}}$" = 1,
-                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\text{AAII}}$" = 1)
+hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}_{t-1}$" = 1,
+                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\\text{AAII}}_{t-1}$" = 1)
+hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}$" = 1,
+                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\\text{AAII}}$" = 1)
 
 # --- 6. Estimate specifications ---------------------------------------------
 H4_primary <- build_h4_table(

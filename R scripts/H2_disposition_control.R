@@ -280,9 +280,9 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
 
   # Row specs for body
   row_specs <- list(
-    list(coef = "R_LOW",  label = "$R^{\text{LOW}}$"),
-    list(coef = "R_MID",  label = "$R^{\text{MID}}$"),
-    list(coef = "R_HIGH", label = "$R^{\text{HIGH}}$")
+    list(coef = "R_LOW",  label = "$R^{\\text{LOW}}$"),
+    list(coef = "R_MID",  label = "$R^{\\text{MID}}$"),
+    list(coef = "R_HIGH", label = "$R^{\\text{HIGH}}$")
   )
   if (show_lambda) {
     row_specs <- c(row_specs, list(
@@ -290,19 +290,19 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
     ))
   }
   row_specs <- c(row_specs, list(
-    list(coef = "R_LOW:STATE",    label = "$R^{\text{LOW}}\\times$ State"),
-    list(coef = "R_MID:STATE",    label = "$R^{\text{MID}}\\times$ State"),
-    list(coef = "R_HIGH:STATE",   label = "$R^{\text{HIGH}}\\times$ State")
+    list(coef = "R_LOW:STATE",    label = "$R^{\\text{LOW}}\\times$ State"),
+    list(coef = "R_MID:STATE",    label = "$R^{\\text{MID}}\\times$ State"),
+    list(coef = "R_HIGH:STATE",   label = "$R^{\\text{HIGH}}\\times$ State")
   ))
   if (show_lambda) {
     row_specs <- c(row_specs, list(
-      list(coef = "D_SENT_VAR",     label = "$D^{\text{SENT}}$")
+      list(coef = "D_SENT_VAR",     label = "$D^{\\text{SENT}}$")
     ))
   }
   row_specs <- c(row_specs, list(
-    list(coef = "R_LOW:D_SENT_VAR",  label = "$R^{\text{LOW}}\\times D^{\text{SENT}}$"),
-    list(coef = "R_MID:D_SENT_VAR",  label = "$R^{\text{MID}}\\times D^{\text{SENT}}$"),
-    list(coef = "R_HIGH:D_SENT_VAR", label = "$R^{\text{HIGH}}\\times D^{\text{SENT}}$"),
+    list(coef = "R_LOW:D_SENT_VAR",  label = "$R^{\\text{LOW}}\\times D^{\\text{SENT}}$"),
+    list(coef = "R_MID:D_SENT_VAR",  label = "$R^{\\text{MID}}\\times D^{\\text{SENT}}$"),
+    list(coef = "R_HIGH:D_SENT_VAR", label = "$R^{\\text{HIGH}}\\times D^{\\text{SENT}}$"),
     list(coef = "log_TNA",        label = "$\\log(\\text{TNA})$"),
     list(coef = "log_Age",        label = "$\\log(\\text{Age})$")
   ))
@@ -423,6 +423,11 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
   # No-op for longtable output (CamelCase \begin{TableNotes}). Retained.
   tex <- threeparttable_note_after_compact(tex)
+  # Phase 2.8: tighten tabcolsep + stretch columns to linewidth.
+  # See H1_sentiment_convexity.R for rationale.
+  tex <- sub("\\begin{longtable}[t]{",
+             "\\setlength{\\tabcolsep}{3pt}\\begin{longtable}[t]{@{\\extracolsep{\\fill}}",
+             tex, fixed = TRUE)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 
@@ -435,16 +440,16 @@ cap_primary <- "H2: Disposition / Illusion-of-Control Hypothesis"
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
-  "Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from ",
+  "Performance segments $R^{\\text{LOW}}$, $R^{\\text{MID}}$, $R^{\\text{HIGH}}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
-  "gross returns. State variable in column (2) is $D^{\text{MD,Det}}_t$ (= 1 if the ",
+  "gross returns. State variable in column (2) is $D^{\\text{MD,Det}}_t$ (= 1 if the ",
   "residual of $\\\\log$(MD/MCAP) on a linear time trend is in the top 34\\\\%, ",
   "following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); ",
   "column (3) is $D^{\\\\text{INV-PCR}}_t$ (= 1 in the bottom 34\\\\% of the CBOE ",
   "equity put-call ratio: high call-to-put = high illusion of control). ",
   "Column (4) is the discriminant specification: it includes both ",
-  "$D^{\text{MD,Det}}_t$ and the Baker-Wurgler orthogonalised sentiment regime ",
-  "$D^{\text{SENT}}_t$ (= 1 if SENT$^\\\\perp$ is in the top 34\\\\%) with full rank ",
+  "$D^{\\text{MD,Det}}_t$ and the Baker-Wurgler orthogonalised sentiment regime ",
+  "$D^{\\text{SENT}}_t$ (= 1 if SENT$^\\\\perp$ is in the top 34\\\\%) with full rank ",
   "interactions. All controls lagged one period; time-invariant fund ",
   "characteristics (expense ratio, load dummy, turnover) included but ",
   "absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt ",
@@ -460,9 +465,9 @@ cap_lagged <- "H2 Robustness --- Lagged State Variables"
 fn_lagged <- paste0(
   "Same sample, dependent variable, controls, and identification strategy as ",
   "Table~\\\\ref{tab:H2_regression}. State variables are lagged one period: ",
-  "column (2) uses $D^{\text{MD,Det}}_{t-1}$, column (3) uses ",
+  "column (2) uses $D^{\\text{MD,Det}}_{t-1}$, column (3) uses ",
   "$D^{\\\\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with ",
-  "$D^{\text{MD,Det}}_{t-1}$ and $D^{\text{SENT}}_{t-1}$. Standard errors two-way ",
+  "$D^{\\text{MD,Det}}_{t-1}$ and $D^{\\text{SENT}}_{t-1}$. Standard errors two-way ",
   "clustered on Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
@@ -474,7 +479,7 @@ cap_robust <- "H2 Robustness --- Style $\\times$ Time Fixed Effects"
 fn_robust <- paste0(
   "Sample, dependent variable, rank construction, and column specifications ",
   "identical to Table~\\\\ref{tab:H2_regression}. State main effects (and ",
-  "$D^{\text{SENT}}_t$ in col 4) are absorbed by the Lipper $\\\\times$ yearmo fixed ",
+  "$D^{\\text{SENT}}_t$ in col 4) are absorbed by the Lipper $\\\\times$ yearmo fixed ",
   "effects and do not appear in the table; time-invariant controls (expense ",
   "ratio, load dummy, turnover) are now identified because there is no fund ",
   "FE. Standard errors two-way clustered on Ticker and calendar month ",
@@ -487,9 +492,9 @@ fn_robust <- paste0(
   "at source."
 )
 
-hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\text{MD,Det}}_{t-1}$" = 1,
+hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\\text{MD,Det}}_{t-1}$" = 1,
                 "$D^{\\\\text{INV-PCR}}_{t-1}$" = 1, "Discriminant" = 1)
-hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\text{MD,Det}}$" = 1,
+hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\\text{MD,Det}}$" = 1,
                 "$D^{\\\\text{INV-PCR}}$" = 1, "Discriminant" = 1)
 
 # --- 6. Estimate three specifications ----------------------------------------

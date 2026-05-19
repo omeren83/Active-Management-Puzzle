@@ -224,9 +224,9 @@ build_h1_table <- function(samp, fe_string,
               t4$joint_chi2, t4$joint_p, t4$asym_z, t4$asym_p_1sd))
 
   row_specs <- list(
-    list(coef = "R_LOW",  label = "$R^{\text{LOW}}$"),
-    list(coef = "R_MID",  label = "$R^{\text{MID}}$"),
-    list(coef = "R_HIGH", label = "$R^{\text{HIGH}}$")
+    list(coef = "R_LOW",  label = "$R^{\\text{LOW}}$"),
+    list(coef = "R_MID",  label = "$R^{\\text{MID}}$"),
+    list(coef = "R_HIGH", label = "$R^{\\text{HIGH}}$")
   )
   if (show_lambda) {
     row_specs <- c(row_specs, list(
@@ -234,9 +234,9 @@ build_h1_table <- function(samp, fe_string,
     ))
   }
   row_specs <- c(row_specs, list(
-    list(coef = "R_LOW:STATE",    label = "$R^{\text{LOW}}\\times$ Sent."),
-    list(coef = "R_MID:STATE",    label = "$R^{\text{MID}}\\times$ Sent."),
-    list(coef = "R_HIGH:STATE",   label = "$R^{\text{HIGH}}\\times$ Sent."),
+    list(coef = "R_LOW:STATE",    label = "$R^{\\text{LOW}}\\times$ Sent."),
+    list(coef = "R_MID:STATE",    label = "$R^{\\text{MID}}\\times$ Sent."),
+    list(coef = "R_HIGH:STATE",   label = "$R^{\\text{HIGH}}\\times$ Sent."),
     list(coef = "log_TNA",        label = "$\\log(\\text{TNA})$"),
     list(coef = "log_Age",        label = "$\\log(\\text{Age})$")
   ))
@@ -346,6 +346,19 @@ build_h1_table <- function(samp, fe_string,
   # CamelCase; regex targets lowercase \begin{tablenotes}). Retained for
   # safety against any residual float emission.
   tex <- threeparttable_note_after_compact(tex)
+  # Phase 2.8 (19 May 2026): Two-step injection before \begin{longtable}:
+  #   1. \setlength{\tabcolsep}{3pt}  --- tightens column spacing so the
+  #      natural table width fits within \linewidth (prevents the right-
+  #      margin overflow observed on J.1, J.2 lagged tables).
+  #   2. @{\extracolsep{\fill}}       --- stretches columns so the table
+  #      spans exactly \linewidth, putting its left and right edges at the
+  #      page margins. Without this, columns are at natural width which is
+  #      narrower than \linewidth, causing the caption (at \linewidth) to
+  #      appear wider than the table --- the perceived caption-vs-table
+  #      misalignment that the user flagged.
+  tex <- sub("\\begin{longtable}[t]{",
+             "\\setlength{\\tabcolsep}{3pt}\\begin{longtable}[t]{@{\\extracolsep{\\fill}}",
+             tex, fixed = TRUE)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 
@@ -358,10 +371,10 @@ cap_primary <- "H1: Sentiment-Convexity Hypothesis"
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
-  "Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from ",
+  "Performance segments $R^{\\text{LOW}}$, $R^{\\text{MID}}$, $R^{\\text{HIGH}}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
   "gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is ",
-  "the regime dummy $D^{\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised ",
+  "the regime dummy $D^{\\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised ",
   "sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler ",
   "2007); column (3) is the standardised Baker-Wurgler orthogonalised ",
   "sentiment index; column (4) is the AAII bull-bear regime dummy. All ",
@@ -379,9 +392,9 @@ cap_lagged <- "H1 Robustness --- Lagged Sentiment"
 fn_lagged <- paste0(
   "Same sample, dependent variable, controls, and identification strategy as ",
   "Table~\\\\ref{tab:H1_regression}. Sentiment proxies are lagged one period: ",
-  "column (2) uses $D^{\text{SENT}}_{t-1}$, column (3) uses the standardised ",
+  "column (2) uses $D^{\\text{SENT}}_{t-1}$, column (3) uses the standardised ",
   "Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses ",
-  "$D^{\text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and ",
+  "$D^{\\text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and ",
   "calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
@@ -404,10 +417,10 @@ fn_robust <- paste0(
   "at source."
 )
 
-hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\text{SENT}}_{t-1}$" = 1,
-                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\text{AAII}}_{t-1}$" = 1)
-hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\text{SENT}}$" = 1,
-                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\text{AAII}}$" = 1)
+hdr_lagged <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}_{t-1}$" = 1,
+                "$\\\\text{SENT}^\\\\perp_{t-1}$" = 1, "$D^{\\text{AAII}}_{t-1}$" = 1)
+hdr_cont   <- c(" " = 1, "Baseline" = 1, "$D^{\\text{SENT}}$" = 1,
+                "$\\\\text{SENT}^\\\\perp$" = 1, "$D^{\\text{AAII}}$" = 1)
 
 # --- 6. Estimate three specifications ----------------------------------------
 H1_primary <- build_h1_table(

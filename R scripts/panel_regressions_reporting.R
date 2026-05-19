@@ -105,9 +105,9 @@ if (!is.null(H1_models)) {
     tt <- pri$tests[[key]]
     state_lbl <- switch(
       key,
-      "t2" = "$D^{\text{SENT}}$",
+      "t2" = "$D^{\\text{SENT}}$",
       "t3" = "$\\text{SENT}^\\perp$",
-      "t4" = "$D^{\text{AAII}}$"
+      "t4" = "$D^{\\text{AAII}}$"
     )
     dir_tag <- if (!is.na(tt$asym_z) && tt$asym_z > 0) "asym +" else "asym -"
     rows[[length(rows) + 1L]] <- c(
@@ -131,7 +131,7 @@ if (!is.null(H2_models)) {
     if (is.null(tt)) next
     state_lbl <- switch(
       key,
-      "t2" = "$D^{\text{MD,Det}}$",
+      "t2" = "$D^{\\text{MD,Det}}$",
       "t3" = "$D^{\\text{INV-PCR}}$",
       "t4" = "Discriminant"
     )
@@ -187,9 +187,9 @@ if (!is.null(H4_models)) {
     tt <- pri$tests[[key]]
     state_lbl <- switch(
       key,
-      "t2" = "$D^{\text{SENT}}$",
+      "t2" = "$D^{\\text{SENT}}$",
       "t3" = "$\\text{SENT}^\\perp$",
-      "t4" = "$D^{\text{AAII}}$"
+      "t4" = "$D^{\\text{AAII}}$"
     )
     df_used <- if (!is.null(tt$df)) tt$df else 4L
     dir_tag <- if (is.na(tt$delta_z)) "" else
@@ -223,12 +223,10 @@ fn <- paste0(
   "with two-way clustering on Ticker and calendar month (Petersen 2009)."
 )
 
-# Phase B helper: extract tablenotes from a threeparttable float and re-emit
-# them AFTER \end{table} as a flowing paragraph (NOT a minipage).
+# Phase 2.8 (19 May 2026): Extract tablenotes from threeparttable and re-emit
+# IMMEDIATELY BEFORE \end{table} (inside the float). See same patch in
+# psychological_premium.R for rationale.
 threeparttable_note_after_compact <- function(s) {
-  # FIX: (?s) modifier so '.' matches newlines; tablenotes block always spans
-  # multiple lines so the previous regex silently failed and left the note
-  # trapped inside the float environment, causing page-bottom overflow.
   note_rx <- "(?s)\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
   nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
   if (!length(nb)) return(s)
@@ -241,13 +239,10 @@ threeparttable_note_after_compact <- function(s) {
   s <- gsub(note_rx, "", s, perl = TRUE)
   s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
   s <- gsub("\\\\end\\{threeparttable\\}\\s*\n?", "", s)
-  # New caption format: matches Tables 4.9-4.18 style — drop italic Note:,
-  # wrap in singlespace so the note renders single-spaced despite document's
-  # \doublespacing default.
   sub("\\end{table}",
-      paste0("\\end{table}\n",
-             "\\begin{singlespace}\\footnotesize\\noindent\n", ni, "\n",
-             "\\end{singlespace}\n"),
+      paste0("\\begin{singlespace}\\footnotesize\\noindent\n", ni, "\n",
+             "\\end{singlespace}\n",
+             "\\end{table}"),
       s, fixed = TRUE)
 }
 
