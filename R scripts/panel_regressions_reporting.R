@@ -239,9 +239,12 @@ threeparttable_note_after_compact <- function(s) {
   s <- gsub(note_rx, "", s, perl = TRUE)
   s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
   s <- gsub("\\\\end\\{threeparttable\\}\\s*\n?", "", s)
+  # Phase 2.9: `\centering` from kableExtra centers notes paragraph; wrap in
+  # brace group with `\raggedright` to force left alignment of notes only.
   sub("\\end{table}",
-      paste0("\\begin{singlespace}\\footnotesize\\noindent\n", ni, "\n",
-             "\\end{singlespace}\n",
+      paste0("{\\raggedright\\noindent\\footnotesize\n",
+             "\\begin{singlespace}\n", ni, "\n",
+             "\\end{singlespace}\\par}\n",
              "\\end{table}"),
       s, fixed = TRUE)
 }

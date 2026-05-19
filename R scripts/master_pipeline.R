@@ -111,7 +111,7 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- FALSE    # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- TRUE   # alpha_reporting + descriptive_statistics
+RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
 RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
 RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
 RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
@@ -334,6 +334,15 @@ if (RUN_PHASE_C_REPORTING) {
 # =============================================================================
 if (RUN_PHASE_D_FF_BENCHMARK) {
   run_script("FF_comparison.R",           "Phase D")
+  # build_ff_tables_manual.R is wired up but protected by an internal
+  # deprecation guard (Phase 2.9, 19 May 2026). The guard halts the script
+  # before any .tex write unless ALLOW_MANUAL_FF_BUILD <- TRUE is set in the
+  # global environment. Expected pipeline behaviour: run_script reports this
+  # as FAILED with the deprecation message, then continues. FF_comparison.R's
+  # savebox-wrapped outputs (Tables 7, 9, 10/G.3, 11, 13 in their FF
+  # variants) are preserved. Defence-in-depth against accidental direct
+  # sourcing in RStudio; the previous behaviour silently overwrote the
+  # good outputs with raw \begin{table}[H] strings.
   run_script("build_ff_tables_manual.R",  "Phase D")
 }
 

@@ -806,9 +806,19 @@ latex_pi0 <- pi0_table %>%
       label     = "pi0_estimate_FF",
       col.names = c("Metric", "Estimate", "$N$", "$\\lambda$", "Interpretation"),
       align     = c("l", "r", "r", "r", "l")) %>%
+  # Phase 2.9 (19 May 2026): G.3 was overflowing right margin. column_spec at
+  # 16em + 14em (em measured at \footnotesize ~8.5pt) plus 3 numeric cols at
+  # natural width plus 4 \tabcolsep gaps (24pt total) yielded a natural width
+  # close to or slightly above \linewidth on the SBE A4 layout (14.5cm). The
+  # clean_latex conditional \resizebox would fire ONLY if strictly greater,
+  # leaving borderline cases overflowing. Two defences applied:
+  #   1. Reduce col 1 to 12em (text "Proportion of True Zero-Alpha Active
+  #      Funds" wraps to 3 lines, still readable)
+  #   2. Reduce col 5 to 11em (interpretation text wraps to 2-3 lines)
+  # Combined natural width drops from ~36em to ~29em, well under \linewidth.
   kable_styling(latex_options = "hold_position") %>%
-  column_spec(1, width = "16em") %>%
-  column_spec(5, width = "14em") %>%
+  column_spec(1, width = "12em") %>%
+  column_spec(5, width = "11em") %>%
   footnote(general        = fn_t10,
            general_title  = "",
            escape         = FALSE,

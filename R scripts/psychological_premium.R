@@ -352,9 +352,16 @@ threeparttable_note_after_compact <- function(s) {
   s <- gsub("\\\\end\\{threeparttable\\}\\s*\n?", "", s)
   # Place singlespace notes BEFORE \end{table} (inside the float) so notes
   # appear flush with table body; \intextsep applies after \end{table}.
+  # Phase 2.9 (19 May 2026): `\centering` from kableExtra wraps the float and
+  # CENTERS subsequent paragraph content, which caused notes in Tables 5.5/5.6
+  # to be center-aligned (lines starting at different positions). Wrap in a
+  # brace group with `\raggedright` to override `\centering` for the notes
+  # paragraph only. `\noindent` prevents first-line indent; `\par` at end
+  # finalises the paragraph before \end{table}.
   sub("\\end{table}",
-      paste0("\\begin{singlespace}\\footnotesize\\noindent\n", ni, "\n",
-             "\\end{singlespace}\n",
+      paste0("{\\raggedright\\noindent\\footnotesize\n",
+             "\\begin{singlespace}\n", ni, "\n",
+             "\\end{singlespace}\\par}\n",
              "\\end{table}"),
       s, fixed = TRUE)
 }

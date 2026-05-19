@@ -41,6 +41,42 @@
 # Output filenames are identical to ff_comparison.R so existing
 # \input{tables/table_..._FF} lines in your master document still work.
 # =============================================================================
+# Phase 2.9 (19 May 2026): DEPRECATION GUARD (revised — no-error exit)
+# ----------------------------------------------------------------------------
+# This script is DISABLED by default. FF_comparison.R now produces all 5 FF
+# .tex files (table_perf_aggregate_FF, table_bootstrap_tails_FF,
+# table_pi0_estimate_FF, table10b_bsw_decomposition_FF,
+# table_port_agg_alpha_FF) via clean_latex() with the savebox+minipage+
+# conditional-resize wrapper required for SBE layout. This manual builder
+# emits the same files with raw \begin{table}[H]\centering\begin{tabular}
+# strings and no resize wrapper. When both ran in Phase D, the manual
+# builder ran SECOND and silently overwrote FF_comparison.R's correctly-
+# wrapped outputs, causing G.3 (and likely G.1/G.2/J.4) overflow on Overleaf.
+#
+# Guard mechanism: a single .proceed flag is set from the global override.
+# If FALSE, the script prints a SKIPPED banner and the entire body (wrapped
+# in `if (.proceed) { ... }` at lines 81 and 502) is bypassed. The script
+# returns cleanly to its caller with no error — important because the
+# pipeline's run_script() honours STOP_ON_ERROR <- TRUE and any stop() here
+# would halt the whole pipeline.
+#
+# To force-run this script anyway (rare; for kableExtra-failure fallback or
+# layout comparison), set the override flag BEFORE sourcing:
+#
+#     ALLOW_MANUAL_FF_BUILD <- TRUE
+#     source("build_ff_tables_manual.R")
+#
+# Without the flag, this script prints a SKIPPED message and does NOT touch
+# any .tex files.
+# =============================================================================
+.proceed <- isTRUE(get0("ALLOW_MANUAL_FF_BUILD", envir = globalenv()))
+if (!.proceed) {
+  cat("\n[SKIPPED] build_ff_tables_manual.R is deprecated and disabled.\n",
+      "  FF_comparison.R produces all 5 FF .tex files via clean_latex.\n",
+      "  Set ALLOW_MANUAL_FF_BUILD <- TRUE to force-run.\n", sep = "")
+}
+
+if (.proceed) {
 
 library(readxl)
 library(dplyr)
@@ -464,3 +500,5 @@ cat("  table_port_agg_alpha_FF.tex      Table 13 (FF)\n")
 cat("\nMove these into your tables/ subdirectory and recompile.\n")
 cat("Figure 3 (FF) is unaffected -- ff_comparison.R produces it directly\n")
 cat("as a PNG via ggplot2; no kableExtra involvement.\n")
+
+}  # end of if (.proceed) — Phase 2.9 deprecation guard wrap
