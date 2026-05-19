@@ -531,6 +531,24 @@
   \renewcommand{\footrulewidth}{0pt}%
 }
 
+% Semantic command for flag/enum identifiers from data sources (e.g. flag
+% values stored in flagged_funds.xlsx columns: SECTOR_FUND, GLOBAL_MANDATE,
+% PASSIVE_INDEX, etc.). Renders in italic so the identifier remains visually
+% distinct from running prose without dropping into a separate font family.
+% Italic Times also packs tighter than \texttt and so eliminates the
+% overfull \hbox lines that the previous \texttt rendering produced in
+% Appendix C. Use \flag{NAME} in prose; for paired identifiers separated by
+% a slash, use \flag{X}\slashbreak\flag{Y} so the line can break at the
+% slash if necessary.
+\newcommand{\flag}[1]{\textit{#1}}
+\newcommand{\slashbreak}{\allowbreak/\allowbreak}
+
+% Permit additional interword stretching in last-resort lines (filenames,
+% ticker pairs, long compound identifiers with no breakpoints). Eliminates
+% the residual <40pt overfull \hbox warnings reported by xelatex without
+% affecting normal paragraph greedy-fit behaviour.
+\emergencystretch=3em
+
 % =============================================================================
 % DOCUMENT BODY
 % =============================================================================
@@ -3911,8 +3929,8 @@ Third, the benchmark assignment for the activeness/tracking-error
 measure carries inferred-confidence assignments for approximately
 37\% of funds, with confidence scores below 5 in the workbook
 documentation. Sector and covered-call-overlay funds are excluded
-from H3 (via the \texttt{SECTOR\_FUND} and
-\texttt{COVERED\_CALL\_OVERLAY} flags in the sample-membership
+from H3 (via the \flag{SECTOR\_FUND} and
+\flag{COVERED\_CALL\_OVERLAY} flags in the sample-membership
 matrix) on theoretical grounds independent of benchmark inference
 quality. Equity-income and specialty-diversified funds, which had
 been excluded from H3 in earlier draft versions on benchmark-
@@ -3920,7 +3938,7 @@ misassignment grounds, are now retained in the H3 regressions
 because the primary activeness measure is the $1-R^2$ from the
 Carhart factor regression, which does not use the assigned
 benchmark; they are excluded only from the tracking-error
-robustness sort when no \texttt{Benchmark\_Code} is available. The
+robustness sort when no \flag{Benchmark\_Code} is available. The
 benchmark inference quality is therefore not load-bearing on the
 headline activeness findings, but it is a limitation of the
 tracking-error robustness analysis specifically.
@@ -4509,7 +4527,7 @@ correspond to the twelve standard size-style categories (for example,
 Equity Income Funds, Real Estate Funds, Science \& Technology Funds)
 are retained as-is. Sector-mandated and covered-call-overlay funds
 in this residual group are excluded from H3 by the
-\texttt{SECTOR\_FUND} and \texttt{COVERED\_CALL\_OVERLAY} flags
+\flag{SECTOR\_FUND} and \flag{COVERED\_CALL\_OVERLAY} flags
 respectively in the sample-membership matrix
 documented in Appendix~\ref{app:benchmark}; the remaining
 non-standard-category funds (Equity Income, Specialty Diversified,
@@ -4627,10 +4645,10 @@ field), and 101 at score 1 (default Russell 3000 placeholder).
 Approximately 37\% of assignments carry confidence $\leq 5$
 (inferred). Sector-mandated funds in the heavily inferred group are
 excluded from the H3 active share analysis under the
-\texttt{SECTOR\_FUND} flag
+\flag{SECTOR\_FUND} flag
 documented in Section~\ref{sec:sample_membership}, while
 equity-income and specialty-diversified funds (which had been
-excluded under the retired \texttt{H3\_EXCLUDED} flag in earlier
+excluded under the retired \flag{H3\_EXCLUDED} flag in earlier
 draft versions) are retained in the H3 regressions, and the primary
 activeness measure ($1-R^2$ from the Carhart factor regression) does
 not use the assigned benchmark at all. The benchmark inference
@@ -4718,12 +4736,12 @@ the analytical context in which their inclusion is methodologically
 defensible. The workbook is curated alongside the data pipeline
 and superseded its prior structure with the v1.3 filter revision
 of May 2026, which retired two flags that had been over-restrictive
-on inspection: \texttt{PASSIVE\_INDEX} (which had previously
+on inspection: \flag{PASSIVE\_INDEX} (which had previously
 excluded the 313 Bloomberg-classified passive index trackers from
 the entire analysis on the rationale that they are not active
 funds, but which over-restricted the descriptive panel and removed
 the active-vs-passive performance benchmark that motivates the
-puzzle in the first place) and \texttt{H3\_EXCLUDED} (which had
+puzzle in the first place) and \flag{H3\_EXCLUDED} (which had
 previously excluded 90 funds in the Equity Income, Specialty
 Diversified, and Specialty-Miscellaneous Lipper categories from the
 H3 analysis on \textcite{CremersPetajisto2009} benchmark-misassignment
@@ -4738,19 +4756,19 @@ The three current scopes are as follows. The \emph{Exclude from
 Entire Analysis} sheet (125 funds in the current workbook) covers
 funds whose strategy or mandate places them outside the
 domestic-equity active-management scope of the dissertation:
-non-U.S.\ benchmarks (36 \texttt{GLOBAL\_MANDATE} plus 2 combined
-\texttt{EM\_MANDATE}/\texttt{GLOBAL\_MANDATE} and 1 combined
-\texttt{GLOBAL\_MANDATE}/\texttt{LONG\_SHORT}), long-short strategies
-(31 \texttt{LONG\_SHORT} pure plus the combinations noted above),
-market-neutral strategies (26 \texttt{MARKET\_NEUTRAL}), bear-market
-or inverse strategies (7 \texttt{BEAR\_MARKET} pure plus 20 combined
-\texttt{BEAR\_MARKET}/\texttt{PASSIVE\_INDEX} legacy combinations
+non-U.S.\ benchmarks (36 \flag{GLOBAL\_MANDATE} plus 2 combined
+\flag{EM\_MANDATE}\slashbreak\flag{GLOBAL\_MANDATE} and 1 combined
+\flag{GLOBAL\_MANDATE}\slashbreak\flag{LONG\_SHORT}), long-short strategies
+(31 \flag{LONG\_SHORT} pure plus the combinations noted above),
+market-neutral strategies (26 \flag{MARKET\_NEUTRAL}), bear-market
+or inverse strategies (7 \flag{BEAR\_MARKET} pure plus 20 combined
+\flag{BEAR\_MARKET}\slashbreak\flag{PASSIVE\_INDEX} legacy combinations
 retained because the bear-market designation remains binding), and
-two confirmed LSEG data-error funds (\texttt{DATA\_ERROR}).
+two confirmed LSEG data-error funds (\flag{DATA\_ERROR}).
 
 The \emph{Exclude from H3 Only} sheet (155 funds) covers
-sector-mandated funds (149 \texttt{SECTOR\_FUND}) and covered-call
-overlay funds (6 \texttt{COVERED\_CALL\_OVERLAY}). Sector mandates
+sector-mandated funds (149 \flag{SECTOR\_FUND}) and covered-call
+overlay funds (6 \flag{COVERED\_CALL\_OVERLAY}). Sector mandates
 mechanically inflate the $1-R^2$ activeness proxy because the
 Carhart four-factor model does not span sector-specific return
 variance, so the resulting high $1-R^2$ values reflect mandate-driven
@@ -4766,8 +4784,8 @@ sample.
 
 The \emph{Exclude from Performance Comparison} sheet (292 funds)
 covers the Entire-Analysis set (propagated as a superset) plus a
-sector-fund extension (169 \texttt{SECTOR\_FUND} funds; two of which
-are also \texttt{GLOBAL\_MANDATE} and so already excluded from the
+sector-fund extension (169 \flag{SECTOR\_FUND} funds; two of which
+are also \flag{GLOBAL\_MANDATE} and so already excluded from the
 entire analysis). The performance-comparison set is the subsample
 on which the Section~\ref{sec:aggregate_performance} portfolio-level
 alpha estimates and the Section~\ref{sec:fdr_results} bootstrap and
