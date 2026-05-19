@@ -2,12 +2,12 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{	ext{SENT}}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{	ext{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{text{SENT}}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H1_lagged}H1 Robustness --- Lagged Sentiment}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{	ext{AAII}}_{t-1}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{text{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{text{AAII}}_{t-1}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,19 +22,19 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0309*** & 0.0332*** & 0.0311*** & 0.0309***\\
+$R^{\text{LOW}}$ & 0.0309*** & 0.0332*** & 0.0311*** & 0.0309***\\
  & (8.31) & (7.95) & (8.41) & (7.89)\\
-$R^{	ext{MID}}$ & 0.0142*** & 0.0148*** & 0.0142*** & 0.0142***\\
+$R^{\text{MID}}$ & 0.0142*** & 0.0148*** & 0.0142*** & 0.0142***\\
  & (16.18) & (15.42) & (16.28) & (14.60)\\
-$R^{	ext{HIGH}}$ & 0.0810*** & 0.0827*** & 0.0810*** & 0.0789***\\
+$R^{\text{HIGH}}$ & 0.0810*** & 0.0827*** & 0.0810*** & 0.0789***\\
  & (14.55) & (13.63) & (14.65) & (13.26)\\
 Sentiment &  & 0.0054*** & 0.0025*** & 0.0013\\
  &  & (2.96) & (3.49) & (0.71)\\
-$R^{	ext{LOW}}\times$ Sent. &  & -0.0091 & -0.0052* & 0.0003\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0091 & -0.0052* & 0.0003\\
  &  & (-1.25) & (-1.69) & (0.05)\\
-$R^{	ext{MID}}\times$ Sent. &  & -0.0024 & -0.0009 & 0.0001\\
+$R^{\text{MID}}\times$ Sent. &  & -0.0024 & -0.0009 & 0.0001\\
  &  & (-1.30) & (-1.18) & (0.07)\\
-$R^{	ext{HIGH}}\times$ Sent. &  & -0.0079 & -0.0044 & 0.0106\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0079 & -0.0044 & 0.0106\\
  &  & (-0.71) & (-0.96) & (1.00)\\
 $\log(\text{TNA})$ & -0.0039*** & -0.0040*** & -0.0040*** & -0.0039***\\
  & (-8.26) & (-8.34) & (-8.38) & (-8.28)\\

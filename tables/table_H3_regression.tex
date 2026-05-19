@@ -2,9 +2,9 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{	ext{LOW}}$, $R^{	ext{MID}}$, $R^{	ext{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\item Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{text{LOW}}$, $R^{text{MID}}$, $R^{text{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H3_regression}H3: Lottery Demand Hypothesis}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
@@ -22,11 +22,11 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0326*** & 0.0320*** & 0.0327*** & 0.0315***\\
+$R^{\text{LOW}}$ & 0.0326*** & 0.0320*** & 0.0327*** & 0.0315***\\
  & (8.29) & (8.16) & (8.29) & (7.98)\\
-$R^{	ext{MID}}$ & 0.0146*** & 0.0146*** & 0.0146*** & 0.0143***\\
+$R^{\text{MID}}$ & 0.0146*** & 0.0146*** & 0.0146*** & 0.0143***\\
  & (15.58) & (15.57) & (15.64) & (15.32)\\
-$R^{	ext{HIGH}}$ & 0.0805*** & 0.0812*** & 0.0805*** & 0.0795***\\
+$R^{\text{HIGH}}$ & 0.0805*** & 0.0812*** & 0.0805*** & 0.0795***\\
  & (14.09) & (14.13) & (14.11) & (14.03)\\
 Lottery measure &  & -0.0065 & 0.0011 & 0.0224*\\
  &  & (-1.28) & (1.05) & (1.66)\\

@@ -2,12 +2,12 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Sample, dependent variable, rank construction, and column specifications identical to Table~\ref{tab:H2_regression}. State main effects (and $D^{	ext{SENT}}_t$ in col 4) are absorbed by the Lipper $\times$ yearmo fixed effects and do not appear in the table; time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The robustness of $\delta^{\text{MD}}_1>0$ across both identification strategies points toward a margin-call alternative (Brunnermeier \& Pedersen 2009) rather than disposition psychology. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item Sample, dependent variable, rank construction, and column specifications identical to Table~\ref{tab:H2_regression}. State main effects (and $D^{text{SENT}}_t$ in col 4) are absorbed by the Lipper $\times$ yearmo fixed effects and do not appear in the table; time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The robustness of $\delta^{\text{MD}}_1>0$ across both identification strategies points toward a margin-call alternative (Brunnermeier \& Pedersen 2009) rather than disposition psychology. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H2_robustness}H2 Robustness --- Style $\times$ Time Fixed Effects}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{text{MD,Det}}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}$} & \multicolumn{1}{c}{Discriminant} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,23 +22,23 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0318*** & 0.0249*** & 0.0371*** & 0.0263***\\
+$R^{\text{LOW}}$ & 0.0318*** & 0.0249*** & 0.0371*** & 0.0263***\\
  & (9.26) & (5.82) & (7.83) & (5.38)\\
-$R^{	ext{MID}}$ & 0.0159*** & 0.0142*** & 0.0178*** & 0.0157***\\
+$R^{\text{MID}}$ & 0.0159*** & 0.0142*** & 0.0178*** & 0.0157***\\
  & (17.19) & (12.86) & (13.50) & (12.66)\\
-$R^{	ext{HIGH}}$ & 0.0796*** & 0.0764*** & 0.0861*** & 0.0778***\\
+$R^{\text{HIGH}}$ & 0.0796*** & 0.0764*** & 0.0861*** & 0.0778***\\
  & (14.59) & (10.87) & (11.89) & (9.83)\\
-$R^{	ext{LOW}}\times$ State &  & 0.0146** & 0.0009 & 0.0134**\\
+$R^{\text{LOW}}\times$ State &  & 0.0146** & 0.0009 & 0.0134**\\
  &  & (2.23) & (0.15) & (2.04)\\
-$R^{	ext{MID}}\times$ State &  & 0.0036** & -0.0010 & 0.0024\\
+$R^{\text{MID}}\times$ State &  & 0.0036** & -0.0010 & 0.0024\\
  &  & (2.07) & (-0.53) & (1.33)\\
-$R^{	ext{HIGH}}\times$ State &  & 0.0068 & 0.0015 & 0.0056\\
+$R^{\text{HIGH}}\times$ State &  & 0.0068 & 0.0015 & 0.0056\\
  &  & (0.70) & (0.14) & (0.57)\\
-$R^{	ext{LOW}}\times D^{	ext{SENT}}$ &  &  &  & -0.0035\\
+$R^{\text{LOW}}\times D^{\text{SENT}}$ &  &  &  & -0.0035\\
  &  &  &  & (-0.49)\\
-$R^{	ext{MID}}\times D^{	ext{SENT}}$ &  &  &  & -0.0042**\\
+$R^{\text{MID}}\times D^{\text{SENT}}$ &  &  &  & -0.0042**\\
  &  &  &  & (-2.34)\\
-$R^{	ext{HIGH}}\times D^{	ext{SENT}}$ &  &  &  & -0.0042\\
+$R^{\text{HIGH}}\times D^{\text{SENT}}$ &  &  &  & -0.0042\\
  &  &  &  & (-0.39)\\
 $\log(\text{TNA})$ & -0.0008*** & -0.0008*** & -0.0012*** & -0.0008***\\
  & (-5.39) & (-5.38) & (-7.21) & (-5.40)\\

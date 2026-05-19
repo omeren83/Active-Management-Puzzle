@@ -2,12 +2,12 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{	ext{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{	ext{MD,Det}}_{t-1}$ and $D^{	ext{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{text{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{text{MD,Det}}_{t-1}$ and $D^{text{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H2_lagged}H2 Robustness --- Lagged State Variables}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{MD,Det}}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{text{MD,Det}}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,27 +22,27 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0309*** & 0.0245*** & 0.0383*** & 0.0259***\\
+$R^{\text{LOW}}$ & 0.0309*** & 0.0245*** & 0.0383*** & 0.0259***\\
  & (8.31) & (5.03) & (7.65) & (4.52)\\
-$R^{	ext{MID}}$ & 0.0142*** & 0.0129*** & 0.0152*** & 0.0135***\\
+$R^{\text{MID}}$ & 0.0142*** & 0.0129*** & 0.0152*** & 0.0135***\\
  & (16.18) & (11.80) & (11.41) & (11.01)\\
-$R^{	ext{HIGH}}$ & 0.0810*** & 0.0775*** & 0.0862*** & 0.0795***\\
+$R^{\text{HIGH}}$ & 0.0810*** & 0.0775*** & 0.0862*** & 0.0795***\\
  & (14.55) & (10.81) & (11.34) & (9.87)\\
 State &  & -0.0038** & 0.0026* & -0.0026*\\
  &  & (-2.54) & (1.71) & (-1.72)\\
-$R^{	ext{LOW}}\times$ State &  & 0.0137* & 0.0012 & 0.0126*\\
+$R^{\text{LOW}}\times$ State &  & 0.0137* & 0.0012 & 0.0126*\\
  &  & (1.92) & (0.16) & (1.69)\\
-$R^{	ext{MID}}\times$ State &  & 0.0027 & -0.0008 & 0.0023\\
+$R^{\text{MID}}\times$ State &  & 0.0027 & -0.0008 & 0.0023\\
  &  & (1.59) & (-0.46) & (1.30)\\
-$R^{	ext{HIGH}}\times$ State &  & 0.0073 & 0.0038 & 0.0056\\
+$R^{\text{HIGH}}\times$ State &  & 0.0073 & 0.0038 & 0.0056\\
  &  & (0.74) & (0.38) & (0.55)\\
-$D^{	ext{SENT}}$ &  &  &  & 0.0042**\\
+$D^{\text{SENT}}$ &  &  &  & 0.0042**\\
  &  &  &  & (2.34)\\
-$R^{	ext{LOW}}\times D^{	ext{SENT}}$ &  &  &  & -0.0035\\
+$R^{\text{LOW}}\times D^{\text{SENT}}$ &  &  &  & -0.0035\\
  &  &  &  & (-0.48)\\
-$R^{	ext{MID}}\times D^{	ext{SENT}}$ &  &  &  & -0.0014\\
+$R^{\text{MID}}\times D^{\text{SENT}}$ &  &  &  & -0.0014\\
  &  &  &  & (-0.73)\\
-$R^{	ext{HIGH}}\times D^{	ext{SENT}}$ &  &  &  & -0.0053\\
+$R^{\text{HIGH}}\times D^{\text{SENT}}$ &  &  &  & -0.0053\\
  &  &  &  & (-0.47)\\
 $\log(\text{TNA})$ & -0.0039*** & -0.0039*** & -0.0054*** & -0.0039***\\
  & (-8.26) & (-8.13) & (-8.20) & (-8.29)\\

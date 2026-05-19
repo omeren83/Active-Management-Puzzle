@@ -2,12 +2,12 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lower-order interaction coefficients ($R^q\times$ Sent.\ and $R^q\times$ Exp.\ ratio) are reported alongside the headline triple interactions to support full interpretation. Sentiment regimes follow Baker-Wurgler (2007) construction: $D^{	ext{SENT}}_t$ is the top-34\% indicator for orthogonalised sentiment; column (3) substitutes the standardised continuous index; column (4) substitutes the AAII bull-bear regime dummy. ExpRatio is the time-invariant fund expense ratio (decimal). Lipper-category $\times$ yearmo fixed effects absorb both sentiment main effects ($\gamma$) and any style-month aggregate flow shocks; cross-fund expense-ratio variation within each (style, month) cell identifies $\theta$ and the fee interactions. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms ($\delta_F$ and the three $\delta^F_q$). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lower-order interaction coefficients ($R^q\times$ Sent.\ and $R^q\times$ Exp.\ ratio) are reported alongside the headline triple interactions to support full interpretation. Sentiment regimes follow Baker-Wurgler (2007) construction: $D^{text{SENT}}_t$ is the top-34\% indicator for orthogonalised sentiment; column (3) substitutes the standardised continuous index; column (4) substitutes the AAII bull-bear regime dummy. ExpRatio is the time-invariant fund expense ratio (decimal). Lipper-category $\times$ yearmo fixed effects absorb both sentiment main effects ($\gamma$) and any style-month aggregate flow shocks; cross-fund expense-ratio variation within each (style, month) cell identifies $\theta$ and the fee interactions. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms ($\delta_F$ and the three $\delta^F_q$). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H4_regression}H4: Fee Elasticity Hypothesis}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{	ext{AAII}}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{text{AAII}}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,33 +22,33 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0321*** & 0.0632*** & 0.0611*** & 0.0610***\\
+$R^{\text{LOW}}$ & 0.0321*** & 0.0632*** & 0.0611*** & 0.0610***\\
  & (9.37) & (8.78) & (10.09) & (9.09)\\
-$R^{	ext{MID}}$ & 0.0160*** & 0.0185*** & 0.0176*** & 0.0171***\\
+$R^{\text{MID}}$ & 0.0160*** & 0.0185*** & 0.0176*** & 0.0171***\\
  & (17.23) & (8.01) & (8.60) & (7.26)\\
-$R^{	ext{HIGH}}$ & 0.0798*** & 0.0670*** & 0.0592*** & 0.0538***\\
+$R^{\text{HIGH}}$ & 0.0798*** & 0.0670*** & 0.0592*** & 0.0538***\\
  & (14.61) & (6.19) & (6.42) & (6.24)\\
 Expense ratio & -0.0016* & 0.0014** & 0.0015** & 0.0012\\
  & (-1.89) & (2.08) & (2.34) & (1.62)\\
-$R^{	ext{LOW}}\times$ Exp.\ ratio &  & -0.0227*** & -0.0230*** & -0.0217***\\
+$R^{\text{LOW}}\times$ Exp.\ ratio &  & -0.0227*** & -0.0230*** & -0.0217***\\
  &  & (-4.35) & (-5.41) & (-4.73)\\
-$R^{	ext{MID}}\times$ Exp.\ ratio &  & -0.0017 & -0.0019 & -0.0022\\
+$R^{\text{MID}}\times$ Exp.\ ratio &  & -0.0017 & -0.0019 & -0.0022\\
  &  & (-0.88) & (-1.11) & (-1.13)\\
-$R^{	ext{HIGH}}\times$ Exp.\ ratio &  & 0.0146 & 0.0198*** & 0.0221***\\
+$R^{\text{HIGH}}\times$ Exp.\ ratio &  & 0.0146 & 0.0198*** & 0.0221***\\
  &  & (1.63) & (2.64) & (3.52)\\
-$R^{	ext{LOW}}\times$ Sent. &  & -0.0062 & -0.0082 & -0.0016\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0062 & -0.0082 & -0.0016\\
  &  & (-0.47) & (-1.46) & (-0.16)\\
-$R^{	ext{MID}}\times$ Sent. &  & -0.0053 & -0.0008 & 0.0031\\
+$R^{\text{MID}}\times$ Sent. &  & -0.0053 & -0.0008 & 0.0031\\
  &  & (-1.00) & (-0.45) & (0.69)\\
-$R^{	ext{HIGH}}\times$ Sent. &  & -0.0258 & -0.0089 & -0.0017\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0258 & -0.0089 & -0.0017\\
  &  & (-1.54) & (-1.45) & (-0.09)\\
 Exp.\ ratio $\times$ Sent. &  & 0.0007 & 0.0000 & 0.0014\\
  &  & (0.74) & (0.01) & (1.36)\\
-$R^{	ext{LOW}}\times$ Exp.\ $\times$ Sent. &  & -0.0046 & 0.0041 & -0.0052\\
+$R^{\text{LOW}}\times$ Exp.\ $\times$ Sent. &  & -0.0046 & 0.0041 & -0.0052\\
  &  & (-0.47) & (0.90) & (-0.78)\\
-$R^{	ext{MID}}\times$ Exp.\ $\times$ Sent. &  & 0.0002 & -0.0008 & 0.0005\\
+$R^{\text{MID}}\times$ Exp.\ $\times$ Sent. &  & 0.0002 & -0.0008 & 0.0005\\
  &  & (0.04) & (-0.54) & (0.11)\\
-$R^{	ext{HIGH}}\times$ Exp.\ $\times$ Sent. &  & 0.0150 & 0.0020 & 0.0142\\
+$R^{\text{HIGH}}\times$ Exp.\ $\times$ Sent. &  & 0.0150 & 0.0020 & 0.0142\\
  &  & (1.04) & (0.44) & (0.82)\\
 $\log(\text{TNA})$ & -0.0008*** & -0.0009*** & -0.0009*** & -0.0009***\\
  & (-5.34) & (-6.51) & (-6.47) & (-6.46)\\

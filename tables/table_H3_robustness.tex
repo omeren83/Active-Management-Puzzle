@@ -2,9 +2,9 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{	ext{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{text{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
@@ -22,11 +22,11 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0319*** & 0.0315*** & 0.0321*** & 0.0308***\\
+$R^{\text{LOW}}$ & 0.0319*** & 0.0315*** & 0.0321*** & 0.0308***\\
  & (9.02) & (8.69) & (8.99) & (8.63)\\
-$R^{	ext{MID}}$ & 0.0159*** & 0.0159*** & 0.0160*** & 0.0156***\\
+$R^{\text{MID}}$ & 0.0159*** & 0.0159*** & 0.0160*** & 0.0156***\\
  & (16.50) & (16.50) & (16.71) & (16.08)\\
-$R^{	ext{HIGH}}$ & 0.0781*** & 0.0784*** & 0.0776*** & 0.0768***\\
+$R^{\text{HIGH}}$ & 0.0781*** & 0.0784*** & 0.0776*** & 0.0768***\\
  & (13.95) & (14.02) & (13.91) & (13.92)\\
 Lottery measure &  & -0.0011 & 0.0026*** & 0.0299**\\
  &  & (-0.37) & (2.70) & (2.17)\\

@@ -2,12 +2,12 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{	ext{LOW}}$, $R^{	ext{MID}}$, $R^{	ext{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is the regime dummy $D^{	ext{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler 2007); column (3) is the standardised Baker-Wurgler orthogonalised sentiment index; column (4) is the AAII bull-bear regime dummy. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{text{LOW}}$, $R^{text{MID}}$, $R^{text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is the regime dummy $D^{text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler 2007); column (3) is the standardised Baker-Wurgler orthogonalised sentiment index; column (4) is the AAII bull-bear regime dummy. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H1_regression}H1: Sentiment-Convexity Hypothesis}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{	ext{AAII}}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{text{AAII}}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,19 +22,19 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0309*** & 0.0336*** & 0.0312*** & 0.0326***\\
+$R^{\text{LOW}}$ & 0.0309*** & 0.0336*** & 0.0312*** & 0.0326***\\
  & (8.31) & (8.25) & (8.42) & (8.06)\\
-$R^{	ext{MID}}$ & 0.0142*** & 0.0151*** & 0.0142*** & 0.0136***\\
+$R^{\text{MID}}$ & 0.0142*** & 0.0151*** & 0.0142*** & 0.0136***\\
  & (16.18) & (15.72) & (16.31) & (14.13)\\
-$R^{	ext{HIGH}}$ & 0.0810*** & 0.0832*** & 0.0810*** & 0.0766***\\
+$R^{\text{HIGH}}$ & 0.0810*** & 0.0832*** & 0.0810*** & 0.0766***\\
  & (14.55) & (13.80) & (14.68) & (13.13)\\
 Sentiment &  & 0.0058*** & 0.0026*** & 0.0004\\
  &  & (3.11) & (3.64) & (0.22)\\
-$R^{	ext{LOW}}\times$ Sent. &  & -0.0110 & -0.0044 & -0.0075\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0110 & -0.0044 & -0.0075\\
  &  & (-1.41) & (-1.38) & (-0.89)\\
-$R^{	ext{MID}}\times$ Sent. &  & -0.0038** & -0.0011 & 0.0030\\
+$R^{\text{MID}}\times$ Sent. &  & -0.0038** & -0.0011 & 0.0030\\
  &  & (-2.21) & (-1.31) & (1.63)\\
-$R^{	ext{HIGH}}\times$ Sent. &  & -0.0101 & -0.0062 & 0.0200**\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0101 & -0.0062 & 0.0200**\\
  &  & (-0.95) & (-1.35) & (2.04)\\
 $\log(\text{TNA})$ & -0.0039*** & -0.0040*** & -0.0040*** & -0.0039***\\
  & (-8.26) & (-8.33) & (-8.40) & (-8.26)\\

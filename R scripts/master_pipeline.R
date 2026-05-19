@@ -112,7 +112,7 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 RUN_PHASE_A_DATA          <- FALSE    # data_import + flow_calculation
 RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
 RUN_PHASE_C_REPORTING     <- TRUE   # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
+RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
 RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
 RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
 RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis

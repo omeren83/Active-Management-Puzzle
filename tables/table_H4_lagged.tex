@@ -4,10 +4,10 @@
 \begin{TableNotes}
 \item Same sample, dependent variable, controls, identification strategy, and FE structure as Table~\ref{tab:H4_regression}. State variables in columns (2)--(4) are lagged one period. ExpRatio enters at $t$ (= $t-1$ = constant). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H4_lagged}H4 Robustness --- Lagged Sentiment}\\
 \toprule
-\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{	ext{AAII}}_{t-1}$} \\
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{text{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{text{AAII}}_{t-1}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -22,33 +22,33 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0321*** & 0.0640*** & 0.0612*** & 0.0560***\\
+$R^{\text{LOW}}$ & 0.0321*** & 0.0640*** & 0.0612*** & 0.0560***\\
  & (9.37) & (8.44) & (10.11) & (9.04)\\
-$R^{	ext{MID}}$ & 0.0160*** & 0.0172*** & 0.0174*** & 0.0180***\\
+$R^{\text{MID}}$ & 0.0160*** & 0.0172*** & 0.0174*** & 0.0180***\\
  & (17.23) & (7.36) & (8.44) & (7.99)\\
-$R^{	ext{HIGH}}$ & 0.0798*** & 0.0743*** & 0.0608*** & 0.0552***\\
+$R^{\text{HIGH}}$ & 0.0798*** & 0.0743*** & 0.0608*** & 0.0552***\\
  & (14.61) & (6.33) & (6.46) & (6.90)\\
 Expense ratio & -0.0016* & 0.0015** & 0.0015** & 0.0010\\
  & (-1.89) & (2.08) & (2.35) & (1.50)\\
-$R^{	ext{LOW}}\times$ Exp.\ ratio &  & -0.0238*** & -0.0232*** & -0.0190***\\
+$R^{\text{LOW}}\times$ Exp.\ ratio &  & -0.0238*** & -0.0232*** & -0.0190***\\
  &  & (-4.24) & (-5.43) & (-4.61)\\
-$R^{	ext{MID}}\times$ Exp.\ ratio &  & -0.0007 & -0.0017 & -0.0023\\
+$R^{\text{MID}}\times$ Exp.\ ratio &  & -0.0007 & -0.0017 & -0.0023\\
  &  & (-0.38) & (-1.03) & (-1.30)\\
-$R^{	ext{HIGH}}\times$ Exp.\ ratio &  & 0.0076 & 0.0185** & 0.0219***\\
+$R^{\text{HIGH}}\times$ Exp.\ ratio &  & 0.0076 & 0.0185** & 0.0219***\\
  &  & (0.76) & (2.39) & (3.90)\\
-$R^{	ext{LOW}}\times$ Sent. &  & -0.0097 & -0.0096 & 0.0293**\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0097 & -0.0096 & 0.0293**\\
  &  & (-0.62) & (-1.50) & (2.17)\\
-$R^{	ext{MID}}\times$ Sent. &  & 0.0004 & 0.0002 & -0.0023\\
+$R^{\text{MID}}\times$ Sent. &  & 0.0004 & 0.0002 & -0.0023\\
  &  & (0.09) & (0.12) & (-0.55)\\
-$R^{	ext{HIGH}}\times$ Sent. &  & -0.0409** & -0.0109* & 0.0012\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0409** & -0.0109* & 0.0012\\
  &  & (-2.50) & (-1.78) & (0.08)\\
 Exp.\ ratio $\times$ Sent. &  & 0.0006 & -0.0000 & 0.0032**\\
  &  & (0.35) & (-0.01) & (1.98)\\
-$R^{	ext{LOW}}\times$ Exp.\ $\times$ Sent. &  & 0.0006 & 0.0044 & -0.0245**\\
+$R^{\text{LOW}}\times$ Exp.\ $\times$ Sent. &  & 0.0006 & 0.0044 & -0.0245**\\
  &  & (0.04) & (0.83) & (-2.43)\\
-$R^{	ext{MID}}\times$ Exp.\ $\times$ Sent. &  & -0.0039 & -0.0017 & 0.0026\\
+$R^{\text{MID}}\times$ Exp.\ $\times$ Sent. &  & -0.0039 & -0.0017 & 0.0026\\
  &  & (-1.05) & (-1.14) & (0.68)\\
-$R^{	ext{HIGH}}\times$ Exp.\ $\times$ Sent. &  & 0.0308** & 0.0054 & 0.0071\\
+$R^{\text{HIGH}}\times$ Exp.\ $\times$ Sent. &  & 0.0308** & 0.0054 & 0.0071\\
  &  & (2.18) & (1.19) & (0.44)\\
 $\log(\text{TNA})$ & -0.0008*** & -0.0009*** & -0.0009*** & -0.0009***\\
  & (-5.34) & (-6.54) & (-6.48) & (-6.45)\\

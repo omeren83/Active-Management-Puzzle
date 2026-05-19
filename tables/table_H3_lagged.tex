@@ -2,9 +2,9 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{	ext{SENT}}_{t-1}$ replaces $D^{	ext{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\item Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{text{SENT}}_{t-1}$ replaces $D^{text{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{TableNotes}
-\begin{longtable}[t]{lrrrr}
+\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H3_lagged}H3 Robustness --- Lagged Sentiment}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
@@ -22,11 +22,11 @@ Variable & (1) & (2) & (3) & (4)\\
 \bottomrule
 \insertTableNotes
 \endlastfoot
-$R^{	ext{LOW}}$ & 0.0326*** & 0.0320*** & 0.0326*** & 0.0316***\\
+$R^{\text{LOW}}$ & 0.0326*** & 0.0320*** & 0.0326*** & 0.0316***\\
  & (8.29) & (8.14) & (8.25) & (7.96)\\
-$R^{	ext{MID}}$ & 0.0146*** & 0.0146*** & 0.0146*** & 0.0143***\\
+$R^{\text{MID}}$ & 0.0146*** & 0.0146*** & 0.0146*** & 0.0143***\\
  & (15.58) & (15.58) & (15.62) & (15.30)\\
-$R^{	ext{HIGH}}$ & 0.0805*** & 0.0813*** & 0.0804*** & 0.0795***\\
+$R^{\text{HIGH}}$ & 0.0805*** & 0.0813*** & 0.0804*** & 0.0795***\\
  & (14.09) & (14.14) & (14.10) & (14.06)\\
 Lottery measure &  & -0.0066 & 0.0013 & 0.0210\\
  &  & (-1.29) & (1.18) & (1.62)\\
