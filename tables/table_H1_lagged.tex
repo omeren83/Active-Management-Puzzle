@@ -1,14 +1,27 @@
-\begin{table}[H]
-\centering
-\caption{\label{tab:H1_lagged}H1 Robustness --- Lagged Sentiment}
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\setlength{\tabcolsep}{3pt}
-\begin{tabular}[t]{lrrrr}
+\begingroup\fontsize{9}{11}\selectfont
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{	ext{SENT}}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{	ext{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:H1_lagged}H1 Robustness --- Lagged Sentiment}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{SENT}}_{t-1}$} & \multicolumn{1}{c}{$\text{SENT}^\perp_{t-1}$} & \multicolumn{1}{c}{$D^{	ext{AAII}}_{t-1}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
+\endfirsthead
+\caption[]{H1 Robustness --- Lagged Sentiment \textit{(continued)}}\\
+\toprule
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\insertTableNotes
+\endlastfoot
 $R^{	ext{LOW}}$ & 0.0309*** & 0.0332*** & 0.0311*** & 0.0309***\\
  & (8.31) & (7.95) & (8.41) & (7.89)\\
 $R^{	ext{MID}}$ & 0.0142*** & 0.0148*** & 0.0142*** & 0.0142***\\
@@ -37,13 +50,7 @@ Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 232,800 & 232,800 & 232,800 & 232,800\\
 $R^2$ (within) & 0.027 & 0.027 & 0.027 & 0.027\\
 Joint test ($\chi^2_3$, $p$) & -- & 4.53 (0.209) & 6.19 (0.103) & 1.27 (0.736)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=+0.09 (p=0.463) & z=+0.14 (p=0.444) & z=+0.71 (p=0.239)\\
-\bottomrule
-\end{tabular}
-
-}
-\end{table}
-\begin{singlespace}\footnotesize\noindent
-Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{	ext{SENT}}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{	ext{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{singlespace}
-
+Asymmetry ($z$, 1-sided $p$) & -- & z=+0.09 (p=0.463) & z=+0.14 (p=0.444) & z=+0.71 (p=0.239)\\*
+\end{longtable}
+\end{ThreePartTable}
+\endgroup{}

@@ -1,14 +1,27 @@
-\begin{table}[H]
-\centering
-\caption{\label{tab:H2_lagged}H2 Robustness --- Lagged State Variables}
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\setlength{\tabcolsep}{3pt}
-\begin{tabular}[t]{lrrrr}
+\begingroup\fontsize{9}{11}\selectfont
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{	ext{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{	ext{MD,Det}}_{t-1}$ and $D^{	ext{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:H2_lagged}H2 Robustness --- Lagged State Variables}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{	ext{MD,Det}}_{t-1}$} & \multicolumn{1}{c}{$D^{\text{INV-PCR}}_{t-1}$} & \multicolumn{1}{c}{Discriminant} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
+\endfirsthead
+\caption[]{H2 Robustness --- Lagged State Variables \textit{(continued)}}\\
+\toprule
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\insertTableNotes
+\endlastfoot
 $R^{	ext{LOW}}$ & 0.0309*** & 0.0245*** & 0.0383*** & 0.0259***\\
  & (8.31) & (5.03) & (7.65) & (4.52)\\
 $R^{	ext{MID}}$ & 0.0142*** & 0.0129*** & 0.0152*** & 0.0135***\\
@@ -46,13 +59,7 @@ $N$ & 232,800 & 232,800 & 168,488 & 232,800\\
 $R^2$ (within) & 0.027 & 0.027 & 0.030 & 0.027\\
 Joint test ($\chi^2_3$, $p$) & -- & 10.31 (0.016) & 0.28 (0.963) & 7.79 (0.051)\\
 Loser-end test ($z$, 1-sided $p$) & -- & z=+1.92 (p=0.973) & z=+0.16 (p=0.564) & z=+1.69 (p=0.954)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=-0.54 (p=0.707) & z=+0.21 (p=0.417) & z=-0.56 (p=0.712)\\
-\bottomrule
-\end{tabular}
-
-}
-\end{table}
-\begin{singlespace}\footnotesize\noindent
-Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{	ext{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{	ext{MD,Det}}_{t-1}$ and $D^{	ext{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{singlespace}
-
+Asymmetry ($z$, 1-sided $p$) & -- & z=-0.54 (p=0.707) & z=+0.21 (p=0.417) & z=-0.56 (p=0.712)\\*
+\end{longtable}
+\end{ThreePartTable}
+\endgroup{}

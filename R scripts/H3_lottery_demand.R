@@ -357,26 +357,25 @@ build_h3_table <- function(samp, fe_string, state_var,
   full_df <- rbind(body_df, footer_df)
   rownames(full_df) <- NULL
 
+  # Phase 2.7 (19 May 2026): Convert from float+scale_down to longtable+
+  # ThreePartTable. See H1_sentiment_convexity.R for rationale.
   ktab <- kbl(
-    full_df, format = "latex", booktabs = TRUE,
+    full_df, format = "latex", booktabs = TRUE, longtable = TRUE,
     caption = caption, label = table_label,
     align = c("l", rep("r", 4)), escape = FALSE, linesep = ""
   ) %>%
-    kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+    kable_styling(latex_options = c("repeat_header"),
+                  font_size = 9) %>%
     add_header_above(col_headers, escape = FALSE, bold = FALSE) %>%
     row_spec(nrow(body_df), hline_after = TRUE) %>%
     footnote(general = footnote_text, general_title = "",
              threeparttable = TRUE, escape = FALSE)
 
   tex <- as.character(ktab)
+  # Defensive: longtable does not emit \begin{table}[!h]; gsub is a no-op.
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
-  tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
-  # T2.10: inject \setlength{\tabcolsep}{3pt} INSIDE the \resizebox group
-  # so the natural table width is narrower; scale_down compression minimised
-  # (group-scoped, no leakage to surrounding document).
-  tex <- gsub("\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{",
-              "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{\\setlength{\\tabcolsep}{3pt}",
-              tex, fixed = TRUE)
+  # No-op for longtable output (CamelCase \begin{TableNotes}). Retained.
+  tex <- threeparttable_note_after_compact(tex)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 

@@ -1,14 +1,27 @@
-\begin{table}[H]
-\centering
-\caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects}
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\setlength{\tabcolsep}{3pt}
-\begin{tabular}[t]{lrrrr}
+\begingroup\fontsize{9}{11}\selectfont
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{	ext{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
+\endfirsthead
+\caption[]{H3 Robustness --- Style $\times$ Time Fixed Effects \textit{(continued)}}\\
+\toprule
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\insertTableNotes
+\endlastfoot
 $R^{	ext{LOW}}$ & 0.0319*** & 0.0315*** & 0.0321*** & 0.0308***\\
  & (9.02) & (8.69) & (8.99) & (8.63)\\
 $R^{	ext{MID}}$ & 0.0159*** & 0.0159*** & 0.0160*** & 0.0156***\\
@@ -39,13 +52,7 @@ Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 211,995 & 211,995 & 211,995 & 211,995\\
 $R^2$ (within) & 0.029 & 0.029 & 0.029 & 0.029\\
 Joint test ($\chi^2_2$, $p$) & -- & 0.13 (0.935) & 20.74 ($<\!0.001$) & 8.36 (0.015)\\
-Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=+0.16 (p=0.437) & z=+2.17 (p=0.015) & z=+0.63 (p=0.263)\\
-\bottomrule
-\end{tabular}
-
-}
-\end{table}
-\begin{singlespace}\footnotesize\noindent
-Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{	ext{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{singlespace}
-
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=+0.16 (p=0.437) & z=+2.17 (p=0.015) & z=+0.63 (p=0.263)\\*
+\end{longtable}
+\end{ThreePartTable}
+\endgroup{}

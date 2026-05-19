@@ -318,26 +318,34 @@ build_h1_table <- function(samp, fe_string,
   full_df <- rbind(body_df, footer_df)
   rownames(full_df) <- NULL
 
+  # Phase 2.7 (19 May 2026): Convert from float+scale_down to longtable+
+  # ThreePartTable. The float pattern with \begin{table}[H] cannot break
+  # across pages, so tall tables overflowed and threeparttable_note_after_
+  # compact() pulled the notes outside the float --- where they could drift
+  # to the next page (see images 1, 2, 9 of pre-defense PDF review).
+  # Longtable+ThreePartTable embeds notes inside \endlastfoot via
+  # \insertTableNotes, gluing them to the last row regardless of page
+  # break. Matches the H4 builder (H4_fee_elasticity.R) exactly.
   ktab <- kbl(
-    full_df, format = "latex", booktabs = TRUE,
+    full_df, format = "latex", booktabs = TRUE, longtable = TRUE,
     caption = caption, label = table_label,
     align = c("l", rep("r", 4)), escape = FALSE, linesep = ""
   ) %>%
-    kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+    kable_styling(latex_options = c("repeat_header"),
+                  font_size = 9) %>%
     add_header_above(col_headers, escape = FALSE, bold = FALSE) %>%
     row_spec(nrow(body_df), hline_after = TRUE) %>%
     footnote(general = footnote_text, general_title = "",
              threeparttable = TRUE, escape = FALSE)
 
   tex <- as.character(ktab)
+  # Defensive: longtable does not emit \begin{table}[!h]; gsub is a no-op
+  # but retained against future kableExtra changes.
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
-  tex <- threeparttable_note_after_compact(tex)  # PHASE B: move note outside float
-  # T2.10: inject \setlength{\tabcolsep}{3pt} INSIDE the \resizebox group
-  # so the natural table width is narrower; scale_down compression minimised
-  # (group-scoped, no leakage to surrounding document).
-  tex <- gsub("\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{",
-              "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{\\setlength{\\tabcolsep}{3pt}",
-              tex, fixed = TRUE)
+  # No-op for longtable output (kableExtra emits \begin{TableNotes} in
+  # CamelCase; regex targets lowercase \begin{tablenotes}). Retained for
+  # safety against any residual float emission.
+  tex <- threeparttable_note_after_compact(tex)
   writeLines(tex, output_path)
   cat(sprintf("Wrote %s\n", output_path))
 

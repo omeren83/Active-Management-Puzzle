@@ -354,18 +354,28 @@ threeparttable_note_after <- function(s) {
   sub("\\end{table}", note_block, s, fixed = TRUE)
 }
 
-# Wrap a longtable in footnotesize group with tight column spacing. Also
-# sets \LTleft=\LTright=\fill to force natural-width centering (default
-# longtable positioning that kableExtra preserves but which callers may
-# want to enforce explicitly when a previous wrapper altered it).
+# Wrap a longtable in footnotesize group with tight column spacing.
+#
+# Phase 2.7 (19 May 2026): \LTleft=\fill / \LTright=\fill removed.
+# The preamble (line 415-416 of dissertation_main.tex) sets
+# \LTleft=\LTright=0pt so longtables span \linewidth, allowing
+# @{\extracolsep{\fill}} in the column spec to stretch the columns.
+# wrap_lt_small was overriding both back to \fill, which centered the
+# longtable at its natural (narrower) width while the caption stayed
+# anchored at \linewidth and ragged-right per \captionsetup[longtable]
+# in the preamble. Result: caption left edge != table left edge --- the
+# misalignment visible in Table F.1 (image 7 of pre-defense review).
+# Dropping these two lines lets the preamble defaults apply, so the
+# longtable spans \linewidth and aligns with the caption.
+#
+# \LTpost=0pt is retained because alpha_reporting's notes are emitted
+# AFTER \end{longtable} as a standalone \begin{singlespace} paragraph
+# (longtable_note_after pattern), not via \insertTableNotes. The 36pt
+# preamble \LTpost would push the notes 36pt away from the table; we
+# want them flush, with the trailing \par giving normal paragraph
+# spacing before the next body line.
 wrap_lt_small <- function(s, tabcolsep = "3pt") {
-  # \setlength{\LTpost}{0pt} is scoped to the brace group, neutralizing the
-  # 36pt \LTpost set globally in the preamble for this table only — gives a
-  # tight gap between the longtable and its caption paragraph (matches
-  # Tables 4.9-4.18).
-  opener <- paste0("{\\setlength{\\tabcolsep}{", tabcolsep,
-                   "}\\setlength{\\LTleft}{\\fill}",
-                   "\\setlength{\\LTright}{\\fill}",
+  opener <- paste0("{\\setlength{\\tabcolsep}{", tabcolsep, "}",
                    "\\setlength{\\LTpost}{0pt}",
                    "\\footnotesize\n\\begin{longtable}")
   parts_open <- strsplit(s, "\\begin{longtable}", fixed = TRUE)[[1]]

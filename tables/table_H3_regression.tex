@@ -1,14 +1,27 @@
-\begin{table}[H]
-\centering
-\caption{\label{tab:H3_regression}H3: Lottery Demand Hypothesis}
-\centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{\setlength{\tabcolsep}{3pt}
-\begin{tabular}[t]{lrrrr}
+\begingroup\fontsize{9}{11}\selectfont
+
+\begin{ThreePartTable}
+\begin{TableNotes}
+\item Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{	ext{LOW}}$, $R^{	ext{MID}}$, $R^{	ext{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{TableNotes}
+\begin{longtable}[t]{lrrrr}
+\caption{\label{tab:H3_regression}H3: Lottery Demand Hypothesis}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
+\endfirsthead
+\caption[]{H3: Lottery Demand Hypothesis \textit{(continued)}}\\
+\toprule
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+\endhead
+
+\endfoot
+\bottomrule
+\insertTableNotes
+\endlastfoot
 $R^{	ext{LOW}}$ & 0.0326*** & 0.0320*** & 0.0327*** & 0.0315***\\
  & (8.29) & (8.16) & (8.29) & (7.98)\\
 $R^{	ext{MID}}$ & 0.0146*** & 0.0146*** & 0.0146*** & 0.0143***\\
@@ -35,13 +48,7 @@ Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
 $N$ & 212,033 & 212,033 & 212,033 & 212,033\\
 $R^2$ (within) & 0.031 & 0.032 & 0.032 & 0.032\\
 Joint test ($\chi^2_2$, $p$) & -- & 2.25 (0.325) & 1.95 (0.378) & 11.33 (0.003)\\
-Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=-0.02 (p=0.506) & z=+0.25 (p=0.400) & z=+1.54 (p=0.062)\\
-\bottomrule
-\end{tabular}
-
-}
-\end{table}
-\begin{singlespace}\footnotesize\noindent
-Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded). Performance segments $R^{	ext{LOW}}$, $R^{	ext{MID}}$, $R^{	ext{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{singlespace}
-
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=-0.02 (p=0.506) & z=+0.25 (p=0.400) & z=+1.54 (p=0.062)\\*
+\end{longtable}
+\end{ThreePartTable}
+\endgroup{}
