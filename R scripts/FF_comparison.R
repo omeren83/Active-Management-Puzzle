@@ -204,6 +204,36 @@ add_stars <- function(val_str, t_stat) {
 }
 
 # kableExtra LaTeX cleaner (mirrors alpha_reporting.R clean_latex)
+# -----------------------------------------------------------------------------
+# Phase 2.10 (19 May 2026): added threeparttable_note_after() helper, mirroring
+# alpha_reporting.R line 338. The non-FF siblings of Tables 7, 9, 11 in
+# alpha_reporting.R route their kbl output through this helper BEFORE
+# clean_latex(); the FF versions in this file previously skipped that step,
+# producing a different upstream structure that triggered "Misplaced \noalign"
+# at the closing brace of \sbox{\tabletempbox} on Overleaf TeX Live 2024+.
+# The helper extracts \begin{tablenotes}...\end{tablenotes}, strips the
+# \begin{threeparttable}/\end{threeparttable} wrappers, and re-emits the note
+# as a {\footnotesize\noindent\textit{Note:} ...\par} block AFTER \end{table}.
+# Defined locally so this script remains self-contained under solo sourcing.
+threeparttable_note_after <- function(s) {
+  note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
+  nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
+  if (!length(nb)) return(s)
+  ni <- nb
+  ni <- sub("^\\\\begin\\{tablenotes\\}(\\[para\\])?\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("\\\\end\\{tablenotes\\}\\s*$", "", ni, perl = TRUE)
+  ni <- sub("^\\\\footnotesize\\s*\n?", "", ni, perl = TRUE)
+  ni <- sub("^\\\\item\\s*", "", ni, perl = TRUE)
+  ni <- trimws(ni)
+  s <- gsub(note_rx, "", s, perl = TRUE)
+  s <- gsub("\\\\begin\\{threeparttable\\}\\s*\n?", "", s)
+  s <- gsub("\\\\end\\{threeparttable\\}\\}?\\s*\n?", "", s)
+  note_block <- paste0("\\end{table}\n",
+                       "{\\footnotesize\\noindent\\textit{Note:} ",
+                       ni, "\\par}\n")
+  sub("\\end{table}", note_block, s, fixed = TRUE)
+}
+
 clean_latex <- function(x, resize = TRUE, small = FALSE) {
   # Phase 2.4 SBE consistency pass (May 2026).
   # Replaces kableExtra's default output with the savebox+minipage pattern
@@ -683,7 +713,8 @@ latex_t7 <- t7_display %>%
            escape         = FALSE,
            threeparttable = TRUE)
 
-writeLines(clean_latex(latex_t7, resize = TRUE),
+writeLines(clean_latex(threeparttable_note_after(as.character(latex_t7)),
+                       resize = TRUE),
            "table_perf_aggregate_FF.tex")
 cat("Written: table_perf_aggregate_FF.tex\n")
 
@@ -749,6 +780,7 @@ latex_boot <- boot_tab %>%
 # inside tabular, which triggers "Misplaced \noalign" in LaTeX. Same fix needed
 # for table10b below; latent bug in alpha_reporting.R lines 370 and 575.
 boot_str <- gsub("\\\\addlinespace[^\n]*\n", "", as.character(latex_boot))
+boot_str <- threeparttable_note_after(boot_str)  # Phase 2.10: mirror non-FF pattern
 # resize=FALSE: wrapping threeparttable in \resizebox is a fragile combo on
 # TeX Live 2024+ (Overleaf default) -- the hbox-restricted mode breaks the
 # \noalign expansion in booktabs' \bottomrule. Table 9 has 5 narrow columns
@@ -806,25 +838,16 @@ latex_pi0 <- pi0_table %>%
       label     = "pi0_estimate_FF",
       col.names = c("Metric", "Estimate", "$N$", "$\\lambda$", "Interpretation"),
       align     = c("l", "r", "r", "r", "l")) %>%
-  # Phase 2.9 (19 May 2026): G.3 was overflowing right margin. column_spec at
-  # 16em + 14em (em measured at \footnotesize ~8.5pt) plus 3 numeric cols at
-  # natural width plus 4 \tabcolsep gaps (24pt total) yielded a natural width
-  # close to or slightly above \linewidth on the SBE A4 layout (14.5cm). The
-  # clean_latex conditional \resizebox would fire ONLY if strictly greater,
-  # leaving borderline cases overflowing. Two defences applied:
-  #   1. Reduce col 1 to 12em (text "Proportion of True Zero-Alpha Active
-  #      Funds" wraps to 3 lines, still readable)
-  #   2. Reduce col 5 to 11em (interpretation text wraps to 2-3 lines)
-  # Combined natural width drops from ~36em to ~29em, well under \linewidth.
   kable_styling(latex_options = "hold_position") %>%
-  column_spec(1, width = "12em") %>%
-  column_spec(5, width = "11em") %>%
+  column_spec(1, width = "16em") %>%
+  column_spec(5, width = "14em") %>%
   footnote(general        = fn_t10,
            general_title  = "",
            escape         = FALSE,
            threeparttable = TRUE)
 
-writeLines(clean_latex(latex_pi0, resize = TRUE),
+writeLines(clean_latex(threeparttable_note_after(as.character(latex_pi0)),
+                       resize = TRUE),
            "table_pi0_estimate_FF.tex")
 cat("Written: table_pi0_estimate_FF.tex\n")
 
@@ -892,6 +915,7 @@ latex_t10b <- bsw_display %>%
            threeparttable = TRUE)
 
 t10b_str <- gsub("\\\\addlinespace[^\n]*\n", "", as.character(latex_t10b))
+t10b_str <- threeparttable_note_after(t10b_str)  # Phase 2.10: mirror non-FF pattern
 writeLines(clean_latex(t10b_str, resize = FALSE, small = TRUE),
            "table10b_bsw_decomposition_FF.tex")
 cat("Written: table10b_bsw_decomposition_FF.tex\n")
@@ -1003,7 +1027,8 @@ latex_d2 <- d2_table %>%
            escape         = FALSE,
            threeparttable = TRUE)
 
-writeLines(clean_latex(as.character(latex_d2), resize = FALSE, small = FALSE),
+writeLines(clean_latex(threeparttable_note_after(as.character(latex_d2)),
+                       resize = FALSE, small = FALSE),
            "table_port_agg_alpha_FF.tex")
 cat("Written: table_port_agg_alpha_FF.tex\n")
 
