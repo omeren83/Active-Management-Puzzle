@@ -205,16 +205,30 @@ add_stars <- function(val_str, t_stat) {
 
 # kableExtra LaTeX cleaner (mirrors alpha_reporting.R clean_latex)
 # -----------------------------------------------------------------------------
-# Phase 2.10 (19 May 2026): added threeparttable_note_after() helper, mirroring
-# alpha_reporting.R line 338. The non-FF siblings of Tables 7, 9, 11 in
-# alpha_reporting.R route their kbl output through this helper BEFORE
-# clean_latex(); the FF versions in this file previously skipped that step,
-# producing a different upstream structure that triggered "Misplaced \noalign"
-# at the closing brace of \sbox{\tabletempbox} on Overleaf TeX Live 2024+.
-# The helper extracts \begin{tablenotes}...\end{tablenotes}, strips the
-# \begin{threeparttable}/\end{threeparttable} wrappers, and re-emits the note
-# as a {\footnotesize\noindent\textit{Note:} ...\par} block AFTER \end{table}.
-# Defined locally so this script remains self-contained under solo sourcing.
+# Phase 2.11 (19 May 2026) -- BUG FIX for "Misplaced \noalign" at Table 9 FF.
+# ROOT CAUSE: line 480 builds boot_summary via data.frame() from colMeans()
+# of sim_matrix. colMeans() carries the matrix column-name attribute
+# ("1%", "5%", "10%", ...) into a NAMED numeric vector. When that vector is
+# passed to data.frame(), R promotes those names to data-frame rownames.
+# kbl() then emits an unannounced first column containing "1%", "5%", ... --
+# the literal "%" character starts a LaTeX comment that eats the rest of
+# each row including the row-terminating "\\". The tabular alignment
+# collapses and \bottomrule arrives outside an alignment context, producing
+# "Misplaced \noalign" at the closing brace of \sbox{\tabletempbox}.
+#
+# alpha_reporting.R escapes this by reading boot_summary from xlsx
+# (read_excel returns a tibble, which has no rownames).
+#
+# TWO-LAYER FIX:
+#   1. Primary: rownames(boot_summary) <- NULL after line 480.
+#   2. Defensive: row.names = FALSE on every kbl() call in this script,
+#      so that any future named-vector pollution cannot reach the .tex.
+#
+# threeparttable_note_after() is also defined locally for structural
+# alignment with alpha_reporting.R's table-rendering pipeline (Tables 7, 9,
+# 11). In current kableExtra output its regex matches nothing because
+# tablenotes span multiple lines; it is retained as a defensive no-op in
+# case the kableExtra emit format changes in a future version.
 threeparttable_note_after <- function(s) {
   note_rx <- "\\\\begin\\{tablenotes\\}.*?\\\\end\\{tablenotes\\}"
   nb <- regmatches(s, regexpr(note_rx, s, perl = TRUE))
@@ -483,6 +497,15 @@ boot_summary <- data.frame(
   t_alpha_sim_mean = colMeans(sim_matrix),
   pct_runs_below   = colMeans(sweep(sim_matrix, 2, actual_pct, "<")) * 100
 )
+# Phase 2.11 (19 May 2026): colMeans() preserves the column-name attribute of
+# sim_matrix (quantile probabilities formatted as "1%", "5%", "10%", ...).
+# When those NAMED numeric vectors enter data.frame(), the names are promoted
+# to data-frame rownames. kbl() then emits them as an unannounced first column,
+# and the literal "%" character starts a LaTeX comment that eats the rest of
+# each row -- producing "Misplaced \noalign" at \bottomrule. alpha_reporting.R
+# escapes this because it reads boot_summary from xlsx (read_excel returns a
+# tibble, which has no rownames). Force the same shape here.
+rownames(boot_summary) <- NULL
 
 # =============================================================================
 # 5. STOREY pi_0 + BSW (2010) DECOMPOSITION
@@ -698,6 +721,7 @@ fn_t7 <- paste(
 latex_t7 <- t7_display %>%
   kbl(format    = "latex",
       booktabs  = TRUE,
+      row.names = FALSE,
       linesep   = "",
       escape    = FALSE,
       caption   = "Aggregate Portfolio Alpha by Group (\\%, Annualised) -- Fama-French (2010) Subperiod",
@@ -763,6 +787,7 @@ latex_boot <- boot_tab %>%
   select(percentile, Actual_t, Sim_Mean, Prob_Luck, Interpretation) %>%
   kbl(format    = "latex",
       booktabs  = TRUE,
+      row.names = FALSE,
       escape    = FALSE,
       caption   = "Fama--French (2010) Bootstrap: Actual vs.\\ Simulated $t(\\hat{\\alpha})$ Percentiles -- FF Subperiod",
       label     = "bootstrap_tails_FF",
@@ -833,6 +858,7 @@ fn_t10 <- paste(
 latex_pi0 <- pi0_table %>%
   kbl(format    = "latex",
       booktabs  = TRUE,
+      row.names = FALSE,
       escape    = FALSE,
       caption   = "Aggregate Skill Estimate: Proportion of True Zero-Alpha Active Funds -- FF Subperiod",
       label     = "pi0_estimate_FF",
@@ -896,6 +922,7 @@ fn_t10b <- paste(
 latex_t10b <- bsw_display %>%
   kbl(format    = "latex",
       booktabs  = TRUE,
+      row.names = FALSE,
       escape    = FALSE,
       caption   = paste0("BSW (2010) Four-Way Decomposition: ",
                          "Proportions of Skilled, Unskilled, and Lucky Funds (\\%) -- FF Subperiod"),
@@ -1012,6 +1039,7 @@ fn_d2 <- paste(
 latex_d2 <- d2_table %>%
   kbl(format    = "latex",
       booktabs  = TRUE,
+      row.names = FALSE,
       linesep   = "",
       escape    = FALSE,
       caption   = "Active vs.\\ Passive Aggregate Portfolio Alpha (\\%, Annualised) -- FF Subperiod",
