@@ -3,7 +3,7 @@ cd "D:\TEZ"
 git status
 
 git add -A  
-git commit -m 'overflowing tables fixed'
+git commit -m 'font and exceeding margin issues correctted'
 git push
 
 PULL
