@@ -943,8 +943,14 @@ latex_t10b <- bsw_display %>%
 
 t10b_str <- gsub("\\\\addlinespace[^\n]*\n", "", as.character(latex_t10b))
 t10b_str <- threeparttable_note_after(t10b_str)  # Phase 2.10: mirror non-FF pattern
-writeLines(clean_latex(t10b_str, resize = FALSE, small = TRUE),
-           "table10b_bsw_decomposition_FF.tex")
+t10b_final <- clean_latex(t10b_str, resize = FALSE, small = TRUE)
+# Re-inject \label after clean_latex() — the sbox/minipage transform strips it
+t10b_final <- sub(
+  "(\\\\caption\\{BSW \\(2010\\) Four-Way Decomposition[^}]*\\})",
+  "\\1\\\\label{tab:bsw_decomposition_FF}",
+  t10b_final
+)
+writeLines(t10b_final, "table10b_bsw_decomposition_FF.tex")
 cat("Written: table10b_bsw_decomposition_FF.tex\n")
 
 # =============================================================================

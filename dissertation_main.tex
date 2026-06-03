@@ -569,13 +569,12 @@
 \thispagestyle{empty}
 \begin{center}
 
-\vspace*{0.5in}
+\vspace*{1.2in}
 
-THE ACTIVE MANAGEMENT PUZZLE
+ACTIVE MANAGEMENT: INFORMATIONAL NECESSITY OR PSYCHOLOGICAL UTILITY?
+INVESTIGATING THE BEHAVIORAL DRIVERS OF ACTIVE MANAGEMENT PUZZLE
 
 \vspace{0.5in}
-
-\vspace{0.15in}
 
 THESIS SUBMITTED TO THE
 
@@ -614,13 +613,12 @@ BOĞAZİÇİ UNIVERSITY
 \thispagestyle{empty}
 \begin{center}
 
-\vspace*{0.5in}
+\vspace*{1.2in}
 
-THE ACTIVE MANAGEMENT PUZZLE
+ACTIVE MANAGEMENT: INFORMATIONAL NECESSITY OR PSYCHOLOGICAL UTILITY?
+INVESTIGATING THE BEHAVIORAL DRIVERS OF ACTIVE MANAGEMENT PUZZLE
 
 \vspace{0.5in}
-
-\vspace{0.15in}
 
 Thesis submitted to the
 
@@ -654,8 +652,12 @@ Boğaziçi University
 % --- Approval page (p.ii --- counted, hidden) --------------------------------
 \setcounter{page}{2}
 \thispagestyle{empty}
+
+\vspace*{0.55in}
+
 \begin{center}
-THE ACTIVE MANAGEMENT PUZZLE
+Active Management: Informational Necessity or Psychological Utility?\\
+Investigating the Behavioral Drivers of Active Management Puzzle
 
 \vspace{0.5in}
 
@@ -666,29 +668,36 @@ has been approved by:
 \vspace{0.5in}
 \end{center}
 
-\noindent Prof.\ Vedat Akgiray \hfill \underline{\hspace{3in}}
-
+\begin{singlespace}
+\noindent Prof.\ Vedat Akgiray \hfill \underline{\hspace{3in}}\\
 \noindent (Thesis Advisor)
+\end{singlespace}
 
 \vspace{0.5in}
 
+\begin{singlespace}
 \noindent Assoc.\ Prof.\ Ali Coşkun \hfill \underline{\hspace{3in}}
+\end{singlespace}
 
 \vspace{0.5in}
 
+\begin{singlespace}
 \noindent Assoc.\ Prof.\ Cenk Cevat Karahan \hfill \underline{\hspace{3in}}
+\end{singlespace}
 
 \vspace{0.5in}
 
-\noindent Assist.\ Prof.\ Emrah Ahi \hfill \underline{\hspace{3in}}
-
+\begin{singlespace}
+\noindent Assist.\ Prof.\ Emrah Ahi \hfill \underline{\hspace{3in}}\\
 \noindent (External Member)
+\end{singlespace}
 
 \vspace{0.5in}
 
-\noindent Assist.\ Prof.\ Han Özsöylev \hfill \underline{\hspace{3in}}
-
+\begin{singlespace}
+\noindent Assist.\ Prof.\ Han Özsöylev \hfill \underline{\hspace{3in}}\\
 \noindent (External Member)
+\end{singlespace}
 
 \vspace{0.5in}
 
@@ -982,7 +991,7 @@ $\text{MAX12}_i$              & Maximum monthly gross return over trailing 12 mo
 
 \noindent The retail mutual-fund industry holds an empirical position that is
 difficult to reconcile with any clean reading of either classical or
-behavioral finance. Three decadeThree decades of academic evidence converge on the conclusion that the average active U.S. equity mutual fund underperforms risk-adjusted benchmarks net of fees by an economically meaningful margin, with point estimates in the major published studies ranging from approximately 80 to 120 basis points per annum
+behavioral finance. Three decades of academic evidence converge on the conclusion that the average active U.S. equity mutual fund underperforms risk-adjusted benchmarks net of fees by an economically meaningful margin, with point estimates in the major published studies ranging from approximately 80 to 120 basis points per annum
 \parencite{Jensen1968,Malkiel1995,Carhart1997,Wermers2000,FamaFrench2010,BarrasScailletWermers2010}.
 The cross-section is heterogeneous; some skill exists; but the median net
 alpha is reliably negative and the industry's aggregate Sharpe ratio,
@@ -990,7 +999,7 @@ weighted by capital, is no better than a low-cost index fund's. Investors,
 in turn, behave as if they have read the literature: assets under management
 in U.S.\ index mutual funds and exchange-traded funds first crossed the
 fifty-percent threshold of total domestic equity fund assets in 2019, and
-the share continues to rise. Yet several trillion dollars remain in active
+the share continues to rise \parencite{ICI2020}. Yet several trillion dollars remain in active
 vehicles, redemption rates respond to performance only mildly and
 asymmetrically \parencite{SirriTufano1998,ChevalierEllison1997}, and new
 active funds continue to be launched at a rate that materially exceeds the
@@ -1714,43 +1723,73 @@ Specific sources are documented in Section~\ref{sec:state_variables}.
 \subsection{External research and benchmark verification}
 \label{sec:external_research}
 
-\noindent Of the 2{,}329 active funds in the working universe, the
-Bloomberg-assigned primary benchmark was retained without modification
-for 2{,}232 (95.8\%). For the remaining 97 funds, active research
-identified a benchmark misassignment or a missing benchmark and
-established the correct assignment through primary-source review. The
-single largest group of corrections concerns the Fidelity Select sector
-fund family: Bloomberg had assigned the S\&P 500 as the primary
-benchmark for the entire family, while the funds' annual reports
-disclose that each Select fund is benchmarked against the relevant
-MSCI U.S.\ IMI 25/50 sector sub-index. The Fidelity Select correction
-covers 37 funds and is supported by a benchmark-change history that
-includes the September 2018 GICS reclassification (Telecom Services
-folded into Communication Services) and the March 2023 GICS
-reclassification (homebuilders moved from Real Estate / Materials to
-Consumer Discretionary).
+\noindent The final benchmark assigned to each fund in the
+dissertation is derived from four sources, documented in full in
+Appendix~\ref{app:benchmark} and summarised here by the confidence
+score attached to each assignment. For 17 funds the benchmark is
+confirmed verbatim from the fund's annual report or prospectus
+(score 10). For 1{,}697 funds it is derived from the LSEG
+Lipper-category to standard Russell/MSCI map (score 8). For 660
+funds the Bloomberg \texttt{Primary\_Benchmark} field names a
+recognised index family directly and is used as-is (score 7). The
+remaining 1{,}390 funds (37\% of the 3{,}764-fund full panel) receive
+an inferred benchmark: 902 from both Bloomberg \texttt{Mcap\_Focus}
+and \texttt{Fund\_Strategy} fields (score 5), 387 from one Bloomberg
+attribute field (score 3), and 101 assigned the Russell 3000
+default (score 1). Scores 7 and above indicate confirmation from
+an authoritative source; scores 5 and below indicate inference from
+Bloomberg fund attributes or a default assignment.
 
+Of the 2{,}329 active funds in the working universe, 97 required
+active correction of a Bloomberg benchmark misassignment or a
+missing benchmark. The single largest correction group concerns the
+Fidelity Select sector fund family: Bloomberg had assigned the
+S\&P 500 as the primary benchmark for the entire family, while the
+funds' annual reports disclose that each Select fund is benchmarked
+against the relevant MSCI U.S.\ IMI 25/50 sector sub-index. The
+Fidelity Select correction covers 37 funds and is supported by a
+benchmark-change history that includes the September 2018 GICS
+reclassification (Telecom Services folded into Communication
+Services) and the March 2023 GICS reclassification (homebuilders
+moved from Real Estate / Materials to Consumer Discretionary).
 A second correction group concerns Rydex sector funds, for which
 Guggenheim's fund-family documentation confirms that no primary
 benchmark is officially declared. For these 14 funds a proxy sector
 index was inferred from the fund's GICS sector classification and
-flagged as INFERRED with a confidence score of 4 in the
-benchmark assignment workbook. Smaller correction groups cover Cohen \&
-Steers realty funds (3 funds, MSCI U.S.\ REIT confirmed; FTSE NAREIT
-substitute applied), MFS Utilities and BULIX (S\&P 500 Utilities
-Index), and approximately 20 additional sector-specialty funds.
-Confidence scores follow the 1--10 framework documented in
-Appendix~\ref{app:benchmark}: scores 7 and above indicate confirmation
-from authoritative sources (prospectus, annual report, factsheet, or
-direct fund-family confirmation); scores 3--5 indicate inference from
-GICS sector and Bloomberg fund attributes; scores 1--2 indicate the
-default Russell 3000 placeholder. The distribution of confidence scores
-across the 3{,}764 funds is concentrated in the high-confidence tiers:
-17 funds at score 10 (verbatim prospectus confirmation), 1{,}697 at
-score 8 (LSEG Lipper category map), 660 at score 7 (Bloomberg primary
-benchmark direct map), 902 at score 5 (strong inference from both
-Bloomberg fields), 387 at score 3 (partial inference), and 101 at
-score 1 (default placeholder).
+flagged as INFERRED in the benchmark assignment workbook. Smaller
+correction groups cover Cohen \& Steers realty funds (3 funds,
+MSCI U.S.\ REIT confirmed; FTSE NAREIT substitute applied), MFS
+Utilities and BULIX (S\&P 500 Utilities Index), and approximately
+20 additional sector-specialty funds.
+
+Regardless of whether Bloomberg's \texttt{Primary\_Benchmark} field
+required active correction, the dissertation does not use
+fund-declared or Bloomberg-assigned benchmarks as individual
+performance benchmarks. Following the academic convention of
+\textcite{SirriTufano1998}, \textcite{CremersPetajisto2009}, and
+\textcite{FamaFrench2010}, each fund is instead assigned a
+category-appropriate broad-based Russell index determined by its
+Lipper style classification. Three considerations motivate this
+choice. First, the Sirri--Tufano fractional performance rank
+requires all funds within a style category to be measured against
+the same index; fund-specific benchmarks would render within-category
+ranks incomparable. Second, fund managers exercise discretion in
+selecting their prospectus benchmarks and there is well-documented
+evidence of strategic benchmark selection to maximise reported
+outperformance \parencite{Sensoy2009}, introducing systematic upward
+bias into alpha estimates if manager-selected benchmarks are used.
+Third, the Carhart four-factor model attributes returns to systematic
+risk factors rather than to a single index, making stylistic
+consistency within peer groups more important than the precise
+identity of the declared benchmark. The benchmark assignment
+workbook therefore records, for each fund, the Russell index
+appropriate to its Lipper category rather than the index named in
+Bloomberg's \texttt{Primary\_Benchmark} field. For the 660 funds
+at confidence score 7, the Bloomberg field happened to name exactly
+that Russell index and was used directly as confirmation; for the
+1{,}697 funds at score 8, the LSEG Lipper category provided the
+same information more directly and Bloomberg's field was not
+consulted as the source.
 
 \subsection{Public-source factor and macroeconomic data}
 \label{sec:public_data}
@@ -2401,109 +2440,176 @@ are formally specified as follows.
 flow--performance convexity documented by \textcite{SirriTufano1998}.
 The specification is the Sirri--Tufano piecewise rank regression
 augmented with sentiment-regime interactions:
-% =============================================================================
-% PHASE 3.A PATCH 3 — Eq. (3.4) Sirri-Tufano + Sentiment specification (H1)
-% Date: 11 May 2026
-%
-% LOCATION in dissertation_main.tex:
-%   Inside \subsection{H1: Sentiment-convexity hypothesis} (label
-%   \label{sec:H1_method}). The block currently starts with:
-%     \begin{equation}
-%       \text{Flow}_{i,t} = \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12} ...
-%       \label{eq:H1}
-%     \end{equation}
-%
-% ACTION:
-%   REPLACE the existing \begin{equation}...\end{equation} block with the
-%   multline version below.
-%
-% WHY:
-%   Equation has six rank-segment-and-interaction terms plus controls; in
-%   rendered PDF it stretches across or past the right margin, leaving (3.4)
-%   tag pushed in. Multline breaks at the natural boundary between rank-level
-%   terms and rank-by-sentiment interaction terms.
-% =============================================================================
 
 \begin{multline}
-\text{Flow}_{i,t} = \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12}
+\text{Flow}_{i,t} =
+  \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12}
 + \beta_{\text{MID}} R^{\text{MID}}_{i,t-12}
 + \beta_{\text{HIGH}} R^{\text{HIGH}}_{i,t-12} \\
-+ \delta_q R^{q}_{i,t-12} D^{\text{SENT}}_t + X_{i,t} \gamma + \mu_i + \varepsilon_{i,t},
++ \delta_{\text{LOW}}\, R^{\text{LOW}}_{i,t-12} D^{\text{SENT}}_t
++ \delta_{\text{MID}}\, R^{\text{MID}}_{i,t-12} D^{\text{SENT}}_t
++ \delta_{\text{HIGH}}\, R^{\text{HIGH}}_{i,t-12} D^{\text{SENT}}_t \\
++ \lambda D^{\text{SENT}}_t + X_{i,t} \gamma + \mu_i + \varepsilon_{i,t},
 \label{eq:H1}
 \end{multline}
 
-% =============================================================================
-% END PHASE 3.A PATCH 3
-% =============================================================================
-where $R^q$ is the Sirri--Tufano rank-segment for $q \in \{\text{LOW},
-\text{MID}, \text{HIGH}\}$, the controls $X_{i,t}$ include
-$\log(\text{TNA}_{i,t-1})$, $\log(\text{Age}_{i,t})$, the trailing
-36-month return volatility, and the contemporaneous Lipper-category
-average flow, and $\mu_i$ is a fund fixed effect. The auxiliary
-hypothesis is the asymmetry test $\delta_{\text{HIGH}} > \delta_{\text{LOW}}$,
-expressing the prediction that sentiment amplifies inflows to winners
-more than it amplifies outflows from losers. Standard errors are
-clustered two-way on fund and calendar month
-\parencite{Petersen2009}.
+\noindent where $R^{\text{LOW}}$, $R^{\text{MID}}$, and $R^{\text{HIGH}}$
+are the Sirri--Tufano piecewise rank segments; $D^{\text{SENT}}_t$ is
+the high-sentiment regime indicator; $\delta_q$ is the
+sentiment-regime interaction coefficient for segment $q \in
+\{\text{LOW}, \text{MID}, \text{HIGH}\}$; $\lambda$ is the main
+effect of the sentiment regime on the level of flows; the controls
+$X_{i,t}$ include $\log(\text{TNA}_{i,t-1})$, $\log(\text{Age}_{i,t})$,
+the trailing 36-month return volatility, and the contemporaneous
+Lipper-category average flow, all measured at $t-1$; and $\mu_i$ is
+a fund fixed effect. The auxiliary hypothesis is the asymmetry test
+$\delta_{\text{HIGH}} > \delta_{\text{LOW}}$, expressing the
+prediction that sentiment amplifies inflows to winners more than it
+amplifies outflows from losers. Standard errors are clustered
+two-way on fund and calendar month \parencite{Petersen2009}.
 
 \subsection{H2: Disposition / illusion-of-control hypothesis}
 \label{sec:H2_method}
 
-\noindent H2 distinguishes between two competing predictions about the
-loser-segment slope. The disposition / illusion-of-control prediction
-of \textcite{ShefrinStatman1985} is $\delta^{\text{IoC}}_{\text{LOW}} > 0$
-under high margin-debt regimes (a positive interaction coefficient
-indicates that high margin debt amplifies retention of losers, since
-the loser-segment slope $\beta_{\text{LOW}}$ is positive in the
-benchmark Sirri--Tufano regression). The
+\noindent H2 tests two competing predictions about how high-leverage
+regimes modulate the loser-segment slope. The specification replaces
+$D^{\text{SENT}}_t$ in Equation~\ref{eq:H1} with the detrended
+margin-debt regime indicator $D^{\text{MD,Det}}_t$:
+
+\begin{multline}
+\text{Flow}_{i,t} =
+  \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12}
++ \beta_{\text{MID}} R^{\text{MID}}_{i,t-12}
++ \beta_{\text{HIGH}} R^{\text{HIGH}}_{i,t-12} \\
++ \delta^{\text{IoC}}_{\text{LOW}}\, R^{\text{LOW}}_{i,t-12} D^{\text{MD,Det}}_t
++ \delta^{\text{IoC}}_{\text{MID}}\, R^{\text{MID}}_{i,t-12} D^{\text{MD,Det}}_t
++ \delta^{\text{IoC}}_{\text{HIGH}}\, R^{\text{HIGH}}_{i,t-12} D^{\text{MD,Det}}_t \\
++ \lambda D^{\text{MD,Det}}_t + X_{i,t} \gamma + \mu_i + \varepsilon_{i,t}.
+\label{eq:H2}
+\end{multline}
+
+\noindent The baseline loser-segment coefficient $\beta_{\text{LOW}}$ is
+positive: an improvement in relative rank within the bottom tercile
+is associated with higher flows, and a deterioration generates
+outflows. The interaction coefficient $\delta^{\text{IoC}}_{\text{LOW}}$
+determines whether high margin debt \emph{steepens} or \emph{flattens}
+that slope. The disposition / illusion-of-control prediction of
+\textcite{ShefrinStatman1985} is $\delta^{\text{IoC}}_{\text{LOW}} < 0$:
+leveraged investors exhibit stronger sunk-cost bias and are more
+reluctant to realise losses, dampening the outflow response to rank
+deterioration and \emph{flattening} the loser-segment slope. The
 \textcite{BrunnermeierPedersen2009} margin-call alternative predicts
-the opposite sign on the same coefficient: high margin debt should
-amplify forced redemptions of losers, generating
-$\delta^{\text{IoC}}_{\text{LOW}} < 0$. The specification follows
-Equation~\ref{eq:H1} with $D^{\text{MD,Det}}$ in place of
-$D^{\text{SENT}}$. Robustness checks substitute the inverse
-put--call ratio regime indicator and a discriminant version that
-includes both indicators jointly.
+$\delta^{\text{IoC}}_{\text{LOW}} > 0$: balance-sheet constraints force
+faster liquidation of losing positions under high leverage,
+\emph{steepening} the slope and amplifying the outflow response to
+any given rank deterioration. All remaining notation follows
+Equation~\ref{eq:H1}. Robustness checks substitute the inverse
+put--call ratio regime indicator $D^{\text{INV-PCR}}_t$ and a
+discriminant version that includes both indicators jointly.
 
 \subsection{H3: Lottery demand and skewness preference}
 \label{sec:H3_method}
 
 \noindent H3 predicts that high-sentiment regimes amplify investor
-demand for lottery-like funds. The specification regresses flow on
-three candidate lottery proxies, each interacted with the sentiment
-regime indicator: $\text{ActR2}$ (the rational-channel control),
-$\text{ActSkew}$ (sample skewness of trailing 36 monthly gross
-returns, the full-distribution lottery measure), and $\text{MAX12}$
-(the maximum monthly gross return over the trailing 12 months, the
-right-tail-only measure). Each proxy is standardised within sample
-and lagged one month. The proxy validation procedure that selects
-these three from the four candidates considered is documented in
-Appendix~\ref{app:proxy_validation}. The behavioral prediction is a
-positive interaction between the lottery proxy and the sentiment
-indicator for $\text{ActSkew}$ and $\text{MAX12}$, with the
-expected sign on $\text{ActR2}$ either zero (the rational
-benchmark) or positive (the
-\textcite{AmihudGoyenko2013} alpha-prediction channel).
+demand for funds with lottery-like return distributions. Three
+candidate lottery proxies are evaluated in separate specifications:
+$\text{ActR2}$ (the rational alpha-prediction channel of
+\textcite{AmihudGoyenko2013}), $\text{ActSkew}$ (sample skewness of
+trailing 36 monthly gross returns, the full-distribution lottery
+measure), and $\text{MAX12}$ (the maximum monthly gross return over
+the trailing 12 months, the right-tail-only measure). Each proxy is
+standardised within sample and lagged one month; the proxy
+validation procedure that selects these three from the four
+candidates considered is documented in
+Appendix~\ref{app:proxy_validation}. For a generic lottery proxy
+$L_{i,t-1}$, the specification is:
+
+\begin{multline}
+\text{Flow}_{i,t} =
+  \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12}
++ \beta_{\text{MID}} R^{\text{MID}}_{i,t-12}
++ \beta_{\text{HIGH}} R^{\text{HIGH}}_{i,t-12} \\
++ \alpha^L\, L_{i,t-1}
++ \delta^L\, L_{i,t-1} D^{\text{SENT}}_t
++ \lambda D^{\text{SENT}}_t
++ X_{i,t} \gamma + \mu_i + \varepsilon_{i,t},
+\label{eq:H3}
+\end{multline}
+
+\noindent where $L_{i,t-1}$ is replaced in turn by
+$\text{ActR2}_{i,t-1}$, $\text{ActSkew}_{i,t-1}$, and
+$\text{MAX12}_{i,t-1}$, each constituting a separate column in the
+reported table alongside a baseline Sirri--Tufano specification with
+no lottery proxy; $\alpha^L$ is the main effect of the lottery proxy
+on flows; and $\delta^L$ is the sentiment-amplification interaction,
+with the superscript $L$ denoting the lottery channel. The rank
+segments $R^q$ are retained as nuisance controls so that H3
+conditions on the H1 channel. The behavioral prediction is
+$\delta^L > 0$ for $\text{ActSkew}$ and $\text{MAX12}$: sentiment
+amplifies investor demand for lottery-like funds. The expected sign
+on $\delta^L$ for $\text{ActR2}$ is either zero (the rational
+benchmark) or positive (investors rationally reward activeness as a
+skill signal under the \textcite{AmihudGoyenko2013} channel). All
+remaining notation and standard errors follow Equation~\ref{eq:H1}.
 
 \subsection{H4: Fee elasticity}
 \label{sec:H4_method}
 
 \noindent H4 tests whether flow--fee elasticity is heterogeneous across
 performance segments and sentiment regimes in a manner inconsistent
-with the rational benchmark. Under the
-\textcite{BerkGreen2004} rational equilibrium, sentiment-driven flow
-should not depend on fee level: the triple interactions
-$\delta^F$ and $\delta^F_q$ should be jointly zero. The behavioral
-alternative permits heterogeneity in fee sensitivity across rank
-segments; the specification therefore includes the full triple
-interaction structure $R^q_{i,t-12} \times \text{ExpRatio}_i \times
-D^{\text{SENT}}_t$ together with all lower-order terms. The
-specification uses Lipper-category $\times$ year-month fixed effects in
-place of fund fixed effects to absorb both the sentiment main effect
-(which is otherwise collinear with the time-invariant fund effect) and
-any aggregate flow shocks within investment style. Standard errors are
-clustered two-way on fund and calendar month
-\parencite{Petersen2009}.
+with the rational benchmark. The specification augments the
+Sirri--Tufano baseline with expense ratio interactions, their
+sentiment interactions, and the full triple interactions with the
+sentiment regime indicator:
+
+\begin{multline}
+\text{Flow}_{i,t} =
+  \beta_{\text{LOW}} R^{\text{LOW}}_{i,t-12}
++ \beta_{\text{MID}} R^{\text{MID}}_{i,t-12}
++ \beta_{\text{HIGH}} R^{\text{HIGH}}_{i,t-12} \\
++ \kappa_{\text{LOW}}\, R^{\text{LOW}}_{i,t-12} D^{\text{SENT}}_t
++ \kappa_{\text{MID}}\, R^{\text{MID}}_{i,t-12} D^{\text{SENT}}_t
++ \kappa_{\text{HIGH}}\, R^{\text{HIGH}}_{i,t-12} D^{\text{SENT}}_t \\
++ \phi_{\text{LOW}}\, R^{\text{LOW}}_{i,t-12} \cdot \text{ExpRatio}_i
++ \phi_{\text{MID}}\, R^{\text{MID}}_{i,t-12} \cdot \text{ExpRatio}_i
++ \phi_{\text{HIGH}}\, R^{\text{HIGH}}_{i,t-12} \cdot \text{ExpRatio}_i \\
++ \delta^F_{\text{LOW}}\, R^{\text{LOW}}_{i,t-12} \cdot \text{ExpRatio}_i \cdot D^{\text{SENT}}_t
++ \delta^F_{\text{MID}}\, R^{\text{MID}}_{i,t-12} \cdot \text{ExpRatio}_i \cdot D^{\text{SENT}}_t
++ \delta^F_{\text{HIGH}}\, R^{\text{HIGH}}_{i,t-12} \cdot \text{ExpRatio}_i \cdot D^{\text{SENT}}_t \\
++ \theta\, \text{ExpRatio}_i
++ \eta\, \text{ExpRatio}_i \cdot D^{\text{SENT}}_t
++ \lambda D^{\text{SENT}}_t
++ X_{i,t} \gamma + \alpha_{s \times t} + \varepsilon_{i,t},
+\label{eq:H4}
+\end{multline}
+
+\noindent where $\text{ExpRatio}_i$ is the fund's annual expense ratio;
+$\theta$ is its main effect on flows; $\kappa_q$ are the lower-order
+rank-sentiment interactions, included as controls to ensure valid
+triple-interaction inference (these correspond to the $\delta_q$ of
+Equation~\ref{eq:H1} re-estimated on the H4 sample); $\phi_q$ are
+the rank-fee interactions capturing how fee level modulates the
+flow--performance slope unconditional on sentiment; $\eta$ is the
+unconditional fee--sentiment interaction capturing whether aggregate
+fee tolerance shifts with the sentiment regime; $\delta^F_q$ are the
+triple interaction coefficients, with the superscript $F$ denoting
+the fee channel; and $\alpha_{s \times t}$ denotes
+Lipper-category $\times$ year-month fixed effects, which replace
+fund fixed effects to absorb both the sentiment main effect
+(otherwise collinear with the time-invariant $\text{ExpRatio}_i$
+under fund fixed effects) and any aggregate flow shocks within
+investment style. All remaining notation follows
+Equation~\ref{eq:H1}. 
+
+Under the \textcite{BerkGreen2004} rational
+equilibrium, fee level should not interact with sentiment-driven
+flow: the joint null is $\eta = \delta^F_{\text{LOW}} =
+\delta^F_{\text{MID}} = \delta^F_{\text{HIGH}} = 0$. The behavioral
+alternative permits heterogeneous fee sensitivity across rank
+segments, with the prediction that high-sentiment investors are less
+fee-sensitive (or differentially so) depending on where a fund sits
+in the performance distribution. Standard errors are clustered
+two-way on fund and calendar month \parencite{Petersen2009}.
 
 % =============================================================================
 % CHAPTER 4 --- EMPIRICAL RESULTS
@@ -3363,62 +3469,100 @@ The rejection of the rational null is modest in economic magnitude
 half a standard deviation of monthly proportional flow --- but is
 statistically detectable on the panel and survives the lagged
 state-variable robustness check of
-Appendix~\ref{app:behavioral_robustness}
+Appendix~\ref{app:behavioral_robustness}.
 
 As expected, the coefficient of the standalone sentiment indicator without any interactions is positive and significant under specifications 2 and 3, which suggests fund flows increase under high-sentiment regimes. On the other hand, coefficients of the control variables size and age are negative and significant under all specifications, so fund flows clearly decrease as a fund gets bigger and older. Conversely, funds receive higher inflows when the flow into their style group as a whole increases, evidenced by the positive and highly significant coefficients on style flow. Finally, volatility seems to have no effect on fund flows as the coefficient on the control variable is insignificant under all specifications. However, this is due to the fact that most of the spread in return volatility lies the cross-section (between funds) rather than in the time-series (within funds), and the former is being absorbed by the fund fixed-effect on this specification. This is confirmed by the negative and highly significant coefficients on return volatility under specifications with no fund fixed effect, which are reported on tables~\ref{tab:H4_regression},~\ref{tab:H4_lagged},~\ref{tab:H1_robustness},~\ref{tab:H2_robustness},~\ref{tab:H3_robustness} and ~\ref{tab:H4_robustness}.
 
 \section{H2: Disposition effect and illusion of control}
 \label{sec:H2}
 
-H2 distinguishes between two competing predictions about
-the loser-segment slope. The disposition / illusion-of-control
-prediction of \textcite{ShefrinStatman1985} and the experimental
-illusion-of-control literature predicts a positive interaction
-between the loser-segment rank and the high-margin-debt regime
-indicator: high margin debt is interpreted as a marker of retail
-overconfidence and thus amplifies investors' reluctance to redeem
-from underperformers. The
-\textcite{BrunnermeierPedersen2009} margin-call alternative
-predicts the opposite sign on the same coefficient: high margin
-debt should generate forced redemptions that amplify rather than
-attenuate the loser-segment outflow.
+H2 tests two competing predictions about how high leverage regimes
+modulate the loser-segment flow--performance slope. The baseline
+loser-segment coefficient $\beta_{\text{LOW}}$ is positive: an
+improvement in relative rank within the bottom tercile attracts
+higher flows, and a deterioration generates outflows. The interaction
+coefficient $\delta^{\text{IoC}}_{\text{LOW}}$ determines whether
+high margin debt \emph{steepens} or \emph{flattens} that slope. The
+disposition / illusion-of-control prediction of
+\textcite{ShefrinStatman1985} is $\delta^{\text{IoC}}_{\text{LOW}} < 0$:
+leveraged investors are more reluctant to redeem from losers,
+dampening the outflow response to rank deterioration and flattening
+the slope. The \textcite{BrunnermeierPedersen2009} margin-call
+alternative predicts $\delta^{\text{IoC}}_{\text{LOW}} > 0$: funding
+constraints force accelerated liquidation of losing positions,
+steepening the slope and amplifying the outflow response to any given
+rank deterioration.
 
 \input{tables/table_H2_regression}
 
 \noindent Table~\ref{tab:H2_regression} reports the panel regression results
 under three competing state-variable proxies: the detrended
 margin-debt regime indicator $D^{\text{MD,Det}}$, the inverse
-put-call ratio regime indicator $D^{\text{INV\text{-}PCR}}_t$,
-and a discriminant specification that includes both regime
-indicators. Under the headline margin-debt proxy, the loser-segment
-interaction
-$\delta^{\text{IoC}}_{\text{LOW}}$
-is significantly positive
-($z = +2.15$, the one-sided $p$-value for the Brunnermeier-Pedersen
-prediction is $0.984$). The result rejects the
-\textcite{ShefrinStatman1985} disposition prediction in favour of
-the \textcite{BrunnermeierPedersen2009} margin-call alternative.
+put--call ratio regime indicator $D^{\text{INV-PCR}}_t$, and a
+discriminant specification that includes both regime indicators
+jointly. The baseline flow--performance convexity is confirmed
+across all specifications. The winner segment commands a slope
+roughly twice the loser segment, replicating the
+\textcite{SirriTufano1998} pattern.
+
+Under the headline margin-debt proxy, the loser-segment interaction
+$\delta^{\text{IoC}}_{\text{LOW}}$ is significantly \emph{positive}
+($\hat{\delta} = +0.0148$, $z = +2.15$, $p < 0.05$). A positive
+coefficient means the loser-segment slope \emph{steepens} under high
+margin debt: rank improvements among losers attract more inflows, and
+rank deteriorations generate more outflows, relative to the
+low-leverage baseline. This is the opposite of the disposition
+prediction. The one-sided $p$-value for the Brunnermeier--Pedersen
+prediction ($\delta > 0$) is $0.016$; the one-sided $p$-value for
+the disposition prediction ($\delta < 0$) is $0.984$. The result
+therefore rejects \textcite{ShefrinStatman1985} in favour of
+\textcite{BrunnermeierPedersen2009}.
 
 The economic interpretation is that high margin-debt regimes are
-associated with accelerated redemptions of losers, not with
-disposition-driven retention. This is the opposite of the
-behavioral prediction H2 was originally designed to test, and the
-finding is reported as such. The result does not falsify the
-disposition effect at the individual-investor level (where it is
-robustly documented by \textcite{Odean1998} and others); it
-falsifies the prediction that the disposition effect generates a
-detectable signature in aggregate flow data conditional on
-margin-debt regimes. The Brunnermeier-Pedersen mechanism, in which
-margin debt creates forced redemptions during stress episodes, is
-the more parsimonious reading of the aggregate flow signature in
-this sample.
+associated with \emph{amplified} rank sensitivity in the loser
+segment, not with the flattened sensitivity that disposition-driven
+retention would produce. Leveraged investors, far from holding losers
+out of sunk-cost bias, appear to liquidate them more aggressively the
+further they fall in the relative performance distribution. This
+finding does not falsify the disposition effect at the
+individual-investor level, where it is robustly documented by
+\textcite{Odean1998} and others; it falsifies the prediction that the
+effect produces a detectable \emph{aggregate} flow signature
+conditional on margin-debt regimes. The
+\textcite{BrunnermeierPedersen2009} mechanism --- in which
+balance-sheet constraints force redemptions during high-leverage
+episodes --- is the more parsimonious reading of the data.
 
-The discriminant specification with both regime indicators
-preserves the margin-debt sign and finds the inverse-PCR regime
-indicator additionally significant in the same direction,
-strengthening the Brunnermeier-Pedersen interpretation across
-multiple state-variable axes. Robustness under the lagged
-state-variable specification of
+The winner-segment interaction $\delta^{\text{IoC}}_{\text{HIGH}}$
+is positive but insignificant ($\hat{\delta} = +0.0095$, $z = 0.96$),
+and the mid-segment interaction is likewise insignificant, so the
+margin-debt effect is concentrated at the loser end, consistent with
+the funding-constraint mechanism which is most binding for positions
+already generating losses. The joint $\chi^2_3$ test rejects the null
+of no margin-debt modulation at 1\% ($p = 0.010$).
+
+The inverse put--call ratio specification ($D^{\text{INV-PCR}}$)
+produces a near-zero and insignificant loser-segment interaction
+($\hat{\delta} = -0.0013$, $z = -0.20$), and the joint test fails to
+reject ($p = 0.931$). The PCR proxy therefore does not corroborate
+the margin-debt result on its own. The discriminant specification,
+which includes both $D^{\text{MD,Det}}$ and the Baker--Wurgler
+sentiment indicator $D^{\text{SENT}}$ jointly, preserves the
+positive loser-segment margin-debt interaction ($\hat{\delta} =
++0.0133$, $z = +1.91$, $p < 0.10$) and leaves the H1 sentiment
+interactions broadly unchanged, confirming that the margin-debt
+effect is not an artefact of omitted sentiment correlation.
+
+The control variables are consistent with the H1 results. Fund size
+and age carry negative and significant coefficients across all
+specifications, confirming that larger and older funds attract
+less flow. Style flow is positive and significant,
+reflecting the well-documented category-flow spillover. Return
+volatility is insignificant under fund fixed effects for the same
+reason noted in Section~\ref{sec:H1}: the within-fund variation in
+volatility is limited, and the cross-sectional spread is absorbed by
+the fixed effect. Robustness under the lagged state-variable and
+alternative fixed-effect specifications of
 Appendix~\ref{app:behavioral_robustness} confirms the directional
 finding.
 
@@ -3439,8 +3583,8 @@ extension of \textcite{ChengEtal2025}). Each proxy is standardised
 within sample. The proxy validation procedure that selects these
 three from the four candidates considered (the fourth being the
 unconditional 36-month return realised volatility, which fails the
-proxy validation tests reported in Appendix~\ref{app:proxy_validation})
-is documented in detail in that appendix.
+proxy validation tests)
+is documented in detail in Appendix~\ref{app:proxy_validation}.
 
 \input{tables/table_H3_regression}
 
@@ -3482,6 +3626,21 @@ return relationship through investor lottery preference, and with
 the \textcite{ChengEtal2025} fund-level extension that establishes
 the same channel in the mutual fund flow domain.
 
+A notable feature of the \text{MAX12} specification is that the
+sentiment regime indicator $D^{\text{SENT}}$ loses its own
+significance (column~4) precisely when $\text{MAX12}$ is
+significant --- a pattern absent in columns~(2) and~(3). This is
+most naturally interpreted as a substitution effect rather than
+multicollinearity: $\text{MAX12}$ is mechanically elevated during
+high-sentiment periods, since bull markets produce more extreme
+right-tail monthly returns, and therefore absorbs the time-series
+variation in investor risk appetite that the macro sentiment
+indicator was proxying in the cruder specifications. Far from
+being a statistical artefact, this substitution strengthens the
+behavioral interpretation --- $\text{MAX12}$ captures the
+sentiment-lottery channel at the fund level with greater
+precision than the aggregate binary indicator.
+
 The Lipper-category $\times$ year-month fixed-effect and lagged state-variable robustness checks
 (Appendix~\ref{app:behavioral_robustness}) corroborate the directional $\text{MAX12}$ pattern
 at marginal significance. Under the lagged-sentiment specification,
@@ -3498,10 +3657,12 @@ robustness specifications.
 
 H4 tests whether flow--fee elasticity is heterogeneous
 across performance segments and sentiment regimes in a manner
-inconsistent with the rational benchmark. Under the
-\textcite{BerkGreen2004} rational equilibrium, sentiment-driven
-flow should not depend on fee level: the triple interactions
-$\delta^F$ and $\delta^F_q$ should be jointly zero. The behavioral
+inconsistent with the rational benchmark. Under the \textcite{BerkGreen2004} rational equilibrium,
+fee sensitivity should be invariant to sentiment regime: the
+unconditional fee--sentiment interaction $\eta$ and the three
+rank-conditioned triple interactions $\delta^F_{\text{LOW}}$,
+$\delta^F_{\text{MID}}$, and $\delta^F_{\text{HIGH}}$ should be
+jointly zero. The behavioral
 alternative permits heterogeneity: \textcite{DelGuercioTkac2008}
 document that institutional and retail clienteles exhibit
 materially different fee sensitivities, and
@@ -3516,14 +3677,37 @@ joint $\chi^2$ on the triple interactions.
 \endgroup
 
 \noindent Table~\ref{tab:H4_regression} reports the H4 regression under three
-sentiment proxies. The joint $\chi^2_4$ test of the triple-interaction
-restriction is statistically insignificant under all three proxies:
-$\chi^2 = 4.45$ ($p = 0.349$) under the Baker-Wurgler high-sentiment
-regime indicator, $\chi^2 = 4.46$ ($p = 0.347$) under the
-orthogonalised continuous sentiment, and $\chi^2 = 5.17$ ($p =
-0.270$) under the AAII regime indicator. The
-headline $\delta^F$-related $z$-statistic is similarly indistinguishable
-from zero in the headline specification ($z = +0.74$).
+sentiment proxies. A preliminary observation on the expense ratio main
+effect $\theta$: it is negative and marginally significant in the
+baseline column~(1) ($\hat{\theta} = -0.0016$, $t = -1.89$), as
+expected under standard fee-sensitivity, but reverses sign in
+columns~(2)--(4) once the fee-rank interactions $\phi_q$ are
+included. This is a coefficient redistribution artefact rather than
+a substantive finding. In the interacted model, $\theta$ identifies
+the fee effect at the degenerate point where all three rank segments
+equal zero simultaneously --- a point outside the support of the
+data. The economically relevant quantity is the total marginal fee
+effect evaluated at a realistic rank, $\hat{\theta} + \sum_q
+\hat{\phi}_q R^q$, which remains negative throughout the full support of the rank distribution, 
+including at the extreme winner tail where $\hat{\phi}_\text{HIGH} > 0$. The sign reversal of $\theta$ therefore
+carries no economic interpretation and should not be read as
+evidence that higher fees attract more flows. 
+
+The joint $\chi^2_4$ test of $\eta = \delta^F_{\text{LOW}} =
+\delta^F_{\text{MID}} = \delta^F_{\text{HIGH}} = 0$ --- that is,
+that neither the unconditional fee--sentiment interaction nor any
+of the three rank-conditioned triple interactions is driven by
+sentiment --- is statistically insignificant under all three
+proxies: $\chi^2 = 4.45$ ($p = 0.349$) under the Baker--Wurgler
+high-sentiment regime indicator $D^{\text{SENT}}$, $\chi^2 = 4.46$
+($p = 0.347$) under the orthogonalised continuous sentiment
+$\text{SENT}^{\perp}$, and $\chi^2 = 5.17$ ($p = 0.270$) under
+the AAII regime indicator $D^{\text{AAII}}$. The $z$-statistic on
+$\hat{\eta}$ --- the unconditional fee--sentiment interaction
+$\text{ExpRatio}_i \times D^{\text{SENT}}_t$ --- is similarly
+indistinguishable from zero ($z = +0.74$, $p = 0.231$ one-sided),
+confirming that aggregate fee tolerance does not shift with
+sentiment independently of rank segment.
 
 H4 is therefore consistent with the \textcite{BerkGreen2004}
 rational null. The empirical signature of behavioral fee
@@ -3533,28 +3717,48 @@ performance segment --- is not present in the data at conventional
 inferential thresholds.
 
 The negative result for H4 is a clean inferential outcome, not a
-failed test. Three implications merit emphasis. First, the result
-rules out the simplest behavioral story: investors are not paying
-for activeness because they are systematically fee-blind. Fee
-elasticity, conditional on performance and sentiment, is consistent
-with rational updating. Second, the result locates the behavioral
+failed test. Three implications merit emphasis. First, the result rules out sentiment-contingent fee blindness
+as a mechanism: fee sensitivity does not diminish during
+high-sentiment regimes, so the behavioral distortions detected
+in H1 and H3 do not operate through investors becoming
+selectively inattentive to costs when optimism is elevated. Second, the result locates the behavioral
 signature in H1, H2, and H3 rather than in fee processing per se;
 the puzzle is in the convexity, the loser segment, and the lottery
-proxy, not in fee-level inattention. Third, one specific lower-order
-interaction merits comment for completeness: the
-$\phi_{\text{HIGH}}$ coefficient ($R^{\text{HIGH}} \times
-\text{ExpRatio}$) is positive, which would on its face suggest
-that higher-fee winners attract more flow. The total marginal fee
-effect at a typical winner (rank 0.85) is $-0.0017 + 0.0156 \times
-0.05 = -0.0009$, however --- still negative. The
-$\phi_{\text{HIGH}}$ coefficient does not threaten H4 because the
-triple interactions $\delta^F_q$, which test whether this pattern
-intensifies with sentiment, are uniformly insignificant. The
-mechanism implied is the fee-as-quality-signal channel of
-\textcite{DelGuercioTkac2008} and \textcite{SirriTufano1998}: a
-high-fee fund that still reaches the top quintile has cleared a
-larger gross-alpha hurdle and may be inferred to be more skilled, a
-heuristic rather than a fee-blindness story.
+proxy, not in fee-level inattention. 
+
+Two lower-order interactions merit comment. The
+$\phi_{\text{LOW}}$ coefficient ($R^{\text{LOW}} \times
+\text{ExpRatio}$) is negative and significant: among loser-segment
+funds, higher fees amplify the outflow response to rank
+deterioration. A fund that charges high fees and still
+underperforms has failed on both dimensions simultaneously, and
+investors penalise this compounded failure more severely than they
+penalise a cheap underperformer at the same rank. 
+
+The $\phi_{\text{HIGH}}$ coefficient ($R^{\text{HIGH}} \times
+\text{ExpRatio}$) is positive and significant, which would on its
+face suggest that higher-fee winners attract more flow. The total marginal fee effect at a typical winner fund (rank
+0.85, where $R^{\text{LOW}} = 0.20$, $R^{\text{MID}} = 0.60$,
+$R^{\text{HIGH}} = 0.05$) is $\hat{\theta} +
+\hat{\phi}_{\text{LOW}}(0.20) + \hat{\phi}_{\text{MID}}(0.60) +
+\hat{\phi}_{\text{HIGH}}(0.05) = 0.0014 + (-0.0227)(0.20) +
+(-0.0017)(0.60) + (0.0146)(0.05) = -0.0034$, which remains
+firmly negative. The positive $\hat{\phi}_{\text{HIGH}}$
+attenuates the fee penalty at the winner end but does not reverse
+it anywhere in the support of the rank distribution. The mechanism implied is
+the fee-as-quality-signal channel of \textcite{DelGuercioTkac2008}
+and \textcite{SirriTufano1998}: a high-fee fund that still reaches
+the top quintile has cleared a larger gross-alpha hurdle and may be
+inferred to be more skilled. 
+
+Taken together, the two lower-order
+interactions form a coherent asymmetric pattern --- fees amplify
+punishment at the loser end and attenuate it at the winner end ---
+that is consistent with conditional rational inference rather than
+fee blindness. Neither coefficient threatens the H4 null because
+the triple interactions $\delta^F_q$, which test whether these fee
+patterns intensify with sentiment, are uniformly insignificant
+across all three sentiment proxies.
 
 \section{The psychological premium framework}
 \label{sec:ppf}
@@ -3715,17 +3919,21 @@ distribution has shifted downward.
 
 The H4 fee elasticity hypothesis, which is consistent with the
 rational null on the present panel, reinforces the
-capital-weighted equilibrium reading. If investors were
-systematically fee-blind in the manner of
-\textcite{ChoiLaibsonMadrian2010}, the implied dead-weight loss to
-investors would be far larger than the net alpha differential
-documented here, and the hybrid position the dissertation defends
-would be untenable. The rational fee elasticity finding indicates
-that the behavioral channels operate principally through the
-flow--performance non-linearity (H1, H2, H3) rather than through
-fee processing per se, and that the size of the cross-sectional
-distortion they introduce is bounded by the empirical magnitude
-of the equal-weighted minus value-weighted gap.
+capital-weighted equilibrium reading. The joint test of
+$\eta = \delta^F_{\text{LOW}} = \delta^F_{\text{MID}} =
+\delta^F_{\text{HIGH}} = 0$ fails to reject under all three
+sentiment proxies, indicating that fee sensitivity does not
+diminish during high-sentiment regimes --- neither on average
+nor differentially across rank segments. This rules out
+sentiment-contingent fee blindness as a mechanism: whatever
+distortions H1, H2, and H3 introduce into the flow--performance
+relationship, they do not operate by making investors selectively
+inattentive to costs when optimism is elevated. The behavioral
+channels are therefore located in the flow--performance
+non-linearity itself rather than in fee processing, a finding
+that is consistent with the \textcite{BerkGreen2004} prediction
+that rational competition for capital operates through
+performance rather than through cost minimisation.
 
 \section{The cross-sectional puzzle: A behavioral account}
 \label{sec:behavioral_cross_section}
@@ -3739,8 +3947,8 @@ The sentiment-convexity channel of H1 amplifies flow-into-winners
 under high-sentiment regimes by a magnitude that is statistically
 detectable at 5\% under the discrete Baker--Wurgler regime
 indicator and at 5\% under the AAII bull--bear regime indicator
-(asymmetry test). The economic interpretation is that sentiment-
-elevated investors over-react to recent winners, channeling
+(asymmetry test). The economic interpretation is that sentiment-elevated investors 
+over-react to recent winners, channeling
 capital into recent strong performers at a rate that exceeds the
 rational-Bayesian benchmark and that the
 \textcite{SirriTufano1998} convexity already incorporates. The
@@ -3794,19 +4002,59 @@ the empirical evidence, each of which the present dissertation
 neither confirms nor rules out.
 
 Reading 1: Passive competition compressing active margins.
-The 2010s witnessed an unprecedented secular shift of retail
-capital from active to passive vehicles. By 2019, index mutual
-funds and exchange-traded funds first crossed the fifty-percent
-threshold of total domestic equity fund assets. Under this
-reading, active funds in the post-2011 regime face systematically
-higher competitive pressure on fees and on cross-sectional alpha
-opportunity sets, with the consequence that the marginal active
-manager is less able to recover the cost of active research from
-gross-alpha generation. The reading is consistent with the
+The 2010s witnessed an unprecedented secular shift of retail capital
+from active to passive vehicles, with index mutual funds and
+exchange-traded funds crossing the fifty-percent threshold of total
+domestic equity fund assets by 2019. Under this reading, the
+passive shift generates the post-2011 alpha contraction through a
+disequilibrium persistence mechanism rather than through a direct
+compression of gross alpha.
+
+The trigger is the cheapening of the passive outside option. As
+low-cost index vehicles reduced their expense ratios to single
+digits per annum, the competitive hurdle that an active fund must
+clear to retain rational investors rose mechanically. In a
+frictionless \textcite{BerkGreen2004} world, this shock would
+equilibrate rapidly through two adjustment margins: active funds
+would cut fees to narrow the cost gap, and outflows would shrink
+active AUM until the remaining managers, operating on a smaller
+asset base, could generate sufficient gross alpha to clear the new
+hurdle. Either margin, operating quickly, would prevent a
+sustained alpha contraction.
+
+Both adjustment margins are impaired in the post-2011 data. On the
+fee side, \textcite{PastorStambaughTaylor2015} document that active
+expense ratios did not fall proportionally to passive fee
+compression, blocking the cost-side adjustment. On the flow side,
+the search frictions and performance-flow asymmetry documented by
+\textcite{SirriTufano1998} --- and amplified by the behavioral
+channels established in Chapter~5 of the present dissertation ---
+imply that outflows from underperforming active funds are slow and
+incomplete. The fund-flow evidence in Figure~4.1 is consistent with
+this: active mean proportional flow turns only gradually negative
+after approximately 2018, more than half a decade after the
+structural break in alpha generation.
+
+The consequence of both valves being partially blocked is that
+active industry AUM remains larger than the new post-shock
+equilibrium warrants for an extended period. This is where the
 \textcite{PastorStambaughTaylor2015} industry-level decreasing
-returns to scale prediction: as the active management industry's
-share of capital declines, the per-fund hurdle for generating
-positive net alpha rises mechanically.
+returns to scale result enters causally: their central finding is
+that gross fund performance declines as active industry AUM grows
+relative to total market capitalisation, because more active
+capital competing for a finite pool of mispriced securities erodes
+the per-dollar alpha available to each manager. An active industry
+that is oversized relative to its new equilibrium therefore
+generates persistently depressed gross alpha --- not because the
+opportunity set has shrunk, but because too many dollars remain
+allocated to harvesting it. Reading~1 thus accounts for the
+direction and persistence of the post-2011 alpha contraction
+through the combination of a higher competitive hurdle, blocked
+fee and flow adjustment, and the PST crowding mechanism operating
+on the excess AUM. The independent compression of the gross alpha
+opportunity set itself --- through the maturation of quantitative
+and factor-replicating strategies --- is the province of
+Reading~2.
 
 Reading 2: Algorithmic trading eliminating cross-sectional
 alpha opportunities. The 2010s also witnessed the maturation of
@@ -3829,13 +4077,7 @@ average managerial skill. Under this reading, the post-2011
 regime contains a different sample of active funds than the
 pre-2011 regime, and the shift in regime-mean alpha reflects the
 selection of funds whose ex-ante characteristics differ from
-those of the pre-break sample. The reading is partially testable
-on the present panel by re-estimating regime-mean alpha on a
-balanced sub-sample of funds present in both regimes; the result
-of that test (not reported here for space) preserves the
-qualitative regime shift but reduces its magnitude by
-approximately one third, suggesting that selection effects
-contribute to but do not exhaust the regime shift.
+those of the pre-break sample. The reading is partially testable on the present panel by re-estimating regime-mean alpha on a balanced sub-sample of funds present in both regimes; this robustness check has not been performed on the present panel and is reserved for future work. The selection-effects reading is therefore neither confirmed nor ruled out by the present evidence, and the 210-basis-point regime-mean shift reported here should be interpreted as an upper bound on the component attributable to genuine skill deterioration
 
 The three readings are not mutually exclusive. The present
 dissertation does not adjudicate between them; the empirical
@@ -3908,10 +4150,7 @@ develops.
 acknowledgement.
 
 First, the static expense ratio used in the construction of the
-net-of-fee return series does not vary at monthly frequency. The
-implied approximation error is bounded by the cross-sectional
-standard deviation of intra-fund fee changes, which historical
-evidence places at well below 10 basis points per annum. The
+net-of-fee return series does not vary at monthly frequency. The implied approximation error for any given fund is bounded by the magnitude of that fund's intra-period fee changes. In practice, mutual fund expense ratios are sticky and change infrequently; when they do change, the revision is typically small. The
 direction of the bias is ambiguous and is unlikely to materially
 affect the qualitative conclusions, but it is acknowledged here.
 
@@ -3925,23 +4164,13 @@ Active Share measure should treat the activeness chapter results
 as the best available approximation rather than as a direct
 analogue.
 
-Third, the benchmark assignment for the activeness/tracking-error
-measure carries inferred-confidence assignments for approximately
-37\% of funds, with confidence scores below 5 in the workbook
-documentation. Sector and covered-call-overlay funds are excluded
-from H3 (via the \flag{SECTOR\_FUND} and
-\flag{COVERED\_CALL\_OVERLAY} flags in the sample-membership
-matrix) on theoretical grounds independent of benchmark inference
-quality. Equity-income and specialty-diversified funds, which had
-been excluded from H3 in earlier draft versions on benchmark-
-misassignment grounds, are now retained in the H3 regressions
-because the primary activeness measure is the $1-R^2$ from the
-Carhart factor regression, which does not use the assigned
-benchmark; they are excluded only from the tracking-error
-robustness sort when no \flag{Benchmark\_Code} is available. The
-benchmark inference quality is therefore not load-bearing on the
-headline activeness findings, but it is a limitation of the
-tracking-error robustness analysis specifically.
+Third, benchmark assignments for approximately 37\% of funds
+are inferred from fund attribute fields rather than drawn from
+a confirmed source. These benchmarks are used exclusively in
+the tracking-error robustness sort, which is a secondary
+check on the headline activeness findings; the primary
+$1-R^2$ activeness proxy requires no fund-specific benchmark
+and is therefore unaffected.
 
 Fourth, the panel is unbalanced and exhibits material attrition.
 Funds that exit the sample during the observation window are
@@ -4058,14 +4287,12 @@ For investors, the dissertation reinforces the long-standing
 practical recommendation that active management is, on average, a
 poor purchase net of fees. The cross-sectional implication is
 sharper: the most behaviorally appealing active funds --- those
-with the most extreme realised maximum returns, the most lottery-
-like return distributions --- are the ones that exhibit the most
+with the most extreme realised maximum returns, the most lottery-like return distributions --- are the ones that exhibit the most
 severe persistent underperformance in subsequent holding periods.
 Investors who select funds on the basis of recent extreme positive
 returns are, on the present evidence, paying a behavioral premium
 of approximately 59 basis points of annual Carhart alpha per
-standard deviation of $\text{MAX12}$ exposure during high-
-sentiment regimes, and that premium is unlikely to be recovered.
+standard deviation of $\text{MAX12}$ exposure during high-sentiment regimes, and that premium is unlikely to be recovered.
 
 For regulators, the dissertation suggests that fee disclosure
 alone --- the focus of much existing regulatory practice --- is
@@ -4084,12 +4311,39 @@ periods --- may be more effective than additional fee disclosure.
 \section{Future research}
 \label{sec:future_research}
 
-\noindent Three extensions of the present work would advance the
-understanding of the active management puzzle.
+\noindent Four extensions of the present work would advance the
+understanding of the active management puzzle, ordered by their
+proximity to the current dataset.
 
-First, the post-2011 regime-shift evidence motivates a fund-level
-holdings-based decomposition of the alpha collapse. The three
-competing readings of the regime shift identified in
+First, the most immediate extension is a balanced-panel
+decomposition of the post-2011 alpha collapse using the present
+return-based panel. The selection-effects reading of the regime
+shift (Reading~3 of Section~\ref{sec:post_2011}) holds that the
+210-basis-point decline in regime-mean alpha across the September
+2011 break reflects changes in the composition of the active fund
+universe rather than deterioration in average managerial skill.
+This reading is testable on the current panel by restricting the
+sub-period analysis to the set of funds present in both P2
+(January 2006--September 2011) and P3 (October 2011--February
+2026), and re-estimating the regime-mean Carhart alpha and the
+Barras et al.\ (2010) skill decomposition on this balanced
+subsample. If the regime-mean shift on the balanced subsample is
+materially smaller than 194 basis points, selection effects account
+for a non-trivial share of the aggregate collapse and the
+upper-bound interpretation stated in Section~\ref{sec:post_2011}
+is binding. If the shift is preserved, Readings~1 and~2 bear the
+full explanatory burden. A natural complement is to characterise
+the demographic differences between the balanced subsample and the
+full unbalanced panel --- fund age, size, expense ratio, and
+activeness at the break date --- which would identify whether the
+entry cohort post-2011 is systematically less skilled or merely
+differently positioned in characteristic space. This extension
+requires no new data and is the first priority for post-defense
+work.
+
+Second, the broader post-2011 regime-shift evidence motivates a
+fund-level holdings-based decomposition of the alpha collapse. The
+three competing readings of the regime shift identified in
 Section~\ref{sec:post_2011} --- passive competition compressing
 active margins, algorithmic trading eliminating cross-sectional
 alpha opportunities, and selection effects from fund entry/exit
@@ -4100,7 +4354,7 @@ that combines the present return-based methodology with quarterly
 fund holdings data would be well-placed to adjudicate among the
 three readings.
 
-Second, the Psychological Premium Framework developed in
+Third, the Psychological Premium Framework developed in
 Section~\ref{sec:ppf} converts the H3 evidence into welfare-relevant
 units, but does not estimate the cross-sectional dispersion of
 the implied psychological premium across investor clienteles. A
@@ -4112,7 +4366,7 @@ test whether the psychological premium is concentrated in the
 retail clientele in the manner suggested by the
 \textcite{Kumar2009} individual-investor lottery evidence.
 
-Third, the structural-break evidence raises the question of
+Fourth, the structural-break evidence raises the question of
 whether the post-2011 regime is structurally different in ways
 that the present return-based methodology cannot fully identify.
 A natural extension would combine the present panel with
@@ -4399,10 +4653,10 @@ the available factor and sentiment series.
 \noindent This appendix documents the priority-ordered cascade by
 which Lipper investment-objective codes are assigned to the 3{,}764
 share classes in the working panel. The cascade is implemented in
-the build\_lipper\_category.R script and produces the
-lipper\_category\_output.xlsx workbook from which the
+the \texttt{build\_lipper\_category.R} script and produces the
+\texttt{lipper\_category\_output.xlsx} workbook from which the
 within-Lipper-category fractional ranks of
-Section~\ref{sec:flow_calculation} are constructed.
+Section~\ref{sec:panel_spec} are constructed.
 
 \section{Source fields}
 \label{sec:lipper_sources}
@@ -4517,11 +4771,11 @@ as a methodological cross-check.
 \label{sec:lipper_notes}
 
 \noindent Three further notes complete the documentation of the
-cascade. First, the classification is performed at the share-class
-level, consistent with the panel structure. Where multiple share
-classes of the same fund receive different classifications due to
-differing LSEG Category fields (a rare event), the modal
-classification across share classes is applied. Second, Lipper
+cascade. First, the classification is applied at the fund level: because the
+panel contains exactly one primary share class per fund (the
+Bloomberg Lipper-designated primary flag), each fund carries a single
+Lipper category entry in \texttt{lipper\_category\_output.xlsx} and
+no within-fund consolidation is required. Second, Lipper
 category labels that appear in the LSEG Category field but do not
 correspond to the twelve standard size-style categories (for example,
 Equity Income Funds, Real Estate Funds, Science \& Technology Funds)
@@ -4544,15 +4798,13 @@ scripts via the panel object.
 \label{app:benchmark}
 
 \noindent This appendix documents the benchmark-assignment process
-that produced the Benchmark\_Assignment\_updated.xlsx
-workbook, the source data for the activeness/tracking-error
-robustness measure of Section~\ref{sec:activeness} and the per-fund
-benchmark--total-return series used in benchmark-relative descriptive
-statistics. Each fund record carries a primary (sector- or
-strategy-specific) benchmark, a broad-based comparator benchmark, the
-corresponding Refinitiv RIC codes for the price-return and total-
-return variants, a confidence score, and a flag indicating its
-membership in the various hypothesis sub-samples.
+that produced the \texttt{Benchmark\_Assignment\_updated.xlsx}
+workbook, the source data for the tracking-error robustness measure
+of Section~\ref{sec:activeness}. Each fund record carries
+a primary (sector- or strategy-specific) benchmark, a broad-based
+comparator benchmark, the corresponding Refinitiv RIC codes for the
+price-return and total-return variants, a confidence score, and a
+flag indicating its membership in the various hypothesis sub-samples.
 
 \section{Three-tier assessment process}
 \label{sec:benchmark_tiers}
@@ -4575,10 +4827,16 @@ with no declared benchmark (primarily Rydex sector funds), a proxy
 sector index was inferred from the fund's GICS sector classification,
 cap focus, and strategy, and flagged as INFERRED.
 
-For the overwhelming majority of funds (1{,}839 of 1{,}936 active
-funds, 95.0\%), the Bloomberg-provided benchmark was appropriate and
-retained without modification. Active research replaced or supplemented
-the benchmark for 97 funds.
+The benchmark assignment workbook covers all 3{,}764 funds in the
+full panel, including passive index trackers. Of the 2{,}329 active
+funds, 97 required a manual correction to a Bloomberg benchmark
+misassignment or a missing benchmark; the remaining 2{,}232 required
+no active-research override. The final assigned benchmark is
+nevertheless not Bloomberg-sourced for the majority of funds: for
+1{,}697 funds it derives from the LSEG Lipper-category to
+Russell/MSCI map (score 8), and Bloomberg's
+\texttt{Primary\_Benchmark} field is the direct source only for the
+660 funds at score 7.
 
 \section{Special treatment: Sector and REIT funds}
 \label{sec:special_treatment}
@@ -4624,7 +4882,7 @@ A second correction group concerns Rydex sector funds, for which
 Guggenheim's documentation confirms the absence of a declared
 primary benchmark. For these 14 funds a proxy sector index is
 inferred from the fund's GICS sector classification and labelled
-INFERRED PROXY with confidence score 4. Smaller correction
+INFERRED PROXY with confidence score 3. Smaller correction
 groups cover Cohen \& Steers Realty funds (3 funds, MSCI U.S.\ REIT
 confirmed), MFS Utilities and BULIX (S\&P 500 Utilities Index), and
 approximately 20 additional sector funds.
@@ -4633,45 +4891,113 @@ approximately 20 additional sector funds.
 \label{sec:confidence_scoring}
 
 \noindent Each benchmark assignment carries a numeric confidence
-score from 1 to 10 reflecting the reliability of the source. The
-distribution across the 3{,}764 funds in the panel is concentrated
-in the high-confidence tiers: 17 funds at score 10 (verbatim
-prospectus confirmation), 1{,}697 at score 8 (LSEG Lipper-category
-to standard Russell/MSCI map), 660 at score 7 (Bloomberg primary
-benchmark direct map to recognised index family), 902 at score 5
-(strong inference from Bloomberg Mcap\_Focus +
-Fund\_Strategy), 387 at score 3 (partial inference from one
+score from 1 to 10 reflecting the reliability of the source used
+to determine the final assigned benchmark. The distribution across
+all 3{,}764 funds in the full panel (active and passive) is
+concentrated in the high-confidence tiers: 17 funds at score 10
+(benchmark confirmed verbatim in fund annual report or prospectus),
+1{,}697 at score 8 (benchmark derived from the LSEG Lipper-category
+to standard Russell/MSCI map), 660 at score 7 (Bloomberg
+\texttt{Primary\_Benchmark} field maps directly to a recognised
+index family), 902 at score 5 (benchmark inferred from both
+Bloomberg \texttt{Mcap\_Focus} and \texttt{Fund\_Strategy} fields),
+387 at score 3 (partial inference from one Bloomberg attribute
 field), and 101 at score 1 (default Russell 3000 placeholder).
 Approximately 37\% of assignments carry confidence $\leq 5$
-(inferred). Sector-mandated funds in the heavily inferred group are
-excluded from the H3 active share analysis under the
-\flag{SECTOR\_FUND} flag
-documented in Section~\ref{sec:sample_membership}, while
-equity-income and specialty-diversified funds (which had been
-excluded under the retired \flag{H3\_EXCLUDED} flag in earlier
-draft versions) are retained in the H3 regressions, and the primary
-activeness measure ($1-R^2$ from the Carhart factor regression) does
-not use the assigned benchmark at all. The benchmark inference
-quality is therefore not load-bearing on the headline activeness
-findings.
+(inferred). Sector-mandated funds are excluded from the H3
+activeness analysis under the \flag{SECTOR\_FUND} flag documented
+in Section~\ref{sec:sample_membership}. The primary activeness
+measure ($1-R^2$ from the Carhart factor regression) uses no
+fund-specific benchmark, so benchmark inference quality is not
+load-bearing on the headline activeness findings.
 
-\section{Refinitiv RIC code standards}
+\section{Refinitiv total-return RIC codes}
 \label{sec:ric_codes}
 
-\noindent Two RIC codes are provided per benchmark: a Price Return
-RIC and a Total Return RIC. The total-return series used in this
-dissertation are pulled at monthly frequency from the Department's
-LSEG Workspace subscription. The principal index families and their
-RIC codes are documented as follows. The Russell index family
-(Russell 1000 / Midcap / 2000 / 3000 in Value, Core, and Growth
-variants, plus Russell 2500 in Value, Core, and Growth variants);
-the MSCI U.S.\ IMI 25/50 sector sub-indices for the eleven GICS
-sectors (Energy, Materials, Industrials, Consumer Discretionary,
-Consumer Staples, Health Care, Financials --- 5\% capped, Information
-Technology, Communication Services, Utilities, Real Estate); the
-S\&P Select Sector index family used as broad-based comparators for
-sector funds; and the FTSE NAREIT All-Equity REITs index used for
-REIT funds.
+\noindent The total-return index series used in this dissertation
+are pulled at monthly frequency from the Department's LSEG
+Workspace subscription. Each benchmark in the assignment workbook
+carries a Refinitiv TR RIC that identifies the specific LSEG
+series used; the three principal index families and their TR RIC
+codes are set out in Tables~\ref{tab:ric_russell}--\ref{tab:ric_other}
+below.
+
+\begin{table}[htbp]
+\captionsetup{justification=raggedright, singlelinecheck=false}
+\caption{Total-return RIC codes --- Russell index family}
+\label{tab:ric_russell}
+\singlespacing\small
+\begin{tabular}{ll}
+\toprule
+Index & TR RIC \\
+\midrule
+Russell 1000           & RU10INTR  \\
+Russell 1000 Value     & RU10VATR  \\
+Russell 1000 Growth    & RU10GRTR  \\
+Russell Midcap         & RUMCINTR  \\
+Russell Midcap Value   & RUMCVATR  \\
+Russell Midcap Growth  & RUMCGRTR  \\
+Russell 2000           & RU20INTR  \\
+Russell 2000 Value     & RUJTTR    \\
+Russell 2000 Growth    & RUOTTR    \\
+Russell 2500           & RU25INTR  \\
+Russell 3000           & RU30INTR  \\
+\bottomrule
+\end{tabular}
+\par\vspace{24pt}
+\end{table}
+
+\begin{table}[htbp]
+\captionsetup{justification=raggedright, singlelinecheck=false}
+\caption{Total-return RIC codes --- MSCI U.S.\ IMI 25/50 sector sub-indices}
+\label{tab:ric_msci}
+\singlespacing\small
+\begin{tabular}{ll}
+\toprule
+Index & TR RIC \\
+\midrule
+MSCI U.S.\ IMI Energy 25/50                  & M1US5ENI \\
+MSCI U.S.\ IMI Materials 25/50               & M1US5MTI \\
+MSCI U.S.\ IMI Industrials 25/50             & M1US5INI \\
+MSCI U.S.\ IMI Consumer Discretionary 25/50  & M1US5CDI \\
+MSCI U.S.\ IMI Consumer Staples 25/50        & M1US5CSI \\
+MSCI U.S.\ IMI Health Care 25/50             & M1US5HCI \\
+MSCI U.S.\ IMI Financials 5\% Capped         & M1US5FNI \\
+MSCI U.S.\ IMI Information Technology 25/50  & M1US5ITI \\
+MSCI U.S.\ IMI Communication Services 25/50  & M1US5TCI \\
+MSCI U.S.\ IMI Utilities 25/50               & M1US5UTI \\
+MSCI U.S.\ IMI Real Estate 25/50             & M1US5REI \\
+\bottomrule
+\end{tabular}
+\par\vspace{24pt}
+\end{table}
+
+\begin{table}[H]
+\captionsetup{justification=raggedright, singlelinecheck=false}
+\caption{Total-return RIC codes --- S\&P Select Sector and other indices}
+\label{tab:ric_other}
+\singlespacing\small
+\begin{tabular}{ll}
+\toprule
+Index & TR RIC \\
+\midrule
+S\&P Energy Select Sector              & IXETR       \\
+S\&P Materials Select Sector           & IXBTR       \\
+S\&P Industrials Select Sector         & IXITR       \\
+S\&P Consumer Discretionary Select     & IXYTR       \\
+S\&P Consumer Staples Select           & IXRTR       \\
+S\&P Health Care Select Sector         & IXVTR       \\
+S\&P Financials Select Sector          & IXMTR       \\
+S\&P IT Select Sector                  & IXKTR       \\
+S\&P Communication Services Select     & IXCSTR      \\
+S\&P Utilities Select Sector           & IXUTR       \\
+S\&P Real Estate Select Sector         & IXRETR      \\
+S\&P 500 Utilities Index               & SPSPUTR     \\
+FTSE NAREIT All-Equity REITs           & .FTFNERUSDT \\
+\bottomrule
+\end{tabular}
+\par\vspace{24pt}
+\end{table}
 
 \section{Data-availability benchmark substitutions}
 \label{sec:substitutions}
@@ -4730,80 +5056,69 @@ affects only 10 funds and is immaterial to the aggregate results.
 \section{Sample-membership flag matrix}
 \label{sec:sample_membership}
 
-\noindent The flagged\_funds.xlsx workbook organises sample
+\noindent The \texttt{flagged\_funds.xlsx} workbook organises sample
 membership across three exclusion scopes that segregate funds by
 the analytical context in which their inclusion is methodologically
-defensible. The workbook is curated alongside the data pipeline
-and superseded its prior structure with the v1.3 filter revision
-of May 2026, which retired two flags that had been over-restrictive
-on inspection: \flag{PASSIVE\_INDEX} (which had previously
-excluded the 313 Bloomberg-classified passive index trackers from
-the entire analysis on the rationale that they are not active
-funds, but which over-restricted the descriptive panel and removed
-the active-vs-passive performance benchmark that motivates the
-puzzle in the first place) and \flag{H3\_EXCLUDED} (which had
-previously excluded 90 funds in the Equity Income, Specialty
-Diversified, and Specialty-Miscellaneous Lipper categories from the
-H3 analysis on \textcite{CremersPetajisto2009} benchmark-misassignment
-grounds, but whose rationale does not apply to the
-\textcite{AmihudGoyenko2013} $1-R^2$ proxy actually used in this
-dissertation, which is computed from a Carhart regression with no
-fund-specific benchmark). The retired flags are documented here for
-completeness and because their pre-retirement scopes appear in the
-provenance records of earlier draft tables.
+defensible.
 
-The three current scopes are as follows. The \emph{Exclude from
-Entire Analysis} sheet (125 funds in the current workbook) covers
-funds whose strategy or mandate places them outside the
-domestic-equity active-management scope of the dissertation:
+The \emph{Exclude from Entire Analysis} scope (125 fund records
+across the full panel) covers funds whose strategy or mandate places 
+them outside the domestic-equity active-management scope of the dissertation:
 non-U.S.\ benchmarks (36 \flag{GLOBAL\_MANDATE} plus 2 combined
 \flag{EM\_MANDATE}\slashbreak\flag{GLOBAL\_MANDATE} and 1 combined
-\flag{GLOBAL\_MANDATE}\slashbreak\flag{LONG\_SHORT}), long-short strategies
-(31 \flag{LONG\_SHORT} pure plus the combinations noted above),
-market-neutral strategies (26 \flag{MARKET\_NEUTRAL}), bear-market
-or inverse strategies (7 \flag{BEAR\_MARKET} pure plus 20 combined
-\flag{BEAR\_MARKET}\slashbreak\flag{PASSIVE\_INDEX} legacy combinations
-retained because the bear-market designation remains binding), and
+\flag{GLOBAL\_MANDATE}\slashbreak\flag{LONG\_SHORT}), long-short
+strategies (31 \flag{LONG\_SHORT} pure plus the combinations noted
+above), market-neutral strategies (26 \flag{MARKET\_NEUTRAL}),
+bear-market or inverse strategies (27 \flag{BEAR\_MARKET}), and
 two confirmed LSEG data-error funds (\flag{DATA\_ERROR}).
+Passive index trackers are retained in the panel: their inclusion
+is necessary to construct the active-versus-passive performance
+comparison that motivates the puzzle.
 
-The \emph{Exclude from H3 Only} sheet (155 funds) covers
+The \emph{Exclude from H3 Only} scope (155 fund records across
+the full panel) covers
 sector-mandated funds (149 \flag{SECTOR\_FUND}) and covered-call
 overlay funds (6 \flag{COVERED\_CALL\_OVERLAY}). Sector mandates
 mechanically inflate the $1-R^2$ activeness proxy because the
 Carhart four-factor model does not span sector-specific return
-variance, so the resulting high $1-R^2$ values reflect mandate-driven
-factor orthogonality rather than active manager discretion (see
-\textcite{KacperczykSialmZheng2008}). Covered-call overlay strategies
-mechanically truncate the right tail of the return distribution,
-producing return distributions opposite in character to the lottery
-profile that H3 is designed to test. Both classes of fund retain
-validity for the H1, H2, and H4 panel regressions (which condition
-on the Sirri--Tufano performance rank but not on the activeness or
-lottery proxies) and therefore appear in the H1/H2/H4 analytical
-sample.
+variance, so the resulting high $1-R^2$ values reflect
+mandate-driven factor orthogonality rather than active manager
+discretion \parencite{KacperczykSialmZheng2008}. Covered-call
+overlay strategies mechanically truncate the right tail of the
+return distribution, producing return distributions opposite in
+character to the lottery profile that H3 is designed to test.
+Equity Income, Specialty Diversified, and Specialty-Miscellaneous
+funds are retained in H3: the
+\textcite{AmihudGoyenko2013} $1-R^2$ proxy is computed from a
+Carhart regression with no fund-specific benchmark, so the
+benchmark-misassignment concern that motivates sector-fund
+exclusion does not apply to these categories. Both sector-mandated
+and covered-call funds retain validity for the H1, H2, and H4
+panel regressions and therefore appear in those analytical samples.
 
-The \emph{Exclude from Performance Comparison} sheet (292 funds)
-covers the Entire-Analysis set (propagated as a superset) plus a
-sector-fund extension (169 \flag{SECTOR\_FUND} funds; two of which
-are also \flag{GLOBAL\_MANDATE} and so already excluded from the
-entire analysis). The performance-comparison set is the subsample
-on which the Section~\ref{sec:aggregate_performance} portfolio-level
-alpha estimates and the Section~\ref{sec:fdr_results} bootstrap and
-BSW decompositions are computed; the wider sector-fund exclusion is
-necessary because the aggregate active portfolio is constructed
-without separating sector funds, and unconditional pooling would
-otherwise contaminate the fund-level alpha distribution with
-benchmark-mismatched sector-fund alphas.
+The \emph{Exclude from Performance Comparison} scope (292 fund
+records across the full panel) comprises the Entire-Analysis set
+as a superset, extended by a broader sector-fund exclusion (169
+\flag{SECTOR\_FUND} records, two
+of which overlap with \flag{GLOBAL\_MANDATE} and are already
+excluded at the entire-analysis level). The wider exclusion is
+necessary because the aggregate active portfolio pools all funds
+unconditionally, and including sector funds would contaminate the
+fund-level alpha distribution with benchmark-mismatched alphas.
+This scope defines the subsample used for the portfolio-level
+alpha estimates of Section~\ref{sec:aggregate_performance} and the
+bootstrap and BSW decompositions of
+Section~\ref{sec:fdr_results}.
 
-The implied current hypothesis sample sizes (post-Evans, post-cleaning
-incubation panel, active funds only) are as follows: the H1/H2/H4
-active regression sample contains 2{,}127 unique funds (of which
-1{,}713 are aligned with all panel-regression controls); the H3
-active regression sample contains 1{,}594 unique active funds (out
-of 2{,}970 H3-eligible tickers across all classification groups);
-and the performance-comparison active sample contains 1{,}815 unique
-funds. These counts reconcile with the analytical-sample totals
-reported in the footnote to Table~\ref{tab:fund_counts}.
+The resulting hypothesis sample sizes on the incubation-corrected
+panel (active funds only) are as follows. The H1/H2/H4 regression
+sample comprises all 2{,}127 active funds in the analytical panel.
+The H3 regression sample additionally excludes the 168 funds
+carrying the \flag{excluded\_h3} tag, yielding 1{,}959 active
+funds. The performance-comparison sample excludes the 163 funds
+carrying the \flag{excluded\_perf} tag, yielding 1{,}964 active
+funds. These counts are consistent with the analytical-sample
+totals reported in the footnote to Table~\ref{tab:fund_counts}.
 
 % --- Appendix D --------------------------------------------------------------
 \chapter{ACTIVENESS AND LOTTERY PROXY VALIDATION}
@@ -4812,8 +5127,8 @@ reported in the footnote to Table~\ref{tab:fund_counts}.
 \noindent This appendix documents the construction and validation of
 the four candidate activeness/lottery proxies considered for the H3
 panel regressions of Chapter~\ref{ch:behavioral}: $\text{ActR2}$,
-$\text{ActSkew}$, $\text{MAX12}$, and the unconditional 36-month
-return realised volatility ($\text{Vol36}$). The proxy validation
+$\text{ActSkew}$, $\text{MAX12}$, and a right-tail conditional
+skewness measure ($\text{UpSkew}$). The proxy validation
 procedure selects three proxies for the H3 horse race and excludes
 the fourth.
 
@@ -4824,8 +5139,7 @@ the fourth.
 from the rolling 36-month Carhart regression that produces the rolling
 alpha series of Section~\ref{sec:rolling_alphas}. Following
 \textcite{AmihudGoyenko2013}, a higher value indicates that a larger
-share of fund return variation is unexplained by the systematic four-
-factor benchmark and is therefore attributable to the fund's
+share of fund return variation is unexplained by the systematic four-factor benchmark and is therefore attributable to the fund's
 idiosyncratic active deviation from a passive factor-mimicking
 portfolio.
 
@@ -4844,11 +5158,12 @@ positive return that lottery-preferring investors should value
 disproportionately under cumulative prospect theory probability
 weighting.
 
-$\text{Vol36}_i$ is the annualised standard deviation of the
-fund's trailing 36 monthly gross returns. The measure is a
-candidate lottery proxy because high return volatility is one
-empirical correlate of high lottery-like character in equity
-markets.
+$\text{UpSkew}_i$ is the sample skewness of the fund's trailing 36
+monthly gross returns restricted to observations above the in-window
+mean, scaled by the upside semi-deviation. The measure tests whether
+the asymmetry signal in $\text{ActSkew}$ is driven specifically by
+the right tail — which cumulative prospect theory predicts investors
+should overweight — rather than by the full third moment.
 
 Each proxy is standardised within sample and lagged one month for the
 H3 regressions to avoid contemporaneous endogeneity.
@@ -4859,27 +5174,34 @@ H3 regressions to avoid contemporaneous endogeneity.
 \input{tables/table_activeness_proxy_diagnostic}
 
 \noindent Table~\ref{tab:activeness_proxy} reports the diagnostic
-statistics for each candidate proxy. The headline metrics are: (i)
-the within-fund persistence of the proxy (autocorrelation at one
-month and one year); (ii) the cross-sectional dispersion (standard
-deviation across funds at a representative cross-section date); (iii)
-the pairwise correlation among the four proxies; and (iv) the
-correlation with the Carhart 4-factor full-period alpha (a sanity
-check that the proxy is not mechanically equivalent to alpha).
+statistics for each candidate proxy. Coverage (column 2) is the
+fraction of fund-months in \texttt{panel\_reg} with the measure
+non-missing; it ranges from 81.6\% to 93.3\%, confirming comparable
+sample availability across candidates. Column 3 reports each measure's cross-sectional
+correlation with $\text{ActR2}$. Columns 4 and 5 report univariate flow-prediction
+$t$-statistics under two fixed-effect structures (Lipper $\times$
+year-month and Ticker $+$ year-month). Column 6 reports the
+horse-race $t$-statistic from a single specification with all four
+measures included simultaneously. Column 7 tests the
+Amihud--Goyenko (2013) prediction that $1-R^2$ positively predicts
+future Carhart alpha, providing a sanity check on the rational-channel
+interpretation of $\text{ActR2}$.
 
 The diagnostic test that distinguishes among the four candidates is
-the cross-sectional correlation with $\text{ActR2}$. A high
-correlation indicates that the candidate proxy is essentially a
+the cross-sectional correlation with $\text{ActR2}$ (column 3). A
+high correlation indicates that the candidate proxy is essentially a
 re-statement of the rational-channel activeness signal of
 \textcite{AmihudGoyenko2013} rather than a distinct behavioral
-signal. $\text{Vol36}$ exhibits cross-sectional correlation with
-$\text{ActR2}$ in excess of 0.85, indicating that volatility and
-unexplained variance share are essentially the same construct on the
-present panel; $\text{Vol36}$ is therefore excluded from the
-horse race to avoid colinearity. $\text{ActSkew}$ and
-$\text{MAX12}$ exhibit modest cross-sectional correlation with
-$\text{ActR2}$ (in the 0.20--0.40 range) and are retained as
-distinct lottery-character measures.
+signal.  
+$\text{UpSkew}$ is dropped on the basis of horse-race
+subsumption: its univariate signals (columns 4--5, $t = 2.51$ and
+$t = 1.50$) do not survive the horse race (column 6, $t = 0.62$),
+indicating that its informational content is fully captured by
+$\text{ActSkew}$ and $\text{MAX12}$ jointly.
+$\text{ActSkew}$ and $\text{MAX12}$ exhibit modest cross-sectional
+correlation with $\text{ActR2}$ (columns 3: $\rho = 0.071$ and
+$\rho = -0.010$ respectively) and are retained as distinct
+lottery-character measures.
 
 The selected three-proxy horse race (Table~\ref{tab:H3_regression}) reports
 $\text{ActR2}$, $\text{ActSkew}$, and $\text{MAX12}$. The
@@ -4938,17 +5260,30 @@ qualification.
 
 \input{tables/table_perf_by_lipper}
 
-\noindent The decomposition shows that the underperformance is
-broadly distributed across the Lipper style classes. The Large-Cap
-Core, Mid-Cap Core, and Small-Cap Core categories each exhibit
-modestly negative net alphas; the Value categories exhibit modestly
-worse net alphas than the Growth categories, consistent with the
-\textcite{FamaFrench1992,FamaFrench2010} value-fund bias finding;
-and the Multi-Cap categories exhibit performance closer to zero,
-consistent with their broader mandate flexibility. No single style
-class drives the aggregate result, supporting the interpretation
-that the active management puzzle is a cross-sectional regularity
-rather than an artifact of style-specific performance.
+The decomposition shows that the gross underperformance is broadly distributed
+across the Lipper style classes, with no single category driving the aggregate
+result. The equal-weighted gross alphas are negative for the majority of active
+cells: Large-Cap Core ($-0.248\%$), Mid-Cap Core ($-0.562\%$), Mid-Cap Growth
+($-0.452\%$), Small-Cap Growth ($-0.654\%$), Equity Income ($-0.242\%$), and
+Multi-Cap Growth ($-0.202\%$) all record negative EW alphas. Value categories
+present a more nuanced pattern than a monotonic underperformance story: at
+the large-cap tier, active value funds do underperform active growth funds
+($-0.717\%$ versus $-0.022\%$ EW), consistent with the value-fund benchmark
+difficulty documented by \textcite{FamaFrench1992,FamaFrench2010}; however,
+this ordering reverses at the mid- and small-cap tiers, where active value
+funds post positive gross alphas (Mid-Cap Value $+0.609\%$; Small-Cap Value
+$+0.583\%$ EW) that exceed the negative gross alphas of their growth
+counterparts ($-0.452\%$ and $-0.654\%$ respectively). The Multi-Cap segment
+exhibits near-zero EW gross alphas ($-0.104\%$ to $-0.212\%$), consistent
+with the broader mandate flexibility of that category. Notably, the
+value-weighted alphas of several active cells are positive or close to zero
+(Large-Cap Core $+0.303\%$; Multi-Cap Core $+1.672\%^{*}$; Small-Cap Core
+$+0.074\%$), reflecting the concentration of larger and better-performing
+funds within each style class and echoing the EW--VW gap documented at the
+aggregate level in Table~\ref{tab:perf_aggregate}. The breadth of negative
+EW gross alphas across styles supports the interpretation that the active
+management puzzle is a cross-sectional regularity rather than an artifact
+of any single investment objective.
 
 % --- Appendix G --------------------------------------------------------------
 \chapter{FAMA AND FRENCH (2010) SUBPERIOD REPLICATION}
@@ -4980,8 +5315,7 @@ heterogeneity.
 \noindent The replication produces aggregate net Carhart alpha
 estimates within approximately 30 basis points of the FF (2010)
 published Tables I--III on the overlap window. The bootstrap
-percentile distribution exhibits the same qualitative pattern: left-
-tail rejection of the zero-skill null at all percentiles below the
+percentile distribution exhibits the same qualitative pattern: left-tail rejection of the zero-skill null at all percentiles below the
 median, with right-tail consistency at conventional thresholds. The
 Storey $\hat{\pi}_0$ estimate on the FF replication window is
 slightly higher than on the full December 1994--February 2026
@@ -4989,13 +5323,11 @@ sample, consistent with the post-2011 regime-shift evidence of
 Section~\ref{sec:subperiod} (the post-break increase in genuinely
 unskilled mass pulls the full-period $\hat{\pi}_0$ estimate
 downward relative to the pre-break-only sub-sample).
-Table~\ref{tab:perf_aggregate_FF} reports the aggregate net Carhart
-alpha on the FF subperiod, Table~\ref{tab:bootstrap_tails_FF} the
+Table~\ref{tab:perf_aggregate_FF} reports the aggregate gross and net Carhart
+alphas on the FF subperiod, Table~\ref{tab:bootstrap_tails_FF} the
 calendar-month bootstrap percentiles,
-Table~\ref{tab:pi0_estimate_FF} the Storey $\hat{\pi}_0$ estimate,
-Table~\ref{tab:bsw_decomposition_FF} the BSW four-way decomposition,
-and Table~\ref{tab:port_agg_alpha_FF} the active-versus-passive
-aggregate-portfolio alpha on the same subperiod.
+Table~\ref{tab:pi0_estimate_FF} the Storey $\hat{\pi}_0$ estimate and
+Table~\ref{tab:bsw_decomposition_FF} the BSW four-way decomposition.
 
 \section{Limitations of the replication}
 \label{sec:ff_limitations}
@@ -5262,7 +5594,7 @@ but the guard is in place.
 puzzle survives qualitatively under FF6 and Carhart$+$PSL, and indeed
 \emph{strengthens} under FF6.
 Table~\ref{tab:alpha_comparison_robust} reports the pooled
-equal-weighted alpha estimates side by side
+ alpha estimates side by side
 across the three specifications;
 Table~\ref{tab:bootstrap_comparison_robust} reports the
 \textcite{FamaFrench2010} calendar-month bootstrap percentile
@@ -5270,15 +5602,15 @@ comparison on the active-fund $t(\hat{\alpha})$ distribution; and
 Table~\ref{tab:bsw_comparison_robust} reports the
 \textcite{BarrasScailletWermers2010} four-way decomposition at the
 canonical $\gamma^* = 0.20$ threshold. Pooled EW net alpha is
-$-2.12\%$ per annum under Carhart, $-2.25\%$ under FF6, and
+$-2.12\%$ per annum under Carhart, $-2.26\%$ under FF6, and
 $-2.06\%$ under Carhart$+$PSL --- all materially negative and
 statistically significant. The BSW decomposition is the most
 informative single statistic: at $\gamma^* = 0.20$, the genuinely
-unskilled mass $T^-_{\gamma^*}$ stands at $21.0\%$ under Carhart,
+unskilled mass $T^-_{\gamma^*}$ stands at $21.1\%$ under Carhart,
 rises to $28.2\%$ under FF6 (a $7.2$-percentage-point increase), and
 falls marginally to $20.6\%$ under Carhart$+$PSL. The Storey
-$\hat{\pi}_0$ estimate moves from $77.6\%$ (Carhart) to $66.0\%$
-under FF6 (an $11.6$-percentage-point drop) and to $76.4\%$ under
+$\hat{\pi}_0$ estimate moves from $77.5\%$ (Carhart) to $66.0\%$
+under FF6 (an $11.5$-percentage-point drop) and to $76.3\%$ under
 Carhart$+$PSL (essentially unchanged). The two effects --- a lower
 $\hat{\pi}_0$ and a higher $T^-_{\gamma^*}$ under FF6 --- are
 complementary: as the model absorbs more of the cross-sectional
@@ -5287,12 +5619,20 @@ estimator attributes to genuine zero-alpha behaviour shrinks, and a
 larger fraction of the cross-section is identified as genuinely
 unskilled rather than indistinguishable-from-zero.
 
-The intuition is that the additional FF5 factors (RMW, CMA) absorb
-cross-sectional return variation that was previously captured by
-Carhart-residual alpha, with the absorbed return disproportionately
-benefiting funds with neutral exposures to RMW and CMA --- which
-shifts the relative position of underperforming funds in the
-cross-section toward the significantly-negative tail. The
+The intuition is that under the Carhart model, fund alphas embed
+unpriced factor-tilt compensation: funds with positive exposures to
+RMW and CMA --- a systematic quality tilt toward profitable,
+conservatively-investing firms that is common in the industry ---
+carry inflated Carhart alphas, while funds with negative exposures
+carry depressed ones. When RMW and CMA are added as explicit
+regressors, these biases are corrected. Because positive-exposure
+funds (whose alphas are corrected downward) are more numerous and
+carry larger average bias magnitudes than negative-exposure funds
+(whose alphas are partially corrected upward), the net effect on the
+cross-sectional distribution is a leftward shift: the pooled EW alpha
+falls, a larger fraction of the distribution is exposed as genuinely
+unskilled, and $\hat{\pi}_0$ declines as fewer funds remain
+indistinguishable from zero. The
 Carhart$+$PSL specification produces pooled-alpha and BSW estimates
 within $1$--$2$ percentage points of the Carhart specification,
 indicating that traded liquidity exposure is not a material

@@ -1,0 +1,72 @@
+% =============================================================================
+% title_page.tex  —  Standalone title page for SBE editor submission
+% Compiler: XeLaTeX
+% NOTE: If compiling inside the main Overleaf project, the shared output.aux
+% file causes \abx@aux@... errors. Fix: in Overleaf, rename this file so its
+% jobname differs from the main project (e.g. title_page_standalone.tex),
+% OR simply ignore the errors — they do not affect output.
+% =============================================================================
+\documentclass[12pt, a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=4cm, right=2.5cm]{geometry}
+
+\usepackage{setspace}
+\doublespacing
+
+\usepackage[document]{ragged2e}
+
+% Silences \abx@aux@... commands from shared biblatex aux file
+\makeatletter
+\providecommand{\abx@aux@refcontext}[1]{}
+\providecommand{\abx@aux@cite}[2]{}
+\providecommand{\abx@aux@segm}[3]{}
+\providecommand{\abx@aux@page}[2]{}
+\providecommand{\abx@aux@defaultrefcontext}[2]{}
+\providecommand{\abx@aux@defaultlabelprefix}[2]{}
+\makeatother
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+
+\vspace*{1.2in}
+
+ACTIVE MANAGEMENT: INFORMATIONAL NECESSITY OR PSYCHOLOGICAL UTILITY?
+INVESTIGATING THE BEHAVIORAL DRIVERS OF ACTIVE MANAGEMENT PUZZLE
+
+\vspace{0.5in}
+
+Thesis submitted to the
+
+Institute for Graduate Studies in Social Sciences
+
+in partial fulfillment of the requirements for the degree of
+
+\vspace{0.5in}
+
+Doctor of Philosophy
+
+in
+
+Management
+
+\vspace{0.5in}
+
+by
+
+Ömer Eren
+
+\vspace{0.5in}
+
+Boğaziçi University
+
+2026
+
+\end{center}
+
+\end{document}

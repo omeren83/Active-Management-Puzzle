@@ -1,0 +1,87 @@
+% =============================================================================
+% approval_page.tex  —  Standalone approval page for SBE editor submission
+% Compiler: XeLaTeX
+% NOTE: If compiling inside the main Overleaf project, the shared output.aux
+% file causes \abx@aux@... errors. Fix: in Overleaf, rename this file so its
+% jobname differs from the main project (e.g. approval_page_standalone.tex),
+% OR simply ignore the errors — they do not affect output.
+% =============================================================================
+\documentclass[12pt, a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=4cm, right=2.5cm]{geometry}
+
+\usepackage{setspace}
+\doublespacing
+
+\usepackage[document]{ragged2e}
+
+% Silences \abx@aux@... commands from shared biblatex aux file
+\makeatletter
+\providecommand{\abx@aux@refcontext}[1]{}
+\providecommand{\abx@aux@cite}[2]{}
+\providecommand{\abx@aux@segm}[3]{}
+\providecommand{\abx@aux@page}[2]{}
+\providecommand{\abx@aux@defaultrefcontext}[2]{}
+\providecommand{\abx@aux@defaultlabelprefix}[2]{}
+\makeatother
+
+\pagestyle{empty}
+
+\begin{document}
+
+\vspace*{0.55in}
+
+\begin{center}
+Active Management: Informational Necessity or Psychological Utility?\\
+Investigating the Behavioral Drivers of Active Management Puzzle
+
+\vspace{0.5in}
+
+The thesis of Ömer Eren
+
+has been approved by:
+
+\vspace{0.5in}
+\end{center}
+
+\begin{singlespace}
+\noindent Prof.\ Vedat Akgiray \hfill \underline{\hspace{3in}}\\
+\noindent (Thesis Advisor)
+\end{singlespace}
+
+\vspace{0.5in}
+
+\begin{singlespace}
+\noindent Assoc.\ Prof.\ Ali Coşkun \hfill \underline{\hspace{3in}}
+\end{singlespace}
+
+\vspace{0.5in}
+
+\begin{singlespace}
+\noindent Assoc.\ Prof.\ Cenk Cevat Karahan \hfill \underline{\hspace{3in}}
+\end{singlespace}
+
+\vspace{0.5in}
+
+\begin{singlespace}
+\noindent Assist.\ Prof.\ Emrah Ahi \hfill \underline{\hspace{3in}}\\
+\noindent (External Member)
+\end{singlespace}
+
+\vspace{0.5in}
+
+\begin{singlespace}
+\noindent Assist.\ Prof.\ Han Özsöylev \hfill \underline{\hspace{3in}}\\
+\noindent (External Member)
+\end{singlespace}
+
+\vspace{0.5in}
+
+\begin{center}
+June 2026
+\end{center}
+
+\end{document}
