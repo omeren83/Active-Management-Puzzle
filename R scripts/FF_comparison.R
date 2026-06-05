@@ -1,5 +1,17 @@
 # =============================================================================
-# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.4
+# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.5
+#
+# v1.5 changes vs v1.4 (panel source fix):
+#   Panel source switched from panel_trimmed to panel_incubation. panel_trimmed
+#   has a hard Dec 1994 date floor that accidentally launders 43 active funds
+#   past the Evans (2010) incubation filter: funds incepted ~mid-1992 to early
+#   1993 have their pre-1995 history truncated by the floor, making them appear
+#   to pass the 36-month cutoff. panel_incubation retains the full history and
+#   the Evans filter correctly excludes the incubation era for these funds.
+#   Active N is unchanged at 805 (all 43 boundary funds clear MIN_OBS_FULL=24
+#   in the 141-month FF window regardless of panel source). Per-fund return
+#   histories change, shifting pi_0 from 76.0% to 78.5% and aggregate portfolio
+#   alphas by ~7-8 bp. Consistent with all other scripts on panel_incubation.
 #
 # v1.4 changes vs v1.3 (figure inline-text strip):
 #   Figure C.1 (fig_luck_vs_skill_combined_FF) inline narrative text stripped
@@ -58,7 +70,7 @@
 # spans Jan 1984 - Sep 2006.
 #
 # REQUIRES IN SESSION:
-#   panel_trimmed   built by data_import_and_cleaning.R + flow_calculation.R
+#   panel_incubation   built by data_import_and_cleaning.R + flow_calculation.R
 #                   (must already contain ret_gross, ret_net, tna, tna_lag,
 #                   MKT_RF, SMB, HML, MOM, RF, ap_group, Expense_Ratio).
 #
@@ -119,7 +131,7 @@ cat("Sample window:", format(DATE_MIN_FF), "to", format(DATE_MAX_FF), "\n")
 # =============================================================================
 # 1. PANEL RESTRICTION  (LOCAL COPY ONLY)
 # =============================================================================
-ap <- panel_trimmed %>%
+ap <- panel_incubation %>%
   filter(!excluded_perf) %>%      # v1.3: performance-comparison subsample
   filter(date >= DATE_MIN_FF, date <= DATE_MAX_FF) %>%
   rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF,
