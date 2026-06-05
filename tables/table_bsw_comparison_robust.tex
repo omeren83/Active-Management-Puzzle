@@ -1,4 +1,4 @@
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \sbox{\tabletempbox}{%
 \footnotesize
@@ -6,9 +6,9 @@
 \toprule
 Model & $\hat{\pi}_0$ & $S^-_{\gamma^*}$ & $S^+_{\gamma^*}$ & $F_{\gamma^*}$ & $T^-_{\gamma^*}$ & $T^+_{\gamma^*}$ \\
 \midrule
-Carhart 4-Factor & 77.5\% & 28.9\% & 5.8\% & 7.7\% & 21.1\% & -2.0\% \\
+Carhart 4-Factor & 77.6\% & 28.8\% & 5.8\% & 7.8\% & 21.0\% & -2.0\% \\
 FF 6-Factor & 66.0\% & 34.8\% & 5.5\% & 6.6\% & 28.2\% & -1.1\% \\
-Carhart + PSL & 76.3\% & 28.2\% & 6.5\% & 7.6\% & 20.6\% & -1.2\% \\
+Carhart + PSL & 76.4\% & 28.2\% & 6.5\% & 7.6\% & 20.6\% & -1.2\% \\
 \bottomrule
 \end{tabular}%
 }
@@ -16,11 +16,15 @@ Carhart + PSL & 76.3\% & 28.2\% & 6.5\% & 7.6\% & 20.6\% & -1.2\% \\
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{BSW (2010) Decomposition Comparison at $\gamma^* = 0.20$\label{tab:bsw_comparison_robust}}
+\caption{\label{tab:bsw_comparison_robust}BSW (2010) Decomposition Comparison at $\gamma^* = 0.20$}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+\textcite{BarrasScailletWermers2010} four-way decomposition of active funds at significance threshold $\gamma^* = 0.20$. $\hat{\pi}_0$: \textcite{Storey2002} estimator of the zero-alpha fund proportion at tuning parameter $\lambda = 0.5$, derived from Newey-West $t(\hat{\alpha})$ p-values on full-period per-fund alphas. $S^-_{\gamma^*}$ ($S^+_{\gamma^*}$): observed fraction of active funds with significantly negative (positive) $t(\hat{\alpha})$ at two-sided level $\gamma^*$; critical values from $N(0,1)$. $F_{\gamma^*} = \hat{\pi}_0 \cdot \gamma^*/2$: expected false-discovery proportion per tail. $T^-_{\gamma^*} = S^-_{\gamma^*} - F_{\gamma^*}$: genuinely unskilled funds. $T^+_{\gamma^*} = S^+_{\gamma^*} - F_{\gamma^*}$: genuinely skilled funds; negative entries indicate right-tail significance does not exceed the false-discovery rate. All quantities are percentages of the active-fund universe. \textit{Carhart 4-Factor}: \citealt{Carhart1997} main-text baseline ($\hat{\pi}_0 = 77.6\%$). \textit{FF 6-Factor}: \citealt{FamaFrench2015} five-factor plus momentum. \textit{Carhart + PSL}: Carhart plus \textcite{PastorStambaugh2003} traded liquidity. Sample: Incubation-corrected panel (\citealt{Evans2010}), no date cap; performance-comparison subsample per flagged\_funds.xlsx; Passive and Unknown funds excluded.
+\end{singlespace}
 \end{minipage}
 \end{table}

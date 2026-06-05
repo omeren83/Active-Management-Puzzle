@@ -1,84 +1,59 @@
 # =============================================================================
-# ROBUSTNESS ALPHA ESTIMATION: FF6 AND CARHART + PS LIQUIDITY (v1.3)
+# ROBUSTNESS ALPHA ESTIMATION: FF6 AND CARHART + PS LIQUIDITY (v1.4)
 #
-# v1.3 changes vs v1.2 (Family B audit):
-#   filter(!excluded_perf) added to the ap_robust panel-prep stage so the
-#   FF6 and C5 robustness specifications are estimated on the same
-#   performance-comparison subsample as the main-text Carhart specification
-#   (alpha_estimation.R v2.7). Without this filter, the Appendix E
-#   robustness tables would describe a strictly larger universe than the
-#   main-text tables, producing a spurious composition difference between
-#   specifications. Per dissertation §4.7 the perf-comparison subsample
-#   excludes 585 funds total, 149 of which are SECTOR_FUND-only flags
-#   (the remainder are caught by Step 8c at source).
-#
-# v1.2 (carried forward) implementation
-# -----
-# Purpose
-# -------
-# Re-estimates the full-period alpha regressions and the Fama-French (2010)
-# bootstrap + BSW decomposition under two alternative factor models, for the
-# Appendix E robustness section. The main-text specification remains the
-# Carhart (1997) four-factor model produced by alpha_estimation.R (v2.6).
-#
-# Specifications estimated here
-# -----------------------------
-#   FF6 : MKT_RF + SMB + HML + RMW + CMA + MOM
-#         Fama-French (2015) five-factor + Carhart momentum.
-#   C5  : MKT_RF + SMB + HML + MOM + PSL
-#         Carhart (1997) four-factor + Pastor-Stambaugh (2003) traded liquidity.
-#
-# v1.1 changes vs v1.0
+# v1.4 changes vs v1.3
 # --------------------
-#   (a) Per-spec sample filter.  v1.0 required all factors across both specs
-#       non-missing, which incorrectly truncated FF6 to the PSL coverage window.
-#       v1.1 filters separately per spec so each uses its maximum sample.
-#   (b) Defensive -99 -> NA conversion for PSL.  Pastor-Stambaugh's raw file
-#       uses -99 as the missing-value sentinel for traded liquidity before
-#       1968-01.  If imported to the factors sheet without cleaning, these
-#       would enter regressions as -9900% monthly returns.  Cleaned at panel
-#       prep regardless of whether the user cleaned them in Excel.
-#   (c) Summary now reports observation count and date range per spec so
-#       sample-window differences are visible to the reader.
+#   Aggregate portfolio regressions added (Table I.1 inputs).
+#   (a) New portfolio regression helpers added in Section 1: fast_ols_port(),
+#       nw_se_port(), wm_monthly(), build_port_returns_robust(), run_port_reg().
+#       These are generalised to arbitrary factor sets and mirror aggregate_alphas.R
+#       exactly. Adjusted R² (not plain R²) is computed and stored.
+#   (b) New step 5e inside the per-spec loop: runs aggregate portfolio regressions
+#       for Active and Passive groups (EW/VW × Gross/Net), producing a
+#       port_alpha data frame with columns: Group, n_funds, t_months,
+#       alpha_ew_gross, t_ew_gross, alpha_vw_gross, t_vw_gross,
+#       alpha_ew_net, t_ew_net, alpha_vw_net, t_vw_net, r2_adj_ew, r2_adj_vw.
+#       All alpha values stored in annualised decimal (×12) form, consistent
+#       with the existing alpha_ann convention.
+#   (c) Carhart added to SPECS so the same loop produces the Carhart
+#       bootstrap_results.xlsx port_alpha sheet, giving build_robust_tables.R
+#       a single uniform reading pattern across all three specifications.
+#       The Carhart bootstrap and BSW blocks are skipped (those results already
+#       exist in bootstrap_results.xlsx from alpha_estimation.R); only the
+#       portfolio regressions and per-fund alpha xlsx are produced.
+#   (d) port_alpha written as a new sheet in bootstrap_results_{spec}.xlsx
+#       alongside the existing summary / bsw_decomposition / bsw_meta sheets.
+#       build_robust_tables.R reads this sheet for Table I.1.
+#
+# v1.3 changes vs v1.2 (Family B audit)
+# --------------------------------------
+#   filter(!excluded_perf) added to the ap_robust panel-prep stage.
+#
+# v1.1 / v1.2 changes — see prior version headers.
 #
 # Scope
 # -----
-# This script deliberately reproduces ONLY the components affected by factor
-# choice:  full-period alphas  ->  cross-sectional moments (Table 5)  ->
-# bootstrap (Table 6) and BSW decomposition (Tables 7-8).  It does NOT recompute
-# rolling alphas (Figure 2) or the performance ranks (flow regressions): those
-# downstream objects use Carhart factors by design in the main text.
-#
-# Data notes
-# ----------
-# PSL (Pastor-Stambaugh 2003 traded liquidity factor, LIQ_V column in
-# liq_data_1962_YYYY.txt on Pastor's Booth page) is in DECIMAL form, matching
-# the existing factors sheet convention.  No percent / decimal conversion
-# required.  As of 2026-04, PSL is released through December 2024, so the C5
-# specification is estimated on 1994-12 -- 2024-12 rather than the full
-# 1994-12 -- 2026-02 window; note accordingly in the appendix footnote.
-#
-# SMB convention
-# --------------
-# Existing SMB in the factors sheet is the FF3/Carhart SMB (single 2x3 size-BM
-# sort).  French's FF5 SMB is slightly different (average across size-BM,
-# size-OP, size-Inv sorts).  Correlation is >0.99 in most subsamples (Fama and
-# French, 2015).  Keeping a single SMB definition across all three specifications
-# isolates the marginal contribution of RMW / CMA / PSL and is defensible; this
-# choice is noted in the appendix.
+# Reproduces the components needed for Appendix I: full-period per-fund alphas,
+# bootstrap t-stat distributions, BSW decomposition, and aggregate portfolio
+# alphas — all under three factor specifications (Carhart, FF6, C+PSL).
+# Rolling alphas and flow regressions use Carhart factors by design and are
+# not re-estimated here.
 #
 # Outputs
 # -------
-#   alpha_fullperiod_FF6.xlsx     |   alpha_fullperiod_C5.xlsx
-#   bootstrap_results_FF6.xlsx    |   bootstrap_results_C5.xlsx
-#   robust_alpha_summary.xlsx     |   side-by-side EW/VW vs Carhart baseline
+#   alpha_fullperiod_FF6.xlsx / alpha_fullperiod_C5.xlsx
+#   alpha_fullperiod_Carhart.xlsx   (Carhart per-fund alphas, for cross-check)
+#   bootstrap_results_FF6.xlsx      sheets: summary, fund_talpha,
+#   bootstrap_results_C5.xlsx              bsw_decomposition, bsw_meta,
+#   bootstrap_results_Carhart.xlsx         port_alpha  (NEW in v1.4)
+#   robust_alpha_summary.xlsx       side-by-side pooled alphas (diagnostic)
 #
 # Prerequisites
 # -------------
-#   - data_import_and_cleaning.R has been sourced; panel_incubation exists with
-#     new columns RMW, CMA, PSL populated from the factors sheet.
-#   - alpha_estimation.R (v2.6) has been run; alpha_fullperiod.xlsx exists for
-#     the side-by-side baseline comparison.
+#   - data_import_and_cleaning.R sourced; panel_incubation in session with
+#     columns RMW, CMA, PSL populated from the factors sheet.
+#   - alpha_estimation.R run; bootstrap_results.xlsx exists for BSW meta
+#     (Carhart bootstrap/BSW not re-estimated here — too expensive to duplicate).
 # =============================================================================
 
 library(dplyr)
@@ -107,11 +82,14 @@ PCTS <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50,
 GAMMA_GRID    <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5
 
-# Factor specifications: list of character vectors of factor column names as
-# they appear in panel_incubation after the pivot in data_import_and_cleaning.R.
+# Factor specifications. Carhart included so portfolio regressions for Table
+# I.1 are produced here for all three specs uniformly. The Carhart bootstrap
+# and BSW are NOT re-run (already done in alpha_estimation.R); a flag below
+# gates those expensive blocks to FF6 and C5 only.
 SPECS <- list(
-  FF6 = c("MKT_RF", "SMB", "HML", "RMW", "CMA", "MOM"),
-  C5  = c("MKT_RF", "SMB", "HML", "MOM", "PSL")
+  Carhart = c("MKT_RF", "SMB", "HML", "MOM"),
+  FF6     = c("MKT_RF", "SMB", "HML", "RMW", "CMA", "MOM"),
+  C5      = c("MKT_RF", "SMB", "HML", "MOM", "PSL")
 )
 
 # --- 1. HELPERS --------------------------------------------------------------
@@ -150,6 +128,92 @@ nw_se <- function(X, e, lag) {
   }, error = function(err) rep(NA_real_, k))
 }
 
+# --- 1b. PORTFOLIO REGRESSION HELPERS ----------------------------------------
+# Used by step 5e (aggregate portfolio alphas for Table I.1).
+# Mirrors aggregate_alphas.R but generalised to arbitrary factor sets.
+
+# Monthly weighted mean for VW portfolio returns (lagged TNA weights).
+wm_monthly <- function(x, w) {
+  v <- !is.na(x) & !is.na(w) & w > 0
+  if (sum(v) == 0L) return(NA_real_)
+  sum(x[v] * w[v]) / sum(w[v])
+}
+
+# Build monthly EW/VW portfolio return series from a fund-month panel.
+build_port_returns_robust <- function(data) {
+  data %>%
+    group_by(date) %>%
+    summarise(
+      ret_ew_gross = mean(ret_gross, na.rm = TRUE),
+      ret_ew_net   = mean(ret_net,   na.rm = TRUE),
+      ret_vw_gross = wm_monthly(ret_gross, tna_lag),
+      ret_vw_net   = wm_monthly(ret_net,   tna_lag),
+      .groups = "drop"
+    ) %>%
+    arrange(date)
+}
+
+# Regress one portfolio return series on a given factor set.
+# factors_ts: distinct date × rf × factor_cols data frame.
+# ret_col:    name of the return column in port_df.
+# Returns list: alpha_ann (annualised decimal), t_nw, r2_adj, n_months.
+run_port_reg <- function(port_df, factors_ts, ret_col, factor_cols) {
+  d <- port_df %>%
+    inner_join(factors_ts, by = "date") %>%
+    filter(!is.na(.data[[ret_col]]),
+           if_all(all_of(factor_cols), ~ !is.na(.)),
+           !is.na(rf))
+  n <- nrow(d)
+  if (n < MIN_OBS_FULL)
+    return(list(alpha_ann = NA_real_, t_nw = NA_real_,
+                r2_adj = NA_real_, n_months = n))
+  y   <- d[[ret_col]] - d$rf
+  X   <- cbind(1, as.matrix(d[, factor_cols, drop = FALSE]))
+  fit <- fast_ols(y, X)
+  if (is.null(fit))
+    return(list(alpha_ann = NA_real_, t_nw = NA_real_,
+                r2_adj = NA_real_, n_months = n))
+  k   <- ncol(X)
+  tss <- sum((y - mean(y))^2)
+  r2_adj <- if (tss == 0) NA_real_
+             else 1 - (sum(fit$e^2) / (n - k)) / (tss / (n - 1))
+  se  <- nw_se(X, fit$e, NW_LAG_FULL)
+  list(alpha_ann = fit$beta[1] * 12,
+       t_nw      = fit$beta[1] / se[1],
+       r2_adj    = r2_adj,
+       n_months  = n)
+}
+
+# Run all four regressions (EW/VW × Gross/Net) for one group, return one row.
+port_alpha_row <- function(group_name, panel_sub, factors_ts, factor_cols) {
+  n_funds <- n_distinct(panel_sub$Ticker)
+  if (n_funds == 0L) {
+    return(data.frame(
+      Group = group_name, n_funds = 0L, t_months = NA_integer_,
+      alpha_ew_gross = NA_real_, t_ew_gross = NA_real_,
+      alpha_vw_gross = NA_real_, t_vw_gross = NA_real_,
+      alpha_ew_net   = NA_real_, t_ew_net   = NA_real_,
+      alpha_vw_net   = NA_real_, t_vw_net   = NA_real_,
+      r2_adj_ew = NA_real_,     r2_adj_vw  = NA_real_
+    ))
+  }
+  pr  <- build_port_returns_robust(panel_sub)
+  rEG <- run_port_reg(pr, factors_ts, "ret_ew_gross", factor_cols)
+  rVG <- run_port_reg(pr, factors_ts, "ret_vw_gross", factor_cols)
+  rEN <- run_port_reg(pr, factors_ts, "ret_ew_net",   factor_cols)
+  rVN <- run_port_reg(pr, factors_ts, "ret_vw_net",   factor_cols)
+  data.frame(
+    Group          = group_name,
+    n_funds        = n_funds,
+    t_months       = rEG$n_months,
+    alpha_ew_gross = rEG$alpha_ann, t_ew_gross = rEG$t_nw,
+    alpha_vw_gross = rVG$alpha_ann, t_vw_gross = rVG$t_nw,
+    alpha_ew_net   = rEN$alpha_ann, t_ew_net   = rEN$t_nw,
+    alpha_vw_net   = rVN$alpha_ann, t_vw_net   = rVN$t_nw,
+    r2_adj_ew      = rEG$r2_adj,   r2_adj_vw  = rVG$r2_adj
+  )
+}
+
 # --- 2. PANEL PREP (shared across specs) -------------------------------------
 cat("=== 1. Preparing panel with extended factor set ===\n")
 
@@ -182,6 +246,8 @@ ap_robust <- panel_incubation %>%
                 ~ ifelse(. == -99, NA_real_, .))) %>%
   filter(!is.na(excess_ret)) %>%
   arrange(Ticker, date)
+# ret_gross, ret_net, tna_lag are passed through from panel_incubation and are
+# available in ap_robust for the portfolio regression helpers (step 5e).
 
 cat("Funds entering robust estimation:", n_distinct(ap_robust$Ticker),
     " |  Fund-months:", nrow(ap_robust), "\n")
@@ -302,7 +368,12 @@ for (spec_name in names(SPECS)) {
     lapply(names(ap_split), run_full_period_spec, factor_cols = factor_cols)
   )
   cat("      Funds estimated:", nrow(alpha_full), "\n")
-  
+
+  # 5b–5d. Bootstrap + BSW: run for FF6 and C5 only.
+  # Carhart bootstrap/BSW already produced by alpha_estimation.R; re-running
+  # them here would be redundant and expensive (~30 min per run).
+  if (spec_name != "Carhart") {
+
   # 5b. Bootstrap prep (active funds only)
   active_fp <- alpha_full %>%
     filter(ap_group == "Active", !is.na(alpha_t_nw))
@@ -385,21 +456,56 @@ for (spec_name in names(SPECS)) {
     pi_A_minus = pi_A_minus,
     pi_A_plus  = pi_A_plus
   )
-  
-  # 5e. Save spec-specific outputs
+
+  } else {
+    # Carhart: read bootstrap/BSW results from alpha_estimation.R outputs.
+    cat("  [b-d] Carhart: reading bootstrap/BSW from bootstrap_results.xlsx...\n")
+    bootstrap_summary <- tryCatch(
+      read_excel("bootstrap_results.xlsx", sheet = "summary"),
+      error = function(e) { cat("      WARNING: bootstrap_results.xlsx not found.\n"); NULL }
+    )
+    bsw_df   <- tryCatch(read_excel("bootstrap_results.xlsx", sheet = "bsw_decomposition"),
+                         error = function(e) NULL)
+    bsw_meta <- tryCatch(read_excel("bootstrap_results.xlsx", sheet = "bsw_meta"),
+                         error = function(e) NULL)
+    active_fp <- alpha_full %>% filter(ap_group == "Active", !is.na(alpha_t_nw))
+    n_bsw     <- if (!is.null(bsw_meta)) as.integer(bsw_meta$n_active[1]) else nrow(active_fp)
+    pi_A_minus <- if (!is.null(bsw_meta)) bsw_meta$pi_A_minus[1] else NA_real_
+    pi_A_plus  <- if (!is.null(bsw_meta)) bsw_meta$pi_A_plus[1]  else NA_real_
+    pi0_bsw    <- if (!is.null(bsw_meta)) bsw_meta$pi0_pct[1] / 100 else NA_real_
+  }
+
+  # 5e. Aggregate portfolio regressions (Table I.1 inputs).
+  # Runs for ALL three specs. Produces Active and Passive rows.
+  cat("  [d2] Aggregate portfolio regressions...\n")
+  factors_ts <- ap_spec %>%
+    distinct(date, rf, !!!syms(factor_cols)) %>%
+    arrange(date)
+  port_alpha <- bind_rows(
+    port_alpha_row("Active",  ap_spec %>% filter(ap_group == "Active"),  factors_ts, factor_cols),
+    port_alpha_row("Passive", ap_spec %>% filter(ap_group == "Passive"), factors_ts, factor_cols)
+  )
+  cat(sprintf("      Active  N=%d T=%d | Passive N=%d T=%d\n",
+              port_alpha$n_funds[1], port_alpha$t_months[1],
+              port_alpha$n_funds[2], port_alpha$t_months[2]))
+
+  # 5f. Save spec-specific outputs
   write_xlsx(alpha_full,
              sprintf("alpha_fullperiod_%s.xlsx", spec_name))
   write_xlsx(
     list(
-      summary           = bootstrap_summary,
+      summary           = if (!is.null(bootstrap_summary)) bootstrap_summary else data.frame(),
       fund_talpha       = active_fp,
-      bsw_decomposition = bsw_df,
-      bsw_meta          = bsw_meta
+      bsw_decomposition = if (!is.null(bsw_df))   bsw_df   else data.frame(),
+      bsw_meta          = if (!is.null(bsw_meta))  bsw_meta else data.frame(),
+      port_alpha        = port_alpha        # NEW v1.4: aggregate portfolio results
     ),
     sprintf("bootstrap_results_%s.xlsx", spec_name)
   )
   
-  # 5f. Accumulate summary row (pooled EW / VW, gross and net, active only)
+  # 5g. Accumulate diagnostic summary row (pooled cross-sectional means,
+  # for robust_alpha_summary.xlsx only — no longer drives any table).
+  if (spec_name != "Carhart") {
   active_full <- alpha_full %>% filter(ap_group == "Active")
   ew_gross <- mean(active_full$alpha_ann,     na.rm = TRUE)
   vw_wts   <- active_full$mean_tna
@@ -424,6 +530,7 @@ for (spec_name in names(SPECS)) {
     pi_A_minus_pct = pi_A_minus,
     pi_A_plus_pct  = pi_A_plus
   )
+  } # end if (spec_name != "Carhart")
 }
 
 # --- 6. SIDE-BY-SIDE SUMMARY WITH CARHART BASELINE ---------------------------
@@ -489,6 +596,8 @@ print(summary_df)
 
 cat("\n=== ROBUSTNESS ESTIMATION COMPLETE ===\n")
 cat("Outputs:\n")
-cat("  alpha_fullperiod_FF6.xlsx / alpha_fullperiod_C5.xlsx\n")
-cat("  bootstrap_results_FF6.xlsx / bootstrap_results_C5.xlsx\n")
-cat("  robust_alpha_summary.xlsx (side-by-side vs Carhart)\n")
+cat("  alpha_fullperiod_Carhart.xlsx / alpha_fullperiod_FF6.xlsx / alpha_fullperiod_C5.xlsx\n")
+cat("  bootstrap_results_Carhart.xlsx / bootstrap_results_FF6.xlsx / bootstrap_results_C5.xlsx\n")
+cat("    Each bootstrap_results_*.xlsx now contains a 'port_alpha' sheet (NEW v1.4)\n")
+cat("    with aggregate portfolio alphas for Active and Passive groups (Table I.1 inputs).\n")
+cat("  robust_alpha_summary.xlsx (diagnostic pooled cross-sectional means, FF6 and C5 only)\n")

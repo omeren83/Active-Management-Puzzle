@@ -1,21 +1,27 @@
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \sbox{\tabletempbox}{%
 \footnotesize
-\begin{tabular}{llrrrrrr}
+\begin{tabular}{llrrrrrrr}
 \toprule
- & & & & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} \\
+ & & & & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} & \\
 \cmidrule(lr){5-6} \cmidrule(lr){7-8}
-Model & Group & $N$ & $T_{\max}$ & EW & VW & EW & VW \\
+Model & Group & $N$ & $T$ & EW & VW & EW & VW & $\bar{R}^2$ \\
 \midrule
-Carhart 4-Factor & Active & 1,815 & 373 & -1.020 & 0.480 & -2.124 & -0.194 \\
- & Passive & 28 & 287 & 0.400 & -0.022 & -0.182 & -0.466 \\
+Carhart 4-Factor & Active & 1,973 & 373 & -0.288 & -0.189 & -1.361$^{***}$ & -0.900$^{**}$ & 0.978 \\
+t(coef) &  &  &  & (-0.65) & (-0.49) & (-3.11) & (-2.35) &  \\
+ & Passive & 281 & 373 & -0.291 & 0.156 & -0.814$^{**}$ & 0.023 & 0.987 \\
+t(coef) &  &  &  & (-0.82) & (0.69) & (-2.34) & (0.11) &  \\
 \addlinespace
-FF 6-Factor & Active & 1,815 & 373 & -1.154 & 0.197 & -2.255 & -0.476 \\
- & Passive & 28 & 287 & 0.521 & -0.125 & -0.049 & -0.570 \\
+FF 6-Factor & Active & 1,973 & 373 & -0.637 & -0.360 & -1.707$^{***}$ & -1.071$^{***}$ & 0.979 \\
+t(coef) &  &  &  & (-1.59) & (-0.95) & (-4.28) & (-2.86) &  \\
+ & Passive & 281 & 373 & -0.684$^{**}$ & -0.147 & -1.208$^{***}$ & -0.279 & 0.988 \\
+t(coef) &  &  &  & (-2.09) & (-0.68) & (-3.77) & (-1.37) &  \\
 \addlinespace
-Carhart + PSL & Active & 1,780 & 360 & -0.950 & 0.440 & -2.059 & -0.241 \\
- & Passive & 27 & 274 & 0.375 & -0.183 & -0.220 & -0.639 \\
+Carhart + PSL & Active & 1,927 & 360 & -0.252 & -0.229 & -1.327$^{***}$ & -0.945$^{**}$ & 0.978 \\
+t(coef) &  &  &  & (-0.57) & (-0.57) & (-3.00) & (-2.37) &  \\
+ & Passive & 277 & 360 & -0.253 & 0.199 & -0.780$^{**}$ & 0.063 & 0.987 \\
+t(coef) &  &  &  & (-0.70) & (0.85) & (-2.19) & (0.28) &  \\
 \bottomrule
 \end{tabular}%
 }
@@ -23,11 +29,15 @@ Carhart + PSL & Active & 1,780 & 360 & -0.950 & 0.440 & -2.059 & -0.241 \\
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{Pooled Alpha Comparison Across Factor Models (\%, Annualised)\label{tab:alpha_comparison_robust}}
+\caption{\label{tab:alpha_comparison_robust}Aggregate Portfolio Alpha Comparison Across Factor Models (\%, Annualised)}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Annualised alpha (\%) from regressing the monthly aggregate portfolio return of each group on the specified factor model, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio ($1/N_t$ weight per fund per month). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1}/\sum_j \text{TNA}_{j,t-1}$. Net returns are gross returns less one-twelfth of the static annual expense ratio each month, following \textcite{Carhart1997} and \textcite{Wermers2000}. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. $N$: unique funds contributing to the portfolio; $T$: monthly observations in the regression. \textit{Carhart 4-Factor}: MKT-RF, SMB, HML, MOM (\citealt{Carhart1997}; main-text baseline). \textit{FF 6-Factor}: MKT-RF, SMB, HML, RMW, CMA, MOM (\citealt{FamaFrench2015} five-factor model plus momentum). \textit{Carhart + PSL}: Carhart four-factor augmented with the \textcite{PastorStambaugh2003} traded liquidity factor. SMB is held constant at the \textcite{FamaFrench1993} construction (single $2\times3$ size--BM sort) across all specifications. Carhart and FF 6-Factor: Dec 1994--Feb 2026. Carhart + PSL: Dec 1994--Dec 2024 (constrained by Pastor liquidity data release). Sample: Incubation-corrected panel (\citealt{Evans2010}), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\end{singlespace}
 \end{minipage}
 \end{table}

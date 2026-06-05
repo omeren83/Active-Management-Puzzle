@@ -1,113 +1,80 @@
 # =============================================================================
-# ROBUST APPENDIX TABLES BUILDER (v1.2)
+# ROBUST APPENDIX TABLES BUILDER (v1.3)
 #
 # Purpose
 # -------
-# Generates LaTeX tables for Appendix E (Factor Model Robustness), comparing
-# pooled alpha, bootstrap inference, and BSW skill decomposition under three
-# factor specifications:
-#   - Carhart 4-factor (main text baseline)
-#   - Fama-French 6-factor (FF5 + MOM)
-#   - Carhart 4-factor + Pastor-Stambaugh traded liquidity (C5)
+# Generates LaTeX tables for Appendix I (Factor Model Robustness).
+# Pure output script: reads all pre-computed results from xlsx, no regressions.
 #
-# v1.2 changes vs v1.1 (Family C audit)
-# --------------------------------------
-#   (a) Workflow notes updated: patch_mean_tna.R is no longer a prerequisite.
-#       alpha_estimation.R v2.7 and alpha_estimation_robust.R v1.3 fix
-#       mean_tna at source via coalesce(class_assets, total_assets), so the
-#       alpha xlsx files produced by these versions already carry valid
-#       mean_tna values. patch_mean_tna.R retained as DEPRECATED for
-#       backward compatibility with v2.6-era xlsx outputs only.
-#   (b) Sample-window labels extended to acknowledge that the upstream
-#       alpha estimation now restricts to the performance-comparison
-#       subsample defined by flagged_funds.xlsx. SAMPLE_LABEL_MAIN and
-#       SAMPLE_LABEL_C5 are augmented; the three Appendix E table footnotes
-#       inherit the updated labels automatically through string concatenation.
-#
-# v1.1 changes vs v1.0
+# v1.3 changes vs v1.2
 # --------------------
-#   (a) Table E.1: Active and Passive groups shown as separate rows per
-#       specification (previously Active only). Model name appears on the
-#       first row of each spec pair, blank on the second.
-#   (b) Prob. Luck display in Table E.2: values that round to 0.0% but are
-#       genuinely close to zero are now rendered as "$<$0.1\%" to
-#       distinguish "essentially zero" from "exactly zero". Values of
-#       exactly 0 (0 runs out of 10,000) are displayed as "0.0\%".
-#   (c) Table E.2 footnote expanded to explain the meaning of 0.0% / <0.1%
-#       entries at lower percentiles.
-#
-# Prerequisite for correct VW values in Table E.1
-# ------------------------------------------------
-# alpha_estimation.R v2.7+ and alpha_estimation_robust.R v1.3+ produce alpha
-# xlsx files with valid mean_tna values, so VW columns render correctly out
-# of the box. For legacy xlsx files produced by v2.6 (where d$tna was NULL,
-# making mean_tna NaN), source patch_mean_tna.R once before this script.
-# See patch_mean_tna.R for the one-time backward-compatibility fix.
+#   (a) Table I.1: reads aggregate portfolio alphas from the new port_alpha
+#       sheet in bootstrap_results_{spec}.xlsx (written by alpha_estimation_
+#       robust.R v1.4). Replaces the old pooled cross-sectional mean approach
+#       (pool_stats). Layout gains t-stat rows and an R²-adjusted column,
+#       matching Table 4.5 format. Caption updated accordingly.
+#   (b) Footnotes added to all three tables using the proven inline
+#       \par\medskip + singlespace pattern from the main-text tables (4.5,
+#       4.6, 4.8). The move_note_after_table() threeparttable workaround is
+#       retired — it was silently dropping footnotes in the output .tex files.
+#   (c) Passive fund count in I.1 now reflects the updated flagged_funds.xlsx
+#       ledger automatically (the estimation script writes the correct counts).
 #
 # Workflow
 # --------
-#   1. Source data_import_and_cleaning.R (v1.2+; produces panels with
-#      flag columns excluded_perf and excluded_h3)
-#   2. Run alpha_estimation.R (v2.7+) -> alpha_fullperiod.xlsx, bootstrap_results.xlsx
-#   3. Run alpha_estimation_robust.R (v1.3+) -> alpha_fullperiod_{FF6,C5}.xlsx etc.
-#   4. Run THIS script.
+#   1. Run alpha_estimation_robust.R v1.4 -> produces bootstrap_results_*.xlsx
+#      each containing a port_alpha sheet alongside existing sheets.
+#   2. Run THIS script (no session panel needed).
 #
 # Tables produced
 # ---------------
-#   table_alpha_comparison_robust.tex     Table E.1 (pooled alpha)
-#   table_bootstrap_comparison_robust.tex Table E.2 (bootstrap percentiles)
-#   table_bsw_comparison_robust.tex       Table E.3 (BSW decomposition)
-#
-# Bibliography
-# ------------
-# Requires entries in dissertation.bib: FamaFrench2015, PastorStambaugh2003,
-# FamaFrench1993. BibTeX strings printed at end of script run.
+#   table_alpha_comparison_robust.tex     Table I.1 (aggregate portfolio alpha)
+#   table_bootstrap_comparison_robust.tex Table I.2 (bootstrap percentiles)
+#   table_bsw_comparison_robust.tex       Table I.3 (BSW decomposition)
 # =============================================================================
 
 library(readxl)
 library(dplyr)
 
 # --- 0. CONFIGURATION --------------------------------------------------------
-# OUT_DIR: where to write the .tex files. Set to "D:/TEZ/tables" to drop
-# outputs directly into your Overleaf-synced repo. If this script is sourced
-# from master_pipeline.R with OUT_DIR already defined in the global environment,
-# that value is used; otherwise the default below applies.
+# OUT_DIR: where to write the .tex files. Defaults to "." (current working
+# directory = WORKING_DIR set by master_pipeline.R), so that the master
+# pipeline's end-of-run sync step picks up table_*.tex files correctly.
+# Override by setting OUT_DIR before sourcing this script.
 if (!exists("OUT_DIR", inherits = TRUE) || is.null(OUT_DIR)) {
-  OUT_DIR <- "./tables_robust"
+  OUT_DIR <- "."
 }
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
-SAMPLE_LABEL_MAIN <- "Dec 1994--Feb 2026, performance-comparison subsample per flagged\\_funds.xlsx"   # baseline / FF6 window
-SAMPLE_LABEL_C5   <- "Dec 1994--Dec 2024, performance-comparison subsample per flagged\\_funds.xlsx"   # PSL-constrained window
-
 PERCENTILES_TO_SHOW <- c(1, 5, 10, 50, 90, 95, 99)
-GAMMA_STAR          <- 20   # BSW threshold for the headline decomposition
+GAMMA_STAR          <- 20
 
-# --- 1. LOAD OUTPUTS ---------------------------------------------------------
+# --- 1. LOAD ALL OUTPUTS -----------------------------------------------------
 cat("=== Loading Excel outputs ===\n")
 
 load_spec <- function(spec_suffix, label) {
-  fp  <- if (spec_suffix == "") "alpha_fullperiod.xlsx"
-  else                    sprintf("alpha_fullperiod_%s.xlsx", spec_suffix)
-  bp  <- if (spec_suffix == "") "bootstrap_results.xlsx"
-  else                    sprintf("bootstrap_results_%s.xlsx", spec_suffix)
+  # spec_suffix: "Carhart", "FF6", or "C5"
+  fp <- sprintf("alpha_fullperiod_%s.xlsx",   spec_suffix)
+  bp <- sprintf("bootstrap_results_%s.xlsx",  spec_suffix)
   list(
     alpha_full   = read_excel(fp),
     boot_summary = read_excel(bp, sheet = "summary"),
     bsw_df       = read_excel(bp, sheet = "bsw_decomposition"),
     bsw_meta     = read_excel(bp, sheet = "bsw_meta"),
+    port_alpha   = read_excel(bp, sheet = "port_alpha"),  # NEW v1.4
     label        = label
   )
 }
 
-car <- load_spec("",    "Carhart 4-Factor")
-ff6 <- load_spec("FF6", "FF 6-Factor")
-c5  <- load_spec("C5",  "Carhart + PSL")
+car <- load_spec("Carhart", "Carhart 4-Factor")
+ff6 <- load_spec("FF6",     "FF 6-Factor")
+c5  <- load_spec("C5",      "Carhart + PSL")
 
-cat("Carhart:", nrow(car$alpha_full), "funds | FF6:", nrow(ff6$alpha_full),
-    "| C5:", nrow(c5$alpha_full), "\n")
+cat("Carhart port_alpha rows:", nrow(car$port_alpha),
+    "| FF6:", nrow(ff6$port_alpha),
+    "| C5:",  nrow(c5$port_alpha), "\n")
 
-# --- 2. FORMATTING HELPERS (identical convention to build_ff_tables_manual) --
+# --- 2. FORMATTING HELPERS ---------------------------------------------------
 fmt3 <- function(x) {
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--", formatC(round(v, 3), format = "f", digits = 3))
@@ -120,28 +87,24 @@ fmt1 <- function(x) {
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--", formatC(round(v, 1), format = "f", digits = 1))
 }
-fmt0 <- function(x) {
-  v <- suppressWarnings(as.numeric(x))
-  ifelse(is.na(v), "--", formatC(round(v, 0), format = "f", digits = 0))
-}
 
-# Probability-of-luck formatter.
-# Exactly 0 (no bootstrap run was as extreme) -> "0.0\%"
-# Greater than 0 but rounds to 0.0           -> "$<$0.1\%"
-# Otherwise                                  -> "xx.x\%"
 fmt_prob <- function(x) {
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--",
-         ifelse(v == 0,            "0.0\\%",
-                ifelse(v < 0.05,          "$<$0.1\\%",
-                       paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+    ifelse(v == 0,   "0.0\\%",
+    ifelse(v < 0.05, "$<$0.1\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
 }
 
-# TNA-weighted mean
-wm <- function(x, w) {
-  v <- !is.na(x) & !is.na(w) & w > 0
-  if (sum(v) == 0L) return(NA_real_)
-  sum(x[v] * w[v]) / sum(w[v])
+# Significance stars from two-sided t-statistic.
+add_stars <- function(val_str, t_stat) {
+  if (is.na(val_str) || val_str == "--") return(val_str)
+  t_abs <- suppressWarnings(abs(as.numeric(t_stat)))
+  if (is.na(t_abs)) return(val_str)
+  if      (t_abs >= 2.576) paste0(val_str, "$^{***}$")
+  else if (t_abs >= 1.960) paste0(val_str, "$^{**}$")
+  else if (t_abs >= 1.645) paste0(val_str, "$^{*}$")
+  else                     val_str
 }
 
 write_tex <- function(lines, fn) {
@@ -150,174 +113,188 @@ write_tex <- function(lines, fn) {
   cat("Written:", path, "\n")
 }
 
-# Phase B helper: rewrite a manually-built table vector so the tablenotes
-# emerge AFTER \end{table} as a flowing paragraph instead of being trapped
-# inside an unbreakable threeparttable. Without this, long notes overflow
-# the page bottom and overwrite the page number.
-move_note_after_table <- function(lines) {
-  notes_open  <- grep("\\\\begin\\{tablenotes\\}", lines)[1]
-  notes_close <- grep("\\\\end\\{tablenotes\\}",   lines)[1]
-  tp_open     <- grep("\\\\begin\\{threeparttable\\}", lines)[1]
-  tp_close    <- grep("\\\\end\\{threeparttable\\}",   lines)[1]
-  tab_close   <- grep("\\\\end\\{table\\}", lines)[1]
-  if (any(is.na(c(notes_open, notes_close, tp_open, tp_close, tab_close)))) return(lines)
-  # Extract note body (between \begin{tablenotes} and \end{tablenotes},
-  # excluding the boundary lines and any \footnotesize / \item prefixes).
-  note_body <- lines[(notes_open + 1L):(notes_close - 1L)]
-  note_body <- sub("^\\\\footnotesize\\s*$", "", note_body)
-  note_body <- sub("^\\\\item\\s*",          "", note_body)
-  note_text <- paste(trimws(note_body), collapse = " ")
-  note_text <- gsub("\\s+", " ", trimws(note_text))
-  # Strip the threeparttable wrapper and tablenotes block from the table.
-  to_drop <- c(tp_open, tp_close,
-               notes_open:notes_close)
-  kept <- lines[setdiff(seq_along(lines), to_drop)]
-  # Find the new \end{table} index after dropping
-  new_tab_close <- grep("\\\\end\\{table\\}", kept)[1]
-  note_block <- paste0("{\\footnotesize\\noindent\\textit{Note:} ",
-                       note_text, "\\par}")
-  c(kept[seq_len(new_tab_close)], note_block)
-}
+# =============================================================================
+# 3. TABLE I.1:  AGGREGATE PORTFOLIO ALPHA COMPARISON ACROSS FACTOR MODELS
+#    Reads port_alpha sheet from bootstrap_results_{spec}.xlsx.
+#    Two rows per spec (Active + Passive), each followed by a t-stat row.
+#    Columns: Model, Group, N, T, EW gross, VW gross, EW net, VW net, R²-adj.
+# =============================================================================
+cat("\n=== Table I.1: Aggregate Portfolio Alpha Comparison ===\n")
 
-
-# Compute pooled statistics for one spec and one ap_group.
-# Returns a named list; n_funds = 0 if group not in spec.
-pool_stats <- function(spec, group_filter) {
-  dat <- spec$alpha_full %>% filter(ap_group == group_filter)
-  if (nrow(dat) == 0L)
-    return(list(n_funds=0L, n_months=NA_integer_,
-                ew_gross=NA_real_, vw_gross=NA_real_,
-                ew_net=NA_real_,   vw_net=NA_real_))
+# Extract one group's row from a spec's port_alpha data frame.
+# alpha values in port_alpha are stored in annualised decimal form (×12);
+# convert to percent (×100) for display.
+get_port_row <- function(spec, group) {
+  r <- spec$port_alpha %>% filter(Group == group)
+  if (nrow(r) == 0L)
+    return(list(n_funds=0L, t_months=NA_integer_,
+                ew_gross=NA_real_, t_ew_gross=NA_real_,
+                vw_gross=NA_real_, t_vw_gross=NA_real_,
+                ew_net  =NA_real_, t_ew_net  =NA_real_,
+                vw_net  =NA_real_, t_vw_net  =NA_real_,
+                r2_adj_ew=NA_real_))
   list(
-    n_funds  = nrow(dat),
-    n_months = max(dat$n_obs, na.rm = TRUE),
-    ew_gross = mean(dat$alpha_ann,     na.rm = TRUE) * 100,
-    vw_gross = wm(dat$alpha_ann,     dat$mean_tna)  * 100,
-    ew_net   = mean(dat$alpha_net_ann, na.rm = TRUE) * 100,
-    vw_net   = wm(dat$alpha_net_ann, dat$mean_tna)  * 100
+    n_funds    = as.integer(r$n_funds[1]),
+    t_months   = as.integer(r$t_months[1]),
+    ew_gross   = as.numeric(r$alpha_ew_gross[1]) * 100,
+    t_ew_gross = as.numeric(r$t_ew_gross[1]),
+    vw_gross   = as.numeric(r$alpha_vw_gross[1]) * 100,
+    t_vw_gross = as.numeric(r$t_vw_gross[1]),
+    ew_net     = as.numeric(r$alpha_ew_net[1])   * 100,
+    t_ew_net   = as.numeric(r$t_ew_net[1]),
+    vw_net     = as.numeric(r$alpha_vw_net[1])   * 100,
+    t_vw_net   = as.numeric(r$t_vw_net[1]),
+    r2_adj_ew  = as.numeric(r$r2_adj_ew[1])
   )
 }
 
-# =============================================================================
-# 3. TABLE E.1:  POOLED ALPHA COMPARISON ACROSS FACTOR MODELS
-#    v1.1: Active and Passive shown as separate rows per spec. Model label
-#    on first row, blank on second. 8 columns: model, group, N, Tmax, EW/VW
-#    gross, EW/VW net.
-# =============================================================================
-cat("\n=== Table E.1: Pooled Alpha Comparison ===\n")
+# Build a two-row block (alpha row + t-stat row) for one group × one spec.
+make_e1_block <- function(model_label, group_label, st) {
+  n_str <- if (st$n_funds == 0L || is.na(st$n_funds)) "--"
+            else formatC(st$n_funds, format = "d", big.mark = ",")
+  t_str <- if (is.na(st$t_months)) "--"
+            else formatC(as.integer(st$t_months), format = "d")
 
-# Build one row; model_label blank on second row of each spec pair.
-make_e1_row <- function(model_label, group_label, st) {
-  n_str <- if (st$n_funds == 0L) "--"
-  else formatC(st$n_funds, format = "d", big.mark = ",")
-  t_str <- if (is.na(st$n_months)) "--"
-  else formatC(as.integer(st$n_months), format = "d")
-  paste0(
-    model_label, " & ",
-    group_label, " & ",
-    n_str,       " & ",
-    t_str,       " & ",
-    fmt3(st$ew_gross), " & ",
-    fmt3(st$vw_gross), " & ",
-    fmt3(st$ew_net),   " & ",
-    fmt3(st$vw_net),   " \\\\"
+  ew_g <- add_stars(fmt3(st$ew_gross), st$t_ew_gross)
+  vw_g <- add_stars(fmt3(st$vw_gross), st$t_vw_gross)
+  ew_n <- add_stars(fmt3(st$ew_net),   st$t_ew_net)
+  vw_n <- add_stars(fmt3(st$vw_net),   st$t_vw_net)
+  r2   <- fmt3(st$r2_adj_ew)
+
+  alpha_row <- paste0(
+    model_label, " & ", group_label, " & ",
+    n_str, " & ", t_str, " & ",
+    ew_g, " & ", vw_g, " & ",
+    ew_n, " & ", vw_n, " & ",
+    r2, " \\\\"
   )
+  # t-stat row: model/group/N/T cells blank; R² cell blank.
+  t_row <- paste0(
+    "t(coef) &  &  &  & ",
+    "(", fmt2(st$t_ew_gross), ") & ",
+    "(", fmt2(st$t_vw_gross), ") & ",
+    "(", fmt2(st$t_ew_net),   ") & ",
+    "(", fmt2(st$t_vw_net),   ") & ",
+    " \\\\"
+  )
+  c(alpha_row, t_row)
 }
 
 e1_rows <- c(
-  # Carhart
-  make_e1_row("Carhart 4-Factor", "Active",  pool_stats(car, "Active")),
-  make_e1_row("",                 "Passive", pool_stats(car, "Passive")),
+  make_e1_block("Carhart 4-Factor", "Active",  get_port_row(car, "Active")),
+  make_e1_block("",                 "Passive", get_port_row(car, "Passive")),
   "\\addlinespace",
-  # FF6
-  make_e1_row("FF 6-Factor",      "Active",  pool_stats(ff6, "Active")),
-  make_e1_row("",                 "Passive", pool_stats(ff6, "Passive")),
+  make_e1_block("FF 6-Factor",      "Active",  get_port_row(ff6, "Active")),
+  make_e1_block("",                 "Passive", get_port_row(ff6, "Passive")),
   "\\addlinespace",
-  # C5
-  make_e1_row("Carhart + PSL",    "Active",  pool_stats(c5,  "Active")),
-  make_e1_row("",                 "Passive", pool_stats(c5,  "Passive"))
+  make_e1_block("Carhart + PSL",    "Active",  get_port_row(c5,  "Active")),
+  make_e1_block("",                 "Passive", get_port_row(c5,  "Passive"))
 )
 
 e1_tex <- c(
-  "\\begin{table}[H]",
+  "\\begin{table}[!htbp]",
   "\\centering",
-  "\\caption{Pooled Alpha Comparison Across Factor Models (\\%, Annualised)\\label{tab:alpha_comparison_robust}}",
-  "\\begin{threeparttable}",
-  "\\begin{tabular}{llrrrrrr}",
+  "\\sbox{\\tabletempbox}{%",
+  "\\footnotesize",
+  "\\begin{tabular}{llrrrrrrrrr}",
   "\\toprule",
-  " & & & & \\multicolumn{2}{c}{Gross Alpha} & \\multicolumn{2}{c}{Net Alpha} \\\\",
+  " & & & & \\multicolumn{2}{c}{Gross Alpha} & \\multicolumn{2}{c}{Net Alpha} & \\\\",
   "\\cmidrule(lr){5-6} \\cmidrule(lr){7-8}",
-  "Model & Group & $N$ & $T_{\\max}$ & EW & VW & EW & VW \\\\",
+  "Model & Group & $N$ & $T$ & EW & VW & EW & VW & $\\bar{R}^2$ \\\\",
   "\\midrule",
   e1_rows,
   "\\bottomrule",
-  "\\end{tabular}",
-  "\\begin{tablenotes}",
-  "\\footnotesize",
+  "\\end{tabular}%",
+  "}",
+  "\\setlength{\\tabletempwidth}{\\wd\\tabletempbox}",
+  "\\ifdim\\tabletempwidth>\\linewidth\\setlength{\\tabletempwidth}{\\linewidth}\\fi",
+  "\\begin{minipage}{\\tabletempwidth}",
+  "\\captionsetup{width=\\linewidth}",
+  "\\caption{\\label{tab:alpha_comparison_robust}Aggregate Portfolio Alpha Comparison Across Factor Models (\\%, Annualised)}",
+  "\\ifdim\\wd\\tabletempbox>\\linewidth",
+  "  \\resizebox{\\linewidth}{!}{\\usebox{\\tabletempbox}}",
+  "\\else",
+  "  \\usebox{\\tabletempbox}",
+  "\\fi",
+  "\\par\\medskip",
+  "\\begin{singlespace}\\footnotesize\\noindent",
   paste0(
-    "\\item Pooled annualised alpha (\\%) for active and passive funds under ",
-    "three factor specifications. \\textit{Carhart 4-Factor}: MKT-RF, SMB, ",
-    "HML, MOM (\\citealt{Carhart1997}; main text baseline). \\textit{FF 6-Factor}: ",
-    "MKT-RF, SMB, HML, RMW, CMA, MOM (\\citealt{FamaFrench2015} five-factor ",
-    "model plus Carhart momentum). \\textit{Carhart + PSL}: Carhart four-factor ",
-    "augmented with the \\textcite{PastorStambaugh2003} traded liquidity factor. ",
-    "EW: equal-weighted cross-sectional mean of per-fund alphas. ",
-    "VW: value-weighted cross-sectional mean using each fund's time-series ",
-    "mean TNA as the weight. ",
+    "Annualised alpha (\\%) from regressing the monthly aggregate portfolio ",
+    "return of each group on the specified factor model, following ",
+    "\\textcite{FamaFrench2010}. ",
+    "EW: equal-weighted portfolio ($1/N_t$ weight per fund per month). ",
+    "VW: value-weighted portfolio with lagged TNA weights ",
+    "$w_{i,t-1} = \\text{TNA}_{i,t-1}/\\sum_j \\text{TNA}_{j,t-1}$. ",
     "Net returns are gross returns less one-twelfth of the static annual ",
     "expense ratio each month, following \\textcite{Carhart1997} and ",
     "\\textcite{Wermers2000}. ",
-    "$N$: funds with at least 24 monthly observations; ",
-    "$T_{\\max}$: maximum number of monthly observations per fund. ",
-    "SMB is held constant across specifications at the \\textcite{FamaFrench1993} ",
-    "construction (single $2\\times3$ size--BM sort); the two SMB definitions ",
-    "correlate above 0.97 over the sample window. ",
-    "Sample: ", SAMPLE_LABEL_MAIN, " for Carhart and FF 6-Factor; ",
-    SAMPLE_LABEL_C5, " for Carhart + PSL (constrained by the December 2024 ",
-    "Pastor liquidity data release)."
+    "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; ",
+    "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\%. ",
+    "$\\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. ",
+    "$N$: unique funds contributing to the portfolio; ",
+    "$T$: monthly observations in the regression. ",
+    "\\textit{Carhart 4-Factor}: MKT-RF, SMB, HML, MOM ",
+    "(\\citealt{Carhart1997}; main-text baseline). ",
+    "\\textit{FF 6-Factor}: MKT-RF, SMB, HML, RMW, CMA, MOM ",
+    "(\\citealt{FamaFrench2015} five-factor model plus momentum). ",
+    "\\textit{Carhart + PSL}: Carhart four-factor augmented with the ",
+    "\\textcite{PastorStambaugh2003} traded liquidity factor. ",
+    "SMB is held constant at the \\textcite{FamaFrench1993} construction ",
+    "(single $2\\times3$ size--BM sort) across all specifications. ",
+    "Carhart and FF 6-Factor: Dec 1994--Feb 2026. ",
+    "Carhart + PSL: Dec 1994--Dec 2024 (constrained by Pastor liquidity data release). ",
+    "Sample: Incubation-corrected panel (\\citealt{Evans2010}), no date cap; ",
+    "performance-comparison subsample per flagged\\_funds.xlsx."
   ),
-  "\\end{tablenotes}",
-  "\\end{threeparttable}",
+  "\\end{singlespace}",
+  "\\end{minipage}",
   "\\end{table}"
 )
-e1_tex <- move_note_after_table(e1_tex)  # PHASE B: move note outside float
+
+# Fix the tabular spec: count columns in header row.
+# Model & Group & N & T & EW & VW & EW & VW & R2 = 9 columns = ll rrr rrr r = llrrrrrrr
+e1_tex[grep("begin\\{tabular\\}", e1_tex)] <- "\\begin{tabular}{llrrrrrrr}"
 write_tex(e1_tex, "table_alpha_comparison_robust.tex")
 
 # =============================================================================
-# 4. TABLE E.2:  BOOTSTRAP PERCENTILE COMPARISON
+# 4. TABLE I.2:  BOOTSTRAP PERCENTILE COMPARISON
 # =============================================================================
-cat("\n=== Table E.2: Bootstrap Percentile Comparison ===\n")
+cat("\n=== Table I.2: Bootstrap Percentile Comparison ===\n")
 
-# Filter each bootstrap summary to the selected percentiles and order.
-bt_car <- car$boot_summary %>% filter(percentile %in% PERCENTILES_TO_SHOW) %>%
-  arrange(percentile)
-bt_ff6 <- ff6$boot_summary %>% filter(percentile %in% PERCENTILES_TO_SHOW) %>%
-  arrange(percentile)
-bt_c5  <- c5$boot_summary  %>% filter(percentile %in% PERCENTILES_TO_SHOW) %>%
-  arrange(percentile)
+n_active_boot <- tryCatch(as.integer(car$bsw_meta$n_active[1]),
+                          error = function(e) NA_integer_)
+n_active_str  <- if (is.na(n_active_boot)) {
+  "$N$"
+} else {
+  paste0("$N = ", formatC(n_active_boot, format="d", big.mark=","), "$")
+}
+
+bt_car <- car$boot_summary %>% filter(percentile %in% PERCENTILES_TO_SHOW) %>% arrange(percentile)
+bt_ff6 <- ff6$boot_summary %>% filter(percentile %in% PERCENTILES_TO_SHOW) %>% arrange(percentile)
+bt_c5  <- c5$boot_summary  %>% filter(percentile %in% PERCENTILES_TO_SHOW) %>% arrange(percentile)
 
 stopifnot(identical(bt_car$percentile, bt_ff6$percentile),
           identical(bt_car$percentile, bt_c5$percentile))
 
 make_e2_row <- function(i) {
   paste0(
-    formatC(bt_car$percentile[i], width = 2, flag = " "),  " & ",
-    fmt3(bt_car$t_alpha_actual[i]),                        " & ",
-    fmt3(bt_ff6$t_alpha_actual[i]),                        " & ",
-    fmt3(bt_c5$t_alpha_actual[i]),                         " & ",
-    fmt_prob(bt_car$pct_runs_below[i]),                    " & ",
-    fmt_prob(bt_ff6$pct_runs_below[i]),                    " & ",
-    fmt_prob(bt_c5$pct_runs_below[i]),                     " \\\\"
+    formatC(bt_car$percentile[i], width = 2, flag = " "), " & ",
+    fmt3(bt_car$t_alpha_actual[i]),                       " & ",
+    fmt3(bt_ff6$t_alpha_actual[i]),                       " & ",
+    fmt3(bt_c5$t_alpha_actual[i]),                        " & ",
+    fmt_prob(bt_car$pct_runs_below[i]),                   " & ",
+    fmt_prob(bt_ff6$pct_runs_below[i]),                   " & ",
+    fmt_prob(bt_c5$pct_runs_below[i]),                    " \\\\"
   )
 }
 
 e2_rows <- vapply(seq_len(nrow(bt_car)), make_e2_row, character(1))
 
 e2_tex <- c(
-  "\\begin{table}[H]",
+  "\\begin{table}[!htbp]",
   "\\centering",
-  "\\caption{Bootstrap Percentile Comparison Across Factor Models\\label{tab:bootstrap_comparison_robust}}",
-  "\\begin{threeparttable}",
+  "\\sbox{\\tabletempbox}{%",
+  "\\footnotesize",
   "\\begin{tabular}{rrrrrrr}",
   "\\toprule",
   " & \\multicolumn{3}{c}{Actual $t(\\hat{\\alpha})$} & \\multicolumn{3}{c}{Prob.\\ Luck} \\\\",
@@ -326,53 +303,60 @@ e2_tex <- c(
   "\\midrule",
   e2_rows,
   "\\bottomrule",
-  "\\end{tabular}",
-  "\\begin{tablenotes}",
-  "\\footnotesize",
+  "\\end{tabular}%",
+  "}",
+  "\\setlength{\\tabletempwidth}{\\wd\\tabletempbox}",
+  "\\ifdim\\tabletempwidth>\\linewidth\\setlength{\\tabletempwidth}{\\linewidth}\\fi",
+  "\\begin{minipage}{\\tabletempwidth}",
+  "\\captionsetup{width=\\linewidth}",
+  "\\caption{\\label{tab:bootstrap_comparison_robust}Bootstrap Percentile Comparison Across Factor Models}",
+  "\\ifdim\\wd\\tabletempbox>\\linewidth",
+  "  \\resizebox{\\linewidth}{!}{\\usebox{\\tabletempbox}}",
+  "\\else",
+  "  \\usebox{\\tabletempbox}",
+  "\\fi",
+  "\\par\\medskip",
+  "\\begin{singlespace}\\footnotesize\\noindent",
   paste0(
-    "\\item Percentiles of the empirical cross-sectional distribution of ",
-    "Newey--West $t(\\hat{\\alpha})$ for actively managed funds (``Actual''), ",
-    "paired with Prob.\\ Luck: the fraction of the $B = 10{,}000$ ",
-    "\\textcite{FamaFrench2010} bootstrap iterations in which the simulated ",
-    "percentile falls below the actual value. ",
-    "Values below 5\\% at lower percentiles indicate underperformance ",
-    "inconsistent with the zero-alpha null; values above 95\\% at upper ",
-    "percentiles indicate outperformance inconsistent with luck. ",
-    "Entries of 0.0% at lower percentiles indicate that zero out ",
-    "of $B = 10{,}000$ bootstrap iterations produced a simulated $t$-statistic ",
-    "as extreme as the actual value. This is the strongest possible bootstrap ",
-    "statement: actual left-tail performance exceeds the worst-luck scenario ",
-    "across all simulated samples. Entries shown as $<$0.1\\% indicate ",
-    "between 0 and 5 iterations out of $B = 10{,}000$ (i.e.\\ Prob.\\ Luck ",
-    "$\\in (0, 0.05)$\\%). Bootstrap methodology is identical across ",
-    "specifications: calendar months resampled with replacement, ",
-    "factor model re-estimated on zero-alpha null series, Newey--West HAC ",
-    "standard errors (6-month lag) applied symmetrically to actual and ",
-    "simulated $t$-statistics following the symmetry requirement of ",
-    "\\textcite{FamaFrench2010}. ",
+    "Percentiles of the empirical $t(\\hat{\\alpha})$ distribution across ",
+    "actively managed funds (``Actual''), paired with Prob.\\ Luck: the ",
+    "fraction of $B = 10{,}000$ \\textcite{FamaFrench2010} bootstrap ",
+    "iterations in which the simulated percentile falls below the actual value. ",
+    "Bootstrap procedure: for each fund, estimated monthly alpha is subtracted ",
+    "from the excess return series to construct a zero-alpha null; calendar ",
+    "months are then resampled with replacement, preserving cross-sectional ",
+    "factor return dependence; the factor model is re-estimated on each ",
+    "resampled series. Newey-West HAC standard errors (6-month lag) are ",
+    "applied symmetrically to actual and simulated $t$-statistics, following ",
+    "the symmetry requirement of \\textcite{FamaFrench2010}. ",
+    "Values of Prob.\\ Luck below 5\\% at lower percentiles indicate ",
+    "underperformance inconsistent with the zero-alpha null. ",
+    "Entries of 0.0\\% indicate zero out of $B = 10{,}000$ iterations ",
+    "produced a simulated $t$-statistic as extreme as the actual value; ",
+    "$<$0.1\\% indicates between 1 and 5 iterations. ",
     "\\textit{Carhart}: MKT-RF, SMB, HML, MOM. ",
     "\\textit{FF6}: MKT-RF, SMB, HML, RMW, CMA, MOM. ",
-    "\\textit{C+PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded ",
-    "liquidity. Sample: ", SAMPLE_LABEL_MAIN, " for Carhart and FF6; ",
-    SAMPLE_LABEL_C5, " for C+PSL."
+    "\\textit{C+PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded liquidity. ",
+    "Sample: actively managed funds (", n_active_str, "), ",
+    "Incubation-corrected panel (\\citealt{Evans2010}), no date cap; ",
+    "performance-comparison subsample per flagged\\_funds.xlsx; ",
+    "minimum 24 monthly observations. ",
+    "Full sample window for Carhart and FF6; Dec 1994--Dec 2024 for C+PSL."
   ),
-  "\\end{tablenotes}",
-  "\\end{threeparttable}",
+  "\\end{singlespace}",
+  "\\end{minipage}",
   "\\end{table}"
 )
-e2_tex <- move_note_after_table(e2_tex)  # PHASE B: move note outside float
 write_tex(e2_tex, "table_bootstrap_comparison_robust.tex")
 
 # =============================================================================
-# 5. TABLE E.3:  BSW DECOMPOSITION COMPARISON AT GAMMA* = 0.20
+# 5. TABLE I.3:  BSW DECOMPOSITION COMPARISON AT GAMMA* = 0.20
 # =============================================================================
-cat("\n=== Table E.3: BSW Decomposition Comparison ===\n")
+cat("\n=== Table I.3: BSW Decomposition Comparison ===\n")
 
-# Extract the gamma* = 20 row from each spec's BSW decomposition.
 get_bsw_row <- function(spec, gamma_val = GAMMA_STAR) {
   row <- spec$bsw_df %>% filter(gamma == gamma_val)
-  if (nrow(row) == 0L) stop(sprintf("gamma = %s not found in %s BSW decomposition",
-                                    gamma_val, spec$label))
+  if (nrow(row) == 0L) stop(sprintf("gamma=%s not found in %s", gamma_val, spec$label))
   list(
     pi0       = as.numeric(spec$bsw_meta$pi0_pct[1]),
     S_neg     = as.numeric(row$S_neg_pct[1]),
@@ -386,107 +370,77 @@ get_bsw_row <- function(spec, gamma_val = GAMMA_STAR) {
 br_car <- get_bsw_row(car)
 br_ff6 <- get_bsw_row(ff6)
 br_c5  <- get_bsw_row(c5)
+pi0_car_str <- paste0(fmt1(br_car$pi0), "\\%")
 
 make_e3_row <- function(label, br) {
-  paste0(
-    label,               " & ",
-    fmt1(br$pi0),        "\\% & ",
-    fmt1(br$S_neg),      "\\% & ",
-    fmt1(br$S_pos),      "\\% & ",
-    fmt1(br$F_luck),     "\\% & ",
-    fmt1(br$T_unskill),  "\\% & ",
-    fmt1(br$T_skill),    "\\% \\\\"
-  )
+  paste0(label, " & ", fmt1(br$pi0), "\\% & ", fmt1(br$S_neg), "\\% & ",
+         fmt1(br$S_pos), "\\% & ", fmt1(br$F_luck), "\\% & ",
+         fmt1(br$T_unskill), "\\% & ", fmt1(br$T_skill), "\\% \\\\")
 }
 
-e3_rows <- c(
-  make_e3_row(car$label, br_car),
-  make_e3_row(ff6$label, br_ff6),
-  make_e3_row(c5$label,  br_c5)
-)
+e3_rows <- c(make_e3_row(car$label, br_car),
+             make_e3_row(ff6$label, br_ff6),
+             make_e3_row(c5$label,  br_c5))
 
 e3_tex <- c(
-  "\\begin{table}[H]",
+  "\\begin{table}[!htbp]",
   "\\centering",
-  "\\caption{BSW (2010) Decomposition Comparison at $\\gamma^* = 0.20$\\label{tab:bsw_comparison_robust}}",
-  "\\begin{threeparttable}",
+  "\\sbox{\\tabletempbox}{%",
+  "\\footnotesize",
   "\\begin{tabular}{lrrrrrr}",
   "\\toprule",
   "Model & $\\hat{\\pi}_0$ & $S^-_{\\gamma^*}$ & $S^+_{\\gamma^*}$ & $F_{\\gamma^*}$ & $T^-_{\\gamma^*}$ & $T^+_{\\gamma^*}$ \\\\",
   "\\midrule",
   e3_rows,
   "\\bottomrule",
-  "\\end{tabular}",
-  "\\begin{tablenotes}",
-  "\\footnotesize",
+  "\\end{tabular}%",
+  "}",
+  "\\setlength{\\tabletempwidth}{\\wd\\tabletempbox}",
+  "\\ifdim\\tabletempwidth>\\linewidth\\setlength{\\tabletempwidth}{\\linewidth}\\fi",
+  "\\begin{minipage}{\\tabletempwidth}",
+  "\\captionsetup{width=\\linewidth}",
+  "\\caption{\\label{tab:bsw_comparison_robust}BSW (2010) Decomposition Comparison at $\\gamma^* = 0.20$}",
+  "\\ifdim\\wd\\tabletempbox>\\linewidth",
+  "  \\resizebox{\\linewidth}{!}{\\usebox{\\tabletempbox}}",
+  "\\else",
+  "  \\usebox{\\tabletempbox}",
+  "\\fi",
+  "\\par\\medskip",
+  "\\begin{singlespace}\\footnotesize\\noindent",
   paste0(
-    "\\item Four-way decomposition of active funds into zero-alpha, genuinely ",
-    "unskilled, and genuinely skilled populations at significance threshold ",
-    "$\\gamma^* = 0.20$, following \\textcite{BarrasScailletWermers2010}. ",
-    "$\\hat{\\pi}_0$: \\textcite{Storey2002} estimator of the proportion of ",
-    "zero-alpha funds at tuning parameter $\\lambda = 0.5$. ",
-    "$S^-_{\\gamma^*}$ ($S^+_{\\gamma^*}$): observed fraction of active funds ",
-    "with significantly negative (positive) Newey--West $t(\\hat{\\alpha})$ at ",
-    "two-sided significance level $\\gamma^*$. ",
-    "$F_{\\gamma^*} = \\hat{\\pi}_0 \\cdot \\gamma^*/2$: expected proportion ",
-    "of false discoveries per tail. ",
-    "$T^-_{\\gamma^*} = S^-_{\\gamma^*} - F_{\\gamma^*}$: genuinely unskilled ",
-    "funds. ",
-    "$T^+_{\\gamma^*} = S^+_{\\gamma^*} - F_{\\gamma^*}$: genuinely skilled ",
-    "funds; negative values indicate right-tail significance does not exceed ",
-    "the false-discovery rate at this threshold. ",
-    "\\textit{Carhart 4-Factor}: \\citealt{Carhart1997} main-text baseline. ",
-    "\\textit{FF 6-Factor}: \\citealt{FamaFrench2015} five-factor plus ",
-    "momentum. ",
-    "\\textit{Carhart + PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded ",
-    "liquidity. Sample: ", SAMPLE_LABEL_MAIN, " for Carhart and FF 6-Factor; ",
-    SAMPLE_LABEL_C5, " for Carhart + PSL."
+    "\\textcite{BarrasScailletWermers2010} four-way decomposition of active funds ",
+    "at significance threshold $\\gamma^* = 0.20$. ",
+    "$\\hat{\\pi}_0$: \\textcite{Storey2002} estimator of the zero-alpha fund ",
+    "proportion at tuning parameter $\\lambda = 0.5$, derived from Newey-West ",
+    "$t(\\hat{\\alpha})$ p-values on full-period per-fund alphas. ",
+    "$S^-_{\\gamma^*}$ ($S^+_{\\gamma^*}$): observed fraction of active funds with ",
+    "significantly negative (positive) $t(\\hat{\\alpha})$ at two-sided level ",
+    "$\\gamma^*$; critical values from $N(0,1)$. ",
+    "$F_{\\gamma^*} = \\hat{\\pi}_0 \\cdot \\gamma^*/2$: expected false-discovery ",
+    "proportion per tail. ",
+    "$T^-_{\\gamma^*} = S^-_{\\gamma^*} - F_{\\gamma^*}$: genuinely unskilled funds. ",
+    "$T^+_{\\gamma^*} = S^+_{\\gamma^*} - F_{\\gamma^*}$: genuinely skilled funds; ",
+    "negative entries indicate right-tail significance does not exceed the ",
+    "false-discovery rate. ",
+    "All quantities are percentages of the active-fund universe. ",
+    "\\textit{Carhart 4-Factor}: \\citealt{Carhart1997} main-text baseline ",
+    "($\\hat{\\pi}_0 = ", pi0_car_str, "$). ",
+    "\\textit{FF 6-Factor}: \\citealt{FamaFrench2015} five-factor plus momentum. ",
+    "\\textit{Carhart + PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded liquidity. ",
+    "Sample: Incubation-corrected panel (\\citealt{Evans2010}), no date cap; ",
+    "performance-comparison subsample per flagged\\_funds.xlsx; Passive and Unknown funds excluded."
   ),
-  "\\end{tablenotes}",
-  "\\end{threeparttable}",
+  "\\end{singlespace}",
+  "\\end{minipage}",
   "\\end{table}"
 )
-e3_tex <- move_note_after_table(e3_tex)  # PHASE B: move note outside float
 write_tex(e3_tex, "table_bsw_comparison_robust.tex")
 
 # =============================================================================
-# 6. SUMMARY + BIBLIOGRAPHY NOTE
+# 6. SUMMARY
 # =============================================================================
-cat("\n=== ALL APPENDIX E TABLES BUILT ===\n")
+cat("\n=== ALL APPENDIX I TABLES BUILT ===\n")
 cat("Files written to:", normalizePath(OUT_DIR), "\n")
-cat("  table_alpha_comparison_robust.tex       (Table E.1)\n")
-cat("  table_bootstrap_comparison_robust.tex   (Table E.2)\n")
-cat("  table_bsw_comparison_robust.tex         (Table E.3)\n")
-cat("\n=== BIBLIOGRAPHY ENTRIES REQUIRED ===\n")
-cat("Add the following to dissertation.bib if not already present:\n")
-cat("
-@article{FamaFrench2015,
-  author    = {Fama, Eugene F. and French, Kenneth R.},
-  title     = {A Five-Factor Asset Pricing Model},
-  journal   = {Journal of Financial Economics},
-  year      = {2015},
-  volume    = {116},
-  number    = {1},
-  pages     = {1--22}
-}
-
-@article{PastorStambaugh2003,
-  author    = {P{\\'a}stor, {\\v L}ubo{\\v s} and Stambaugh, Robert F.},
-  title     = {Liquidity Risk and Expected Stock Returns},
-  journal   = {Journal of Political Economy},
-  year      = {2003},
-  volume    = {111},
-  number    = {3},
-  pages     = {642--685}
-}
-
-@article{FamaFrench1993,
-  author    = {Fama, Eugene F. and French, Kenneth R.},
-  title     = {Common Risk Factors in the Returns on Stocks and Bonds},
-  journal   = {Journal of Financial Economics},
-  year      = {1993},
-  volume    = {33},
-  number    = {1},
-  pages     = {3--56}
-}
-")
+cat("  table_alpha_comparison_robust.tex       (Table I.1)\n")
+cat("  table_bootstrap_comparison_robust.tex   (Table I.2)\n")
+cat("  table_bsw_comparison_robust.tex         (Table I.3)\n")
