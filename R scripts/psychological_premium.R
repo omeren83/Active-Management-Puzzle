@@ -95,7 +95,6 @@ OUTPUT_TEX <- file.path(WORKING_DIR, "table_psychological_premium.tex")
 DO_BOOTSTRAP <- TRUE
 B_BOOT       <- 1000L
 SET_SEED     <- 20260502L
-STAR_THR     <- c(`***` = 2.576, `**` = 1.960, `*` = 1.645)
 
 # --- 1. Pre-flight ----------------------------------------------------------
 if (!exists("panel_reg")) {
@@ -203,9 +202,12 @@ fmt_p     <- function(p) {
   if (!is.finite(p)) return("--")
   if (p < 0.001) "$<\\!0.001$" else formatC(p, format = "f", digits = 3)
 }
-star_for  <- function(t_stat) {
-  if (!is.finite(t_stat)) return("")
-  for (s in names(STAR_THR)) if (abs(t_stat) >= STAR_THR[[s]]) return(s)
+# Stars keyed to the reported 1-sided p (directional prediction: Diff < 0)
+star_for_p <- function(p) {
+  if (!is.finite(p)) return("")
+  if (p < 0.01) return("***")
+  if (p < 0.05) return("**")
+  if (p < 0.10) return("*")
   ""
 }
 
@@ -380,7 +382,7 @@ for (lname in names(all_sps)) {
       fmt_pse(r$SP_low,  r$SE_low),
       fmt_pse(r$SP_high, r$SE_high),
       fmt_pse(r$Diff,    r$SE_diff),
-      paste0(fmt_p(r$p_diff), star_for(r$z_diff))
+      paste0(fmt_p(r$p_diff), star_for_p(r$p_diff))
     )
   }
 }
@@ -392,6 +394,13 @@ colnames(ppf_df) <- c("Lottery", "Segment",
                       "$p$ (1-sided)")
 rownames(ppf_df) <- NULL
 
+# Worked bp example (MAX12, R_MID) computed from current estimates
+BPS_PER_RANK <- 269
+mid_lo <- abs(sp_max12$MID$SP_low)
+mid_hi <- abs(sp_max12$MID$SP_high)
+bps_lo <- as.integer(round(mid_lo * BPS_PER_RANK))
+bps_hi <- as.integer(round(mid_hi * BPS_PER_RANK))
+
 caption <- "Psychological Premium (Shadow Price) Estimates"
 fn <- paste0(
   "Each row is computed from a separate joint regression of the form ",
@@ -402,7 +411,7 @@ fn <- paste0(
   "the lottery measure. Standard errors via the delta method using the ",
   "joint coefficient covariance from the underlying regression; clustered ",
   "two-way on Ticker and yearmo. ",
-  "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "Stars refer to the 1-sided $p$: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "\\\\smallskip ",
   "\\\\textit{Conversion to alpha basis points.} To express the premium ",
   "in welfare-relevant units, the rank-to-alpha mapping is calibrated ",
@@ -411,12 +420,14 @@ fn <- paste0(
   "$Q5-Q1=2.150\\\\%$ p.a.). With a midpoint-to-midpoint rank distance of ",
   "$0.8$, this implies approximately 269 basis points of annual Carhart ",
   "alpha per rank-point. Applying this conversion at the middle rank ",
-  "segment, the MAX12 premium is approximately 13 basis points of annual ",
-  "alpha per standard deviation at low-sentiment regimes ",
-  "($|\\\\text{SP}_{\\\\text{low}}|\\\\times 269\\\\approx 0.049\\\\times 269$) ",
-  "and approximately 59 basis points per standard deviation at ",
-  "high-sentiment regimes ",
-  "($|\\\\text{SP}_{\\\\text{high}}|\\\\times 269\\\\approx 0.219\\\\times 269$). ",
+  sprintf(paste0(
+    "segment, the MAX12 premium is approximately %d basis points of annual ",
+    "alpha per standard deviation at low-sentiment regimes ",
+    "($|\\\\text{SP}_{\\\\text{low}}|\\\\times 269\\\\approx %.3f\\\\times 269$) ",
+    "and approximately %d basis points per standard deviation at ",
+    "high-sentiment regimes ",
+    "($|\\\\text{SP}_{\\\\text{high}}|\\\\times 269\\\\approx %.3f\\\\times 269$). "),
+    bps_lo, mid_lo, bps_hi, mid_hi),
   "The conversion uses Jegadeesh--Titman momentum sorts as the closest ",
   "available rank-alpha mapping in the dissertation; the ",
   "within-Lipper-category mapping that drives the H1--H4 panel ",
