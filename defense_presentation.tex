@@ -86,20 +86,21 @@
 \setlength{\tabcolsep}{6pt}
 \footnotesize
 \begin{tabular}{@{}cl@{\hspace{12pt}}cl}
-  \textbf{I}   & Motivation \& Research Question  &
-  \textbf{VIII}& H1: Sentiment-Convexity \\
-  \textbf{II}  & Data \& Sample Construction      &
-  \textbf{IX}  & H2: Disposition / Illusion of Control \\
-  \textbf{III} & Aggregate Performance            &
-  \textbf{X}   & H3: Lottery Demand \\
-  \textbf{IV}  & Bootstrap \& FDR Decomposition  &
-  \textbf{XI}  & H4: Fee Elasticity \\
-  \textbf{V}   & Structural Break \& Sub-Periods  &
-  \textbf{XII} & Psychological Premium Framework \\
-  \textbf{VI}  & Activeness \& Persistence        &
-  \textbf{XIII}& Discussion \& Synthesis \\
-  \textbf{VII} & Behavioral Framework             &
-  \textbf{XIV} & Conclusion \\
+  \textbf{I}    & Motivation \& Research Question  &
+  \textbf{IX}   & H1: Sentiment-Convexity \\
+  \textbf{II}   & Data \& Sample Construction      &
+  \textbf{X}    & H2: Disposition / Illusion of Control \\
+  \textbf{III}  & Aggregate Performance            &
+  \textbf{XI}   & H3: Lottery Demand \\
+  \textbf{IV}   & Bootstrap \& FDR Decomposition  &
+  \textbf{XII}  & H4: Fee Elasticity \\
+  \textbf{V}    & Factor Robustness                &
+  \textbf{XIII} & Psychological Premium Framework \\
+  \textbf{VI}   & Structural Break \& Sub-Periods  &
+  \textbf{XIV}  & Discussion \& Synthesis \\
+  \textbf{VII}  & Activeness \& Persistence        &
+  \textbf{XV}   & Conclusion \\
+  \textbf{VIII} & Behavioral Framework             & & \\
 \end{tabular}
 \end{frame}
 
@@ -158,7 +159,7 @@
         \textbf{Four channels tested here}
         \begin{itemize}\itemsep2pt
           \item \textbf{H1} Sentiment amplifies winner-chasing.
-          \item \textbf{H2} Margin pressure locks in losers.
+          \item \textbf{H2} Loss aversion locks in losers.
           \item \textbf{H3} Lottery appeal weakens exit discipline.
           \item \textbf{H4} Fee sensitivity relaxes under optimism.
         \end{itemize}
@@ -224,7 +225,7 @@
 % ============================================================
 \section{II.\ Data \& Sample Construction}
 
-\begin{frame}{Universe Construction}
+\begin{frame}{Universe Construction (Table 4.1)}
   \begin{columns}[T]
     \begin{column}{0.54\textwidth}
       \textbf{Bloomberg pull}
@@ -236,8 +237,8 @@
       \vspace{5pt}
       \textbf{LSEG Workspace}
       \begin{itemize}\itemsep3pt
-        \item Lipper category codes (22 US domestic equity categories).
-        \item Benchmark total-return series for tracking error calculation.
+        \item Lipper category codes.
+        \item Benchmark total-return series.
       \end{itemize}
     \end{column}
     \begin{column}{0.44\textwidth}
@@ -269,10 +270,11 @@
       \end{itemize}
       \vspace{5pt}
       \textbf{Incubation bias (Evans 2010)}\\
-      \footnotesize First 36 months of each fund's history dropped.\\[2pt]
-      \texttt{panel\_incubation}: no date cap.\\
-      \texttt{panel\_trimmed}: capped at 1995–2023
-      (H1–H4 behavioral regressions; sentiment series ends Dec 2023).
+      \begin{itemize}
+      \item Incubated funds outperform non-incubated ones 3.5\% p.a.\\[2pt]
+      \item Fewer than 5\% of incubated funds remain in incubation beyond 36 months\\[2pt]
+      \item First 36 months of each fund's history dropped.\\[2pt]
+      \end{itemize}
     \end{column}
     \begin{column}{0.47\textwidth}
       \textbf{Flagged exclusion ledger}
@@ -327,10 +329,10 @@
   \end{tikzpicture}
   \vspace{10pt}\\
 \footnotesize Break dates from Bai–Perron (1998, 2003) test on rolling Carhart gross alpha.
-  Regime-mean gross alphas (\%, per annum): P1 $+0.05$, P2 $+0.774$, P3 $-1.390$.
+  Regime-mean gross alphas (\%, per annum): P1 $+0.05$, P2 $+0.74$, P3 $-1.39$.
 \end{frame}
 
-\begin{frame}{Descriptive Statistics: Key Moments}
+\begin{frame}{Descriptive Statistics: Key Moments (Table 4.2)}
   \scriptsize
   \begin{tabular}{lrrrrrr}
     \toprule
@@ -372,12 +374,11 @@
     \item Time-series regression; alpha annualised ($\times 12$).
     \item \textbf{Newey–West HAC} standard errors (6-month lag) throughout.
     \item Portfolio-level estimation (EW and VW aggregate portfolio series).
-    \item Net returns: gross less $\text{ER}/12$ each month (Carhart 1997, Wermers 2000).
-    \item Symmetry requirement: bootstrap simulated $t$-stats use \emph{same} NW lag as actual.
+    \item Net returns: gross return less $\text{ER}/12$ each month.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Headline Result: Aggregate Alpha}
+\begin{frame}{Headline Result: Aggregate Alpha (Table 4.5)}
   \begin{columns}[c]
     \begin{column}{0.56\textwidth}
       \scriptsize
@@ -410,7 +411,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Rolling Alpha}
+\begin{frame}{Rolling Alpha (Figure 4.2)}
   \begin{columns}[c]
     \begin{column}{0.55\textwidth}
       \IfFileExists{tables/fig_rolling_alphas.png}{%
@@ -427,20 +428,6 @@
       \end{itemize}
     \end{column}
   \end{columns}
-\end{frame}
-
-\begin{frame}{Factor Robustness}
-  \begin{itemize}\itemsep5pt
-    \item Main results estimated under Carhart (1997) four-factor model.
-    \item \textbf{Appendix E} re-estimates under FF5 (Fama \& French 2015) and
-          Carhart + Pastor–Stambaugh (2003) liquidity factor.
-    \item Qualitative verdict \textbf{unchanged}: EW net alpha negative and significant;
-          VW net alpha negative but of smaller magnitude.
-    \item RMW and CMA absorb some dispersion but do not overturn the puzzle.
-    \item Factor model choice \emph{does not} alter H1–H4 identification:
-          behavioral channels are identified from flow--performance convexity,
-          not from the level of alpha.
-  \end{itemize}
 \end{frame}
 
 % ============================================================
@@ -465,7 +452,7 @@
 \begin{frame}{FF (2010) Bootstrap: Design}
   \textbf{Steps}
   \begin{enumerate}\itemsep3pt
-    \item Estimate $\hat{\alpha}_i$ for each fund; compute zero-alpha residuals
+    \item Estimate $\hat{\alpha}_i$ for each fund; compute zero-alpha returns
           $\tilde{r}_{i,t} = r_{i,t} - \hat{\alpha}_i$.
     \item Draw $B = 10{,}000$ bootstrap samples by resampling \emph{calendar months}
           (same months for all funds — preserves cross-section).
@@ -473,51 +460,121 @@
     \item Compare \emph{actual} cross-sectional $t$-percentiles to the simulated distribution.
   \end{enumerate}
   \vspace{6pt}
-  \textbf{Key design choice}: simulated $t$-stats use \textbf{same Newey–West lag} as actual
-  (apples-to-apples; was a confirmed bug in earlier versions, corrected in v2.5).
 \end{frame}
 
-\begin{frame}{Bootstrap Results \& FDR Decomposition}
+\begin{frame}{FF (2010) Bootstrap: Actual vs.\ Simulated Percentiles (Table 4.6)}
   \begin{columns}[T]
-    \begin{column}{0.44\textwidth}
-      \small\textbf{Bootstrap: Left tail (losers)}
-      \begin{itemize}\itemsep3pt
-        \item Bottom 1\textsuperscript{st} pctile actual $t \approx -3.52$
-              vs.\ simulated mean $\approx -2.37$.
-        \item \alert{Left-tail rejection}: genuine underperformers exist.
-      \end{itemize}
-      \vspace{4pt}
-      \small\textbf{Bootstrap: Right tail (winners)}
-      \begin{itemize}\itemsep3pt
-        \item Top 99\textsuperscript{th} pctile actual $t \approx 2.43$
-              vs.\ simulated mean $\approx 2.34$.
-        \item Consistent with zero skill at the top.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.54\textwidth}
-      \small\textbf{BSW decomposition at $\gamma = 20\pct$}
-      \vspace{4pt}\\
-      \footnotesize
-      \begin{tabular}{lrr}
+    \begin{column}{0.55\textwidth}
+      \scriptsize
+      \begin{tabular}{rrrcp{2.8cm}}
         \toprule
-        & Neg.\ tail & Pos.\ tail \\
+        Pctile & Actual $t(\hat{\alpha})$ & Sim.\ Mean & Prob.\ Luck & Interpretation \\
         \midrule
-        $\hat{\pi}_0$ (zero-alpha) & \multicolumn{2}{c}{$77.8\pct$ \;($N=1{,}815$)} \\
-        Observed $S_\gamma$        & 28.9\% & 5.8\% \\
-        False disc.\ $F_\gamma$    & \multicolumn{2}{c}{7.8\%} \\
-        \textbf{True proportion}   & $\hat{\pi}^-_A = \mathbf{21.1\pct}$ & $\hat{\pi}^+_A = \mathbf{-2.0\pct}$ \\
+        1  & $-3.619$ & $-2.064$ & $0.0\%$ & Worse than luck (sig.) \\
+        5  & $-2.684$ & $-1.370$ & $0.0\%$ & Worse than luck (sig.) \\
+        10 & $-2.184$ & $-1.053$ & $0.0\%$ & Worse than luck (sig.) \\
+        50 & $-0.606$ & $-0.015$ & $0.8\%$ & Indistinguishable from luck \\
+        90 & $+0.993$ & $+1.014$ & $50.1\%$ & Consistent with zero-skill \\
+        95 & $+1.362$ & $+1.326$ & $59.6\%$ & Consistent with zero-skill \\
+        99 & $+2.248$ & $+2.019$ & $80.9\%$ & Consistent with zero-skill \\
         \bottomrule
       \end{tabular}
-      \vspace{5pt}\\
-      \footnotesize $\hat{\pi}^+_A < 0$: skilled mass does \emph{not exceed} the false-discovery
-      rate. Storey estimator is conservative — upper-bound on skilled share.
-      \vspace{5pt}\\
-      \tiny\textit{Barras, Scaillet \& Wermers (2010, JF)}
+      \vspace{2pt}\\
+      \tiny $N=1{,}815$ active funds. Prob.\ Luck: fraction of bootstrap iterations
+      where simulated percentile falls below actual. Values $<5\%$ indicate
+      underperformance unlikely to be explained by luck alone.
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \footnotesize
+      \begin{itemize}\itemsep3pt
+        \item \textbf{Left tail}: actual $t$ at 1st–10th percentiles far more
+              negative than zero-skill benchmark — Prob.\ Luck $= 0.0\%$.
+              \alert{Genuine underperformers exist.}
+        \item \textbf{Median}: actual $t = -0.61$ vs.\ simulated $-0.02$ —
+              the typical fund underperforms even on a gross basis.
+        \item \textbf{Right tail}: actual $t$ at 90th–99th percentiles
+              indistinguishable from or below simulated —
+              \textbf{no evidence of genuine skill at the top}.
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Luck vs.\ Skill: CDF (Figure 3)}
+\begin{frame}{BSW (2010) Decomposition: Methodology}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \small\textbf{Step 1 — Estimate $\hat{\pi}_0$}\\[3pt]
+      Using Storey (2002) on Newey--West $p$-values:
+      \[
+        \hat{\pi}_0 = \frac{|\{p_i > \lambda\}|}{N(1-\lambda)}, \quad \lambda = 0.5
+      \]
+      \footnotesize Funds with $p_i > 0.5$ are unlikely to have non-zero true alpha;
+      their density provides a conservative upper bound on the zero-alpha mass.
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \small\textbf{Step 2 — Decompose tails}\\[3pt]
+      \footnotesize At significance level $\gamma$:
+      \begin{itemize}\itemsep2pt
+        \item $S^-_\gamma$, $S^+_\gamma$: observed fractions with sig.\ negative / positive $t(\hat{\alpha})$.
+        \item $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: false discoveries per tail.
+        \item $\hat{\pi}^-_A = S^-_\gamma - F_\gamma$: genuinely unskilled.
+        \item $\hat{\pi}^+_A = S^+_\gamma - F_\gamma$: genuinely skilled.
+      \end{itemize}
+      \vspace{3pt}
+      \footnotesize Reference row: $\gamma = 0.20$.\\
+      $\hat{\pi}^+_A < 0$: right-tail significance does not exceed false-discovery rate.
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{BSW (2010) Decomposition: Results (Table 4.8)}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \footnotesize
+      \renewcommand{\arraystretch}{1.3}
+      \begin{tabular}{lcc}
+        \toprule
+        & \textbf{Neg.\ tail} & \textbf{Pos.\ tail} \\
+        \midrule
+        $\hat{\pi}_0$ — zero-alpha funds
+          & \multicolumn{2}{c}{$\mathbf{77.8\%}$ \enspace ($N = 1{,}815$)} \\
+        \midrule
+        Observed $S_\gamma$
+          & $28.9\%$ & $5.8\%$ \\
+        False disc.\ $F_\gamma$
+          & $7.8\%$ & $7.8\%$ \\
+        \midrule
+        True proportion
+          & $\hat{\pi}^-_A = \mathbf{21.1\%}$
+          & $\hat{\pi}^+_A = \mathbf{-2.0\%}$ \\
+        \bottomrule
+      \end{tabular}
+      \renewcommand{\arraystretch}{1}
+      \vspace{4pt}\\
+      \tiny $\gamma = 0.20$. \textit{Barras, Scaillet \& Wermers (2010, JF)}
+    \end{column}
+    \begin{column}{0.51\textwidth}
+      \footnotesize
+      \begin{itemize}\itemsep4pt
+        \item \textbf{77.8\%} of funds carry zero true alpha — the majority
+              of the active fund industry generates no risk-adjusted return
+              in either direction.
+        \item \textbf{21.1\%} are genuinely unskilled: their negative alpha
+              exceeds what false discoveries alone would predict. These are
+              the funds persistently destroying value for investors.
+        \item $\hat{\pi}^+_A = -2.0\%$: the genuinely skilled mass does
+              \emph{not exceed} the false-discovery rate. The Storey
+              estimator is conservative, so this is an upper bound —
+              the true skilled share is zero or negligibly small.
+        \item Together with the bootstrap left-tail rejection, this paints
+              a consistent picture: \alert{the active management puzzle is
+              driven by a unskilled minority, not a skilled one.}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Luck vs.\ Skill: CDF (Figure 4.3)}
   \begin{columns}[T]
     \begin{column}{0.55\textwidth}
       \IfFileExists{tables/fig_luck_vs_skill_combined.png}{%
@@ -538,24 +595,103 @@
 \end{frame}
 
 % ============================================================
-%  PART V — STRUCTURAL BREAK & SUB-PERIODS
+%  PART V — FACTOR ROBUSTNESS
 % ============================================================
-\section{V.\ Structural Break \& Sub-Period Analysis}
+\section{V.\ Factor Robustness}
+
+\begin{frame}{V: Factor Robustness — Aggregate Alpha (Table I.1)}
+  \textbf{Does the puzzle survive alternative factor structures?}
+  \vspace{3pt}\\
+  \scriptsize
+  \begin{tabular}{llrccccc}
+    \toprule
+    & & & & \multicolumn{2}{c}{Gross $\alpha$ (\%)} & \multicolumn{2}{c}{Net $\alpha$ (\%)} \\
+    \cmidrule(lr){5-6}\cmidrule(lr){7-8}
+    Model & Group & $N$ & $T$ & EW & VW & EW & VW \\
+    \midrule
+    Carhart 4-Factor & Active  & 1,973 & 373 & $-0.288$ & $-0.189$ & $-1.361^{***}$ & $-0.900^{**}$ \\
+                     & Passive & 281   & 373 & $-0.291$ & $+0.156$ & $-0.814^{**}$  & $+0.023$ \\[2pt]
+    FF 6-Factor      & Active  & 1,973 & 373 & $-0.637$ & $-0.360$ & $-1.707^{***}$ & $-1.071^{***}$ \\
+                     & Passive & 281   & 373 & $-0.684^{**}$ & $-0.147$ & $-1.208^{***}$ & $-0.279$ \\[2pt]
+    Carhart + PSL    & Active  & 1,927 & 360 & $-0.252$ & $-0.229$ & $-1.327^{***}$ & $-0.945^{**}$ \\
+                     & Passive & 277   & 360 & $-0.253$ & $+0.199$ & $-0.780^{**}$  & $+0.063$ \\
+    \bottomrule
+  \end{tabular}
+  \vspace{4pt}
+  \normalsize
+  \begin{itemize}\itemsep1pt
+    \item \small EW net alpha significantly negative under all three models —
+          puzzle is \alert{not a Carhart artefact}.
+    \item \small FF6 \emph{strengthens} the result: Active VW net alpha
+          turns highly significant ($-0.90^{**} \to -1.07^{***}$) — RMW and CMA
+          absorb return variation that was masking underperformance.
+    \item \small Carhart + PSL closely tracks the four-factor baseline;
+          illiquidity premium is not driving the result.
+    \item \small BG rational equilibrium: already fragile at VW under Carhart;
+          rejected outright under FF6.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{V: Factor Robustness — BSW Decomposition (Table I.3)}
+  \small\textbf{Does the skill decomposition change under alternative factor structures?}
+  \vspace{4pt}\\
+  \begin{columns}[c]
+    \begin{column}{0.54\textwidth}
+      \scriptsize
+      \renewcommand{\arraystretch}{1.25}
+      \begin{tabular}{lcccccc}
+        \toprule
+        Model & $\hat{\pi}_0$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma$ \\
+        \midrule
+        Carhart 4-Factor & 77.6\% & 28.8\% & 5.8\% & 7.8\% & \textbf{21.0\%} & \textbf{$-$2.0\%} \\
+        FF 6-Factor      & 66.0\% & 34.8\% & 5.5\% & 6.6\% & \textbf{28.2\%} & \textbf{$-$1.1\%} \\
+        Carhart + PSL    & 76.4\% & 28.2\% & 6.5\% & 7.6\% & \textbf{20.6\%} & \textbf{$-$1.2\%} \\
+        \bottomrule
+      \end{tabular}
+      \renewcommand{\arraystretch}{1}
+      \vspace{3pt}\\
+      \tiny $\gamma^* = 0.20$. $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled.
+      $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled.
+      Negative $T^+_\gamma$ indicates right-tail significance does not
+      exceed the false-discovery rate.
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \footnotesize
+      \begin{itemize}\itemsep4pt
+        \item $T^+_\gamma < 0$ under all three models: \alert{no evidence of
+              genuine skill regardless of factor structure.}
+        \item FF6 is the most revealing: $\hat{\pi}_0$ drops sharply
+              (77.6\%→66.0\%) and $T^-_\gamma$ rises to 28.2\% — richer
+              factor structure exposes more genuinely unskilled funds that
+              Carhart alpha was masking.
+        \item Carhart + PSL closely tracks the four-factor baseline across
+              all three decomposition metrics.
+        \item \textbf{Verdict}: the active management puzzle strengthens
+              under FF6. More funds are unskilled; none are skilled.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================================
+%  PART VI — STRUCTURAL BREAK & SUB-PERIODS
+% ============================================================
+\section{VI.\ Structural Break \& Sub-Period Analysis}
 
 \begin{frame}{Bai–Perron Test: Setup \& BIC Solution}
   \begin{itemize}\itemsep5pt
-    \item Applied to the 12-month trailing mean of the monthly cross-sectional EW
-          rolling Carhart gross alpha series.
+\item Applied to the raw monthly cross-sectional EW mean of 
+      36-month rolling Carhart gross alpha (Active funds).
     \item \textbf{Bai \& Perron (1998, 2003)}: BIC-optimal number of breaks selected;
           confidence intervals via Newey–West HAC (Andrews 1991).
     \item BIC selects \textbf{5 breaks}, defining 6 regimes.
-    \item Minimum segment length: 36 months (BSW reliability constraint).
+    \item Minimum segment length: 36 months.
     \item \textbf{Adopted partition}: 3 regimes — Breaks 1–3 pooled into P1,
           Break 5 pooled into P3 (sub-60-month segments not reliable for FF/BSW inference).
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Structural Break Figure (Figure D.1)}
+\begin{frame}{Structural Breaks (Figure H.1)}
   \begin{columns}[T]
     \begin{column}{0.60\textwidth}
       \IfFileExists{tables/fig_breaktest.png}{%
@@ -568,166 +704,230 @@
         \toprule
         Break & Date & 95\% CI \\
         \midrule
-        1 & Dec 1999 & wide \\
-        2 & Dec 2002 & wide \\
+        1 & Dec 1999 & 10 months \\
+        2 & Dec 2002 & 6 months \\
         3 & Dec 2005 & 8 months \\
-        \textbf{4} & \textbf{Nov 2011} & \textbf{9 months} \\
+        \textbf{4} & \textbf{Sep 2011} & \textbf{9 months} \\
         5 & Jan 2023 & 31 months \\
         \bottomrule
       \end{tabular}
       \vspace{6pt}\\
       \textbf{Break 4} is the key structural event:\\
-      $+0.74\pct \to -1.20\pct$ (\textbf{194 bp shift}).\\
-      Tightest CI in the sample.\\
-      Not previously reported with this methodology.
+      $+0.74\pct \to -1.20\pct$ (194 bp shift).\\
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Sub-Period Performance \& Skill Decomposition}
-  \footnotesize
-  \begin{tabular}{lrrrrr}
+\begin{frame}{Sub-Period Performance \& Skill Decomposition (Table H.2)}
+  \scriptsize
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{lrrrrrrrr}
     \toprule
-    & \multicolumn{2}{c}{Active net $\alpha$ (\%, ann.)} & $\hat{\pi}_0$ & $\hat{\pi}^-_A$ & $\hat{\pi}^+_A$ \\
-    \cmidrule(l){2-3}
-    Period & EW & VW & & at $\gamma=20\pct$ & at $\gamma=20\pct$ \\
+    & \multicolumn{2}{c}{Gross $\alpha$ (\%)} & \multicolumn{2}{c}{Net $\alpha$ (\%)} & $\hat{\pi}_0$ & $\hat{\pi}^-_A$ & $\hat{\pi}^+_A$ \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Period & EW & VW & EW & VW & & \multicolumn{2}{c}{at $\gamma=20\%$} \\
     \midrule
-    P1: Jan 1995–Dec 2005 & $-1.34^{*}$ & $-0.93$ & 81.4\% & 10.8\% & $+3.3\%$ \\
-    P2: Jan 2006–Sep 2011 & $-0.67$    & $-0.85$ & 87.3\% & $3.1\%$ & $+8.4\%$ \\
-    P3: Oct 2011–Feb 2026 & $-2.50^{***}$& $-1.41^{***}$ & 60.8\% & 35.4\% & $-3.7\%$ \\
+    P1: Jan 1995--Dec 2005 & $-0.30$ & $-0.27$ & $-1.34^{*}$    & $-0.93$       & 81.4\% & 10.8\% & $+3.3\%$ \\
+    P2: Jan 2006--Sep 2011 & $+0.42$ & $-0.06$ & $-0.67$        & $-0.85$       & 87.3\% & $3.1\%$ & $+8.4\%$ \\
+    P3: Oct 2011--Feb 2026 & $-1.42^{***}$ & $-0.69^{**}$ & $-2.50^{***}$ & $-1.41^{***}$ & 60.8\% & 35.4\% & $-3.7\%$ \\
     \midrule
-    Full period           & $-1.36^{***}$& $-0.90^{**}$  & 77.8\% & 21.1\% & $-2.0\%$ \\
+    Full period            & $-0.29$ & $-0.19$ & $-1.36^{***}$  & $-0.90^{**}$  & 77.8\% & 21.1\% & $-2.0\%$ \\
     \bottomrule
-  \end{tabular}
-  \vspace{6pt}
-  \begin{itemize}\itemsep4pt
-    \item \textbf{P2} is the ``golden era'' — positive gross alpha, positive skilled share ($8.4\pct$).
-    \item \textbf{P3 collapse}: $\hat{\pi}^-_A$ jumps to 35.4\%; skilled share goes negative.
-    \item The regime change is not a mean-shift — it \emph{reshapes the cross-sectional skill distribution}.
-    \item \textbf{Three interpretations} of P3 collapse discussed in Section 6.3 (skill erosion /
-          factor proliferation / behavioral crowding).
+  \end{tabular}}
+  \vspace{5pt}
+  \begin{itemize}\itemsep3pt
+    \item \textbf{P2 golden era}: positive EW gross alpha ($+0.42\%$) — managers
+          generated genuine gross outperformance; underperformance is pure fee drag.
+    \item \textbf{P3 collapse}: gross alpha turns significantly negative ($-1.42^{***}$) —
+          managers destroy value even before fees; $\hat{\pi}^-_A$ jumps to 35.4\%.
+    \item Regime change \emph{reshapes} the cross-sectional skill distribution, not just the mean.
+          \textbf{Three interpretations}: skill erosion / factor proliferation / behavioral crowding.
   \end{itemize}
 \end{frame}
 
 % ============================================================
 %  PART VI — ACTIVENESS & PERSISTENCE
 % ============================================================
-\section{VI.\ Activeness \& Persistence}
+\section{VII.\ Activeness \& Persistence}
 
-\begin{frame}{Activeness Measures \& Quintile Sorts}
+\begin{frame}[shrink=10]{Activeness Measures \& Quintile Sorts (Table 4.14 \& 4.15)}
   \begin{columns}[T]
-    \begin{column}{0.50\textwidth}
-      \textbf{Two measures}
-      \begin{itemize}\itemsep4pt
-        \item $1 - R^2$: residual from 36-month rolling Carhart regression
+    \begin{column}{0.38\textwidth}
+      \small\textbf{Two measures}
+      \begin{itemize}\itemsep1pt
+        \item $1 - R^2$: residual variance from 36-month rolling Carhart regression
               (Amihud \& Goyenko 2013). Higher = more active.
-        \item \textbf{Tracking Error}: annualised SD of monthly return minus
+        \item Tracking Error: annualised SD of fund return minus
               benchmark return (Cremers \& Petajisto 2009).
       \end{itemize}
-      \vspace{6pt}
-      \textbf{Sort design}
-      \begin{itemize}\itemsep4pt
-        \item Funds sorted into quintiles Q1–Q5 annually.
-        \item Q1: closet indexers ($1-R^2 \approx 0.032$).
-        \item Q5: most active ($1-R^2 \approx 0.211$; ER = 1.36\%).
+      \vspace{3pt}
+      \small\textbf{Key finding}
+      \begin{itemize}\itemsep1pt
+        \item Gross Q5$-$Q1 spread positive and significant under both measures.
+        \item \alert{Net Q5$-$Q1 near zero} — fees fully erode gross outperformance.
+        \item Results robust across both proxies.
       \end{itemize}
     \end{column}
-    \begin{column}{0.46\textwidth}
-      \footnotesize
-      \begin{tabular}{lrrrr}
+    \begin{column}{0.60\textwidth}
+      \footnotesize\textbf{Panel A: $1-R^2$}\\[1pt]
+      \setlength{\tabcolsep}{4pt}
+      \scriptsize
+      \begin{tabular}{@{}p{1.8em}p{3.2em}rrrrr@{}}
         \toprule
-        & Act. & TNA & ER & Car.\ $\alpha$ \\
-        & $1-R^2$ & \$M & \% & EW gross \\
+        & Act.\ $1{-}R^2$ & TNA \$M & ER \% & Gross EW\% p.a. & Net EW\% p.a. \\
         \midrule
-        Q1 (Closet) & 0.032 & 3,420 & 0.80 & $-0.60^{*}$ \\
-        Q2          & 0.057 & 4,615 & 0.95 & $-0.34$ \\
-        Q3          & 0.076 & 2,489 & 1.04 & $-0.32$ \\
-        Q4          & 0.100 & 1,425 & 1.10 & $-0.22$ \\
-        Q5 (Active) & 0.211 &   980 & 1.36 & $+0.10$ \\
+        Q1 & 0.032 & 3,420 & 0.80 & $-0.60^{*}$  & $-1.42^{***}$ \\
+        Q2 & 0.057 & 4,615 & 0.95 & $-0.34$      & $-1.32^{***}$ \\
+        Q3 & 0.076 & 2,489 & 1.04 & $-0.32$      & $-1.38^{***}$ \\
+        Q4 & 0.100 & 1,425 & 1.10 & $-0.23$      & $-1.36^{**}$ \\
+        Q5 & 0.211 &   980 & 1.36 & $+0.10$      & $-1.28^{**}$ \\
         \midrule
-        Q5$-$Q1     &       &       &      & $+0.69^{*}$ \\
+        Q5$-$Q1 & & & & $+0.69^{*}$ & $+0.14$ \\
         \bottomrule
       \end{tabular}
-      \vspace{4pt}\\
-      \tiny EW gross alpha; Carhart four-factor; NW $t$-stats.
+      \vspace{2pt}\\
+      \footnotesize\textbf{Panel B: Tracking Error}\\[1pt]
+      \setlength{\tabcolsep}{4pt}
+      \scriptsize
+      \begin{tabular}{@{}p{1.8em}p{3.2em}rrrrr@{}}
+        \toprule
+        & Act.\ TE & TNA \$M & ER \% & Gross EW\% p.a. & Net EW\% p.a. \\
+        \midrule
+        Q1 & 0.034 & 3,133 & 0.81 & $-0.64^{*}$  & $-1.47^{***}$ \\
+        Q2 & 0.052 & 2,736 & 0.98 & $-0.37$      & $-1.38^{***}$ \\
+        Q3 & 0.066 & 2,711 & 1.09 & $-0.23$      & $-1.34^{**}$ \\
+        Q4 & 0.086 & 3,490 & 1.17 & $-0.35$      & $-1.54^{***}$ \\
+        Q5 & 0.145 & 1,610 & 1.19 & $+0.17$      & $-1.04^{*}$ \\
+        \midrule
+        Q5$-$Q1 & & & & $+0.81^{**}$ & $+0.43$ \\
+        \bottomrule
+      \end{tabular}
     \end{column}
   \end{columns}
 \end{frame}
 
 \begin{frame}{Activeness: Interpretation}
   \begin{itemize}\itemsep4pt
-    \item \textbf{Gross} alpha is positive for Q5 and Q5–Q1 spread is marginally significant.
-    \item But Q5 carries the \emph{highest fees} (ER = 1.36\%): \textbf{net alpha is negative}.
-    \item Most-active funds underperform most severely \emph{net of fees}.
-    \item \textbf{Closet indexers} (Q1): near-market returns but active-style fees
-          — the worst of both worlds.
+    \item Gross alpha is positive for Q5 and Q5$-$Q1 spread is marginally
+          significant — most-active managers do generate some gross outperformance.
+    \item But Q5 carries the \emph{highest fees} (ER = 1.36\%): net alpha is
+          negative and the Q5$-$Q1 net spread collapses to near zero.
+    \item Closet indexers (Q1): near-market gross returns but active-style fees
+          — the worst of both worlds for investors.
     \item Q5 funds are disproportionately small (TNA \$980M vs.\ Q1 \$3,420M) —
-          consistent with Berk–Green decreasing returns to scale.
-    \item Forward link to \textbf{H3}: high-activeness funds carry extreme MAX12
-          (lottery appeal), partly explaining why flows persist despite negative net alpha.
+          consistent with Berk--Green decreasing returns to scale.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Performance Persistence}
+\begin{frame}{Performance Persistence: KTWW Bootstrap Design}
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
-      \small\textbf{KTWW (2006) bootstrap on decile cohorts}
-      \begin{itemize}\itemsep3pt
-        \item Formation: rank funds by past $t(\hat{\alpha})$ into deciles.
-        \item Holding period: compute next-period EW decile alpha.
-        \item Bootstrap: test if holding-period $t(\hat{\alpha})$ exceeds zero-skill null.
-      \end{itemize}
-      \vspace{3pt}
-      \small\textbf{Key results}
-      \begin{itemize}\itemsep3pt
-        \item \alert{D1 (losers): significant loser persistence confirmed.}
-        \item \textbf{D10 (winners): no significant winner persistence.}
-        \item Pattern strongest in P3; consistent with BSW collapse in $\hat{\pi}^+_A$.
+      \small\textbf{Kosowski, Timmermann, Wermers \& White (2006)}
+      \begin{itemize}\itemsep2pt
+        \item \textbf{Formation}: rank active funds into deciles D1--D10
+              by Carhart $t(\hat{\alpha})$.
+              D1 = best past performers; D10 = worst.
+        \item \textbf{Holding period}: EW decile portfolios; holding-period
+              Carhart alpha pooled across non-overlapping cohorts
+              (36-month formation, 12-month holding).
+        \item \textbf{Bootstrap}: resample residuals $B=10{,}000$ under
+              zero-persistence null. $p^R_B$ ($p^L_B$): fraction of
+              simulated $t(\hat{\alpha})$ exceeding (falling below)
+              the observed holding-period $t$-statistic.
       \end{itemize}
     \end{column}
     \begin{column}{0.45\textwidth}
-      \begin{block}{Interpretation}
-        \small
-        Loser persistence \emph{without} winner persistence is the asymmetric footprint
-        of H1–H4 behavioral mechanisms:
-        \begin{itemize}\itemsep3pt
-          \item Winners get chased (flows erode alpha — BG).
-          \item Losers get \emph{held} (flows fail to exit — behavioral).
+      \begin{block}{Why bootstrap over OLS?}
+        \footnotesize
+        \begin{itemize}\itemsep1pt
+          \item OLS $p^C$ compares against the standard normal —
+                the null for a \emph{randomly drawn} fund.
+          \item D1 and D10 are not random draws: they were
+                \emph{selected because they were extreme}. Even under
+                zero skill, a selected extreme decile has had a luck run
+                that spills into the holding period. Its null has
+                \emph{fatter tails} — $p^C$ overstates significance.
+          \item The bootstrap re-runs the full select-then-test procedure
+                $B=10{,}000$ times under zero skill, generating the correct
+                fat-tailed null. $p^L_B$ is the valid inferential basis.
         \end{itemize}
       \end{block}
     \end{column}
   \end{columns}
 \end{frame}
 
+\begin{frame}{Performance Persistence: Results (Table 4.18)}
+  \scriptsize
+  \begin{tabular}{@{}lrrrrrrrr@{}}
+    \toprule
+    & \multicolumn{4}{c}{Full Period} & P1 & P2 & P3 \\
+    \cmidrule(lr){2-5}
+    Decile & $\hat{\alpha}$ (\%/mo) & $t(\hat{\alpha})$ & $p^C$ & $p^L_B$ & $p^L_B$ & $p^L_B$ & $p^L_B$ \\
+    \midrule
+    D1 (Best past)   & $-0.052$        & $(-1.06)$ & $0.145$ & $0.366$ & $0.576$ & $0.361$ & $0.470$ \\
+    D5               & $-0.110^{*}$    & $(-1.92)$ & $0.028$ & $0.274$ & $0.643$ & $0.536$ & $0.282$ \\
+    D10 (Worst past) & $-0.189^{***}$  & $(-3.49)$ & $<.001$ & $\mathbf{0.143}$ & $0.729$ & $0.189$ & $\mathbf{0.098}$ \\
+    \midrule
+    D1$-$D10         & $+0.136^{*}$    & $(+1.79)$ & $0.037$ & & & & \\
+    \bottomrule
+  \end{tabular}
+  \vspace{4pt}
+  \begin{itemize}\itemsep2pt
+    \item \textbf{No winner persistence}: D1 $p^L_B = 0.366$ — past winners do not
+          outperform the zero-persistence null. BG is consistent: inflows erode any edge.
+    \item \alert{Loser persistence}: D10 $p^L_B = 0.143$ full period; $0.098$ in P3.
+          Underperformers continue to underperform after selection-bias correction.
+    \item \textbf{OLS vs.\ bootstrap divergence}: D10 $p^C < .001$ but $p^L_B = 0.143$ —
+          the parametric test wildly overstates significance. OLS treats D10 as a
+          random fund; bootstrap correctly accounts for it being the worst selected decile.
+          $p^L_B$ is the valid inferential basis here.
+    \item \textbf{D1$-$D10 spread}: $+0.14\%$/mo, significant — driven entirely
+          by loser persistence, not winner skill. Asymmetry is the behavioral footprint.
+  \end{itemize}
+\end{frame}
+
 % ============================================================
 %  PART VII — BEHAVIORAL FRAMEWORK
 % ============================================================
-\section{VII.\ Behavioral Framework}
+\section{VIII.\ Behavioral Framework}
 
 \begin{frame}{The Residual Puzzle}
+  \begin{block}{Berk \& Green (2004): The Rational Benchmark}
+    \small Skilled managers attract flows; capital competition erodes alpha until
+    VW net alpha $\approx 0$. Managers capture skill rents through fees.
+    Consistent with our VW net $\alpha = -0.90\%$ (marginally significant).
+  \end{block}
+  \vspace{3pt}
+  \textbf{What BG leaves unexplained:}
+  \vspace{3pt}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{What BG (2004) explains}
       \begin{itemize}\itemsep4pt
-        \item VW net alpha $\approx -0.90\pct$ (close to zero, fees paid out).
-        \item Capital-weighted investors collectively break even before fees.
-        \item Flows chase skilled managers; competition drives equilibrium.
+        \item \textbf{EW–VW gap} ($\approx 46\bp$): small funds underperform
+              disproportionately — the flow-equilibration mechanism is
+              not working uniformly across the size distribution.
+        \item \textbf{21.1\% genuinely unskilled} ($\hat{\pi}^-_A$): BG
+              tolerates unskilled managers if capital exits them.
+              Combined with loser persistence, it suggests the
+              exit mechanism is impaired.
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{What BG leaves unexplained}
       \begin{itemize}\itemsep4pt
-        \item \alert{EW–VW gap of $\approx 46\bp$}: small funds underperform disproportionately.
-        \item Loser persistence: underperformers retain capital.
-        \item State-dependence: flows change \emph{character} across sentiment regimes.
-        \item Lottery-like flows unrelated to risk-adjusted expected returns.
+        \item \textbf{Loser persistence}: worst past performers continue
+              to underperform — the flow-equilibration mechanism
+              does not reverse negative alpha at the bottom of the
+              distribution.
+        \item \textbf{Non-stationary skill distribution}: the skill
+              distribution is not stationary — it collapsed
+              post-2011, which cannot be explained with BG who treat the skill distribution as exogeneous.
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{8pt}
+  \vspace{4pt}
   \begin{block}{Behavioral Claim}
-    The cross-sectional heterogeneity and the loser-flow anomaly require
-    at least one behavioral channel beyond rational capital allocation.
+    \small These residuals require at least one behavioral channel
+    that impairs the flow-equilibration mechanism — the focus of H1--H4.
   \end{block}
 \end{frame}
 
@@ -740,7 +940,7 @@
     + \delta_1 R^{\text{LOW}}_{i,t} \cdot Z_t
     + \delta_2 R^{\text{MID}}_{i,t} \cdot Z_t
     + \delta_3 R^{\text{HIGH}}_{i,t} \cdot Z_t
-    + \gamma \mathbf{X}_{i,t} + \mu_i + \varepsilon_{i,t}
+    + \gamma X_{i,t-1} + \mu_i + \varepsilon_{i,t}
   \]
   \vspace{2pt}
   \begin{columns}[T]
@@ -774,7 +974,7 @@
 % ============================================================
 %  PART VIII — H1
 % ============================================================
-\section{VIII.\ H1: Sentiment-Convexity}
+\section{IX.\ H1: Sentiment-Convexity}
 
 \begin{frame}{H1: Hypothesis \& Prediction}
   \begin{block}{H1: Sentiment-Convexity}
@@ -804,15 +1004,55 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{H1: Regression Specification}
+  \small Baseline piecewise model augmented with sentiment interactions:
+  \vspace{-2pt}
+  \[
+    \text{Flow}_{i,t+1} = \sum_{q} \beta_q R^q_{i,t}
+    + \sum_{q} \delta_q \bigl(R^q_{i,t} \times Z_t\bigr)
+    + \gamma Z_t
+    + \theta\, X_{i,t-1}
+    + \mu_i + \varepsilon_{i,t}
+  \]
+  \vspace{-2pt}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \footnotesize\textbf{Performance segments} $R^q$:\\
+      $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ — piecewise fractional rank of lagged 12-month cumulative gross return within Lipper category.\\[5pt]
+      \textbf{Sentiment state} $Z_t$ — three columns:
+      \vspace{2pt}\\
+      \begin{tabular}{@{}ll@{}}
+        (2): & $D^{\text{SENT}}_t$ (BW top-34\% regime dummy) \\
+        (3): & $\text{SENT}^\perp_t$ (orthogonalized BW index) \\
+        (4): & $D^{\text{AAII}}_t$ (AAII bull-bear regime dummy) \\
+      \end{tabular}
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \footnotesize\textbf{Controls} $\mathbf{X}_{i,t-1}$:
+      \begin{itemize}\itemsep1pt
+        \item $\log(\text{TNA})_{i,t}$
+        \item $\log(\text{Age})_{i,t}$
+        \item Return volatility$_{i,t-1}$
+        \item Style flow$_{i,t-1}$
+      \end{itemize}
+      \vspace{3pt}
+      Fund FE ($\mu_i$); two-way clustering: Ticker $\times$ yearmo.\\
+      $N=232{,}800$. December excluded.\\[4pt]
+      \textbf{Tests}: joint $\chi^2_3$ ($H_0: \delta_1=\delta_2=\delta_3=0$);\\
+      headline asymmetry: $\delta_3 - \delta_1 > 0$.
+    \end{column}
+  \end{columns}
+\end{frame}
+
 \begin{frame}{H1: Results}
   \scriptsize
-  \begin{tabular}{lllcp{3.2cm}}
+  \begin{tabular}{lllcp{4.5cm}}
     \toprule
     State proxy & Joint $\chi^2$ (df=3) & Headline $z$ & 1-sided $p$ & Decision \\
     \midrule
-    $D^{\text{SENT}}$     & 9.13 ($p=0.028$)          & $+0.06$ & $0.475$ & \yes\ (asymmetry +) \\
-    $\text{SENT}^\perp$   & 6.92 ($p=0.074$)          & $-0.36$ & $0.639$ & \yes\ (asymmetry $-$) \\
-    $D^{\text{AAII}}$     & \textbf{11.02 ($p=0.012$)} & $\mathbf{+2.11}$ & $\mathbf{0.018}$ & \textbf{\yes\ (asym.\ +)} \\
+    $D^{\text{SENT}}$     & 9.13 ($p=0.028$)          & $+0.06$ & $0.475$ & \no\ (joint sig., no asymmetry) \\
+    $\text{SENT}^\perp$   & 6.92 ($p=0.074$)          & $-0.36$ & $0.639$ & \no\ (joint sig., wrong direction) \\
+    $D^{\text{AAII}}$     & \textbf{11.02 ($p=0.012$)} & $\mathbf{+2.11}$ & $\mathbf{0.018}$ & \textbf{\yes\ (asymmetry confirmed)} \\
     \bottomrule
   \end{tabular}
   \normalsize
@@ -820,7 +1060,7 @@
   \begin{itemize}\itemsep3pt
     \item Joint $\chi^2$ rejects the null that all three interaction terms are zero in all specs.
     \item AAII spec: both joint test and asymmetry $z$ significant.
-    \item BW SENT directions mixed — AAII is the cleaner signal; lagged spec consistent.
+    \item BW SENT directions mixed — AAII is the cleaner signal.
     \item \textbf{Verdict}: flow convexity is sentiment-state-dependent — consistent with
           representativeness heuristic, not rational search-cost adjustment.
   \end{itemize}
@@ -829,62 +1069,98 @@
 % ============================================================
 %  PART IX — H2
 % ============================================================
-\section{IX.\ H2: Disposition Effect / Illusion of Control}
+\section{X.\ H2: Disposition Effect / Illusion of Control}
 
 \begin{frame}{H2: Hypothesis \& Discrimination Design}
   \begin{block}{H2: Disposition Effect / Illusion of Control}
-    \small High financial stress flattens the loser-segment outflow response —
-    investors fail to exit underperformers when most constrained.
+    \small Do behavioral constraints prevent investors from exiting underperformers,
+    or does financial stress \emph{accelerate} their exit? H2 discriminates between
+    two channels with \emph{opposing} predictions for the loser-segment interaction $\delta_1$.
   \end{block}
-  \vspace{4pt}
-  \small\textbf{Two competing mechanisms for loser stickiness:}
-  \vspace{3pt}
+  \vspace{2pt}
+  \small\textbf{Two channels, opposing predictions for $\delta_1$:}
+  \vspace{2pt}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Disposition Effect (Shefrin \& Statman 1985)}
-      \begin{itemize}\itemsep2pt
-        \item Loss aversion prevents realising losses.
-        \item Predicts: $\delta_1 < 0$ (exit further attenuated).
-        \item Proxy: Inverse Put/Call Ratio ($D^{\text{INV-PCR}}$).
+      \textbf{Behavioral retention} ($\delta_1 < 0$, given $\beta_1 > 0$)
+      \begin{itemize}\itemsep1pt
+        \item \textit{Disposition effect} (Shefrin \& Statman 1985):
+              loss aversion prevents realising losses — loser-segment slope attenuated.
+        \item \textit{Illusion of control} (Barber \& Odean 2001):
+              overconfident belief in market predictability sustains retention of losers.
+        \item Proxy: Call-to-put ratio ($D^{\text{INV-PCR}}$) — high C/P reflects
+              directional overconfidence.
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{Brunnermeier–Pedersen (2009) Margin Call}
-      \begin{itemize}\itemsep2pt
-        \item Margin pressure forces liquidation of liquid assets; fund positions retained.
-        \item Predicts: $\delta_1 > 0$ (loser slope steepens).
-        \item Proxy: Margin Debt growth ($D^{\text{MD}}$).
+      \textbf{Funding constraints} ($\delta_1 > 0$, given $\beta_1 > 0$)
+      \begin{itemize}\itemsep1pt
+        \item \textit{Brunnermeier \& Pedersen (2009)}: margin pressure forces
+              liquidation — loser exit \emph{accelerates}.
+        \item Loser-segment slope \emph{steepens}, not flattens.
+        \item Proxy: Detrended margin debt ($D^{\text{MD,Det}}$).
       \end{itemize}
     \end{column}
   \end{columns}
+\end{frame}
+
+\begin{frame}{H2: Regression Specifications}
+  \footnotesize\textbf{Standard spec} (Cols.\ 2--3): piecewise model with financial-stress state $Z_t$:
+  \vspace{-2pt}
+  \[
+    \text{Flow}_{i,t+1} = \sum_q \beta_q R^q_{i,t}
+    + \sum_q \delta_q (R^q_{i,t}\times Z_t)
+    + \gamma Z_t + \theta\,X_{i,t-1} + \mu_i + \varepsilon_{i,t}
+  \]
+  \vspace{-2pt}
+  \begin{tabular}{@{}ll@{}}
+(2): & $Z_t = D^{\text{MD,Det}}_t$ — top-34\% indicator for $\Delta^{yoy}(\text{MD}/\text{MCAP})$ (year-over-year change in margin debt ratio) \\
+    (3): & $Z_t = D^{\text{INV-PCR}}_t$ — top-34\% indicator for CBOE equity call-put ratio \\
+  \end{tabular}\\[5pt]
+  \footnotesize\textbf{Discriminant spec} (Col.\ 4): adds $D^{\text{SENT}}_t$ alongside $D^{\text{MD,Det}}_t$ with full rank interactions to test channel separation:
+  \vspace{-2pt}
+  \[
+    \text{Flow}_{i,t+1} = \sum_q \beta_q R^q_{i,t}
+    + \sum_q \delta^{\text{MD}}_q (R^q_{i,t}\times D^{\text{MD,Det}}_t)
+    + \sum_q \delta^{\text{S}}_q (R^q_{i,t}\times D^{\text{SENT}}_t)
+    + \gamma^{\text{MD}} D^{\text{MD,Det}}_t + \gamma^{\text{S}} D^{\text{SENT}}_t
+    + \theta\,\mathbf{X}_{i,t-1} + \mu_i + \varepsilon_{i,t}
+  \]
+  \vspace{-2pt}
+  \footnotesize\textbf{Controls} $\mathbf{X}_{i,t-1}$: $\log(\text{TNA})$, $\log(\text{Age})$, Return volatility, Style flow.\\
+  \vspace{4pt}
+  Fund FE; Ticker $\times$ yearmo clustering. $N=232{,}800$ (Cols.\ 2,4); $168{,}488$ (Col.\ 3, PCR sample 2003--2019).\\
+  \vspace{4pt}
+  \textbf{Test}: joint $\chi^2_3$ ($H_0: \delta_1=\delta_2=\delta_3=0$); headline: $\delta_1 > 0$ one-sided (loser-end steepening).
 \end{frame}
 
 \begin{frame}{H2: Results}
   \scriptsize
   \begin{tabular}{lccp{1.6cm}p{3.2cm}}
     \toprule
-    State proxy & Joint $\chi^2$ (df=3) & $\delta_1$ $z$ & 1-sided\newline LEFT $p$ & Decision \\
+    State proxy & Joint $\chi^2$ (df=3) & Headline $z$ & 1-sided $p$ & Decision \\
     \midrule
-    $D^{\text{MD,Det}}$  & \textbf{11.24 ($p=0.010$)} & $+2.15$ & $0.984$ & \yes\ \textbf{(BP margin-call)} \\
-    $D^{\text{INV-PCR}}$ & 0.44 ($p=0.931$)           & $-0.20$ & $0.420$ & \no\ (disposition) \\
+    $D^{\text{MD,Det}}$  & \textbf{11.24 ($p=0.010$)} & $+2.15$ & $0.984$ & \yes\ \textbf{(BP direction)} \\
+    $D^{\text{INV-PCR}}$ & 0.44 ($p=0.931$)           & $-0.20$ & $0.420$ & \no\ \\
     Discriminant         & 7.52 ($p=0.057$)            & $+1.91$ & $0.972$ & \yes\ (BP direction) \\
     \bottomrule
   \end{tabular}
   \normalsize
   \vspace{5pt}
   \begin{itemize}\itemsep3pt
-    \item \textbf{$\delta_1 > 0$} with high one-sided $p$: rejects disposition ($\delta_1 < 0$) decisively.
+    \item \textbf{Baseline $\beta_1 = 0.031^{***}$} — loser-segment slope is positive, confirming the sign framework: $\delta_1 > 0$ steepens exit, $\delta_1 < 0$ would attenuate it.
+    \item \textbf{$\delta_1 > 0$} with high one-sided $p$: rejects disposition/illusion-of-control ($\delta_1 < 0$) decisively.
     \item High margin debt \emph{steepens} the loser segment — losers bleed \emph{more} under stress.
     \item \textbf{Brunnermeier–Pedersen (2009)} signature: liquidity spiral, not loss aversion.
-    \item INV-PCR: clean null — disposition effect not operative in this sample.
-    \item \textbf{Verdict}: loser stickiness is a margin-call / liquidity effect.
+    \item INV-PCR: clean null — illusion of control not operative in this sample.
+    \item \textbf{Verdict}: loser exit acceleration is a margin-call / liquidity effect.
   \end{itemize}
 \end{frame}
 
 % ============================================================
 %  PART X — H3
 % ============================================================
-\section{X.\ H3: Lottery Demand}
+\section{XI.\ H3: Lottery Demand}
 
 \begin{frame}{H3: Hypothesis \& Proxies}
   \begin{block}{H3: Lottery Demand and Skewness Preference}
@@ -900,7 +1176,7 @@
       \textbf{ActR2}\\
       $1 - R^2$ activeness\\
       (Amihud–Goyenko 2013)\\
-      \small Proxy for benchmark deviation
+      \small Proxy for idiosyncratic return variance
     \end{column}
     \begin{column}{0.32\textwidth}
       \textbf{ActSkew}\\
@@ -912,7 +1188,7 @@
       \textbf{MAX12}\\
       Maximum monthly return\\
       in prior 12 months\\
-      \small BFL (2011) lottery proxy
+      \small Bali, Cakici \& Whitelaw (2011) lottery proxy
     \end{column}
   \end{columns}
   \vspace{8pt}
@@ -920,6 +1196,47 @@
   Barberis \& Huang (2008): CPT investors overprice positively skewed assets.
   Kumar (2009): retail investors demand lottery stocks.
   Cheng et al.\ (2025): MAX weakens loser exit in mutual funds.
+\end{frame}
+
+\begin{frame}{H3: Regression Specification}
+  \small Baseline piecewise model augmented with a lottery proxy and its sentiment interaction:
+  \vspace{-2pt}
+  \[
+    \text{Flow}_{i,t+1} = \sum_q \beta_q R^q_{i,t}
+    + \eta\, L_{i,t}
+    + \delta \bigl(L_{i,t} \times D^{\text{SENT}}_t\bigr)
+    + \gamma\, D^{\text{SENT}}_t
+    + \theta\,X_{i,t-1}
+    + \mu_i + \varepsilon_{i,t}
+  \]
+  \vspace{-2pt}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \footnotesize\textbf{Lottery measure} $L_{i,t}$ — one per column:
+      \vspace{2pt}\\
+      \begin{tabular}{@{}ll@{}}
+        (2): & ActR2\\
+        (3): & ActSkew\\
+        (4): & MAX12\\
+      \end{tabular}\\[5pt]
+      $D^{\text{SENT}}_t$: Baker--Wurgler top-34\% regime dummy.\\
+      $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$: retained as nuisance controls.
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \footnotesize\textbf{Controls} $\mathbf{X}_{i,t-1}$:
+      \begin{itemize}\itemsep1pt
+        \item $\log(\text{TNA})_{i,t}$
+        \item $\log(\text{Age})_{i,t}$
+        \item Return volatility$_{i,t-1}$
+        \item Style flow$_{i,t-1}$
+      \end{itemize}
+      \vspace{3pt}
+      Fund FE ($\mu_i$); Ticker $\times$ yearmo clustering.\\
+      $N=212{,}033$; H3/activeness subsample.\\[4pt]
+      \textbf{Tests}: joint $\chi^2_2$ ($H_0: \eta=\delta=0$);\\
+      headline: $\delta > 0$ (1-sided).
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{H3: Results}
@@ -937,24 +1254,86 @@
   \vspace{5pt}
   \begin{itemize}\itemsep3pt
     \item Only \textbf{MAX12} clears the threshold — investors chase \emph{recent extreme maximum returns}.
-    \item ActR2 null: earlier spurious result ($p=0.990$) on \texttt{panel\_trimmed} was incubation-bias artifact;
-          \texttt{panel\_incubation} delivers a clean null.
-    \item ``Delegated lottery'': retail investors outsource gambling to the fund with the best recent headline.
-    \item Non-monotone, Q5-concentrated effect; survives Patton–Timmermann (2010) monotonicity test.
+    \item ActR2 and ActSkew has no predictive power on fund flows. 
+    \item Investors reward right-side skewness, not left-side skewness or idiosyncratic variance.
   \end{itemize}
 \end{frame}
 
 % ============================================================
 %  PART XI — H4
 % ============================================================
-\section{XI.\ H4: Fee Elasticity}
+\section{XII.\ H4: Fee Elasticity}
 
-\begin{frame}{H4: Hypothesis \& Results}
+\begin{frame}{H4: Hypothesis}
   \begin{block}{H4: Fee Elasticity}
     During high-sentiment regimes, investors become less sensitive to expense ratios
     — the negative flow–fee relationship is attenuated ($\psi > 0$).
   \end{block}
-  \vspace{6pt}
+  \vspace{8pt}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Behavioral prediction}
+      \begin{itemize}\itemsep3pt
+        \item High sentiment inflates perceived manager quality.
+        \item Investors become willing to pay higher fees for access.
+        \item Expense ratio $\times$ Sentiment interaction $> 0$: fee drag is attenuated under optimism.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \small\textbf{Rational null}
+      \begin{itemize}\itemsep3pt
+        \item Fees are observable and easily compared — investors price them correctly regardless of sentiment.
+        \item Expense ratio $\times$ Sentiment interaction $= 0$.
+        \item BG: fee sensitivity should not vary with market psychology.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[shrink=5]{H4: Regression Specification}
+  \small Triple-interaction model — expense ratio as focal variable, not a control:
+  \vspace{-4pt}
+  \begin{multline*}
+    \text{Flow}_{i,t+1} = \sum_q \beta_q R^q_{i,t}
+    + \theta\,\text{ExpRatio}_i
+    + \sum_q \psi_q (R^q_{i,t}\times\text{ExpRatio}_i)
+    + \sum_q \delta_q (R^q_{i,t}\times Z_t) \\
+    + \phi\,(\text{ExpRatio}_i\times Z_t)
+    + \sum_q \kappa_q (R^q_{i,t}\times\text{ExpRatio}_i\times Z_t)
+    + \theta'\,X_{i,t-1} + \mu_{s,t} + \varepsilon_{i,t}
+  \end{multline*}
+  \vspace{-6pt}
+  \begin{columns}[T]
+    \begin{column}{0.50\textwidth}
+      \footnotesize\textbf{Sentiment state} $Z_t$ — three columns:
+      \vspace{2pt}\\
+      \begin{tabular}{@{}ll@{}}
+        (2): & $D^{\text{SENT}}_t$ (BW top-34\% regime dummy) \\
+        (3): & $\text{SENT}^\perp_t$ (standardised BW index) \\
+        (4): & $D^{\text{AAII}}_t$ (AAII bull-bear regime dummy) \\
+      \end{tabular}\\[2pt]
+      \vspace{4pt}
+      \footnotesize Joint $\chi^2_4$: all four ExpRatio $\times$ Sent.\ terms $= 0$.\\
+      Headline test: $\phi > 0$ — Expense ratio $\times$ Sent.\ interaction.
+    \end{column}
+    \begin{column}{0.47\textwidth}
+      \footnotesize\textbf{Controls} $\mathbf{X}_{i,t-1}$:
+      \begin{itemize}\itemsep0pt
+        \item $\log(\text{TNA})_{i,t}$
+        \item $\log(\text{Age})_{i,t}$
+        \item Load dummy$_i$
+        \item Return volatility$_{i,t-1}$
+        \item Turnover$_i$
+        \item Style flow$_{i,t-1}$
+      \end{itemize}
+      \footnotesize\textbf{FE}: Lipper $\times$ yearmo ($\mu_{s,t}$) — absorbs sentiment main effects.\\
+      Ticker $\times$ yearmo clustering. $N=232{,}168$.\\
+      
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{H4: Results}
   \scriptsize
   \begin{tabular}{lp{3.6cm}p{3.0cm}p{1.6cm}}
     \toprule
@@ -966,7 +1345,7 @@
     \bottomrule
   \end{tabular}
   \normalsize
-  \vspace{4pt}
+  \vspace{12pt}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \small\textbf{H4 fails to reject}
@@ -974,14 +1353,7 @@
         \item No sentiment proxy generates significant fee-elasticity amplification.
         \item Consistent with \textbf{rational null}: investors process fees
               regardless of sentiment.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \small\textbf{Policy implication}
-      \begin{itemize}\itemsep2pt
-        \item Regulatory fee disclosure is \emph{partly justified}.
         \item Behavioral distortions operate through flow–performance \emph{convexity}, not fee blindness.
-        \item Disclosure reform alone will not fix the cross-sectional puzzle.
       \end{itemize}
     \end{column}
   \end{columns}
@@ -990,12 +1362,12 @@
 % ============================================================
 %  PART XII — PPF
 % ============================================================
-\section{XII.\ Psychological Premium Framework}
+\section{XIII.\ Psychological Premium Framework}
 
 \begin{frame}{Shadow Price: Theory}
-  \textbf{Motivation}: convert behavioral flow evidence into welfare-relevant units.
+  \textbf{Motivation}: convert behavioral flow evidence into welfare-relevant units.\\
   \vspace{6pt}
-  \textbf{Flow indifference condition} $d\,\text{Flow} = 0$:
+  \textbf{Flow indifference condition:} $d\,\text{Flow} = 0$
   \[
     \text{SP}_t \;=\; \frac{dR}{d\,\text{AS}}\bigg|_{d\text{Flow}=0}
     \;=\; -\frac{\eta + \phi \cdot D^{\text{HIGH}}_t}
@@ -1011,7 +1383,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Shadow Price: Results}
+\begin{frame}{Shadow Price: Results (Table 5.5)}
   \footnotesize
   \begin{tabular}{llrrrr}
     \toprule
@@ -1050,41 +1422,41 @@
 % ============================================================
 %  PART XIII — DISCUSSION
 % ============================================================
-\section{XIII.\ Discussion \& Synthesis}
+\section{XIV.\ Discussion \& Synthesis}
 
 \begin{frame}{Behavioral Evidence Scorecard}
+  \resizebox{\linewidth}{!}{%
   \begin{tabular}{llll}
     \toprule
     Hypothesis & Channel & Evidence & Verdict \\
     \midrule
     \textbf{H1} & Sentiment-Convexity  & AAII: $\chi^2$ $p=0.012$, $z=+2.11$ & \yes \\
-    \textbf{H2} & Margin-Call (BP)     & D\textsuperscript{MD}: $\chi^2$ $p=0.010$, $\delta_1>0$ & \yes\ (BP channel) \\
+    \textbf{H2} & Margin-Call (BP)     & D\textsuperscript{MD}: $\chi^2$ $p=0.010$, $\delta_1>0$ & \yes \\
                 & Disposition (DE)     & INV-PCR: $\chi^2$ $p=0.931$   & \no \\
     \textbf{H3} & Lottery (MAX12)      & $\chi^2$ $p=0.003$, $z=+1.54$ & \yes \\
                 & Lottery (ActR2/Skew) & $\chi^2$ $p>0.32$              & \no \\
     \textbf{H4} & Fee Elasticity       & all $\chi^2$ $p>0.27$          & \no \\
     \bottomrule
-  \end{tabular}
-  \vspace{8pt}
-  \textbf{3 of 4 core hypotheses generate detectable behavioral signatures.}\\
+  \end{tabular}}
+  \par\vspace{8pt}
+  3 of 4 core hypotheses generate detectable behavioral signatures.\\
   H4 (and the disposition channel of H2) are consistent with the rational null.
 \end{frame}
 
 \begin{frame}{Reconciliation with Berk–Green (2004)}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{BG accepted at the capital-weighted level}
+      \textbf{BG (somewhat) accepted at the capital-weighted level:}
       \begin{itemize}\itemsep4pt
-        \item VW net alpha: $-0.90\pct$ (significant at 5\%, but economically close
-              to the fee level — investors in aggregate are roughly paying for skill).
-        \item Investors in aggregate are not irrational in their capital allocation.
+        \item VW net alpha of $-0.90\pct$ is statistically significant but small in magnitude.
+        \item The evidence is mixed with respect to BG rational equilibrium.
         \item Fee processing is intact (H4 null).
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \textbf{Behavioral channels explain the cross-section}
+      \textbf{Behavioral channels explain the cross-section:}
       \begin{itemize}\itemsep4pt
-        \item EW–VW gap ($\approx 46\bp$): small funds hold \emph{too much} capital.
+        \item EW–VW gap ($\approx 46\bp$): small funds underperform.
         \item Loser persistence without winner persistence.
         \item Sentiment modulates flow convexity (H1).
         \item Lottery appeal sustains underperformer inflows (H3, PPF).
@@ -1108,10 +1480,6 @@
           active-fund investors toward the most behavioral tail, amplifying the
           cross-sectional underperformance of small, lottery-like funds.
   \end{enumerate}
-  \vspace{6pt}
-  \footnotesize
-  The dissertation cannot fully adjudicate among the three readings with return-only data.
-  Holdings data or high-frequency factor decomposition would be required.
 \end{frame}
 
 \begin{frame}{Contribution to the Literature}
@@ -1119,9 +1487,8 @@
     \item \textbf{Extended FF/BSW window}: the qualitative bootstrap pattern
           (left-tail rejection, right-tail consistency) is stable from the canonical
           1984–2006 sample through February 2026 — confirming structural robustness.
-    \item \textbf{November 2011 break}: a 194 bp structural break in the active-fund
-          alpha distribution, with the tightest confidence interval (9 months) in the
-          sample — not previously documented with the present methodology.
+    \item \textbf{September 2011 break}: a 194 bp structural break in the active-fund
+          alpha distribution, not documented previously.
     \item \textbf{Unified H1–H4 test}: four behavioral hypotheses tested jointly on one
           carefully cleaned panel, distinguishing channels that carry signal (H1, H2-BP, H3)
           from those consistent with the rational null (H4, H2-DE).
@@ -1132,26 +1499,23 @@
 \end{frame}
 
 \begin{frame}{Limitations}
-  \begin{itemize}\itemsep6pt
-    \item \textbf{No holdings data}: lottery proxies (MAX12, ActSkew) are return-based.
-          Stock-level lottery exposure (Kumar 2009) cannot be directly measured.
-    \item \textbf{Sentiment series truncation}: Baker–Wurgler series ends December 2023;
-          AAII and margin debt extend to February 2026. H1 SENT specs exclude the
-          most recent 14 months.
+  \begin{itemize}\itemsep4pt
+    \item \textbf{No holdings data}: lottery and activeness proxies (MAX12, ActSkew, ActR2) are return-based.
+           More reliable activeness measures such as the Active Share measure of Cremers \& Petajisto (2009) which require holdings data cannot be measured with the available data set.
+    \item \textbf{Sentiment series truncation}: Baker–Wurgler series ends on December 2023, CBOE Call/Put ratio series ends on October 2019;
+          AAII and margin debt extend to February 2026.
     \item \textbf{Cross-sectional vs.\ within-fund}: fee variation used in H4 is
-          cross-sectional; within-fund fee change variation is limited, reducing power
-          to detect intertemporal elasticity effects.
+          cross-sectional; within-fund fee variation is non-existent, eliminating 
+          the possibility of detecting intertemporal elasticity effects.
     \item \textbf{US domestic equity only}: generalization to international or
           fixed-income active management requires separate investigation.
-    \item \textbf{Benchmark assignment}: 97 manual corrections represent best effort;
-          residual benchmark error may affect activeness quintile sorting.
   \end{itemize}
 \end{frame}
 
 % ============================================================
 %  PART XIV — CONCLUSION
 % ============================================================
-\section{XIV.\ Conclusion}
+\section{XV.\ Conclusion}
 
 \begin{frame}{Summary of Findings}
   \begin{block}{In three sentences}
@@ -1166,253 +1530,141 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{Implications}
-  \begin{columns}[T]
-    \begin{column}{0.32\textwidth}
-      \small\textbf{For investors}
-      \begin{itemize}\itemsep2pt
-        \item Active management is, on average, a poor net-of-fee purchase.
-        \item Most lottery-like funds deliver the worst subsequent risk-adjusted performance.
-        \item Sentiment-aware rebalancing reduces the behavioral premium paid.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.32\textwidth}
-      \small\textbf{For regulators}
-      \begin{itemize}\itemsep2pt
-        \item Fee disclosure alone is insufficient — distortions operate through convexity, not fee blindness.
-        \item Mandatory MAX-return disclosure may reduce lottery-channel flows.
-        \item Regime-aware suitability standards during high-sentiment periods.
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.32\textwidth}
-      \small\textbf{For the literature}
-      \begin{itemize}\itemsep2pt
-        \item Hybrid verdict: rational at aggregate, behavioral in the cross-section.
-        \item Regime-aware specifications are necessary post-2011.
-        \item Holdings data would adjudicate the three P3 readings.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-\end{frame}
-
 \begin{frame}[standout]
   \Huge Thank you\\[12pt]
   \normalsize
-  Questions welcome
+  All questions are welcome
 \end{frame}
 
 % ============================================================
 %  APPENDIX
 % ============================================================
+
 \appendix
 
+% ============================================================
+%  APPENDIX INDEX
+% ============================================================
 \begin{frame}{Appendix Slides}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \footnotesize
-      \begin{enumerate}\itemsep1pt
-        \item[A1]  Full H1 coefficient table
-        \item[A2]  Full H2 coefficient table
-        \item[A3]  Full H3 coefficient table
-        \item[A4]  Full H4 coefficient table
-        \item[A5]  Bootstrap tails: percentile table
-        \item[A6]  BSW decomposition: full $\gamma$-grid
-        \item[A7]  Sub-period BSW full $\gamma$-grid
-      \end{enumerate}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \footnotesize
-      \begin{enumerate}\itemsep1pt
-        \item[A8]  Factor robustness: FF5 and C+PSL
-        \item[A9]  Activeness persistence (KTWW deciles)
-        \item[A10] Margin debt construction (H2)
-        \item[A11] Benchmark assignment methodology
-        \item[A12] Fund flows figure
-        \item[A13--A15] Sharpe's Arithmetic Identity
-        \item[A16--A18] Sample exclusion framework
-      \end{enumerate}
-    \end{column}
-  \end{columns}
-  \vspace{6pt}
-  \footnotesize Detailed tables available in the dissertation. Page references
-  will be provided on request during Q\&A.
-\end{frame}
-
-\begin{frame}[allowframebreaks]{A5: Bootstrap Tails — Selected Percentiles}
-  \footnotesize
-  The Fama–French (2010) bootstrap compares actual cross-sectional $t(\hat{\alpha})$
-  percentiles to the simulated zero-skill distribution ($B=10{,}000$).\\[6pt]
-  \textbf{Left tail}: actual $t$ at bottom percentiles is substantially more negative
-  than the simulated mean $\to$ genuine underperformance.\\
-  \textbf{Right tail}: actual $t$ at top percentiles tracks the simulated mean
-  $\to$ no evidence of genuine skill at the top.\\[6pt]
-  Full table available as Table 6 in the dissertation.
-\end{frame}
-
-\begin{frame}{A6: BSW Full $\gamma$-Grid}
-  \footnotesize
-  \begin{tabular}{rrrrrr}
-    \toprule
-    $\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma$ \\
-    \midrule
-    5\%  & 13.1 & 1.7 & 2.0 & 11.1 & $-0.2$ \\
-    10\% & 19.7 & 2.9 & 3.9 & 15.8 & $-1.0$ \\
-    15\% & 23.6 & 4.2 & 5.9 & 17.8 & $-1.6$ \\
-    \textbf{20\%} & \textbf{28.9} & \textbf{5.8} & \textbf{7.8} &
-    $\hat{\pi}^-_A=\mathbf{21.1}$ & $\hat{\pi}^+_A=\mathbf{-2.0}$ \\
-    25\% & 33.3 & 7.5 & 9.8 & 23.5 & $-2.3$ \\
-    30\% & 37.3 & 9.5 & 11.7 & 25.6 & $-2.2$ \\
-    35\% & 40.2 & 10.3 & 13.7 & 26.6 & $-3.3$ \\
-    40\% & 42.8 & 11.8 & 15.6 & 27.2 & $-3.8$ \\
-    45\% & 44.6 & 12.8 & 17.6 & 27.0 & $-4.7$ \\
-    50\% & 47.2 & 14.0 & 19.5 & 27.7 & $-5.5$ \\
-    \bottomrule
-  \end{tabular}
-  \vspace{6pt}\\
-  $\hat{\pi}_0 = 77.8\%$, $N=1{,}815$ active funds. Full-period Carhart alphas.
-  All quantities as \% of active-fund universe.
-\end{frame}
-
-\begin{frame}{A12: Fund Flows (Figure 1)}
-  \begin{columns}[T]
-    \begin{column}{0.60\textwidth}
-      \IfFileExists{tables/fig_fund_flows.png}{%
-        \includegraphics[width=\linewidth]{tables/fig_fund_flows}}{%
-        \fbox{\parbox[c][4cm][c]{\linewidth}{\centering\footnotesize\texttt{fig\_fund\_flows.png}}}}
-    \end{column}
-    \begin{column}{0.38\textwidth}
-      \begin{itemize}\itemsep5pt
-        \item Average monthly proportional fund flows: active vs.\ passive.
-        \item Passive flows persistently above active post-2010.
-        \item Active flows declined structurally after the 2011 break.
-        \item Flow convexity (winner-chasing) visible as spikes in active flows
-              around return peaks.
-      \end{itemize}
-    \end{column}
-  \end{columns}
+  \vfill
+  \begin{center}
+    \footnotesize
+    \begin{tabular}{rl}
+      A1--A3   & Sharpe's Arithmetic Identity \\[3pt]
+      A4--A6   & Sample Exclusion Framework \\[3pt]
+      A7       & Fund flows figure \\[3pt]
+      A8       & BSW decomposition: full $\gamma$-grid \\[3pt]
+      A9       & Performance persistence: full table (Panel A) \\[3pt]
+      A10      & Activeness-conditioned persistence \\[3pt]
+      A11      & H1: Full coefficient table \\[3pt]
+      A12      & H2: Full coefficient table \\[3pt]
+      A13      & H3: Full coefficient table \\[3pt]
+      A14--A15 & H4: Full coefficient table \\[3pt]
+      A16      & Margin debt construction (H2) \\
+    \end{tabular}
+  \end{center}
+  \vfill
 \end{frame}
 
 % ============================================================
-%  A13–A15: SHARPE'S ARITHMETIC IDENTITY
+%  A1–A3: SHARPE'S ARITHMETIC
 % ============================================================
 
-\begin{frame}{A13: Sharpe's Arithmetic — Market Decomposition}
+\begin{frame}{A1: Sharpe's Arithmetic — Market Decomposition}
 
-  \textbf{Setup.} Partition all investors into two exhaustive, mutually exclusive groups:
+  \textbf{Setup.} The market is divided into two mutually exclusive and exhaustive segments:
+  \[
+    V_M = V_P + V_A
+  \]
+  where $V_M$ is total market value, $V_P$ is total value held by passive investors,
+  and $V_A$ is total value held by active investors.\\[6pt]
 
-  \vspace{4pt}
-  \begin{columns}[T]
-    \begin{column}{0.46\textwidth}
-      \small\textbf{Passive investors} $\mathcal{P}$\\[3pt]
-      Hold market portfolio $M$: every security $i$ at its cap weight $w_i^M$.
-      \[
-        w_i^{\mathcal{P}} = w_i^M = \frac{\text{MktCap}_i}{\sum_j \text{MktCap}_j}
-      \]
-    \end{column}
-    \begin{column}{0.50\textwidth}
-      \small\textbf{Active investors} $\mathcal{A}$\\[3pt]
-      Hold any portfolio deviating from $M$. Market clearing requires:
-      \[
-        w_i^M = \lambda\, w_i^{\mathcal{P}} + (1-\lambda)\, w_i^{\mathcal{A}}
-      \]
-      \footnotesize where $\lambda \in (0,1)$ is passive share of total wealth.
-    \end{column}
-  \end{columns}
+  \textbf{Value-weight shares:}
+  \[
+    w_P = \frac{V_P}{V_M} \qquad w_A = \frac{V_A}{V_M} \qquad w_P + w_A = 1
+  \]
+
+  \textbf{Market return identity.} The market return is the value-weighted average
+  of passive and active returns:
+  \[
+    R_M = w_P \cdot R_P + w_A \cdot R_A
+  \]
+
+  \textbf{Passive return.} By construction, passive investors hold the market portfolio:
+  \[
+    R_P = R_M
+  \]
+
+\end{frame}
+
+\begin{frame}{A2: Sharpe's Arithmetic — The Identity}
+
+  \textbf{Derivation.} Substitute $R_P = R_M$ into the market return equation:
+  \[
+    R_M = w_P \cdot R_M + w_A \cdot R_A
+  \]
+  Rearrange:
+  \[
+    R_M (1 - w_P) = w_A \cdot R_A
+    \qquad\Longrightarrow\qquad
+    R_M \cdot w_A = w_A \cdot R_A
+  \]
+  Divide both sides by $w_A > 0$:
+  \[
+    \boxed{R_A = R_M}
+  \]
+  \alert{Before costs, the aggregate gross return of active management equals the market return.}
 
   \vspace{6pt}
-  \textbf{Key implication.} Substituting $w_i^{\mathcal{P}} = w_i^M$ and rearranging:
+  \textbf{Net-of-cost corollary.} Let $c_A > c_P \geq 0$ be per-period cost rates:
   \[
-    w_i^M = \lambda\, w_i^M + (1-\lambda)\, w_i^{\mathcal{A}}
-    \;\implies\;
-    \boxed{w_i^{\mathcal{A}} = w_i^M \quad \forall\, i}
+    NR_A - NR_P = (R_M - c_A) - (R_M - c_P) = c_P - c_A < 0
   \]
-  \alert{In aggregate, active investors hold the market portfolio.}
+  \[
+    \boxed{NR_A < NR_P}
+  \]
+  \alert{After costs, the average active investor must underperform the average passive investor.
+  Always. In every period.}\\[4pt]
 
 \end{frame}
 
-% ----------------------------------------------------------
-
-\begin{frame}{A14: Sharpe's Arithmetic — The Identity}
-
-  \textbf{Gross return identity.}
-  Since $w_i^{\mathcal{A}} = w_i^M$ in aggregate, for any period $t$:
-  \[
-    R^{\mathcal{A},\text{gross}}_t
-    = \sum_i w_i^{\mathcal{A}} R_{i,t}
-    = \sum_i w_i^{M} R_{i,t}
-    = R^{M}_t
-    \qquad \square
-  \]
-  \[
-    \boxed{R^{\mathcal{A},\text{gross}}_t = R^{M}_t}
-  \]
-
-  \vspace{4pt}
-  \textbf{Net-of-cost corollary.}
-  Let $c^{\mathcal{A}} > c^{\mathcal{P}} \geq 0$ be per-period cost rates. Then:
-
-  \[
-    R^{\mathcal{A},\text{net}}_t
-    = R^{M}_t - c^{\mathcal{A}}
-    < R^{M}_t - c^{\mathcal{P}}
-    = R^{\mathcal{P},\text{net}}_t
-  \]
-  \[
-    \boxed{R^{\mathcal{A},\text{net}}_t < R^{\mathcal{P},\text{net}}_t}
-  \]
-
-  \vspace{4pt}
-  \alert{After costs, the average active investor must underperform
-  the average passive investor. Always. In every period.}\\[4pt]
-  \footnotesize\textit{Sharpe (1991, Financial Analysts Journal)}
-
-\end{frame}
-
-% ----------------------------------------------------------
-
-\begin{frame}{A15: What the Identity Does — and Does Not — Imply}
-
+\begin{frame}{A3: What the Identity Does — and Does Not — Imply}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \small\textbf{What it \emph{does} establish}
       \begin{itemize}\itemsep2pt
-        \item A \emph{tautological} result: follows from market clearing alone —
-              no model, no data required.
-        \item Average active dollar underperforms by exactly
-              $c^{\mathcal{A}} - c^{\mathcal{P}}$ per period.
+        \item A \emph{tautological} result: follows from the definition
+              of value-weighted returns and market clearing alone.
+        \item The average active dollar underperforms by exactly
+              $c_A - c_P$ per period.
         \item Holds for \emph{any} period, asset class, or market structure.
       \end{itemize}
     \end{column}
     \begin{column}{0.48\textwidth}
       \small\textbf{What it \emph{does not} establish}
       \begin{itemize}\itemsep2pt
-        \item Nothing about the \emph{distribution}: some managers outperform;
-              the identity forces others to underperform by more.
-        \item Nothing about \emph{investor} returns: skilled fund selection
-              could allow investors to outperform net of fees.
-        \item Nothing about \emph{persistence}: whether the same managers
-              consistently over- or underperform is purely empirical.
+        \item Nothing about the \emph{distribution}: some managers
+              outperform; others underperform by more to compensate.
+        \item Nothing about \emph{investor} returns: skilled fund
+              selection could allow outperformance net of fees.
+        \item Nothing about \emph{persistence}: an empirical question.
       \end{itemize}
     \end{column}
   \end{columns}
-
   \vspace{5pt}
   \begin{block}{The Bridge to This Dissertation}
-    \small
-    The identity explains why the \emph{average} active fund underperforms.
-    The puzzle is why investors \emph{persist} in allocating to the
-    below-average tail — which is where H1–H4 live.
+    \small The identity explains why the \emph{average} active fund underperforms.
+    The puzzle is why investors \emph{persist} in allocating to the below-average
+    tail — which is where H1–H4 live.
     The identity is the starting point, not the answer.
   \end{block}
-
 \end{frame}
 
 % ============================================================
-%  A16–A18: SAMPLE EXCLUSION FRAMEWORK
+%  A4–A6: SAMPLE EXCLUSION FRAMEWORK
 % ============================================================
 
-\begin{frame}{A16: Exclusion Framework — Three-Tier Architecture}
-
+\begin{frame}{A4: Exclusion Framework — Three-Tier Architecture}
   \begin{columns}[T]
     \begin{column}{0.50\textwidth}
       \small\textbf{Three motivations}
@@ -1445,89 +1697,358 @@
       H1, H2, H4 retain all active funds.
     \end{column}
   \end{columns}
-
 \end{frame}
 
-% ----------------------------------------------------------
-
-\begin{frame}{A17: Tier 0 — Entire-Analysis Exclusions}
-
+\begin{frame}{A5: Tier 0 — Entire-Analysis Exclusions}
   \scriptsize
   \begin{tabular}{lcp{8.2cm}}
     \toprule
     Category & $N$ & Rationale \& Citation \\
     \midrule
-    Global mandate
-      & 38
-      & Non-US benchmarks (MSCI World/ACWI). Carhart factors are constructed on US equities;
-        structurally invalid outside US scope.
-        \textit{Fama \& French (2010, JF).} \\[2pt]
-    EM mandate
-      & 2
-      & Emerging-markets benchmark. Same rationale as global mandate. \\[2pt]
-    Long/short
-      & 32
-      & Leveraged/short positions violate Sharpe's (1991) arithmetic identity
-        and render Carhart loadings uninterpretable.
-        \textit{Sharpe (1991, FAJ); FF (2010, JF).} \\[2pt]
-    Market-neutral
-      & 26
-      & Net-zero market exposure: $\beta_{\text{MKT}} \approx 0$ by mandate;
-        Carhart attribution meaningless. Violates long-only assumption.
-        \textit{FF (2010, JF).} \\[2pt]
-    Bear-market/inverse
-      & 27
-      & Negative market beta violates long-only assumption;
-        factor loadings uninterpretable.
-        \textit{FF (2010, JF).} \\[2pt]
-    Data error
-      & 2
-      & Confirmed data errors (QWVOX, VALLCEN):
-        impossible cumulative returns. \\
+    Global mandate      & 38 & Non-US benchmarks (MSCI World/ACWI). Carhart factors constructed on US equities; structurally invalid outside US scope. \textit{FF (2010, JF).} \\[2pt]
+    EM mandate          & 2  & Emerging-markets benchmark. Same rationale as global mandate. \\[2pt]
+    Long/short          & 32 & Leveraged/short positions violate Sharpe's (1991) arithmetic identity and render Carhart loadings uninterpretable. \textit{Sharpe (1991, FAJ); FF (2010, JF).} \\[2pt]
+    Market-neutral      & 26 & Net-zero market exposure: $\beta_{\text{MKT}} \approx 0$ by mandate; Carhart attribution meaningless. \textit{FF (2010, JF).} \\[2pt]
+    Bear-market/inverse & 27 & Negative market beta violates long-only assumption. \textit{FF (2010, JF).} \\[2pt]
+    Data error          & 2  & Confirmed data errors (QWVOX, VALLCEN): impossible cumulative returns. \\
     \midrule
-    \textbf{Total}
-      & \textbf{127}
-      & Dropped from all panels at source. \\
+    \textbf{Total}      & \textbf{127} & Dropped from all panels at source. \\
     \bottomrule
   \end{tabular}
-
 \end{frame}
 
-% ----------------------------------------------------------
-
-\begin{frame}{A18: Tier 1 \& Tier 2 — Scoped Exclusions}
-
+\begin{frame}{A6: Tier 1 \& Tier 2 — Scoped Exclusions}
   \scriptsize
   \begin{tabular}{lclp{6.8cm}}
     \toprule
     Category & $N$ & Scope & Rationale \& Citation \\
     \midrule
-    Sector funds
-      & 149
-      & Tier 1
-      & The Carhart factors do not span sector-specific return variance, leaving
-        a large residual that mechanically inflates $1-R^2$ (factor orthogonality
-        directly) and, via the resulting fat-tailed return distribution, also
-        inflates MAX12 and return skewness — all driven by mandate concentration,
-        not manager discretion.
-        Excluded from: aggregate $\alpha$, bootstrap/FDR/BSW, portfolio sorts,
-        persistence, sub-period $\alpha$, and all activeness/H3 analyses.
-        \emph{Retained} in H1, H2, H4 flow regressions.
-        \textit{Kacperczyk, Sialm \& Zheng (2005, JF);
-        Amihud \& Goyenko (2013, RFS).} \\[4pt]
-    Covered-call overlay
-      & 6
-      & Tier 2
-      & A covered-call overlay mechanically \emph{truncates} the right return
-        tail — the conceptual inverse of the lottery signal tested in H3.
-        Excluded from: H3 lottery-demand regressions, Psychological Premium
-        Framework, and all activeness sort analyses.
-        \emph{Retained} in all other analyses including aggregate $\alpha$,
-        bootstrap/FDR/BSW, portfolio sorts, persistence, and H1/H2/H4.
-        \textit{Barberis \& Huang (2008, JF).} \\
+    \textbf{Sector funds}
+      & 149 & Tier 1
+      & The Carhart factors do not span sector-specific return variance, leaving a large residual that mechanically inflates $1-R^2$ (factor orthogonality directly) and, via the resulting fat-tailed return distribution, also inflates MAX12 and return skewness — all driven by mandate concentration, not manager discretion. Excluded from: aggregate $\alpha$, bootstrap/FDR/BSW, portfolio sorts, persistence, sub-period $\alpha$, and all activeness/H3 analyses. \emph{Retained} in H1, H2, H4. \textit{Kacperczyk, Sialm \& Zheng (2005, JF); Amihud \& Goyenko (2013, RFS).} \\[4pt]
+    \textbf{Covered-call overlay}
+      & 6 & Tier 2
+      & Mechanically \emph{truncates} the right return tail — the conceptual inverse of the lottery signal tested in H3. Excluded from: H3, PPF, activeness sorts. \emph{Retained} in all other analyses. \textit{Barberis \& Huang (2008, JF).} \\
     \bottomrule
   \end{tabular}
+\end{frame}
 
+% ============================================================
+%  A7: FUND FLOWS FIGURE
+% ============================================================
+
+\begin{frame}{A7: Fund Flows (Figure 1)}
+  \begin{columns}[T]
+    \begin{column}{0.60\textwidth}
+      \IfFileExists{tables/fig_fund_flows.png}{%
+        \includegraphics[width=\linewidth]{tables/fig_fund_flows}}{%
+        \fbox{\parbox[c][4cm][c]{\linewidth}{\centering\footnotesize\texttt{fig\_fund\_flows.png}}}}
+    \end{column}
+    \begin{column}{0.38\textwidth}
+      \begin{itemize}\itemsep5pt
+        \item Average monthly proportional fund flows: active vs.\ passive.
+        \item Passive flows persistently above active post-2010.
+        \item Active flows declined structurally after the Sep 2011 break.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ============================================================
+%  A8: BSW FULL GAMMA-GRID
+% ============================================================
+
+\begin{frame}{A8: BSW Decomposition — Full $\gamma$-Grid}
+  \footnotesize
+  \begin{tabular}{@{}rrrrrr@{}}
+    \toprule
+    $\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma$ \\
+    \midrule
+    5\%  & 13.1 & 1.7 & 2.0 & 11.1 & $-0.2$ \\
+    10\% & 19.7 & 2.9 & 3.9 & 15.8 & $-1.0$ \\
+    15\% & 23.6 & 4.2 & 5.9 & 17.8 & $-1.6$ \\
+    \textbf{20\%} & \textbf{28.9} & \textbf{5.8} & \textbf{7.8} & $\mathbf{21.1}$ & $\mathbf{-2.0}$ \\
+    25\% & 33.3 & 7.5 & 9.8  & 23.5 & $-2.3$ \\
+    30\% & 37.3 & 9.5 & 11.7 & 25.6 & $-2.2$ \\
+    35\% & 40.2 & 10.3 & 13.7 & 26.6 & $-3.3$ \\
+    40\% & 42.8 & 11.8 & 15.6 & 27.2 & $-3.8$ \\
+    45\% & 44.6 & 12.8 & 17.6 & 27.0 & $-4.7$ \\
+    50\% & 47.2 & 14.0 & 19.5 & 27.7 & $-5.5$ \\
+    \bottomrule
+  \end{tabular}
+  \vspace{6pt}\\
+  $\hat{\pi}_0 = 77.8\%$, $N=1{,}815$ active funds. Full-period Carhart alphas.
+  All quantities as \% of active-fund universe. Reference row ($\gamma=20\%$) in bold.\\[4pt]
+  $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled.
+  $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled.
+  Negative $T^+_\gamma$ indicates skilled mass does not exceed the false-discovery rate.
+\end{frame}
+
+% ============================================================
+%  A9: PERSISTENCE FULL TABLE (PANEL A)
+% ============================================================
+
+\begin{frame}{A9: Performance Persistence — Full Table, Panel A}
+  \scriptsize
+  \begin{tabular}{@{}lrrrrrr@{}}
+    \toprule
+    Decile & $\hat{\alpha}$ (\%/mo) & $t(\hat{\alpha})$ & $p^C$ & $p^R_B$ & $p^L_B$ & ExpR \\
+    \midrule
+    D1 (Best past)  & $-0.052$         & $(-1.06)$ & $0.145$  & $0.634$ & $0.366$ & 1.00 \\
+    D2              & $-0.053$         & $(-1.00)$ & $0.159$  & $0.755$ & $0.245$ & 1.02 \\
+    D3              & $-0.055$         & $(-0.91)$ & $0.181$  & $0.585$ & $0.415$ & 1.01 \\
+    D4              & $-0.069$         & $(-1.59)$ & $0.056$  & $0.803$ & $0.197$ & 1.03 \\
+    D5              & $-0.110^{*}$     & $(-1.92)$ & $0.028$  & $0.726$ & $0.274$ & 1.02 \\
+    D6              & $-0.090$         & $(-1.51)$ & $0.065$  & $0.618$ & $0.382$ & 1.05 \\
+    D7              & $-0.111$         & $(-1.50)$ & $0.067$  & $0.652$ & $0.348$ & 1.01 \\
+    D8              & $-0.110^{*}$     & $(-1.92)$ & $0.028$  & $0.843$ & $0.157$ & 1.09 \\
+    D9              & $-0.076$         & $(-0.99)$ & $0.162$  & $0.595$ & $0.405$ & 1.08 \\
+    D10 (Worst past)& $-0.189^{***}$   & $(-3.49)$ & $<.001$  & $0.857$ & $\mathbf{0.143}$ & 1.15 \\
+    \midrule
+    D1$-$D10        & $+0.136^{*}$     & $(+1.79)$ & $0.037$  & $0.280$ & $0.720$ & -- \\
+    \bottomrule
+  \end{tabular}
+  \vspace{4pt}\\
+  \footnotesize Panel A: Full period (Jan 1995–Feb 2026). $\hat{\alpha}$ = EW holding-period
+  Carhart alpha (\%/month). $p^C$ = OLS two-tailed $p$-value. $p^R_B$ ($p^L_B$) = bootstrap
+  right (left) tail $p$-value under zero-persistence null ($B=10{,}000$). ExpR = mean expense
+  ratio (\% p.a.). Formation ranking on $t(\hat{\alpha})$; D1 = highest past $t$, D10 = lowest.
+  \textit{Kosowski, Timmermann, Wermers \& White (2006, JF)}.
+\end{frame}
+
+% ============================================================
+%  A10: ACTIVENESS-CONDITIONED PERSISTENCE
+% ============================================================
+
+\begin{frame}{A10: Activeness-Conditioned Persistence}
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrrrr@{}}
+    \toprule
+    & \multicolumn{2}{c}{T1: Low activeness} & \multicolumn{2}{c}{T2: Mid activeness} & \multicolumn{2}{c}{T3: High activeness} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+    Decile & $\hat{\alpha}$ (\%/mo) & $p^C$ & $\hat{\alpha}$ (\%/mo) & $p^C$ & $\hat{\alpha}$ (\%/mo) & $p^C$ \\
+    \midrule
+    D1 (Best past)   & $-0.211^{***}$ & $<.001$ & $-0.016$ & $0.400$ & $+0.080$ & $0.191$ \\
+    D5               & $-0.110^{*}$   & $0.031$ & $-0.108$ & $0.105$ & $-0.023$ & $0.373$ \\
+    D10 (Worst past) & $-0.197^{***}$ & $<.001$ & $-0.188^{***}$ & $<.001$ & $-0.221$ & $0.051$ \\
+    \midrule
+    D1$-$D10         & $-0.014$ & $0.379$ & $+0.172^{**}$ & $0.012$ & $+0.300^{*}$ & $0.034$ \\
+    \bottomrule
+  \end{tabular}
+  \vspace{5pt}
+  \begin{itemize}\itemsep3pt
+    \item \textbf{T1 (Closet indexers)}: winner reversion and loser persistence coexist —
+          D1 and D10 both significantly negative at similar magnitudes. Uniform chronic
+          underperformance; D1$-$D10 near zero and insignificant.
+    \item \textbf{T2 (Middle)}: cleanest signal — D10 loser persistence significant
+          ($-0.188^{***}$), D1$-$D10 spread significant at 5\%. Loser persistence
+          concentrated here.
+    \item \textbf{T3 (Most active)}: largest spread (+0.300*) but high variance;
+          D10 borderline ($p=0.051$). Idiosyncratic noise dominates at extremes.
+    \item Loser persistence is not monotone in activeness — concentrated in mid-activeness
+          funds where cross-sectional skill dispersion is clearest.
+    \item \footnotesize Bootstrap inference omitted (secondary conditional test); $p^C$ values are parametric.
+  \end{itemize}
+\end{frame}
+
+% ============================================================
+%  A11: H1 FULL COEFFICIENT TABLE
+% ============================================================
+
+\begin{frame}{A11: H1 — Full Coefficient Table}
+  \scriptsize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Variable & Baseline & $D^{\text{SENT}}$ & $\text{SENT}^\perp$ & $D^{\text{AAII}}$ \\
+    & (1) & (2) & (3) & (4) \\
+    \midrule
+    $R^{\text{LOW}}$              & $0.031^{***}$ & $0.034^{***}$ & $0.031^{***}$ & $0.033^{***}$ \\
+    $R^{\text{MID}}$              & $0.014^{***}$ & $0.015^{***}$ & $0.014^{***}$ & $0.014^{***}$ \\
+    $R^{\text{HIGH}}$             & $0.081^{***}$ & $0.083^{***}$ & $0.081^{***}$ & $0.077^{***}$ \\
+    Sentiment                     &               & $0.006^{***}$ & $0.003^{***}$ & $0.000$ \\
+    $R^{\text{LOW}}\times$ Sent.  &               & $-0.011$      & $-0.004$      & $-0.008$ \\
+    $R^{\text{MID}}\times$ Sent.  &               & $-0.004^{**}$ & $-0.001$      & $+0.003$ \\
+    $R^{\text{HIGH}}\times$ Sent. &               & $-0.010$      & $-0.006$      & $+0.020^{**}$ \\
+    $\log(\text{TNA})$            & $-0.004^{***}$& $-0.004^{***}$& $-0.004^{***}$& $-0.004^{***}$ \\
+    $\log(\text{Age})$            & $-0.011^{***}$& $-0.011^{***}$& $-0.012^{***}$& $-0.011^{***}$ \\
+    Return volatility             & $-0.026$      & $-0.034$      & $-0.034$      & $-0.026$ \\
+    Style flow                    & $0.100^{***}$ & $0.096^{***}$ & $0.094^{***}$ & $0.100^{***}$ \\
+    \midrule
+    Joint $\chi^2_3$ ($p$)        & --            & 9.13 (0.028)  & 6.92 (0.074)  & 11.02 (0.012) \\
+    Asymmetry $z$ (1-sided $p$)   & --            & $+0.06$ (0.475) & $-0.36$ (0.639) & $+2.11$ (0.018) \\
+    \bottomrule
+  \end{tabular}
+  \vspace{3pt}\\
+  \tiny Fund FE; two-way clustering Ticker $\times$ yearmo. $N=232{,}800$. Dec.\ excluded.
+  $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{frame}
+
+% ============================================================
+%  A11: H2 FULL COEFFICIENT TABLE
+% ============================================================
+
+\begin{frame}{A12: H2 — Full Coefficient Table}
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Variable & Baseline & $D^{\text{MD,Det}}$ & $D^{\text{INV-PCR}}$ & Discriminant \\
+    & (1) & (2) & (3) & (4) \\
+    \midrule
+    $R^{\text{LOW}}$                     & $0.031^{***}$ & $0.024^{***}$ & $0.039^{***}$ & $0.026^{***}$ \\
+    $R^{\text{MID}}$                     & $0.014^{***}$ & $0.013^{***}$ & $0.015^{***}$ & $0.014^{***}$ \\
+    $R^{\text{HIGH}}$                    & $0.081^{***}$ & $0.076^{***}$ & $0.087^{***}$ & $0.079^{***}$ \\
+    State                                &               & $-0.003^{**}$ & $+0.000$      & $-0.002$ \\
+    $R^{\text{LOW}}\times$ State         &               & $+0.015^{**}$ & $-0.001$      & $+0.013^{*}$ \\
+    $R^{\text{MID}}\times$ State         &               & $+0.003$      & $-0.001$      & $+0.002$ \\
+    $R^{\text{HIGH}}\times$ State        &               & $+0.010$      & $+0.003$      & $+0.007$ \\
+    $D^{\text{SENT}}$                    &               &               &               & $+0.005^{***}$ \\
+    $R^{\text{LOW}}\times D^{\text{SENT}}$&              &               &               & $-0.005$ \\
+    $R^{\text{MID}}\times D^{\text{SENT}}$&              &               &               & $-0.003^{*}$ \\
+    $R^{\text{HIGH}}\times D^{\text{SENT}}$&             &               &               & $-0.007$ \\
+    $\log(\text{TNA})$                   & $-0.004^{***}$& $-0.004^{***}$& $-0.005^{***}$& $-0.004^{***}$ \\
+    $\log(\text{Age})$                   & $-0.011^{***}$& $-0.011^{***}$& $-0.014^{***}$& $-0.011^{***}$ \\
+    Return volatility                    & $-0.026$      & $-0.025$      & $-0.100^{***}$& $-0.032$ \\
+    Style flow                           & $0.100^{***}$ & $0.100^{***}$ & $0.099^{***}$ & $0.096^{***}$ \\
+    \midrule
+    Joint $\chi^2_3$ ($p$)               & --            & 11.24 (0.010) & 0.44 (0.931)  & 7.52 (0.057) \\
+    Loser-end $z$ (1-sided $p$)          & --            & $+2.15$ (0.984) & $-0.20$ (0.420) & $+1.91$ (0.972) \\
+    \bottomrule
+  \end{tabular}
+  \vspace{3pt}\\
+  \tiny Fund FE; Ticker $\times$ yearmo clustering. Cols (1)(2)(4): $N=232{,}800$; Col (3): $N=168{,}488$ (PCR 2003--2019).
+  $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{frame}
+
+% ============================================================
+%  A12: H3 FULL COEFFICIENT TABLE
+% ============================================================
+
+\begin{frame}{A13: H3 — Full Coefficient Table}
+  \scriptsize
+  \setlength{\tabcolsep}{5pt}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Variable & Baseline & ActR2 & ActSkew & MAX12 \\
+    & (1) & (2) & (3) & (4) \\
+    \midrule
+    $R^{\text{LOW}}$              & $0.031^{***}$ & $0.031^{***}$ & $0.031^{***}$ & $0.031^{***}$ \\
+    $R^{\text{MID}}$              & $0.014^{***}$ & $0.014^{***}$ & $0.014^{***}$ & $0.014^{***}$ \\
+    $R^{\text{HIGH}}$             & $0.077^{***}$ & $0.077^{***}$ & $0.077^{***}$ & $0.077^{***}$ \\
+    Lottery measure               &               & $-0.007$      & $+0.001$      & $+0.022^{*}$ \\
+    Sentiment                     &               & $+0.003^{***}$& $+0.003^{**}$ & $+0.000$ \\
+    Lottery $\times$ Sent.        &               & $-0.000$      & $+0.000$      & $+0.033$ \\
+    $\log(\text{TNA})$            & $-0.003^{***}$& $-0.003^{***}$& $-0.003^{***}$& $-0.003^{***}$ \\
+    $\log(\text{Age})$            & $-0.011^{***}$& $-0.012^{***}$& $-0.012^{***}$& $-0.013^{***}$ \\
+    Return volatility             & $-0.022$      & $-0.039$      & $-0.023$      & $-0.077^{**}$ \\
+    Style flow                    & $0.156^{***}$ & $0.145^{***}$ & $0.147^{***}$ & $0.148^{***}$ \\
+    \midrule
+    Joint $\chi^2_2$ ($p$)        & --            & 2.25 (0.325)  & 1.95 (0.378)  & 11.33 (0.003) \\
+    Sent.\ amp.\ $z$ (1-sided $p$)& --            & $-0.02$ (0.506) & $+0.25$ (0.400) & $+1.54$ (0.062) \\
+    \bottomrule
+  \end{tabular}
+  \vspace{3pt}\\
+  \tiny Fund FE; Ticker $\times$ yearmo clustering. $N=212{,}033$ (H3/activeness subsample).
+  $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+\end{frame}
+
+% ============================================================
+%  A13–A14: H4 FULL COEFFICIENT TABLE (SPLIT)
+% ============================================================
+
+\begin{frame}{A14: H4 — Full Coefficient Table (Upper Block)}
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Variable & Baseline & $D^{\text{SENT}}$ & $\text{SENT}^\perp$ & $D^{\text{AAII}}$ \\
+    & (1) & (2) & (3) & (4) \\
+    \midrule
+    Expense ratio                          & $-0.002^{*}$  & $+0.001^{**}$ & $+0.002^{**}$ & $+0.001$ \\
+    $R^{\text{LOW}}\times$ Exp.\ ratio     &               & $-0.023^{***}$& $-0.023^{***}$& $-0.022^{***}$ \\
+    $R^{\text{MID}}\times$ Exp.\ ratio     &               & $-0.002$      & $-0.002$      & $-0.002$ \\
+    $R^{\text{HIGH}}\times$ Exp.\ ratio    &               & $+0.015$      & $+0.020^{***}$& $+0.022^{***}$ \\
+    $R^{\text{LOW}}\times$ Sent.           &               & $-0.006$      & $-0.008$      & $-0.002$ \\
+    $R^{\text{MID}}\times$ Sent.           &               & $-0.005$      & $-0.001$      & $+0.003$ \\
+    $R^{\text{HIGH}}\times$ Sent.          &               & $-0.026$      & $-0.009$      & $-0.002$ \\
+    Exp.\ ratio $\times$ Sent.             &               & $+0.001$      & $+0.000$      & $+0.001$ \\
+    $R^{\text{LOW}}\times$ Exp.\ $\times$ Sent. &          & $-0.005$      & $+0.004$      & $-0.005$ \\
+    $R^{\text{MID}}\times$ Exp.\ $\times$ Sent. &          & $+0.000$      & $-0.001$      & $+0.001$ \\
+    $R^{\text{HIGH}}\times$ Exp.\ $\times$ Sent.&          & $+0.015$      & $+0.002$      & $+0.014$ \\
+    \midrule
+    Joint $\chi^2_4$ ($p$)                 & --            & 4.45 (0.349)  & 4.46 (0.347)  & 5.17 (0.270) \\
+    \bottomrule
+  \end{tabular}
+  \vspace{3pt}\\
+  \tiny Upper block: focal variables (expense ratio interactions). See A14 for controls.
+\end{frame}
+
+\begin{frame}{A15: H4 — Full Coefficient Table (Lower Block: Controls)}
+  \scriptsize
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Variable & Baseline & $D^{\text{SENT}}$ & $\text{SENT}^\perp$ & $D^{\text{AAII}}$ \\
+    & (1) & (2) & (3) & (4) \\
+    \midrule
+    $\log(\text{TNA})$      & $-0.001^{***}$& $-0.001^{***}$& $-0.001^{***}$& $-0.001^{***}$ \\
+    $\log(\text{Age})$      & $-0.003^{***}$& $-0.003^{***}$& $-0.003^{***}$& $-0.003^{***}$ \\
+    Load dummy              & $+0.000$      & $+0.000$      & $+0.000$      & $+0.000$ \\
+    Return volatility       & $-0.134^{***}$& $-0.144^{***}$& $-0.144^{***}$& $-0.144^{***}$ \\
+    Turnover                & $-0.000$      & $-0.000$      & $-0.000$      & $-0.000$ \\
+    Style flow              & $+0.065$      & $+0.065$      & $+0.067$      & $+0.067$ \\
+    \bottomrule
+  \end{tabular}
+  \vspace{4pt}\\
+  \footnotesize\textbf{Fixed effects}: Lipper $\times$ yearmo ($\mu_{s,t}$) — absorbs sentiment main effects
+  and style-month aggregate flow shocks.\\
+  \textbf{Clustering}: Ticker $\times$ yearmo (Petersen 2009). $N=232{,}168$.\\
+  $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.\\[4pt]
+  \footnotesize\textit{Note}: cross-fund expense-ratio variation within each (Lipper style, month) cell identifies
+  $\theta$ and the fee-sentiment interactions. The Lipper $\times$ yearmo FE is what distinguishes
+  H4 from H1--H3 (which use Fund FE).
+\end{frame}
+
+% ============================================================
+%  A15: MARGIN DEBT CONSTRUCTION
+% ============================================================
+
+\begin{frame}{A16: H2 State Variable — Margin Debt Construction}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \small\textbf{Raw data \& scaling}
+      \begin{itemize}\itemsep2pt
+        \item Source: FINRA monthly debit balances in margin accounts (Rule 4521(d)).
+              Available from January 1997; H2 window January 1998--December 2023.
+        \item Scale by Wilshire 5000 Full Cap Index (.W5KF, LSEG):
+              \[
+                \text{MDRatio}(t) = \frac{\text{MarginDebt}(t)}{\text{W5KF}(t)}
+              \]
+        \item Year-over-year differencing removes seasonality:
+              \[
+                \Delta^{yoy}\text{MDRatio}(t) = \frac{\text{MDRatio}(t) - \text{MDRatio}(t-12)}{\text{MDRatio}(t-12)}
+              \]
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \small\textbf{Regime dummy}
+      \begin{itemize}\itemsep2pt
+        \item Following Baker--Wurgler (2007): top-34\% indicator
+              \[
+                D^{\text{MD,Det}}_t = \mathbf{1}\!\left[\Delta^{yoy}\text{MDRatio}(t) > Q_{66}\right]
+              \]
+        \item $Q_{66}$ fixed on full 1998--2023 sample; no look-ahead bias.
+      \end{itemize}
+      \vspace{3pt}
+      \small\textbf{Robustness proxy}
+      \begin{itemize}\itemsep2pt
+        \item CBOE equity call-to-put ratio ($D^{\text{INV-PCR}}$): bottom-34\% indicator for PCR — high C/P reflects illusion of control.
+        \item Available 1995--2023; Col (3) of H2 table.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \end{document}
