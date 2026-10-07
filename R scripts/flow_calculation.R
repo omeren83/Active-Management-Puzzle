@@ -1,12 +1,18 @@
 # =============================================================================
-# FUND FLOW CALCULATION AND VALIDATION                                     v1.1
+# FUND FLOW CALCULATION AND VALIDATION                                     v1.2
+#
+# v1.2 changes (pipeline audit, Oct 2026):
+#   - ret_net_raw is now the LSEG index return itself, which is NAV-based and
+#     net of fees (see data_import_and_cleaning.R v1.4). v1.1 subtracted ER/12
+#     from an already-net series, overstating flows by TNA_{t-1} * ER/12.
+#   - No flow is computed in a month where the TNA source switches between
+#     class_assets and total_assets (2,682 switches in panel_master); the
+#     switch is a change of measurement base, not an investor flow.
+#   - Winsorisation cut-offs for the proportional flows now exclude December,
+#     matching the text (December is set to NA in any case).
 #
 # v1.1 changes:
-#   - Net-return derivation comment rewritten: BSW (2010) observe net directly
-#     from CRSP and DERIVE gross by adding back ER/12. The LSEG pipeline
-#     observes gross only and DERIVES net by subtracting ER/12. Same
-#     arithmetic, opposite direction. The convention itself originates in
-#     Carhart (1997) and Wermers (2000) and is used throughout the literature.
+#   - Net-return derivation comment rewritten (superseded by v1.2).
 #
 # Computes Sirri-Tufano (1998) flows from TNA and unwinsorised net returns,
 # appends results to all three panels (panel_master, panel_incubation,
@@ -14,31 +20,23 @@
 #
 # Formula: Flow_{i,t} = TNA_{i,t} - TNA_{i,t-1} * (1 + R_{i,t})
 # where TNA = class_assets if available, else total_assets
-#       R   = ret_net_raw (unwinsorised approximated net return)
-#             = ret_gross_raw - Expense_Ratio / 1200
-#             LSEG serves identical index series for gross and net total
-#             returns; true net returns are unavailable from the index. The
-#             gross-net wedge of Expense_Ratio/12 follows the standard
-#             fee-decomposition convention (Carhart 1997; Wermers 2000;
-#             Pastor and Stambaugh 2002), applied in the opposite direction
-#             to BSW (2010), who observe net and derive gross. This introduces
-#             a small, bounded, predictable downward bias in estimated flows
-#             proportional to the fund expense ratio.
+#       R   = ret_net_raw: the NAV-based (net-of-fee) index return, screened
+#             for data errors but not winsorised. Net is the correct return
+#             for the identity, since TNA grows by the net return.
 #
-# NOTE: The flow formula is an accounting identity. It uses ret_net_raw
-# (unwinsorised) rather than ret_net (winsorised). Plugging clipped returns
-# into a balance-sheet identity produces fictitious asset growth and biased
-# flow estimates. Winsorisation is applied to the OUTPUT (flow_calc_pct_win),
-# not to the inputs of the identity.
+# NOTE: The flow formula is an accounting identity, so it uses unclipped
+# returns. Winsorisation is applied to the OUTPUT (flow_calc_pct_win) only.
 #
 # New columns appended to all three panels:
 #   tna               - TNA in USD millions (class_assets or total_assets)
 #   tna_source        - "class" or "total" (audit trail)
 #   tna_lag           - lagged TNA
-#   flow_calc         - Sirri-Tufano flow in USD millions
+#   flow_calc         - Sirri-Tufano flow in USD millions (NA when tna_source
+#                       differs from the previous month)
 #   flow_calc_pct     - proportional flow (flow_calc / tna_lag)
 #   is_december       - TRUE for December obs (year-end distribution artifact)
-#   flow_calc_pct_win - flow_calc_pct winsorised at 1/99 pct, NA in December
+#   flow_calc_pct_win - flow_calc_pct winsorised at 1/99 pct (cut-offs from
+#                       non-December months), NA in December
 #   flow_lseg_pct     - LSEG fund_flow / tna_lag (for validation only)
 #   flow_lseg_pct_win - winsorised LSEG flow (for validation only)
 #
@@ -86,10 +84,9 @@ compute_flows <- function(panel) {
     arrange(date) %>%
     mutate(
       tna_lag       = lag(tna),
-      # ret_net_raw = ret_gross_raw - Expense_Ratio/1200 (see data_import_and_cleaning.R).
-      # Uses approximated net return (unwinsorised) - the flow identity requires
-      # actual returns, not clipped values.
-      flow_calc     = tna - tna_lag * (1 + ret_net_raw),
+      # Net (NAV-based) return; no flow across a class/total TNA switch
+      flow_calc     = if_else(tna_source == lag(tna_source),
+                              tna - tna_lag * (1 + ret_net_raw), NA_real_),
       # Proportional flow
       flow_calc_pct = if_else(
         !is.na(tna_lag) & tna_lag > 0,
@@ -101,8 +98,9 @@ compute_flows <- function(panel) {
     # --- 3. Winsorise, flag December ----------------------------------------
   mutate(
     is_december       = (format(date, "%m") == "12"),
+    # cut-offs from non-December months only; December itself set to NA
     flow_calc_pct_win = if_else(is_december, NA_real_,
-                                winsorise(flow_calc_pct)),
+                                winsorise(if_else(is_december, NA_real_, flow_calc_pct))),
     # LSEG proportional flow on same TNA base (validation only)
     flow_lseg_pct     = if_else(
       !is.na(tna_lag) & tna_lag > 0 & !is.na(fund_flow),
@@ -110,7 +108,7 @@ compute_flows <- function(panel) {
       NA_real_
     ),
     flow_lseg_pct_win = if_else(is_december, NA_real_,
-                                winsorise(flow_lseg_pct))
+                                winsorise(if_else(is_december, NA_real_, flow_lseg_pct)))
   )
 }
 
@@ -128,6 +126,9 @@ cat("\npanel_trimmed - proportional flow summary:\n")
 print(summary(panel_trimmed$flow_calc_pct))
 cat("\nTNA source distribution (panel_trimmed):\n")
 print(table(panel_trimmed$tna_source, useNA = "always"))
+n_switch <- panel_master %>% group_by(Ticker) %>% arrange(date) %>%
+  summarise(n = sum(tna_source != lag(tna_source), na.rm = TRUE), .groups = "drop")
+cat("TNA source switches (panel_master, flow set to NA):", sum(n_switch$n), "\n")
 
 # =============================================================================
 # VALIDATION: compare calculated vs LSEG flows (panel_trimmed only)

@@ -1,5 +1,27 @@
 # =============================================================================
-# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.3
+# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.4
+#
+# v1.4 changes vs v1.3 (pipeline audit, Oct 2026):
+#   - RETURN INDEX IS NET OF FEES. The LSEG total-return index (sheet
+#     "gross_return") is NAV-based and therefore net of the expense ratio.
+#     Verified against published calendar-year NAV returns (MTCBX, TEMTX,
+#     HSLAX, 2021-2025: 15 of 15 fund-years agree to rounding). Step 9 now
+#     sets ret_net_raw = index return and ret_gross_raw = ret_net_raw + ER/1200
+#     (gross = net + ER/12, as in Fama & French 2010 and BSW 2010). v1.3 had
+#     the direction reversed, so its "net" series deducted fees twice.
+#   - NO POOLED WINSORISATION OF RETURNS. Pooled 1/99 cut-offs clipped whole
+#     market months (91% of funds in Oct 2008), creating spurious factor-model
+#     residuals. Step 10 now (a) removes data errors with a documented screen
+#     (factor-of-two rule + terminal-print rule), written to return_screen.xlsx,
+#     and (b) uses screened raw returns as ret_gross / ret_net. Per-month
+#     cross-sectional 1/99 winsorised series (ret_gross_cs, ret_net_cs) are
+#     kept for robustness only. Flows keep their own winsorisation.
+#   - Expense_Ratio cleaned at source: values outside [0, 5]% set to NA.
+#   - Step 8b: ProFunds abbreviations ("PRFND", "ULTRSCT", ...) and
+#     "leveraged" now caught in all ap_groups (Bloomberg truncates names, so
+#     v1.3 missed UltraSector ProFunds, one of them labelled Active).
+#   - Join-uniqueness assertions added (static, fund panel, base panel).
+#   - Duplicated Step 8c filter lines removed.
 #
 # v1.3 changes vs v1.2 (filter-methodology revision, May 2026):
 #   - flagged_funds.xlsx ledger updated: PASSIVE_INDEX (313 funds, formerly
@@ -78,11 +100,11 @@
 #   (1) Frozen tail removal - drops LSEG forward-filled post-closure obs
 #   (2) Empty fund exclusion - drops funds with zero valid return obs
 #   (3) Evans (2010) incubation bias correction
-#   (4) Winsorisation of monthly returns at 1st / 99th percentile
-#   (5) Leveraged / derivative-based passive fund exclusion (defensive)
+#   (4) Return data-error screen (v1.4; replaces pooled winsorisation)
+#   (5) Leveraged / derivative-based fund exclusion (name patterns)
 #   (6) flagged_funds.xlsx Entire-Analysis exclusion + flag columns [NEW v1.2]
 #
-# Dependencies: readxl, dplyr, tidyr, lubridate
+# Dependencies: readxl, dplyr, tidyr, lubridate, writexl
 # Evans (2010): Journal of Finance, Vol. LXV, No. 4
 # =============================================================================
 
@@ -90,6 +112,7 @@ library(lubridate)
 library(readxl)
 library(dplyr)
 library(tidyr)
+library(writexl)
 
 FILE          <- "fund_data.xlsx"
 FLAGGED_FILE  <- "flagged_funds.xlsx"   # exclusion ledger (8c)
@@ -97,6 +120,14 @@ DATE_MIN_DATA <- as.Date("1994-12-01")  # include Dec 1994 for lag computation
 DATE_MIN      <- as.Date("1995-01-01")  # actual sample start for analysis
 DATE_MAX      <- as.Date("2023-12-31")  # sample end (panel_trimmed)
 EVANS_MONTHS  <- 36   # Evans (2010): <5% of funds incubated longer than 36 months
+
+# Return data-error screen (Step 10). Ratio = (1 + r_fund) / (1 + r_median),
+# where r_median is the cross-sectional median fund return that month.
+SCREEN_RATIO_ANY  <- 2      # any month: flag if ratio > 2 or < 1/2
+SCREEN_LOG_FINAL  <- 0.30   # final month of a fund that dies before data end: flag if |log(ratio)| > 0.30
+SCREEN_FILE       <- "return_screen.xlsx"   # flagged list, for inspection
+# Fund-months confirmed genuine on inspection: "Ticker|YYYY-MM" (kept unscreened)
+RETURN_SCREEN_KEEP <- character(0)
 
 # =============================================================================
 # HELPER 1: parse date column headers (Excel serial, ISO, Mon-YYYY)
@@ -142,9 +173,21 @@ winsorise <- function(x, low = 0.01, high = 0.99) {
 # =============================================================================
 static <- read_excel(FILE, sheet = "static") %>%
   mutate(Inception_Date = parse_inception_date(Inception_Date))
+stopifnot(!anyDuplicated(static$Ticker))   # one static row per fund
 
 cat("Static loaded:", nrow(static), "funds |",
     sum(!is.na(static$Inception_Date)), "with valid Inception_Date\n")
+
+# Expense ratio (% p.a.): numeric; values outside [0, 5] are data errors -> NA
+static <- static %>%
+  mutate(.er_raw       = suppressWarnings(as.numeric(Expense_Ratio)),
+         .er_bad       = !is.na(.er_raw) & (.er_raw < 0 | .er_raw > 5),
+         Expense_Ratio = if_else(.er_bad, NA_real_, .er_raw))
+cat("Expense_Ratio outside [0, 5]% set to NA:", sum(static$.er_bad), "funds\n")
+if (any(static$.er_bad))
+  print(as.data.frame(static[static$.er_bad, c("Ticker", "Name", ".er_raw")]),
+        row.names = FALSE)
+static <- select(static, -.er_raw, -.er_bad)
 
 # =============================================================================
 # 2. FUND-LEVEL TIME SERIES - pivot wide -> long
@@ -167,6 +210,7 @@ read_fund_ts <- function(sheet) {
 
 fund_ts_list <- lapply(ts_sheets, read_fund_ts)
 fund_panel   <- Reduce(function(a, b) full_join(a, b, by = c("Ticker", "date")), fund_ts_list)
+stopifnot(!anyDuplicated(fund_panel[c("Ticker", "date")]))   # one row per fund-month
 
 cat("Raw panel:", nrow(fund_panel), "rows |", n_distinct(fund_panel$Ticker), "funds\n")
 
@@ -256,6 +300,7 @@ base_panel <- fund_panel_clean %>%
   left_join(static,      by = "Ticker") %>%
   left_join(macro_panel, by = "date") %>%
   arrange(Ticker, date)
+stopifnot(!anyDuplicated(base_panel[c("Ticker", "date")]))   # joins added no rows
 
 # =============================================================================
 # 6. EVANS (2010) INCUBATION FILTER
@@ -367,13 +412,28 @@ LEVERAGED_KEYWORDS <- paste(
 # The user-curated workbook continues to govern Step 8c; the v1.2 inline
 # retention logic remains superseded.
 
+# v1.4: Bloomberg truncates fund names ("ULTRSCTR PRFND", "PROFND", "US PF-INV"),
+# so the patterns above miss several UltraSector ProFunds. These abbreviations, plus
+# "leveraged", are unambiguous and are applied to ALL ap_groups (one ProFund,
+# IDPIX, is labelled Active by LSEG). "ultra" stays Passive-only because
+# genuine active funds use it (e.g. American Century Ultra, Wasatch Ultra Growth).
+LEVERAGED_ANY_GROUP <- "prfnd|prfund|profnd|profund|pf-inv|leveraged"
+
 exclude_leveraged <- function(panel) {
   panel %>%
     filter(
       !(ap_group == "Passive" &
-          grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE))
+          grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE)),
+      !grepl(LEVERAGED_ANY_GROUP, Name, ignore.case = TRUE)
     )
 }
+
+cat("\nStep 8b removes (panel_master, all groups):\n")
+print(as.data.frame(panel_master %>%
+  distinct(Ticker, Name, ap_group) %>%
+  filter((ap_group == "Passive" & grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE)) |
+           grepl(LEVERAGED_ANY_GROUP, Name, ignore.case = TRUE)) %>%
+  arrange(ap_group, Name)), row.names = FALSE)
 
 n_pass_before <- n_distinct(panel_trimmed$Ticker[panel_trimmed$ap_group == "Passive"])
 
@@ -474,10 +534,6 @@ panel_master     <- panel_master     %>% filter(!Ticker %in% tickers_entire)
 panel_incubation <- panel_incubation %>% filter(!Ticker %in% tickers_entire)
 panel_trimmed    <- panel_trimmed    %>% filter(!Ticker %in% tickers_entire)
 
-panel_master     <- panel_master     %>% filter(!Ticker %in% tickers_entire)
-panel_incubation <- panel_incubation %>% filter(!Ticker %in% tickers_entire)
-panel_trimmed    <- panel_trimmed    %>% filter(!Ticker %in% tickers_entire)
-
 # Tag remaining funds with the two flag columns
 add_flag_cols <- function(panel) {
   panel %>%
@@ -518,45 +574,32 @@ cat(sprintf("    excluded_h3   = TRUE : %d funds\n",
             n_distinct(panel_trimmed$Ticker[panel_trimmed$excluded_h3])))
 
 # =============================================================================
-# 9. MONTHLY PERCENTAGE RETURNS FROM INDEX LEVELS
-#    gross_return is the LSEG total return index level (not a percentage).
-#    ret_gross_raw: unwinsorised gross decimal return (index_t/index_{t-1} - 1).
-#    ret_gross: winsorised gross return (Step 10 below).
+# 9. MONTHLY RETURNS FROM THE TOTAL-RETURN INDEX
+#    gross_return is the LSEG total-return index LEVEL. Despite the sheet name,
+#    it is NAV-based and therefore NET of the expense ratio (v1.4; verified
+#    against published calendar-year NAV returns of MTCBX, TEMTX and HSLAX,
+#    2021-2025, 15 of 15 fund-years agree to rounding). The "net_return" sheet
+#    is the same series (identical in 99.6% of cells).
 #
-#    NET RETURN APPROXIMATION (direction reversed from BSW 2010):
-#    LSEG serves identical total return index series for both the gross and
-#    net return fields. True net returns are therefore unavailable from the
-#    LSEG index. We approximate net returns from gross by deducting one-twelfth
-#    of the static annual expense ratio per month:
-#         ret_net_raw = ret_gross_raw - Expense_Ratio / 1200
-#    Expense_Ratio is in percentage terms (e.g. 1.0 = 1%), so dividing by 1200
-#    converts to a monthly decimal deduction. Where Expense_Ratio is missing
-#    or unparseable, ret_net_raw is NA - no imputation is applied.
+#    ret_net_raw   = index_t / index_{t-1} - 1          (what investors earn)
+#    ret_gross_raw = ret_net_raw + Expense_Ratio / 1200  (before expenses)
 #
-#    The arithmetic gross-net wedge of Expense_Ratio/12 follows the standard
-#    fee-decomposition convention in the mutual fund literature - originating
-#    in Carhart (1997) and Wermers (2000), adopted in Pastor and Stambaugh
-#    (2002) and used throughout BSW (2010). BSW (2010) and most CRSP-based
-#    studies observe NET returns and DERIVE gross by ADDING back the wedge.
-#    Our pipeline observes gross only and DERIVES net by SUBTRACTING the
-#    wedge - the same arithmetic, applied in the opposite direction.
+#    Gross = net + ER/12 is the convention of Fama & French (2010) and
+#    BSW (2010). Expense_Ratio is in percent (1.0 = 1%) and is a static
+#    end-of-sample snapshot. Where it is missing, ret_gross_raw is NA and
+#    ret_net_raw is unaffected (no imputation). Returns exclude sales loads,
+#    as in CRSP-based studies.
 #
-#    IMPORTANT: ret_gross_raw and ret_net_raw (unwinsorised) are preserved on
-#    the panel for use in the Sirri-Tufano flow identity in flow_calculation.R.
-#    Winsorisation is applied to the OUTPUT only (Step 10).
-#
-#    First observation per fund is NA by construction (no lagged index).
+#    First observation per fund in each panel is NA (no lagged index).
 # =============================================================================
 compute_returns <- function(panel) {
   panel %>%
     group_by(Ticker) %>%
     arrange(date) %>%
     mutate(
-      ret_gross_raw = gross_return / lag(gross_return) - 1,
-      fee_monthly   = suppressWarnings(as.numeric(Expense_Ratio) / 1200),
-      ret_net_raw   = ret_gross_raw - fee_monthly,
-      ret_gross     = ret_gross_raw,
-      ret_net       = ret_net_raw
+      fee_monthly   = suppressWarnings(as.numeric(Expense_Ratio)) / 1200,
+      ret_net_raw   = gross_return / lag(gross_return) - 1,  # NAV-based: net
+      ret_gross_raw = ret_net_raw + fee_monthly               # add back ER/12
     ) %>%
     select(-fee_monthly) %>%
     ungroup()
@@ -566,35 +609,87 @@ panel_master     <- compute_returns(panel_master)
 panel_incubation <- compute_returns(panel_incubation)
 panel_trimmed    <- compute_returns(panel_trimmed)
 
-cat("\nMonthly returns computed for all panels.\n")
-cat("panel_trimmed ret_gross_raw summary:\n")
-print(summary(panel_trimmed$ret_gross_raw))
-cat("panel_trimmed ret_net_raw summary (gross - ER/12 approximation):\n")
-print(summary(panel_trimmed$ret_net_raw))
+cat("\nMonthly returns computed for all panels (index = net of fees).\n")
 
 # =============================================================================
-# 10. WINSORISE MONTHLY RETURNS
-#     ret_gross and ret_net winsorised at 1st/99th percentile.
-#     ret_gross_raw and ret_net_raw remain untouched for the flow identity.
-#     Standard practice: Carhart (1997), Fama & French (2010).
+# 10. RETURN DATA-ERROR SCREEN (replaces pooled winsorisation, v1.4)
+#     Pooled 1/99 cut-offs clipped whole market months rather than outliers
+#     (91% of funds in Oct 2008) and created spurious factor-model residuals.
+#     Carhart (1997), Fama & French (2010), BSW (2010) and Kosowski et al.
+#     (2006) do not winsorise fund returns. Instead, data errors are removed:
+#
+#     ratio_it = (1 + r_it) / (1 + median_t), median over all funds in month t
+#       Rule A (any month):  ratio > 2 or ratio < 1/2 - a long-only fund
+#                            cannot double or halve relative to the median fund
+#       Rule B (final month): |log ratio| > 0.30 in the LAST month of a fund
+#                            that stops reporting before the data end -
+#                            liquidation/merger prints in the LSEG index
+#
+#     Flags are computed once on panel_master (full fund histories, so "final
+#     month" is the true last month) and applied to all panels. Flagged months
+#     get NA in ret_net_raw and ret_gross_raw, so they also drop out of flows.
+#     The list is written to SCREEN_FILE; months confirmed genuine can be
+#     restored via RETURN_SCREEN_KEEP.
+#
+#     ret_gross / ret_net (used by all performance scripts) = screened raw
+#     returns. ret_gross_cs / ret_net_cs = per-month cross-sectional 1/99
+#     winsorisation of the same series, for robustness only.
 # =============================================================================
-winsorise_returns <- function(panel) {
+screen_tbl <- panel_master %>%
+  filter(!is.na(ret_net_raw)) %>%
+  group_by(date) %>%
+  mutate(med_t = median(ret_net_raw)) %>%
+  ungroup() %>%
+  group_by(Ticker) %>%
+  # final month only if the fund stops reporting before the data end
+  mutate(is_final = date == max(date) & max(date) < max(panel_master$date)) %>%
+  ungroup() %>%
+  mutate(
+    ratio  = (1 + ret_net_raw) / (1 + med_t),
+    rule_A = ratio > SCREEN_RATIO_ANY | ratio < 1 / SCREEN_RATIO_ANY,
+    rule_B = is_final & !rule_A & abs(log(pmax(ratio, 1e-9))) > SCREEN_LOG_FINAL,
+    key    = paste0(Ticker, "|", format(date, "%Y-%m")),
+    kept   = key %in% RETURN_SCREEN_KEEP
+  ) %>%
+  filter(rule_A | rule_B) %>%
+  transmute(Ticker, Name, ap_group, date, ret_net_raw, median_t = med_t,
+            ratio, rule = if_else(rule_A, "A: ratio outside [1/2, 2]",
+                                  "B: final-month print"),
+            action = if_else(kept, "kept (RETURN_SCREEN_KEEP)", "set to NA")) %>%
+  arrange(ap_group, Ticker, date)
+
+screen_drop <- screen_tbl %>% filter(action == "set to NA") %>% select(Ticker, date)
+
+cat("\n--- Step 10: return data-error screen (panel_master) ---\n")
+cat("  Flagged fund-months:", nrow(screen_tbl),
+    "| set to NA:", nrow(screen_drop), "\n")
+print(as.data.frame(count(screen_tbl, ap_group, rule)), row.names = FALSE)
+write_xlsx(list(flagged = screen_tbl), SCREEN_FILE)
+cat("  Flagged list written to", SCREEN_FILE, "\n")
+
+apply_return_screen <- function(panel) {
+  bad <- paste(panel$Ticker, panel$date) %in% paste(screen_drop$Ticker, screen_drop$date)
   panel %>%
-    mutate(
-      ret_gross = winsorise(ret_gross_raw),
-      ret_net   = winsorise(ret_net_raw)
-    )
+    mutate(ret_net_raw   = if_else(bad, NA_real_, ret_net_raw),
+           ret_gross_raw = if_else(bad, NA_real_, ret_gross_raw),
+           # main performance series: screened, not winsorised
+           ret_net   = ret_net_raw,
+           ret_gross = ret_gross_raw) %>%
+    # robustness series: per-month cross-sectional 1/99 winsorisation
+    group_by(date) %>%
+    mutate(ret_net_cs   = winsorise(ret_net_raw),
+           ret_gross_cs = winsorise(ret_gross_raw)) %>%
+    ungroup()
 }
 
-panel_master     <- winsorise_returns(panel_master)
-panel_incubation <- winsorise_returns(panel_incubation)
-panel_trimmed    <- winsorise_returns(panel_trimmed)
+panel_master     <- apply_return_screen(panel_master)
+panel_incubation <- apply_return_screen(panel_incubation)
+panel_trimmed    <- apply_return_screen(panel_trimmed)
 
-cat("\nReturns winsorised at 1st/99th percentile for all panels.\n")
-cat("panel_trimmed ret_gross summary post-winsorisation:\n")
-print(summary(panel_trimmed$ret_gross))
-cat("Raw (unwinsorised) ret_gross_raw preserved for flow formula:\n")
-print(summary(panel_trimmed$ret_gross_raw))
+cat("\npanel_incubation ret_net (screened) summary:\n")
+print(summary(panel_incubation$ret_net))
+cat("panel_incubation ret_gross (screened, = net + ER/12) summary:\n")
+print(summary(panel_incubation$ret_gross))
 
 # =============================================================================
 # 11. SUMMARY

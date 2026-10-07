@@ -1,5 +1,12 @@
-# panel_regressions_setup.R                                              v1.3
+# panel_regressions_setup.R                                              v1.4
 # =============================================================================
+# v1.4 changes (pipeline audit, Oct 2026):
+#   - Section 6 rolling stats (12m return for the performance rank, 36m vol,
+#     36m skew, 12m MAX) now use ret_net_raw. The LSEG index is net of fees
+#     (data_import_and_cleaning.R v1.4), so ret_net_raw is the return investors
+#     observe and chase. Values match v1.3, whose gross column was this same
+#     index return (apart from months removed by the new data-error screen).
+#
 # v1.3 changes vs v1.2 (Family E pre-defense audit):
 #   - Default PANEL_CHOICE switched from "trimmed" to "incubation". This
 #     aligns the H1-H4 behavioral panel regressions with the rest of the
@@ -121,7 +128,7 @@ cat("Source panel:", panel_obj_name,
     " | funds =", n_distinct(panel$Ticker), "\n")
 
 # --- 2. Sanity-check required columns ----------------------------------------
-required <- c("Ticker", "date", "ret_gross_raw", "tna_lag",
+required <- c("Ticker", "date", "ret_net_raw", "tna_lag",
               "flow_calc_pct_win", "is_december", "ap_group",
               "Lipper_Category", "Name", "Inception_Date",
               "Expense_Ratio", "Turnover")
@@ -172,23 +179,24 @@ cat("LoadDummy: load=", sum(load_lookup$LoadDummy),
     " | other=", sum(load_lookup$LoadDummy == 0), "\n", sep = "")
 
 # --- 6. Per-fund rolling stats (12m return, 36m vol, 36m skew, age) ----------
+# Inputs are net (NAV-based) returns: what investors observe.
 # Strict-completion windows: any NA input -> NA output (no near-window estimates).
 panel <- panel %>%
   arrange(Ticker, date) %>%
   group_by(Ticker) %>%
   mutate(
-    cumret_12m   = slide_dbl(ret_gross_raw,
+    cumret_12m   = slide_dbl(ret_net_raw,
                              ~ prod(1 + .x) - 1,
                              .before = 11, .complete = TRUE),
-    ret_vol_36m  = slide_dbl(ret_gross_raw,
+    ret_vol_36m  = slide_dbl(ret_net_raw,
                              stats::sd,
                              .before = 35, .complete = TRUE),
-    ret_skew_36m = slide_dbl(ret_gross_raw,
+    ret_skew_36m = slide_dbl(ret_net_raw,
                              ~ e1071::skewness(.x, na.rm = FALSE),
                              .before = 35, .complete = TRUE),
     age_months   = as.numeric(difftime(date, as.Date(Inception_Date),
                                        units = "days")) / 30.4375,
-    ret_max12_12m = slide_dbl(ret_gross_raw, max,
+    ret_max12_12m = slide_dbl(ret_net_raw, max,
                               .before = 11, .complete = TRUE)
   ) %>%
   ungroup()
