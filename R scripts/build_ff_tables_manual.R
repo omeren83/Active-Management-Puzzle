@@ -1,5 +1,13 @@
 # =============================================================================
-# MANUAL FF TABLES BUILDER                                                  v1.2
+# MANUAL FF TABLES BUILDER                                                  v1.3
+#
+# v1.3 changes vs v1.2 (pipeline audit, Oct 2026), mirroring FF_comparison.R v1.6:
+#   (a) Table 9 FF labels follow the numbers in both tails; Prob. Luck via
+#       fmt_prob(); footnote states draw-order resampling.
+#   (b) Table 11 FF: population estimates at GAMMA_STAR = 0.45 (BSW 2010,
+#       eq. 8); tails described as Student-t p-value based.
+#   (c) Table 7 FF N column read from portfolio_alphas_FF.xlsx (n_funds =
+#       portfolio constituents) when present.
 #
 # v1.2 change vs v1.1 (Family B audit + Family C follow-on):
 #   (a) SAMPLE_LABEL extended to acknowledge the performance-comparison subsample
@@ -111,6 +119,15 @@ fmt0 <- function(x) {
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--", formatC(round(v, 0), format = "f", digits = 0))
 }
+# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+fmt_prob <- function(x) {
+  v <- suppressWarnings(as.numeric(x))
+  ifelse(is.na(v), "--",
+    ifelse(v == 0,   "0.0\\%",
+    ifelse(v < 0.05, "$<$0.1\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+}
+GAMMA_STAR <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
 
 # Significance stars from a t-statistic
 stars <- function(t) {
@@ -154,14 +171,19 @@ add_stars_t <- function(val_str, t_stat) {
   else                     val_str
 }
 
-# Fund counts per group for the N column (computed from per-fund alpha_full).
-n_funds_by_group <- list(
-  "Active"           = sum(alpha_full$ap_group == "Active",  na.rm = TRUE),
-  "Passive"          = sum(alpha_full$ap_group == "Passive", na.rm = TRUE),
-  "Unknown"          = sum(alpha_full$ap_group == "Unknown", na.rm = TRUE),
-  "Active + Passive" = sum(alpha_full$ap_group %in% c("Active","Passive"), na.rm = TRUE),
-  "Full Sample"      = nrow(alpha_full)
-)
+# Fund counts per group for the N column: portfolio constituents written by
+# FF_comparison.R v1.6 (n_funds); falls back to per-fund alpha_full counts.
+if ("n_funds" %in% names(alpha_agg)) {
+  n_funds_by_group <- as.list(tapply(alpha_agg$n_funds, alpha_agg$ap_group, function(v) v[1]))
+} else {
+  n_funds_by_group <- list(
+    "Active"           = sum(alpha_full$ap_group == "Active",  na.rm = TRUE),
+    "Passive"          = sum(alpha_full$ap_group == "Passive", na.rm = TRUE),
+    "Unknown"          = sum(alpha_full$ap_group == "Unknown", na.rm = TRUE),
+    "Active + Passive" = sum(alpha_full$ap_group %in% c("Active","Passive"), na.rm = TRUE),
+    "Full Sample"      = nrow(alpha_full)
+  )
+}
 
 make_t7_block <- function(grp) {
   eg <- alpha_agg %>% filter(ap_group == grp, weighting == "EW")
@@ -220,8 +242,9 @@ t7_tex <- c(
     "EW: equal-weighted portfolio (each fund alive in month $t$ contributes $1/N_t$). ",
     "VW: value-weighted portfolio with lagged TNA weights ",
     "$w_{i,t-1} = \\text{TNA}_{i,t-1} / \\sum_j \\text{TNA}_{j,t-1}$. ",
-    "Net returns are computed as gross returns less one-twelfth of the static ",
-    "annual expense ratio each month, following \\textcite{Carhart1997} and \\textcite{Wermers2000}. ",
+    "Net returns are the funds' NAV-based total returns (net of expenses); ",
+    "gross returns add back one-twelfth of the static annual expense ratio each month, ",
+    "following \\textcite{FamaFrench2010}. ",
     "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; ",
     "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\%. ",
     "$N$: unique funds contributing to the portfolio series; ",
@@ -247,19 +270,16 @@ bt <- boot_summary[boot_summary$percentile %in% c(1, 5, 10, 50, 90, 95, 99), ]
 bt <- bt[order(bt$percentile), ]
 n_active_bs <- sum(alpha_full$ap_group == "Active" & !is.na(alpha_full$alpha_t_nw))
 
-interp <- ifelse(bt$percentile <= 10 & bt$pct_runs_below < 5,
-                 "Worse than luck (significant)",
-                 ifelse(bt$percentile >= 90 & bt$pct_runs_below > 95,
-                        "Evidence of genuine skill",
-                        ifelse(bt$percentile == 50,
-                               "Indistinguishable from luck",
-                               "Consistent with zero-skill")))
+# Same rule in both tails: the label follows the reported probability
+interp <- ifelse(bt$pct_runs_below < 5, "Worse than luck (significant)",
+          ifelse(bt$pct_runs_below > 95, "Better than luck (significant)",
+                 "Consistent with zero skill"))
 
 t9_rows <- paste0(
   formatC(bt$percentile, width = 2, flag = " "), " & ",
   fmt3(bt$t_alpha_actual),    " & ",
   fmt3(bt$t_alpha_sim_mean),  " & ",
-  fmt1(bt$pct_runs_below), "\\% & ",
+  fmt_prob(bt$pct_runs_below), " & ",
   interp, " \\\\"
 )
 
@@ -285,15 +305,17 @@ t9_tex <- c(
     "$ funds). For each fund, estimated monthly alpha is subtracted from ",
     "the excess return series to construct a zero-alpha null return. ",
     "In each of $B = 10{,}000$ bootstrap iterations, calendar months are ",
-    "resampled with replacement, preserving cross-sectional factor return ",
+    "resampled with replacement and kept in the order drawn, the same draw ",
+    "applying to all funds, preserving cross-sectional factor return ",
     "dependence. The \\textcite{Carhart1997} four-factor model is re-estimated on ",
     "each resampled series. \\textit{Actual} $t(\\hat{\\alpha})$: percentile ",
     "of the empirical $t$-statistic distribution across active funds. ",
     "\\textit{Simulated Mean}: average of that percentile across all ",
     "iterations. \\textit{Prob.\\ Luck}: fraction of iterations in which ",
     "the simulated percentile falls below the actual value; values below ",
-    "5\\% at lower percentiles indicate underperformance unlikely to be ",
-    "explained by luck alone. Newey--West standard errors with a 6-month ",
+    "5\\% (above 95\\%) indicate that the actual percentile is worse (better) ",
+    "than zero-alpha luck would produce; 0.0\\% means no iteration and ",
+    "$<$0.1\\% means 1 to 4 of 10,000 iterations. Newey--West standard errors with a 6-month ",
     "lag are used throughout. Compare with \\textcite{FamaFrench2010}, Table~III."
   ),
   "\\end{tablenotes}",
@@ -365,11 +387,11 @@ write_tex(t10_tex, "table_pi0_estimate_FF.tex")
 # =============================================================================
 cat("=== Table 11 (FF) ===\n")
 
-# Bold the gamma=0.20 row by wrapping its cells in \textbf{}
+# Row bolding disabled (boldify is the identity); flag kept at gamma*
 boldify <- function(s, do_bold) s
 
 t11_rows <- vapply(seq_len(nrow(bsw_df)), function(i) {
-  is_bold <- as.numeric(bsw_df$gamma[i]) == 20
+  is_bold <- as.numeric(bsw_df$gamma[i]) == round(GAMMA_STAR * 100)
   paste0(
     boldify(paste0(fmt0(bsw_df$gamma[i]), "\\%"),     is_bold), " & ",
     boldify(fmt1(bsw_df$S_neg_pct[i]),                 is_bold), " & ",
@@ -403,9 +425,7 @@ t11_tex <- c(
     "$S^-_\\gamma$ ($S^+_\\gamma$): observed fraction of active funds with ",
     "significantly negative (positive) Newey--West $t(\\hat{\\alpha})$ at ",
     "two-sided significance level $\\gamma$, using full-period \\textcite{Carhart1997} ",
-    "four-factor alphas. Critical values are from the standard normal ",
-    "distribution, consistent with the large-sample approximation in ",
-    "\\textcite{BarrasScailletWermers2010}. ",
+    "four-factor alphas and the same Student-$t$ $p$-values as $\\hat{\\pi}_0$. ",
     "$F_\\gamma = \\hat{\\pi}_0 \\cdot \\gamma/2$: expected proportion ",
     "of false discoveries per tail arising from zero-alpha funds, where ",
     "$\\hat{\\pi}_0 = ", fmt1(pi0_pct), "\\%$ is the \\textcite{Storey2002} estimate ",
@@ -413,9 +433,10 @@ t11_tex <- c(
     "$T^-_\\gamma = S^-_\\gamma - F_\\gamma$: genuinely unskilled funds ",
     "(significant negative alpha net of false discoveries). ",
     "$T^+_\\gamma = S^+_\\gamma - F_\\gamma$: genuinely skilled funds. ",
-    "The reference row ($\\gamma = 0.20$) provides the population-level ",
-    "estimates $\\hat{\\pi}^-_A$ and $\\hat{\\pi}^+_A$ following ",
-    "\\textcite{BarrasScailletWermers2010}. ",
+    "The row at $\\gamma^* = ", formatC(GAMMA_STAR, format = "f", digits = 2),
+    "$ gives the population estimates $\\hat{\\pi}^-_A$ and $\\hat{\\pi}^+_A$ ",
+    "(\\citealt{BarrasScailletWermers2010}, eq.~8: a sufficiently high $\\gamma^*$; ",
+    "pre-set 0.35 or 0.45 match their MSE-based choice). ",
     "Negative $T^+_\\gamma$ entries indicate right-tail significance does ",
     "not exceed the false-discovery rate at that threshold. Sample: $N = ",
     total_n, "$ actively managed funds, ", SAMPLE_LABEL,
@@ -502,3 +523,8 @@ cat("Figure 3 (FF) is unaffected -- ff_comparison.R produces it directly\n")
 cat("as a PNG via ggplot2; no kableExtra involvement.\n")
 
 }  # end of if (.proceed) — Phase 2.9 deprecation guard wrap
+# Clean up the guard so a later source() in the same session is not
+# accidentally forced (Oct 2026 audit).
+rm(.proceed)
+if (exists("ALLOW_MANUAL_FF_BUILD", envir = globalenv()))
+  rm("ALLOW_MANUAL_FF_BUILD", envir = globalenv())

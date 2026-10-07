@@ -124,6 +124,14 @@ for (v in c("ActSkew", "MAX12")) {
               v, lo, hi))
 }
 
+# Standardise the three proxies (z-scores within the estimation sample), as
+# the text states: coefficients are flow responses per one-SD change, and the
+# horse race compares like with like. [Oct 2026 audit: previously raw units.]
+for (v in c("ActR2", "ActSkew", "MAX12")) {
+  samp[[v]] <- as.numeric(scale(samp[[v]]))
+}
+cat("ActR2, ActSkew, MAX12 standardised (mean 0, SD 1 in the H3 sample).\n")
+
 cat(sprintf(
   "\nAligned H3 sample: %d fund-months | %d funds | %d months | %d styles\n",
   nrow(samp), nlevels(droplevels(samp$Ticker)),
@@ -394,7 +402,9 @@ fn_primary <- paste0(
   "Dependent variable is the Sirri--Tufano (1998) winsorised proportional ",
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
   "All lottery proxies lagged one period and winsorised at the 1st/99th ",
-  "percentiles of the pooled distribution (ActR2 naturally bounded). ",
+  "percentiles of the pooled distribution (ActR2 naturally bounded), then ",
+  "standardised to mean zero and unit standard deviation in the estimation ",
+  "sample, so coefficients are flow responses per one-SD change. ",
   "Performance segments $R^{\\\\text{LOW}}$, $R^{\\\\text{MID}}$, $R^{\\\\text{HIGH}}$ retained as ",
   "nuisance controls so H3 conditions on the H1 channel. Time-invariant ",
   "fund characteristics (expense ratio, load dummy, turnover) absorbed by ",

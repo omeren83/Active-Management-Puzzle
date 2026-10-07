@@ -1,5 +1,29 @@
 # =============================================================================
-# PERSISTENCE TESTING                                                      v1.2
+# PERSISTENCE TESTING                                                      v1.3
+#
+# v1.3 changes vs v1.2 (pipeline audit, Oct 2026):
+#   (a) BOOTSTRAP NULL IMPOSED. v1.2 resampled fund-level holding residuals
+#       that still contained each fund's abnormal return, so simulated
+#       t-statistics were centred on the actual ones and bootstrap p-values
+#       could not be small (e.g. t = -3.49 with p = 0.143). Demeaning fund
+#       residuals is not enough: pseudo returns built from formation loadings
+#       do not reproduce the misfit of pooling cohort blocks under one set of
+#       loadings, and the null stays off-centre (simulated mean t up to ~2).
+#       v1.3 imposes the null on the decile regression itself (Fama & French
+#       2010 residual bootstrap at portfolio level): subtract each decile's
+#       estimated alpha, resample pooled months jointly across deciles in draw
+#       order, re-estimate. Section 6.
+#   (b) Deciles assigned on ALL funds with a formation estimate, before
+#       dropping funds without holding-period data (v1.2 ranked survivors only).
+#   (c) Bootstrap HAC weights use the capped lag, as for the actual t.
+#   (d) Month draws made on the main process from BOOT_SEED (independent of
+#       N_CORES); cache key carries BOOT_KERNEL and min_obs_hold.
+#   (e) Regime panels follow REGIME_BREAKS (same dates as subperiod_analysis.R,
+#       checked against breaktest_results.xlsx). A cohort enters a regime panel
+#       only if its formation AND holding windows lie inside that regime;
+#       cohorts crossing a boundary form Panel F. Regime panels with fewer than
+#       MIN_PANEL_COHORTS cohorts are dropped (a single 12-month cohort cannot
+#       support a five-parameter HAC regression). No overlap between C/D/E/F.
 
 
 # Changes from v1.1:
@@ -95,7 +119,7 @@ FORM_MONTHS      <- 36L
 HOLD_MONTHS      <- 12L
 MIN_OBS_FORM     <- 24L
 NW_LAG_FORM      <- 3L    # methodology Section 2.3
-NW_LAG_HOLD      <- 12L   # methodology Section 3.4 (capped to (T-1)/2 in fits)
+NW_LAG_HOLD      <- 12L   # methodology Section 3.4 (capped at T-1 in fits)
 N_DECILES        <- 10L
 
 # Bootstrap parameters
@@ -126,29 +150,63 @@ COHORT_DEFS <- data.frame(
 
 USABLE_COHORTS <- COHORT_DEFS$cohort_id[COHORT_DEFS$hold_months == HOLD_MONTHS]
 
-# Panel definitions -- Panel A/B use all 7 usable cohorts; C/D/E restrict by
-# regime-based formation-period assignment; F uses the two boundary-straddling
-# cohorts (3 and 5) per methodology Section 5.
+# Regime boundaries: last month of P1 and of P2 ("YYYY-MM"), identical to
+# SUBPERIOD_BREAKS in subperiod_analysis.R; must be detected break dates.
+REGIME_BREAKS     <- c("2006-03", "2010-08")
+BREAKTEST_FILE    <- "breaktest_results.xlsx"
+MIN_PANEL_COHORTS <- 2L
+BOOT_KERNEL       <- "v1.3-portfolio-null"  # part of the cache key; bump on bootstrap changes
+
+# Panel definitions. A/B: all usable cohorts. C/D/E: cohorts whose formation
+# and holding windows both lie inside P1/P2/P3. F: cohorts that cross a
+# regime boundary. Built from REGIME_BREAKS, so the panels never overlap.
+.bd <- readxl::read_excel(BREAKTEST_FILE, sheet = "Break Dates")
+.bd <- format(as.Date(.bd[["Point Estimate"]]), "%Y-%m")
+if (!all(REGIME_BREAKS %in% .bd))
+  stop("REGIME_BREAKS (", paste(REGIME_BREAKS, collapse = ", "), ") are not all among ",
+       "the break dates in ", BREAKTEST_FILE, " (", paste(.bd, collapse = ", "),
+       "). Use the same boundaries as SUBPERIOD_BREAKS in subperiod_analysis.R.",
+       call. = FALSE)
+.reg_end <- ceiling_date(as.Date(paste0(REGIME_BREAKS, "-01")), "month") - days(1)
+regime_of <- function(d) 1L + (d > .reg_end[1]) + (d > .reg_end[2])   # 1, 2, 3
+.cd <- COHORT_DEFS[COHORT_DEFS$cohort_id %in% USABLE_COHORTS, ]
+.cd$reg_lo <- regime_of(.cd$form_lo)
+.cd$reg_hi <- regime_of(.cd$hold_hi)
+.span <- function(lo, hi) paste0(format(lo, "%b %Y"), "--", format(hi, "%b %Y"))
+.reg_lbl <- c(paste0("P1 (to ", format(.reg_end[1], "%b %Y"), ")"),
+              paste0("P2 (", .span(.reg_end[1] + days(1), .reg_end[2]), ")"),
+              paste0("P3 (from ", format(.reg_end[2] + days(1), "%b %Y"), ")"))
+
 PANELS <- list(
   A = list(label = "A",
            title = "Panel A: Full sample, t-statistic ranking",
            cohorts = USABLE_COHORTS, rank_var = "t_stat"),
   B = list(label = "B",
            title = "Panel B: Full sample, raw-alpha ranking (robustness)",
-           cohorts = USABLE_COHORTS, rank_var = "alpha"),
-  C = list(label = "C",
-           title = "Panel C: P1 sub-period (Jan 1995--Dec 2005)",
-           cohorts = c(1L, 2L, 3L), rank_var = "t_stat"),
-  D = list(label = "D",
-           title = "Panel D: P2 sub-period (Jan 2006--Sep 2011)",
-           cohorts = c(4L),           rank_var = "t_stat"),
-  E = list(label = "E",
-           title = "Panel E: P3 sub-period (Oct 2011--Feb 2026)",
-           cohorts = c(5L, 6L, 7L),   rank_var = "t_stat"),
-  F = list(label = "F",
-           title = "Panel F: Cross-regime (boundary-straddling cohorts 3, 5)",
-           cohorts = c(3L, 5L),       rank_var = "t_stat")
+           cohorts = USABLE_COHORTS, rank_var = "alpha")
 )
+for (r in 1:3) {
+  coh_r <- .cd$cohort_id[.cd$reg_lo == r & .cd$reg_hi == r]
+  if (length(coh_r) >= MIN_PANEL_COHORTS) {
+    lbl <- c("C", "D", "E")[r]
+    PANELS[[lbl]] <- list(label = lbl,
+                          title = paste0("Panel ", lbl, ": ", .reg_lbl[r],
+                                         ", cohorts ", paste(coh_r, collapse = ", ")),
+                          cohorts = coh_r, rank_var = "t_stat")
+  } else {
+    cat(sprintf("Regime P%d: %d cohort(s) fully inside -- regime panel omitted.\n",
+                r, length(coh_r)))
+  }
+}
+coh_x <- .cd$cohort_id[.cd$reg_lo != .cd$reg_hi]
+if (length(coh_x) > 0L)
+  PANELS$F <- list(label = "F",
+                   title = paste0("Panel F: Cross-regime (cohorts ",
+                                  paste(coh_x, collapse = ", "), " span a boundary)"),
+                   cohorts = coh_x, rank_var = "t_stat")
+cat("Persistence panels:\n")
+for (.p in PANELS) cat("  ", .p$title, "\n")
+rm(.bd, .cd, .span, .p)
 
 # =============================================================================
 # 1. HELPERS (kernels mirror alpha_estimation.R v2.5 / subperiod_analysis.R v1.2)
@@ -471,6 +529,16 @@ estimate_cohort <- function(cd) {
     return(NULL)
   }
   
+  # Deciles on ALL funds with a formation estimate (before the survival
+  # filter below), for both ranking variables. D1 = highest.
+  dec_of <- function(v) {
+    out <- rep(NA_integer_, length(v)); ok <- !is.na(v)
+    if (sum(ok) >= N_DECILES) out[ok] <- as.integer(dplyr::ntile(-v[ok], N_DECILES))
+    out
+  }
+  form_est$dec_t <- dec_of(form_est$t_alpha_f)
+  form_est$dec_a <- dec_of(form_est$alpha_f)
+
   hold_by_fund <- split(hold_panel, hold_panel$Ticker)
   ticker_set   <- intersect(form_est$Ticker, names(hold_by_fund))
   # Funds with formation estimates but no holding observations at all are
@@ -517,7 +585,7 @@ estimate_cohort <- function(cd) {
     form_est    = form_est,       # per-fund formation loadings, alpha, t, exp_r
     fac_hold    = fac_hold,        # factor series over holding window
     fac_comp    = fac_comp,        # [n_funds x 12] factor-based return
-    res_mat     = res_mat,         # [n_funds x 12] holding residuals
+    res_mat     = res_mat,         # [n_funds x 12] holding residuals (diagnostics)
     exr_mat     = exr_mat          # [n_funds x 12] actual excess returns
   )
 }
@@ -539,16 +607,9 @@ cohorts <- cohorts[!sapply(cohorts, is.null)]
 # analysis unit and are what the LaTeX table reports.
 # =============================================================================
 
+# Deciles were assigned in estimate_cohort() on all formation funds (v1.3).
 assign_deciles <- function(coh_obj, rank_var) {
-  v <- if (rank_var == "t_stat") coh_obj$form_est$t_alpha_f
-  else                      coh_obj$form_est$alpha_f
-  ok <- !is.na(v)
-  dec <- rep(NA_integer_, length(v))
-  if (sum(ok) < N_DECILES) return(dec)
-  # D1 = highest rank; so descending rank gives D1 first.
-  # ntile with descending order: use -v for the ranking.
-  dec[ok] <- as.integer(dplyr::ntile(-v[ok], N_DECILES))
-  dec
+  if (rank_var == "t_stat") coh_obj$form_est$dec_t else coh_obj$form_est$dec_a
 }
 
 # =============================================================================
@@ -714,183 +775,113 @@ build_actual_panel <- function(panel, cohorts_by_id, factors_ts) {
 }
 
 # =============================================================================
-# 6. BOOTSTRAP NULL DISTRIBUTION (KTWW Step 5)
+# 6. BOOTSTRAP NULL DISTRIBUTION (v1.3: portfolio-level residual bootstrap)
 # =============================================================================
-# Vectorised per-iteration logic:
-#   - Each cohort draws tau_k in {1..HOLD_MONTHS}^HOLD_MONTHS (i.i.d. with
-#     replacement). The SAME tau_k is applied to all funds in cohort k,
-#     preserving cross-sectional residual correlation.
-#   - Pseudo fund excess return at calendar month t, cohort k:
-#       r^b_{i,t} = fac_comp[i,t] + res_mat[i, tau_k(t)]
-#     NA entries in res_mat (funds dead at index tau_k(t)) propagate to NA
-#     and are excluded from the decile mean.
-#   - Within each decile d: mean across fund rows at each calendar month t.
-#   - Stack decile series across cohorts into one 12 * K_panel vector.
-#   - Run Carhart with NW SE -> record t_alpha^b for decile d.
+# The test statistic is the NW t of the intercept in a Carhart regression of
+# each pooled decile series (12-month cohort blocks stacked). The null is
+# imposed on exactly that regression, following the Fama & French (2010)
+# residual bootstrap:
+#   (1) y_d = alpha_d + b_d' f + e_d on the actual series (as in Section 5);
+#   (2) null series y~_d = y_d - alpha_hat_d (zero alpha by construction,
+#       same loadings, same pooling misfit, same residuals);
+#   (3) resample pooled months with replacement, ONE draw shared by all
+#       deciles and the spread (preserves cross-decile dependence), rows kept
+#       in draw order;
+#   (4) re-estimate and record the NW t (lag capped at n - 1).
+# v1.2 resampled fund-level residuals relative to formation-period loadings.
+# That kept each fund's alpha (no null) and, once demeaned, still produced a
+# null distribution centred away from zero, because pseudo returns built from
+# formation loadings do not reproduce the misfit of pooling cohort blocks
+# under one set of loadings. Imposing the null on the decile regression
+# itself removes both problems.
 # =============================================================================
 
-# Inputs prepared per panel: a list of cohort blocks, each providing:
-#   fac_comp[n_funds x HOLD_MONTHS]
-#   res_mat [n_funds x HOLD_MONTHS]
-#   dec_idx [n_funds]   (decile membership in 1..10, NA = skip)
-#   fac_ts  [HOLD_MONTHS x 5]   (date, mkt_rf, smb, hml, mom)
-#
-# Bootstrap kernel: one iteration returns a numeric vector of length
-# (N_DECILES + 1) of simulated t_alpha per decile (plus spread D1 - D10).
+# Panel matrix: rows = pooled holding months, cols = D1..D10 + spread
+build_panel_matrix <- function(series_by_dec) {
+  all_dates <- sort(unique(do.call(c, lapply(series_by_dec, function(s)
+    if (is.null(s) || nrow(s) == 0L) NULL else s$date))))
+  Y <- matrix(NA_real_, nrow = length(all_dates), ncol = N_DECILES + 1L)
+  for (d in seq_len(N_DECILES)) {
+    s <- series_by_dec[[d]]
+    if (!is.null(s) && nrow(s) > 0L) Y[match(s$date, all_dates), d] <- s$ret_ew_ex
+  }
+  Y[, N_DECILES + 1L] <- Y[, 1L] - Y[, N_DECILES]          # D1 - D10
+  fac <- factors_ts[match(all_dates, factors_ts$date), c("mkt_rf", "smb", "hml", "mom")]
+  list(Y = Y, X = cbind(1, as.matrix(fac)), dates = all_dates)
+}
 
-# Worker: produces t_alpha^b for all deciles + spread in one panel.
-# bs_blocks is a list, one element per cohort in the panel, each a list with:
-#   fac_comp, res_mat, dec_idx, fac_mat (factors as numeric matrix [12 x 5])
-one_boot_iter <- function(run_id, bs_blocks, nw_lag_hold, min_obs_hold) {
-  # For each cohort: draw tau_k, reindex res_mat columns, build pseudo
-  # excess-return matrix = fac_comp + res_resampled.
-  K <- length(bs_blocks)
-  # Use ncol() per block to avoid relying on an exported global.
-  H_each  <- vapply(bs_blocks, function(b) ncol(b$res_mat), integer(1))
-  total_T <- sum(H_each)
-  n_dec   <- 10L   # decile count; stable design choice
-  # Pre-allocate: for each decile, we'll build a concatenated vector of
-  # length sum(H_each) (one per calendar position in panel).
-  dec_series <- vector("list", n_dec)
-  for (d in seq_len(n_dec)) dec_series[[d]] <- numeric(total_T)
-  factor_stack <- matrix(0, nrow = total_T, ncol = 4)
-  
-  offset <- 0L
-  for (k in seq_len(K)) {
-    blk <- bs_blocks[[k]]
-    H   <- H_each[k]
-    tau <- sample.int(H, size = H, replace = TRUE)
-    pseudo <- blk$fac_comp + blk$res_mat[, tau, drop = FALSE]
-    for (d in seq_len(n_dec)) {
-      rows <- which(blk$dec_idx == d)
-      if (length(rows) == 0L) {
-        dec_series[[d]][offset + seq_len(H)] <- NA_real_
-      } else if (length(rows) == 1L) {
-        dec_series[[d]][offset + seq_len(H)] <- pseudo[rows, ]
-      } else {
-        dec_series[[d]][offset + seq_len(H)] <- colMeans(pseudo[rows, , drop = FALSE],
-                                                         na.rm = TRUE)
-      }
+# NW t of the intercept (Bartlett weights on the capped lag)
+nw_t_alpha <- function(y, X, lag) {
+  Tn <- length(y); L <- min(lag, Tn - 1L)
+  tryCatch({
+    XtX_inv <- solve(crossprod(X))
+    beta    <- XtX_inv %*% crossprod(X, y)
+    e       <- as.vector(y - X %*% beta)
+    sc      <- X * e
+    S       <- crossprod(sc) / Tn
+    if (L > 0L) for (j in seq_len(L)) {
+      G <- crossprod(sc[(j + 1):Tn, , drop = FALSE], sc[1:(Tn - j), , drop = FALSE]) / Tn
+      S <- S + (1 - j / (L + 1)) * (G + t(G))
     }
-    factor_stack[offset + seq_len(H), ] <- as.matrix(blk$fac_mat)
-    offset <- offset + H
-  }
-  
-  # Spread D1 - D10
-  spread_series <- dec_series[[1]] - dec_series[[n_dec]]
-  
-  # Regress each decile (and spread) on Carhart factors
-  t_sim <- numeric(n_dec + 1L)
-  for (d in seq_len(n_dec + 1L)) {
-    y <- if (d <= n_dec) dec_series[[d]] else spread_series
-    ok <- is.finite(y) & is.finite(factor_stack[, 1])
-    if (sum(ok) < min_obs_hold) { t_sim[d] <- NA_real_; next }
-    yk <- y[ok]; Xk <- cbind(1, factor_stack[ok, , drop = FALSE])
-    Tn <- length(yk); L <- min(nw_lag_hold, Tn - 1L)
-    t_sim[d] <- tryCatch({
-      XtX_inv <- solve(crossprod(Xk))
-      beta    <- XtX_inv %*% crossprod(Xk, yk)
-      e       <- as.vector(yk - Xk %*% beta)
-      scores  <- Xk * e
-      S       <- crossprod(scores) / Tn
-      if (L > 0L) {
-        for (j in seq_len(L)) {
-          w  <- 1 - j / (nw_lag_hold + 1)
-          Gj <- crossprod(scores[(j + 1):Tn, , drop = FALSE],
-                          scores[1:(Tn - j),  , drop = FALSE]) / Tn
-          S  <- S + w * (Gj + t(Gj))
-        }
-      }
-      vc <- (Tn * XtX_inv %*% S %*% XtX_inv)[1, 1]
-      beta[1] / sqrt(max(vc, 0))
-    }, error = function(e) NA_real_)
-  }
-  t_sim
+    beta[1] / sqrt(max((Tn * XtX_inv %*% S %*% XtX_inv)[1, 1], 0))
+  }, error = function(e) NA_real_)
 }
 
-# Build per-panel bootstrap blocks (one element per cohort).
-build_bs_blocks <- function(panel, cohorts_by_id) {
-  blks <- list()
-  for (cid in panel$cohorts) {
-    coh <- cohorts_by_id[[as.character(cid)]]
-    if (is.null(coh)) next
-    dec <- assign_deciles(coh, panel$rank_var)
-    blks[[length(blks) + 1L]] <- list(
-      cohort_id = cid,
-      fac_comp  = coh$fac_comp,
-      res_mat   = coh$res_mat,
-      dec_idx   = dec,
-      # factor matrix for the holding window, 4 columns: MKT_RF, SMB, HML, MOM
-      fac_mat   = as.matrix(coh$fac_hold[, c("mkt_rf", "smb", "hml", "mom")])
-    )
-  }
-  blks
+# One iteration: samp = pre-drawn row indices; Yn = null series matrix
+one_boot_iter <- function(samp, Yn, X, nw_lag, min_obs) {
+  vapply(seq_len(ncol(Yn)), function(d) {
+    y <- Yn[samp, d]; ok <- is.finite(y)
+    if (sum(ok) < min_obs) return(NA_real_)
+    nw_t_alpha(y[ok], X[samp[ok], , drop = FALSE], nw_lag)
+  }, numeric(1))
 }
 
-# Run the full B-iteration bootstrap (cached). Returns matrix
-# [B_RUNS x (N_DECILES + 1)] of simulated t_alpha per decile + spread.
-run_bootstrap <- function(panel, cohorts_by_id, B = B_RUNS) {
-  bs_blocks <- build_bs_blocks(panel, cohorts_by_id)
-  if (length(bs_blocks) == 0L) {
-    warning(sprintf("Panel %s: no cohorts usable for bootstrap.", panel$label))
+# Full bootstrap for one panel (cached). Returns [B x (N_DECILES + 1)].
+run_bootstrap <- function(panel, act, B = B_RUNS) {
+  pm <- build_panel_matrix(act$series_by_dec)
+  Y <- pm$Y; X <- pm$X
+  if (nrow(Y) < 12L) {
+    warning(sprintf("Panel %s: fewer than 12 pooled months; no bootstrap.", panel$label))
     return(matrix(NA_real_, nrow = 0L, ncol = N_DECILES + 1L))
   }
-  
-  # Cache key: invalidated by any change to panel composition, residuals,
-  # deciles, or bootstrap parameters.
-  cache_key <- digest::digest(list(
-    panel_label = panel$label,
-    rank_var    = panel$rank_var,
-    cohorts     = panel$cohorts,
-    # hash of the decile assignments + residual matrix across cohorts
-    blocks      = lapply(bs_blocks, function(b)
-      list(dec = b$dec_idx,
-           fac_comp = round(b$fac_comp, 8),
-           res_mat  = round(b$res_mat,  8),
-           fac_mat  = round(b$fac_mat,  8))),
-    B           = B,
-    seed        = BOOT_SEED,
-    nw_hold     = NW_LAG_HOLD,
-    n_dec       = N_DECILES
-  ))
+  # Impose H0 column by column: subtract the estimated alpha
+  Yn <- Y
+  for (d in seq_len(ncol(Y))) {
+    ok <- is.finite(Y[, d])
+    if (sum(ok) < 12L) { Yn[, d] <- NA_real_; next }
+    a_hat <- solve(crossprod(X[ok, , drop = FALSE]),
+                   crossprod(X[ok, , drop = FALSE], Y[ok, d]))[1]
+    Yn[, d] <- Y[, d] - a_hat
+  }
+
+  cache_key <- digest::digest(list(panel_label = panel$label, rank_var = panel$rank_var,
+                                   cohorts = panel$cohorts, Yn = round(Yn, 10),
+                                   X = round(X, 10), B = B, seed = BOOT_SEED,
+                                   nw_hold = NW_LAG_HOLD, min_obs = 12L,
+                                   kernel = BOOT_KERNEL))
   cache_file <- file.path(BOOT_CACHE_DIR,
-                          sprintf("persistence_bootstrap_cache_%s.rds",
-                                  panel$label))
+                          sprintf("persistence_bootstrap_cache_%s.rds", panel$label))
   if (USE_BOOT_CACHE && file.exists(cache_file)) {
     cached <- tryCatch(readRDS(cache_file), error = function(e) NULL)
     if (!is.null(cached) && identical(cached$key, cache_key)) {
-      cat(sprintf("  [cache hit] Panel %s: loaded from %s\n",
-                  panel$label, cache_file))
+      cat(sprintf("  [cache hit] Panel %s\n", panel$label))
       return(cached$sim_matrix)
     }
-    cat(sprintf("  [cache miss] Panel %s: key changed; recomputing.\n",
-                panel$label))
+    cat(sprintf("  [cache miss] Panel %s: key changed; recomputing.\n", panel$label))
   }
-  
-  cat(sprintf("  Bootstrapping panel %s (B = %d, cores = %d) ...\n",
-              panel$label, B, N_CORES))
+
+  cat(sprintf("  Bootstrapping panel %s (B = %d, T = %d) ...\n", panel$label, B, nrow(Y)))
   t0 <- Sys.time()
-  
-  # Workers
+  set.seed(BOOT_SEED)                                     # draws independent of cores
+  samp_list <- replicate(B, sample.int(nrow(Y), nrow(Y), replace = TRUE), simplify = FALSE)
   cl <- makeCluster(N_CORES)
-  clusterExport(cl,
-                c("bs_blocks", "one_boot_iter", "N_DECILES",
-                  "HOLD_MONTHS", "NW_LAG_HOLD"),
-                envir = environment())
-  clusterSetRNGStream(cl, BOOT_SEED)
-  sim_list <- parLapply(cl, seq_len(B), one_boot_iter,
-                        bs_blocks, NW_LAG_HOLD, min_obs_hold = 12L)
+  clusterExport(cl, "nw_t_alpha", envir = environment())
+  sim_list <- parLapply(cl, samp_list, one_boot_iter, Yn, X, NW_LAG_HOLD, 12L)
   stopCluster(cl)
-  
   sim_matrix <- do.call(rbind, sim_list)
   cat(sprintf("  Panel %s wall time: %.1f sec\n", panel$label,
               as.numeric(difftime(Sys.time(), t0, units = "secs"))))
-  
-  if (USE_BOOT_CACHE) {
-    saveRDS(list(key = cache_key, sim_matrix = sim_matrix), cache_file)
-    cat(sprintf("  [cached] Saved panel %s to %s\n",
-                panel$label, cache_file))
-  }
+  if (USE_BOOT_CACHE) saveRDS(list(key = cache_key, sim_matrix = sim_matrix), cache_file)
   sim_matrix
 }
 
@@ -944,7 +935,7 @@ for (pnm in names(PANELS)) {
   est <- act$estimates
   
   # 7b. Bootstrap null distribution
-  sim <- run_bootstrap(panel, cohorts_by_id)
+  sim <- run_bootstrap(panel, act)
   
   # 7c. Bootstrap p-values for each decile + spread (column order: D1..D10, Spread)
   est$p_boot_right <- NA_real_
@@ -1079,7 +1070,8 @@ pack_tab <- data.frame(
 )
 
 fn_text <- paste(
-  "\\textcite{KosowskiTimmermannWermersWhite2006} bootstrap persistence test on 36-month formation,",
+  "\\textcite{Carhart1997} persistence test with bootstrap inference in the spirit of",
+  "\\textcite{KosowskiTimmermannWermersWhite2006}, on 36-month formation,",
   "12-month holding non-overlapping cohorts, ranked by formation-period",
   "\\textcite{Carhart1997} four-factor alpha $t$-statistic (Newey-West, 3-month",
   "lag) except Panel B, which ranks by raw alpha as a robustness check.",
@@ -1092,7 +1084,10 @@ fn_text <- paste(
   "$p^R_B$, $p^L_B$: right- and left-tail bootstrap $p$-values",
   "($B = 10{,}000$), computed as the fraction of simulated decile",
   "$t(\\hat{\\alpha})$ under the zero-true-alpha null that exceed (fall below)",
-  "the observed $t$-statistic.",
+  "the observed $t$-statistic. The null is imposed on each decile regression",
+  "by subtracting its estimated alpha; pooled holding months are then resampled",
+  "with replacement (one draw shared by all deciles) and the regression re-estimated",
+  "(the residual bootstrap of \\textcite{FamaFrench2010} applied to the decile regressions).",
   "$\\text{JB}_p$: Jarque-Bera $p$-value for the decile-portfolio holding-",
   "period excess return distribution. Where $\\text{JB}_p < 0.05$, the",
   "bootstrap $p$-values are the valid inferential basis.",
@@ -1101,9 +1096,11 @@ fn_text <- paste(
   "Significance stars on $\\hat{\\alpha}$ and factor loadings reflect",
   "Newey-West $t$-statistics: $^{*}$, $^{**}$, $^{***}$ at 10\\%, 5\\%, 1\\%.",
   "Sample: Active funds in the \\textcite{Evans2010}-corrected",
-  "panel\\_incubation, Jan 1995--Feb 2026; performance-comparison subsample",
-  "per flagged\\_funds.xlsx. Panel D uses a single cohort",
-  "(12 months) and should be interpreted with caution."
+  paste0("panel\\_incubation, ", format(min(factors_ts$date), "%b %Y"), "--",
+         format(max(factors_ts$date), "%b %Y"), "; performance-comparison subsample"),
+  "per flagged\\_funds.xlsx.",
+  "Regime panels contain only cohorts whose formation and holding windows lie",
+  "inside one regime; Panel F contains the cohorts that cross a regime boundary."
 )
 
 k <- full_data %>%
@@ -1112,7 +1109,7 @@ k <- full_data %>%
       linesep   = "",
       escape    = FALSE,
       longtable = TRUE,
-      caption   = "Persistence in Active Mutual Fund Performance: Carhart and KTWW Bootstrap Tests",
+      caption   = "Persistence in Active Mutual Fund Performance: Carhart Test with Bootstrap Inference",
       label     = "persistence",
       col.names = c("Decile",
                     "$\\hat{\\alpha}$", "$t(\\hat{\\alpha})$",
@@ -1156,4 +1153,4 @@ for (pnm in names(results_per_panel)) {
 cat("\nOutputs:\n")
 cat("  persistence_results.xlsx  (audit + downstream numeric data)\n")
 cat("  table_persistence.tex     (single longtable, 6 panels)\n")
-cat("  persistence_bootstrap_cache_*.rds  (per-panel caches)\n")
+cat("  persistence_bootstrap_cache_*.rds  (per-panel caches)\n")

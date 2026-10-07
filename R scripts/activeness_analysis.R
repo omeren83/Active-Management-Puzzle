@@ -1,5 +1,28 @@
 # =============================================================================
-# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.3
+# ACTIVENESS ANALYSIS - DEGREE-OF-ACTIVENESS QUINTILE SORTS                v1.4
+#
+# v1.4 changes vs v1.3 (pipeline audit, Oct 2026):
+#   (a) NO LOOK-AHEAD. v1.3 sorted funds once on lifetime averages of 1-R^2
+#       and tracking error, i.e. on information from the whole sample, then
+#       measured returns over the same sample. Funds are now sorted EVERY
+#       MONTH on measures available at the end of month t-1:
+#         1-R^2: from the 36-month rolling Carhart regression ending t-1
+#                (alpha_rolling.xlsx), as in Amihud & Goyenko (2013);
+#         TE   : annualised SD of the fund-minus-benchmark return over the
+#                36 months ending t-1 (at least 24 observations).
+#       Quintile breakpoints are recomputed each month (cross-section of
+#       active funds with a measure that month).
+#   (b) Benchmarks joined on year-month, not on the exact date (fund dates
+#       are last business days, benchmark dates may differ).
+#   (c) MR test: months resampled with the stationary bootstrap of Politis &
+#       Romano (1994), mean block length MR_BLOCK = 6, as in Patton &
+#       Timmermann (2010). v1.3 drew months i.i.d. Unverified citations of
+#       MR results in Cremers-Petajisto (2009), Amihud-Goyenko (2013) and
+#       Berk-van Binsbergen (2015) removed.
+#   (d) Footnotes describe the monthly sort and the NAV-based net returns.
+#   Note: the 1-R^2 measure comes from alpha_rolling.xlsx, which
+#   alpha_estimation.R builds on the performance-comparison sample
+#   (!excluded_perf); H3-eligible funds outside it have no 1-R^2.
 #
 # v1.3 changes vs v1.2 (filter-methodology revision, May 2026):
 #   No code change. flagged_funds.xlsx ledger updated upstream: H3_EXCLUDED
@@ -64,9 +87,9 @@
 #   U-shaped or non-monotone with the endpoints dominating. The MR test
 #   bootstraps the joint distribution of inter-quintile differences under the
 #   least-favorable null (all alphas equal) and tests whether the gradient is
-#   monotone in either direction. Cremers & Petajisto (2009, RFS), Amihud &
-#   Goyenko (2013, RFS), and Berk & van Binsbergen (2015, JFE) all report MR
-#   test results, so this addition aligns activeness_analysis.R with the canon.
+#   monotone in either direction. [v1.4: claim that Cremers-Petajisto (2009),
+#   Amihud-Goyenko (2013) and Berk-van Binsbergen (2015) report MR tests
+#   removed - not verified.]
 #   New output: table_activeness_monotonicity.tex (8 rows: 2 measures x 4 panels)
 #   and a new 'monotonicity' sheet in activeness_alphas.xlsx. Runtime addition
 #   ~30-60 seconds for B = 1000 bootstrap iterations across the 8 cells.
@@ -124,6 +147,7 @@ library(knitr)
 library(kableExtra)
 library(stringr)
 library(zoo)
+library(slider)   # trailing tracking-error window (v1.4)
 
 # =============================================================================
 # 0. CONFIG
@@ -136,6 +160,9 @@ MIN_OBS_ACT   <- 24L     # min monthly obs to assign a fund an activeness value
 # Patton-Timmermann (2010) MR test bootstrap settings
 MR_B          <- 1000L   # number of bootstrap iterations per panel
 MR_SEED       <- 42L     # reproducibility
+MR_BLOCK      <- 6L      # mean block length, stationary bootstrap (Politis-Romano 1994)
+TE_WINDOW     <- 36L     # months in the trailing tracking-error window
+TE_MIN_OBS    <- 24L     # minimum non-missing months in that window
 
 FILE          <- "fund_data.xlsx"
 ROLLING_FILE  <- "alpha_rolling.xlsx"
@@ -417,8 +444,9 @@ run_models <- function(ret_col, port_df, factors_df, subtract_rf = TRUE) {
 #   2. Recenter excess returns: r_q,t* = r_q,t - alpha_q. This imposes the
 #      least-favorable null where every quintile has alpha = 0 (a single
 #      point in the "all alphas equal" null space).
-#   3. Resample calendar months with replacement, preserving cross-sectional
-#      factor dependence. In each iteration re-estimate Carhart alphas
+#   3. Resample calendar months with the stationary bootstrap (mean block
+#      MR_BLOCK), the same draw for all quintiles and the factors, preserving
+#      cross-sectional and short-run time dependence. Re-estimate Carhart alphas
 #      from the recentered, resampled data, recompute J_up^bs and J_dn^bs.
 #   4. p-values:  p_up = mean(J_up^bs >= J_up_obs)
 #                 p_dn = mean(J_dn^bs >= J_dn_obs)
@@ -485,11 +513,21 @@ mr_test <- function(port_df, factors_df, ret_col, B = MR_B, seed = MR_SEED,
   J_dn_obs  <- min(-diffs_obs)
   
   # 4. Bootstrap loop. Inline OLS for speed (avoids fast_ols overhead).
+  #    Stationary bootstrap (Politis & Romano 1994): blocks of geometric length
+  #    with mean MR_BLOCK, wrapping around the sample end; the same index
+  #    vector is applied to all quintiles and the factors.
+  stat_boot_idx <- function(T, L) {
+    idx <- integer(T); idx[1] <- sample.int(T, 1L)
+    for (t in seq_len(T)[-1]) {
+      idx[t] <- if (runif(1) < 1 / L) sample.int(T, 1L) else (idx[t - 1L] %% T) + 1L
+    }
+    idx
+  }
   set.seed(seed)
   J_up_bs <- numeric(B)
   J_dn_bs <- numeric(B)
   for (b in seq_len(B)) {
-    idx     <- sample.int(T, size = T, replace = TRUE)
+    idx     <- stat_boot_idx(T, MR_BLOCK)
     X_bs    <- X_full[idx, , drop = FALSE]
     XtX_inv <- tryCatch(solve(crossprod(X_bs)), error = function(e) NULL)
     if (is.null(XtX_inv)) {
@@ -614,93 +652,82 @@ cat("  Date range            :", format(min(bench_long$date)),
     "to", format(max(bench_long$date)), "\n")
 
 # =============================================================================
-# 4. ACTIVENESS MEASURES PER FUND (Active funds only)
-#    (a) mean_1mR2: time-series average of (1 - as_r2) from rolling Carhart.
-#    (b) te_ann   : annualised sd of (ret_gross - bench_ret) over fund's life.
-#
-#    Active funds are eligible for (a) iff they have >= MIN_OBS_ACT rolling
-#    observations. They are eligible for (b) iff they additionally have a
-#    non-empty, non-error Benchmark_Code that matches at least MIN_OBS_ACT
-#    benchmark observations. Funds without a matchable benchmark are dropped
-#    from the TE sort only and remain in the R^2 sort.
+# 4. MONTHLY ACTIVENESS MEASURES (Active funds only, information to t-1)
+#    (a) act_r2: 1 - R^2 of the 36-month rolling Carhart regression ending in
+#        month t-1 (alpha_rolling.xlsx; Amihud & Goyenko 2013).
+#    (b) act_te: annualised SD of (ret_gross - bench_ret) over the 36 months
+#        ending in month t-1, at least TE_MIN_OBS observations
+#        (Cremers & Petajisto 2009 interpretation).
+#    A measure dated t-1 is attached to month t through a month index, so a
+#    missing month never shifts the lag.
 # =============================================================================
-cat("=== 4. Per-fund activeness measures ===\n")
+cat("=== 4. Monthly activeness measures (lagged one month) ===\n")
+ym <- function(d) year(d) * 12L + month(d)
 
-# (a) 1 - R^2  (Amihud & Goyenko, 2013)
-act_r2 <- alpha_roll %>%
+# (a) 1 - R^2, shifted forward one month
+r2_lag <- alpha_roll %>%
   filter(ap_group == "Active", !is.na(as_r2)) %>%
-  group_by(Ticker) %>%
-  summarise(
-    n_roll      = n(),
-    mean_1mR2   = mean(1 - as_r2,   na.rm = TRUE),
-    median_1mR2 = median(1 - as_r2, na.rm = TRUE),
-    .groups     = "drop"
-  ) %>%
-  filter(n_roll >= MIN_OBS_ACT)
+  transmute(Ticker, ym = ym(date) + 1L, act_r2 = 1 - as_r2)
 
-# (b) Tracking Error  (Cremers & Petajisto 2009 interpretation)
-# v1.2: filter(!excluded_h3) restricts to the H3 / activeness subsample.
+# (b) Tracking error: monthly active return, trailing 36-month SD, shift
 te_input <- panel_incubation %>%
   filter(!excluded_h3) %>%
   filter(ap_group == "Active", !is.na(ret_gross),
          !is.na(Benchmark_Code), Benchmark_Code != "",
          !grepl("^#|^N/A", Benchmark_Code)) %>%
-  select(Ticker, date, Benchmark_Code, ret_gross) %>%
-  inner_join(bench_long %>% select(Benchmark_Code, date, bench_ret),
-             by = c("Benchmark_Code", "date")) %>%
+  transmute(Ticker, Benchmark_Code, ym = ym(date), ret_gross) %>%
+  inner_join(bench_long %>% transmute(Benchmark_Code, ym = ym(date), bench_ret),
+             by = c("Benchmark_Code", "ym")) %>%          # v1.4: join on year-month
   mutate(active_return = ret_gross - bench_ret)
 
-act_te <- te_input %>%
-  group_by(Ticker, Benchmark_Code) %>%
-  summarise(
-    n_te    = n(),
-    te_ann  = sd(active_return,   na.rm = TRUE) * sqrt(12),
-    mean_ar = mean(active_return, na.rm = TRUE) * 12,
-    .groups = "drop"
-  ) %>%
-  filter(n_te >= MIN_OBS_ACT)
+te_lag <- te_input %>%
+  group_by(Ticker) %>%
+  arrange(ym, .by_group = TRUE) %>%
+  mutate(te_36 = slide_index_dbl(active_return, ym, function(x) {
+    x <- x[!is.na(x)]
+    if (length(x) < TE_MIN_OBS) NA_real_ else sd(x) * sqrt(12)
+  }, .before = TE_WINDOW - 1L)) %>%
+  ungroup() %>%
+  filter(!is.na(te_36)) %>%
+  transmute(Ticker, ym = ym + 1L, act_te = te_36)
 
-cat("  Active funds with R^2 measure :", nrow(act_r2), "\n")
-cat("  Active funds with TE measure  :", nrow(act_te), "\n")
-
-# Combine into one fund-level table; assign quintiles within each measure.
-fund_activeness <- alpha_full %>%
-  filter(ap_group == "Active") %>%
-  left_join(act_r2 %>% select(Ticker, mean_1mR2), by = "Ticker") %>%
-  left_join(act_te %>% select(Ticker, Benchmark_Code, te_ann), by = "Ticker") %>%
-  mutate(
-    q_R2 = safe_ntile(mean_1mR2, N_QUINT),
-    q_TE = safe_ntile(te_ann,    N_QUINT)
-  )
-
-# Quick diagnostic: cross-tab of quintile assignments
-cat("  Quintile distribution (R^2) :", paste(table(fund_activeness$q_R2,
-                                                  useNA = "always"),
-                                             collapse = " / "), "\n")
-cat("  Quintile distribution (TE)  :", paste(table(fund_activeness$q_TE,
-                                                  useNA = "always"),
-                                             collapse = " / "), "\n")
+cat("  Fund-months with lagged 1-R^2 :", nrow(r2_lag), "\n")
+cat("  Fund-months with lagged TE    :", nrow(te_lag), "\n")
 
 # =============================================================================
-# 5. PORT_BASE: ATTACH QUINTILES TO FUND-MONTH ROWS
-#    Active funds only. Carries gross/net returns, lagged TNA, fee, turnover,
-#    and the two activeness values + quintile labels.
+# 5. PORT_BASE: MONTHLY QUINTILES
+#    Active funds only. Breakpoints recomputed each month across the active
+#    funds that have the measure in that month (Q1 = lowest activeness).
 # =============================================================================
-cat("=== 5. Building port_base ===\n")
+cat("=== 5. Building port_base (monthly sorts) ===\n")
 
 port_base <- panel_incubation %>%
-  filter(!excluded_h3) %>%             # v1.2: H3 / activeness subsample
+  filter(!excluded_h3) %>%             # H3 / activeness subsample
   filter(ap_group == "Active") %>%
   select(Ticker, date, ap_group, ret_gross, ret_net, tna_lag,
          Expense_Ratio, Turnover) %>%
-  mutate(fee_sort = suppressWarnings(as.numeric(Expense_Ratio))) %>%
-  inner_join(
-    fund_activeness %>% select(Ticker, mean_1mR2, te_ann, q_R2, q_TE),
-    by = "Ticker"
-  )
+  mutate(fee_sort = suppressWarnings(as.numeric(Expense_Ratio)),
+         ym       = ym(date)) %>%
+  left_join(r2_lag, by = c("Ticker", "ym")) %>%
+  left_join(te_lag, by = c("Ticker", "ym")) %>%
+  group_by(date) %>%
+  mutate(q_R2 = safe_ntile(act_r2, N_QUINT),
+         q_TE = safe_ntile(act_te, N_QUINT)) %>%
+  ungroup()
 
 cat("  port_base rows:", nrow(port_base),
-    "| funds:",        n_distinct(port_base$Ticker), "\n")
+    "| funds:", n_distinct(port_base$Ticker),
+    "| with R^2 quintile:", sum(!is.na(port_base$q_R2)),
+    "| with TE quintile:", sum(!is.na(port_base$q_TE)), "\n")
+
+# Fund-level summary (descriptive only; NOT used for sorting)
+fund_activeness <- port_base %>%
+  group_by(Ticker) %>%
+  summarise(n_r2 = sum(!is.na(act_r2)), mean_act_r2 = mean(act_r2, na.rm = TRUE),
+            n_te = sum(!is.na(act_te)), mean_act_te = mean(act_te, na.rm = TRUE),
+            .groups = "drop")
+act_r2 <- r2_lag
+act_te <- te_lag
 
 # =============================================================================
 # 6. PORTFOLIO RETURN CONSTRUCTION
@@ -729,9 +756,9 @@ build_port <- function(data, q_col, sort_name, value_col) {
 }
 
 port_r2 <- build_port(port_base,
-                      "q_R2", "Activeness_R2", "mean_1mR2")
+                      "q_R2", "Activeness_R2", "act_r2")
 port_te <- build_port(port_base %>% filter(!is.na(q_TE)),
-                      "q_TE", "Activeness_TE", "te_ann")
+                      "q_TE", "Activeness_TE", "act_te")
 
 # =============================================================================
 # 7. REGRESSIONS
@@ -913,11 +940,11 @@ n_panel  <- 5L
 fn_char <- paste(
   "Cross-sectional means of monthly fund characteristics by activeness",
   "quintile, actively managed funds only. Q1 = lowest activeness; Q5 =",
-  "highest activeness. Activeness is fund-level: time-series average of",
-  "$1-R^2$ from a 36-month rolling \\textcite{Carhart1997} regression",
-  "(Panel A; \\citealt{AmihudGoyenko2013}), or annualised Tracking Error",
-  "against the fund's assigned benchmark index",
-  "(Panel B; following \\citealt{CremersPetajisto2009}).",
+  "highest activeness. Funds are sorted every month on information up to",
+  "the previous month: $1-R^2$ from the 36-month rolling \\textcite{Carhart1997}",
+  "regression ending in $t-1$ (Panel A; \\citealt{AmihudGoyenko2013}), or",
+  "annualised Tracking Error against the fund's assigned benchmark index over",
+  "the 36 months ending in $t-1$ (Panel B; following \\citealt{CremersPetajisto2009}).",
   "Mean Act.: cross-sectional mean of the activeness measure within the",
   "quintile (decimal for $1-R^2$; annualised decimal for Tracking Error).",
   "$N$ Avg.: average number of funds in the quintile portfolio per month.",
@@ -1081,15 +1108,15 @@ fn_base_alpha <- paste(
   "short spread; the risk-free rate is omitted from the spread return because",
   "it cancels in the self-financing construction:",
   "$(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$.",
-  "EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are computed by",
-  "deducting one-twelfth of the static annual expense ratio from each fund's",
-  "monthly gross return, following \\textcite{Carhart1997} and \\textcite{Wermers2000}.",
+  "EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds'",
+  "NAV-based total returns (net of expenses); gross returns add back one-twelfth",
+  "of the static annual expense ratio each month, following \\textcite{FamaFrench2010}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\% respectively.",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
   "H3 / activeness subsample per flagged\\_funds.xlsx. Active funds",
-  "only. Quintile assignment is fund-level using the time-series average of",
-  "the activeness measure across each fund's history (minimum 24 monthly obs.)."
+  "only. Quintiles are formed every month from the cross-section of active",
+  "funds, using the activeness measure available at the end of the previous month."
 )
 
 fn_r2 <- paste(fn_base_alpha,
@@ -1102,7 +1129,8 @@ fn_r2 <- paste(fn_base_alpha,
 
 fn_te <- paste(fn_base_alpha,
   "Activeness measured as annualised Tracking Error against the fund's assigned",
-  "benchmark index, $\\sqrt{12}\\cdot\\mathrm{sd}(r_{i,t}^{\\text{gross}}-r_{b(i),t})$,",
+  "benchmark index over the 36 months ending in $t-1$ (at least 24 observations),",
+  "$\\sqrt{12}\\cdot\\mathrm{sd}(r_{i,s}^{\\text{gross}}-r_{b(i),s})$,",
   "where $b(i)$ is the benchmark code recorded for fund $i$ in the static",
   "metadata. Following the interpretation of \\textcite{CremersPetajisto2009},",
   "higher tracking error indicates greater portfolio deviation from the",
@@ -1177,7 +1205,8 @@ fn_mr <- paste(
   "$J_{\\\\downarrow} = \\\\min_{q \\\\geq 2}(\\\\alpha_{q-1} - \\\\alpha_q)$",
   "for the decreasing-pattern alternative.",
   "$p_{\\\\uparrow}$ and $p_{\\\\downarrow}$ are bootstrap p-values from",
-  paste0("$B = ", MR_B, "$"), "calendar-month resamples under the",
+  paste0("$B = ", MR_B, "$"), "stationary-bootstrap resamples of calendar months",
+  paste0("(stationary bootstrap of Politis and Romano 1994, mean block length ", MR_BLOCK, ")"), "under the",
   "least-favorable null configuration (each quintile's excess return series",
   "recentered by subtracting its full-sample Carhart alpha, imposing",
   "$\\\\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern",
@@ -1186,8 +1215,7 @@ fn_mr <- paste(
   "$\\\\alpha_{\\\\text{Q5}}-\\\\alpha_{\\\\text{Q1}}$ are annualised Carhart alphas (\\\\%).",
   "$J_{\\\\uparrow}$ and $J_{\\\\downarrow}$ are reported in annualised \\\\%",
   "terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\\\\%,",
-  "5\\\\%, 1\\\\%. Implementation follows the recentering procedure of",
-  "\\\\textcite{CremersPetajisto2009} and \\\\textcite{AmihudGoyenko2013}.",
+  "5\\\\%, 1\\\\%.",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
   "H3 / activeness subsample per flagged\\\\_funds.xlsx."
 )
@@ -1268,4 +1296,4 @@ mr_print <- mr_all %>%
   mutate(across(c(alpha_q1, alpha_q5, spread), ~ round(.x, 3)))
 print(as.data.frame(mr_print), row.names = FALSE)
 
-cat("\n[SUCCESS] activeness_analysis.R v1.2 complete.\n")
+cat("\n[SUCCESS] activeness_analysis.R v1.4 complete.\n")

@@ -135,7 +135,8 @@ if (!is.null(H2_models)) {
       "t3" = "$D^{\\text{INV-PCR}}$",
       "t4" = "Discriminant"
     )
-    n_used <- if (!is.null(tt$n)) tt$n else nobs(pri$m2)
+    # model for test tK is mK (t2 -> m2, t3 -> m3, t4 -> m4)
+    n_used <- if (!is.null(tt$n)) tt$n else nobs(pri[[sub("^t", "m", key)]])
     dir_tag <- if (is.na(tt$d1_z)) "" else
                if (tt$d1_z > 0) "BP margin-call ($\\delta_1$ > 0)"
                else "Disposition ($\\delta_1$ < 0)"

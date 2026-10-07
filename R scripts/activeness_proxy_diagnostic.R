@@ -1,5 +1,17 @@
-# activeness_proxy_diagnostic.R                                        v1.0
+# activeness_proxy_diagnostic.R                                        v1.1
 # =============================================================================
+# v1.1 changes (pipeline audit, Oct 2026):
+#   - Sample restricted to the H3 / activeness subsample (!excluded_h3), like
+#     H3_lottery_demand.R.
+#   - UpSkew built from ret_net_raw (net index return; skewness is unaffected
+#     by the constant fee wedge, but net is the investor-observed series).
+#   - Test E: forward alpha taken from the FULL rolling-alpha file by month
+#     index, 36 months ahead (window t+1..t+36, no overlap with the 36-month
+#     window ending at t). v1.0 used lead(alpha, 12) on the regression sample,
+#     which had Decembers and incomplete rows removed, so "12 rows ahead" was
+#     not 12 months ahead and the windows overlapped by 24 months.
+#   - Now run by master_pipeline.R in Phase J (after H3).
+#
 # Horse race among four candidate "lottery preference" / "activeness"
 # proxies for the H3 regression. Run this AFTER panel_regressions_setup.R
 # has produced panel_reg in the session (or panel_reg.rds on disk), and
@@ -93,7 +105,7 @@ extra_proxies <- panel_incubation %>%
   arrange(Ticker, date) %>%
   group_by(Ticker) %>%
   mutate(
-    UpSkew_raw = slider::slide_dbl(ret_gross_raw, upskew_fun,
+    UpSkew_raw = slider::slide_dbl(ret_net_raw, upskew_fun,
                                    .before = 35, .complete = TRUE),
     UpSkew = dplyr::lag(UpSkew_raw, 1)
   ) %>%
@@ -102,6 +114,7 @@ extra_proxies <- panel_incubation %>%
 
 # --- 3. Build working frame -------------------------------------------------
 df <- panel_reg %>%
+  filter(!excluded_h3) %>%                       # v1.1: H3 / activeness subsample
   left_join(extra_proxies, by = c("Ticker", "date")) %>%
   filter(!is_december) %>%
   mutate(
@@ -245,12 +258,13 @@ if (!is.null(joint_test)) {
 }
 
 # --- TEST E: Future-alpha predictability ------------------------------------
-# Amihud-Goyenko (2013) replication. Read alpha_rolling.xlsx, construct
-# 12-month-forward alpha within fund, regress on each standardised measure
-# with yearmo FE and Ticker clustering. AG predicts: 1 - R^2 should
-# positively predict future risk-adjusted return.
+# Amihud-Goyenko (2013) replication. Forward alpha = rolling 36-month Carhart
+# alpha dated t+36 (window t+1..t+36), taken from the full alpha_rolling.xlsx
+# by month index, so it never overlaps the window ending at t. Regress on each
+# standardised measure with yearmo FE and two-way clustering. AG predict that
+# 1 - R^2 positively predicts future risk-adjusted return.
 cat("\n=========================================================================\n")
-cat("TEST E: Future Carhart-alpha predictability (12m forward)\n")
+cat("TEST E: Future Carhart-alpha predictability (36m ahead, non-overlapping)\n")
 cat("=========================================================================\n")
 test_e_df <- NULL
 if (!file.exists(ALPHA_ROLL_FILE)) {
@@ -260,18 +274,15 @@ if (!file.exists(ALPHA_ROLL_FILE)) {
   if (is.null(alpha_xl) || !"alpha_ann" %in% names(alpha_xl)) {
     cat("Could not read alpha_ann column from alpha_rolling.xlsx; skipped.\n")
   } else {
-    alpha_xl <- alpha_xl %>%
-      mutate(date = as.Date(date)) %>%
-      select(Ticker, date, alpha_ann)
+    ym_of <- function(d) as.integer(format(d, "%Y")) * 12L + as.integer(format(d, "%m"))
+    # forward alpha keyed on the month it is used: value at t+36 -> key t
+    alpha_fwd <- alpha_xl %>%
+      transmute(Ticker, ym = ym_of(as.Date(date)) - 36L, alpha_lead12 = alpha_ann)
     samp_e <- samp %>%
-      mutate(Ticker_chr = as.character(Ticker)) %>%
-      left_join(alpha_xl, by = c("Ticker_chr" = "Ticker", "date" = "date")) %>%
-      arrange(Ticker, date) %>%
-      group_by(Ticker) %>%
-      mutate(alpha_lead12 = dplyr::lead(alpha_ann, 12)) %>%
-      ungroup() %>%
+      mutate(Ticker_chr = as.character(Ticker), ym = ym_of(date)) %>%
+      left_join(alpha_fwd, by = c("Ticker_chr" = "Ticker", "ym" = "ym")) %>%
       filter(!is.na(alpha_lead12))
-    cat(sprintf("Test E sample (alpha_lead12 non-NA): %s obs\n",
+    cat(sprintf("Test E sample (alpha 36m ahead non-NA): %s obs\n",
                 formatC(nrow(samp_e), format="d", big.mark=",")))
     
     test_e_results <- list()
@@ -333,7 +344,7 @@ colnames(summary_df) <- c("Measure",
                           "Univ.\\ $t$ (style FE)",
                           "Univ.\\ $t$ (fund FE)",
                           "Horserace $t$",
-                          "$\\alpha_{t+12}$-pred.\\ $t$")
+                          "$\\alpha_{t+36}$-pred.\\ $t$")
 
 caption <- "Activeness / Lottery Proxy Diagnostic"
 fn <- paste0(
@@ -344,7 +355,9 @@ fn <- paste0(
   "The ``winning'' proxy is identified by (i) high univariate $|t|$ under ",
   "the FE structure that preserves its dominant variation source, (ii) ",
   "survival in the horse race conditional on the others, and (iii) ",
-  "consistency with Amihud--Goyenko's (2013) future-alpha prediction."
+  "consistency with Amihud--Goyenko's (2013) future-alpha prediction. ",
+  "Future alpha: 36-month rolling Carhart alpha over months $t+1$ to $t+36$, ",
+  "which does not overlap the window used for the measures."
 )
 
 ktab <- kbl(

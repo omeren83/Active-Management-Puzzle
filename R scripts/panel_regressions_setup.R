@@ -1,5 +1,26 @@
-# panel_regressions_setup.R                                              v1.4
+# panel_regressions_setup.R                                              v1.5
 # =============================================================================
+# v1.5 changes (pipeline audit, Oct 2026, Batch 3):
+#   - JANUARIES RESTORED. Style flow is now built from a December-inclusive
+#     winsorised flow (.f_sty). v1.4 used flow_calc_pct_win, which is NA in
+#     December, so style_flow was NA in December and style_flow_lag NA in
+#     every January; all H1-H4 samples silently lost January (and December
+#     is excluded by design), leaving February-November only.
+#   - $5M FILTER implemented as the text states: fund-months with lagged TNA
+#     below MIN_TNA_LAG (USD millions) are dropped at the very end (14b), after
+#     all lags (including the row-based sentiment lags) are built.
+#   - Rolling return statistics (12m return for the rank, 36m vol, 36m skew,
+#     12m MAX) computed on each fund's full return history in panel_master
+#     and joined by (Ticker, date). On panel_incubation the Evans filter
+#     removed the first 36 months, so 36-month statistics started only at
+#     month ~72 of fund age. Falls back to the source panel if panel_master
+#     is not in the session.
+#   - Upstream stamp attached to panel_reg (attr "upstream_stamp"), so
+#     master_pipeline.R can refuse a stale panel_reg.rds.
+#   - Note: ActR2 comes from alpha_rolling.xlsx, which alpha_estimation.R
+#     builds on the performance-comparison sample (!excluded_perf); H3-eligible
+#     funds outside that sample have ActR2 = NA.
+#
 # v1.4 changes (pipeline audit, Oct 2026):
 #   - Section 6 rolling stats (12m return for the performance rank, 36m vol,
 #     36m skew, 12m MAX) now use ret_net_raw. The LSEG index is net of fees
@@ -52,7 +73,7 @@
 # COLUMNS PRODUCED IN panel_reg:
 #   IDs:           Ticker, date, yearmo, Lipper_Category, ap_group, Name
 #   LHS:           flow (Sirri-Tufano winsorised), is_december (filter flag)
-#   Performance:   cumret_lag (12m gross return ending t-1), rank_lag,
+#   Performance:   cumret_lag (12m net return ending t-1), rank_lag,
 #                  R_LOW, R_MID, R_HIGH (proposal Eq 6-8)
 #   Controls:      log_TNA, log_Age, ExpRatio, LoadDummy, ret_vol (36m SD),
 #                  Turnover, style_flow_lag
@@ -105,6 +126,7 @@ suppressPackageStartupMessages({
 PANEL_CHOICE <- "incubation"  # "incubation" (default) | "trimmed" | "master"
 SUBSET       <- "active"      # "active"  | "passive"   | "all"
 MIN_CAT_SIZE <- 5L            # min funds per (date, Lipper_Category) for rank
+MIN_TNA_LAG  <- 5             # USD millions; drop fund-months with smaller lagged TNA
 
 if (!exists("WORKING_DIR")) WORKING_DIR <- getwd()
 ALPHA_ROLLING_FILE <- file.path(WORKING_DIR, "alpha_rolling.xlsx")
@@ -129,7 +151,7 @@ cat("Source panel:", panel_obj_name,
 
 # --- 2. Sanity-check required columns ----------------------------------------
 required <- c("Ticker", "date", "ret_net_raw", "tna_lag",
-              "flow_calc_pct_win", "is_december", "ap_group",
+              "flow_calc_pct", "flow_calc_pct_win", "is_december", "ap_group",
               "Lipper_Category", "Name", "Inception_Date",
               "Expense_Ratio", "Turnover")
 missing_cols <- setdiff(required, names(panel))
@@ -178,40 +200,47 @@ panel <- left_join(panel, load_lookup, by = "Ticker")
 cat("LoadDummy: load=", sum(load_lookup$LoadDummy),
     " | other=", sum(load_lookup$LoadDummy == 0), "\n", sep = "")
 
-# --- 6. Per-fund rolling stats (12m return, 36m vol, 36m skew, age) ----------
-# Inputs are net (NAV-based) returns: what investors observe.
-# Strict-completion windows: any NA input -> NA output (no near-window estimates).
-panel <- panel %>%
+# --- 6. Per-fund rolling stats (12m return, 36m vol, 36m skew, 12m MAX) -----
+# Inputs are net (NAV-based) returns: what investors observe. Computed on the
+# fund's FULL history (panel_master) so 36-month windows are not truncated by
+# the Evans incubation cut, then lagged one month and joined by (Ticker, date).
+# Strict-completion windows: any NA input -> NA output.
+stats_src <- if (exists("panel_master")) panel_master else {
+  warning("panel_master not in session; rolling stats use ", panel_obj_name,
+          " (36-month windows start after the incubation cut).")
+  panel
+}
+roll_stats <- stats_src %>%
+  filter(Ticker %in% unique(panel$Ticker)) %>%
+  select(Ticker, date, ret_net_raw) %>%
   arrange(Ticker, date) %>%
   group_by(Ticker) %>%
   mutate(
-    cumret_12m   = slide_dbl(ret_net_raw,
-                             ~ prod(1 + .x) - 1,
-                             .before = 11, .complete = TRUE),
-    ret_vol_36m  = slide_dbl(ret_net_raw,
-                             stats::sd,
-                             .before = 35, .complete = TRUE),
-    ret_skew_36m = slide_dbl(ret_net_raw,
-                             ~ e1071::skewness(.x, na.rm = FALSE),
-                             .before = 35, .complete = TRUE),
-    age_months   = as.numeric(difftime(date, as.Date(Inception_Date),
-                                       units = "days")) / 30.4375,
+    cumret_12m    = slide_dbl(ret_net_raw, ~ prod(1 + .x) - 1,
+                              .before = 11, .complete = TRUE),
+    ret_vol_36m   = slide_dbl(ret_net_raw, stats::sd,
+                              .before = 35, .complete = TRUE),
+    ret_skew_36m  = slide_dbl(ret_net_raw, ~ e1071::skewness(.x, na.rm = FALSE),
+                              .before = 35, .complete = TRUE),
     ret_max12_12m = slide_dbl(ret_net_raw, max,
-                              .before = 11, .complete = TRUE)
-  ) %>%
-  ungroup()
-
-# --- 7. Lag rolling stats by 1 month -----------------------------------------
-panel <- panel %>%
-  arrange(Ticker, date) %>%
-  group_by(Ticker) %>%
-  mutate(
-    cumret_lag   = lag(cumret_12m,   1),
-    ret_vol_lag  = lag(ret_vol_36m,  1),
-    ret_skew_lag = lag(ret_skew_36m, 1),
-    age_lag      = lag(age_months,   1),
+                              .before = 11, .complete = TRUE),
+    # --- 7. Lag by one month (window ends t-1) ---
+    cumret_lag    = lag(cumret_12m,    1),
+    ret_vol_lag   = lag(ret_vol_36m,   1),
+    ret_skew_lag  = lag(ret_skew_36m,  1),
     ret_max12_lag = lag(ret_max12_12m, 1)
   ) %>%
+  ungroup() %>%
+  select(Ticker, date, cumret_lag, ret_vol_lag, ret_skew_lag, ret_max12_lag)
+stopifnot(!anyDuplicated(roll_stats[c("Ticker", "date")]))
+
+panel <- panel %>%
+  left_join(roll_stats, by = c("Ticker", "date")) %>%
+  arrange(Ticker, date) %>%
+  group_by(Ticker) %>%
+  mutate(age_months = as.numeric(difftime(date, as.Date(Inception_Date),
+                                          units = "days")) / 30.4375,
+         age_lag    = lag(age_months, 1)) %>%
   ungroup()
 
 # --- 8. Within-Lipper-category fractional rank on lagged cumret -------------
@@ -237,19 +266,29 @@ panel <- panel %>%
   )
 
 # --- 9. Leave-one-out style flow, then lag by 1 month ------------------------
+# Built from a December-INCLUSIVE flow (.f_sty, pooled 1/99 winsorisation) so
+# that December style flow exists and January's lagged style flow is not NA.
+# The dependent variable (flow) still excludes December.
+if (!exists("winsorise")) {
+  winsorise <- function(x, low = 0.01, high = 0.99) {
+    q <- quantile(x, probs = c(low, high), na.rm = TRUE)
+    pmax(pmin(x, q[2]), q[1])
+  }
+}
+panel <- panel %>% mutate(.f_sty = winsorise(flow_calc_pct))
 panel <- panel %>%
   group_by(date, Lipper_Category) %>%
   mutate(
-    .style_n     = sum(!is.na(flow_calc_pct_win)),
-    .style_total = sum(flow_calc_pct_win, na.rm = TRUE),
+    .style_n     = sum(!is.na(.f_sty)),
+    .style_total = sum(.f_sty, na.rm = TRUE),
     style_flow   = if_else(
-      !is.na(flow_calc_pct_win) & .style_n > 1,
-      (.style_total - flow_calc_pct_win) / (.style_n - 1),
+      !is.na(.f_sty) & .style_n > 1,
+      (.style_total - .f_sty) / (.style_n - 1),
       NA_real_
     )
   ) %>%
   ungroup() %>%
-  select(-.style_n, -.style_total) %>%
+  select(-.style_n, -.style_total, -.f_sty) %>%
   arrange(Ticker, date) %>%
   group_by(Ticker) %>%
   mutate(style_flow_lag = lag(style_flow, 1)) %>%
@@ -421,7 +460,19 @@ panel_reg <- panel_reg %>%
 
 cat("Added lagged sentiment columns (suffix _lag).\n")
 
+# --- 14b. $5M lagged-TNA filter (after ALL lags, incl. the sentiment lags
+# above, so no lag spans a removed month). log_TNA = log(TNA_{t-1}).
+n_pre_tna <- nrow(panel_reg)
+panel_reg <- panel_reg %>% filter(!is.na(log_TNA), log_TNA >= log(MIN_TNA_LAG))
+cat(sprintf("Lagged-TNA filter (>= USD %sM): %d -> %d fund-months (-%d)\n",
+            MIN_TNA_LAG, n_pre_tna, nrow(panel_reg), n_pre_tna - nrow(panel_reg)))
+
 # --- 15. Save and expose -----------------------------------------------------
+# Upstream stamp: master_pipeline.R recomputes it before reusing the RDS
+if (exists("panel_reg_stamp", mode = "function"))
+  attr(panel_reg, "upstream_stamp") <- panel_reg_stamp()
+cat("January fund-months in panel_reg (non-NA flow):",
+    sum(month(panel_reg$date) == 1L & !is.na(panel_reg$flow)), "\n")
 saveRDS(panel_reg, OUT_FILE_RDS)
 cat("\nWrote", OUT_FILE_RDS, "\n")
 

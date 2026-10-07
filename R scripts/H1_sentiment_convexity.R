@@ -18,16 +18,18 @@
 # composition.
 #
 # (1) PRIMARY                          -> table_H1_regression.tex
-#     Lagged sentiment + fund FE       (Huang et al. 2015 timing)
+#     Contemporaneous sentiment + fund FE
 #     Goes in the main body of the dissertation.
 #
-# (2) TIMING ROBUSTNESS                -> table_H1_contemporaneous.tex
-#     Contemporaneous sentiment + fund FE   (Baker-Wurgler 2007 timing)
-#     Goes in Appendix F.1.
+# (2) TIMING ROBUSTNESS                -> table_H1_lagged.tex
+#     Sentiment lagged one month + fund FE   (Huang et al. 2015 timing)
 #
 # (3) IDENTIFICATION ROBUSTNESS        -> table_H1_robustness.tex
-#     Lagged sentiment + Lipper x yearmo FE  (Cheng et al. 2025)
-#     Goes in Appendix F.2.
+#     Contemporaneous sentiment + Lipper x yearmo FE  (Cheng et al. 2025)
+#
+# [Oct 2026 audit: header corrected to match the code below; v1.x header
+#  described the primary as lagged and named a _contemporaneous table that
+#  the script does not write. models also saved to H1_models.rds.]
 # =============================================================================
 
 suppressPackageStartupMessages({
@@ -444,3 +446,5 @@ H1_robust <- build_h1_table(
 
 H1_models <- list(primary = H1_primary, lagged = H1_lagged, robust = H1_robust)
 assign("H1_models", H1_models, envir = .GlobalEnv)
+saveRDS(H1_models, file.path(WORKING_DIR, "H1_models.rds"))   # reporting can run standalone
+cat("Saved H1_models.rds\n")

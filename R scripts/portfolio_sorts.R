@@ -1,5 +1,16 @@
 # =============================================================================
-# PORTFOLIO SORTS — Size, Momentum, Fee Quintiles                            v1.4
+# PORTFOLIO SORTS — Size, Momentum, Fee Quintiles                            v1.5
+#
+# Changes from v1.4 (pipeline audit, Oct 2026):
+#   - Fee quintiles formed every month within (date, ap_group), like Size and
+#     Momentum. v1.4 fixed them once on the whole-sample cross-section of
+#     funds, i.e. on a population that includes funds not yet alive. The
+#     expense ratio itself is still the static end-of-sample LSEG snapshot;
+#     the footnote now says so (a look-ahead proxy, disclosed).
+#   - Momentum signal built from net returns (ret_net, what investors observe;
+#     Carhart 1997 sorts on past net returns). Since data_import v1.4, gross
+#     returns are missing for funds without an expense ratio, which would have
+#     dropped those funds from the momentum sort.
 #
 # Changes from v1.3 (Family D pre-defense audit):
 #   - Performance-comparison subsample filter added to the panel-prep stage:
@@ -377,8 +388,8 @@ port_base <- panel_incubation %>%
   group_by(Ticker) %>%
   mutate(
     size_sort = log(pmax(tna_lag, 1e-6)),
-    # 11-month cumulative return, skip t-1 (Jegadeesh & Titman 1993)
-    mom_raw   = rollapplyr(1 + ret_gross, width = 11,
+    # 11-month cumulative net return, skip t-1 (Jegadeesh & Titman 1993)
+    mom_raw   = rollapplyr(1 + ret_net, width = 11,
                            FUN = prod, fill = NA, align = "right") - 1,
     mom_sort  = lag(mom_raw, 2)
   ) %>%
@@ -392,19 +403,12 @@ port_base <- port_base %>%
          q_mom  = safe_ntile(mom_sort)) %>%
   ungroup()
 
-# Fixed within-group quintiles for FEE (static expense ratio).
-# Use one canonical fee per fund (first non-NA value) to prevent
-# many-to-many joins if Expense_Ratio varies across rows for the same fund.
-fee_q <- port_base %>%
-  group_by(Ticker, ap_group) %>%
-  summarise(fee_sort = first(na.omit(fee_sort)), .groups = "drop") %>%
-  filter(!is.na(fee_sort)) %>%
-  group_by(ap_group) %>%
+# FEE quintiles: monthly breakpoints within group, like Size and Momentum.
+# The expense ratio is one static value per fund (end-of-sample snapshot).
+port_base <- port_base %>%
+  group_by(date, ap_group) %>%
   mutate(q_fee = safe_ntile(fee_sort)) %>%
-  ungroup() %>%
-  select(Ticker, q_fee)
-
-port_base <- left_join(port_base, fee_q, by = "Ticker")
+  ungroup()
 
 cat("  Active:",  sum(port_base$ap_group == "Active",  na.rm = TRUE), "fund-months\n")
 cat("  Passive:", sum(port_base$ap_group == "Passive", na.rm = TRUE), "fund-months\n")
@@ -617,8 +621,9 @@ pack_tab <- data.frame(
 
 fn_d1 <- paste(
   "Quintile portfolios sorted monthly within group on $\\log(\\text{TNA}_{t-1})$",
-  "(Size), cumulative 11-month gross return ending $t-2$ skipping $t-1$",
-  "(Momentum; \\citealt{JegadeeshTitman1993}), and static annual Expense Ratio (Fee).",
+  "(Size), cumulative 11-month net return ending $t-2$ skipping $t-1$",
+  "(Momentum; \\citealt{JegadeeshTitman1993}; net returns), and annual Expense Ratio (Fee;",
+  "a static end-of-sample LSEG value, so the fee sort uses information not available in real time).",
   "EW: equal-weighted; VW: lagged-TNA-weighted. Returns in monthly \\%.",
   "EW Sharpe is the annualised Sharpe ratio of the quintile portfolio's",
   # Single \\ in the R string → single \ in the .tex file → correct LaTeX command.
@@ -879,11 +884,12 @@ fn_d3 <- paste(fn_base,
                "Size sorted monthly on $\\log(\\text{TNA}_{t-1})$; Q1 = smallest.")
 
 fn_d4 <- paste(fn_base,
-               "Momentum sorted monthly on cumulative gross return over $t-12$ to $t-2$,",
+               "Momentum sorted monthly on cumulative net return over $t-12$ to $t-2$,",
                "skipping $t-1$ (\\citealt{JegadeeshTitman1993}); Q1 = past losers.")
 
 fn_d5 <- paste(fn_base,
-               "Fee sorted once on static annual Expense Ratio; Q1 = lowest fee.",
+               "Fee sorted monthly within group on the static (end-of-sample) annual",
+               "Expense Ratio; Q1 = lowest fee.",
                "Leveraged and derivative-based passive funds excluded prior to sorting",
                "(see Cleaning Step 6 in the data construction notes).")
 
@@ -906,4 +912,4 @@ cat("Written: table_port_size_alpha.tex\n")
 cat("Written: table_port_mom_alpha.tex\n")
 cat("Written: table_port_fee_alpha.tex\n")
 
-cat("\n[SUCCESS] portfolio_sorts.R v1.4 complete.\n")
+cat("\n[SUCCESS] portfolio_sorts.R v1.4 complete.\n")

@@ -15,16 +15,20 @@
 # coefficient differences reflect spec changes, not sample composition.
 #
 # (1) PRIMARY                          -> table_H2_regression.tex
-#     Lagged state variables + fund FE   (Huang et al. 2015 timing)
+#     Contemporaneous state variables + fund FE
 #     Goes in the main body of the dissertation.
 #
-# (2) TIMING ROBUSTNESS                -> table_H2_contemporaneous.tex
-#     Contemporaneous state + fund FE    (Baker-Wurgler 2007 timing)
-#     Goes in Appendix F.1.
+# (2) TIMING ROBUSTNESS                -> table_H2_lagged.tex
+#     State variables lagged one month + fund FE   (Huang et al. 2015 timing)
 #
 # (3) IDENTIFICATION ROBUSTNESS        -> table_H2_robustness.tex
-#     Lagged state + Lipper x yearmo FE  (Cheng et al. 2025)
-#     Goes in Appendix F.2.
+#     Contemporaneous state + Lipper x yearmo FE   (Cheng et al. 2025)
+#
+# [Oct 2026 audit: header corrected to match the code. D_INV_PCR thresholds
+#  now taken from the MONTHLY put-call series (one value per month), like
+#  the other regime dummies in behavioral_state_variables.R; previously the
+#  34th percentile was taken over fund-months, which weights months by the
+#  number of funds. Models also saved to H2_models.rds.]
 #
 # Four columns per table:
 #   (1) Baseline
@@ -94,13 +98,17 @@ samp_md <- panel_reg %>%
 
 # PCR sample: own shorter window. D_INV_PCR (cont) and D_INV_PCR_lag built
 # from PUT_CALL_RATIO and its lag respectively, using the same Q34 threshold.
+# Thresholds from the monthly series (one observation per month)
+pcr_month <- panel_reg %>% distinct(yearmo, PUT_CALL_RATIO, PUT_CALL_RATIO_lag)
+pcr_thr_cont_m <- quantile(pcr_month$PUT_CALL_RATIO,     1 - 0.66, na.rm = TRUE, names = FALSE)
+pcr_thr_lag_m  <- quantile(pcr_month$PUT_CALL_RATIO_lag, 1 - 0.66, na.rm = TRUE, names = FALSE)
 samp_pcr <- panel_reg %>%
   filter(!is_december) %>%
   filter(if_all(all_of(c(core_rhs, "PUT_CALL_RATIO", "PUT_CALL_RATIO_lag")),
                 ~ !is.na(.))) %>%
   mutate(
-    pcr_thr_cont = quantile(PUT_CALL_RATIO,     1 - 0.66, na.rm = TRUE),
-    pcr_thr_lag  = quantile(PUT_CALL_RATIO_lag, 1 - 0.66, na.rm = TRUE),
+    pcr_thr_cont = pcr_thr_cont_m,
+    pcr_thr_lag  = pcr_thr_lag_m,
     D_INV_PCR     = as.numeric(PUT_CALL_RATIO     <= pcr_thr_cont),
     D_INV_PCR_lag = as.numeric(PUT_CALL_RATIO_lag <= pcr_thr_lag),
     Ticker          = as.factor(Ticker),
@@ -519,3 +527,5 @@ H2_robust <- build_h2_table(
 
 H2_models <- list(primary = H2_primary, lagged = H2_lagged, robust = H2_robust)
 assign("H2_models", H2_models, envir = .GlobalEnv)
+saveRDS(H2_models, file.path(WORKING_DIR, "H2_models.rds"))   # reporting can run standalone
+cat("Saved H2_models.rds\n")
