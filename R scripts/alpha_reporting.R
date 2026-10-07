@@ -1,5 +1,15 @@
 # =============================================================================
-# PERFORMANCE REPORTING: TABLES 5-10b AND FIGURES 2-3 (v8.5)
+# PERFORMANCE REPORTING: TABLES 5-10b AND FIGURES 2-3 (v8.6)
+#
+# v8.6 changes vs v8.5 (pipeline audit, Oct 2026):
+#   (a) Table 9 labels follow the numbers in both tails: Prob. Luck < 5% ->
+#       "Worse than luck (significant)", > 95% -> "Better than luck
+#       (significant)". Prob. Luck printed with fmt_prob() so "0.0%" (no
+#       iteration) and "<0.1%" (1-4 iterations) are distinguished.
+#   (b) Table 9 footnote states that resampled months keep their draw order.
+#   (c) Table 10b: S-/S+ counted from the same Student-t NW p-values as pi0
+#       (v8.5 used normal critical values); population estimates pi_A-/pi_A+
+#       taken at GAMMA_STAR = 0.45 per BSW (2010) eq. 8, not at 0.20.
 #
 # v8.5 changes vs v8.4 (R-source backslash + Phase B caption architecture):
 #   (a) fn_t7 (Table 7 footnote) and fn_t9 (Table 9 footnote): flagged_funds.xlsx
@@ -190,6 +200,17 @@ fmt <- function(x, digits = 3) {
 }
 
 fmt1 <- function(x) formatC(round(as.numeric(x), 1), format = "f", digits = 1)
+
+# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+fmt_prob <- function(x) {
+  v <- suppressWarnings(as.numeric(x))
+  ifelse(is.na(v), "--",
+    ifelse(v == 0,   "0.0\\%",
+    ifelse(v < 0.05, "$<$0.1\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+}
+
+GAMMA_STAR <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
 
 # Fixes kableExtra LaTeX bugs:
 #   1. Extra closing brace on \end{threeparttable}.
@@ -497,8 +518,9 @@ fn_t7 <- paste(
   "EW: equal-weighted portfolio (each fund alive in month $t$ contributes",
   "$1/N_t$). VW: value-weighted portfolio with lagged TNA weights",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
-  "Net returns are computed as gross returns less one-twelfth of the static",
-  "annual expense ratio each month, following \\\\textcite{Carhart1997} and \\\\textcite{Wermers2000}.",
+  "Net returns are the funds' NAV-based total returns (net of expenses);",
+  "gross returns add back one-twelfth of the static annual expense ratio each month,",
+  "following \\\\textcite{FamaFrench2010}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
@@ -685,12 +707,12 @@ boot_tab <- boot_summary %>%
     Actual_t  = sapply(t_alpha_actual,   fmt, digits = 3),
     Sim_Mean  = sapply(t_alpha_sim_mean, fmt, digits = 3),
     # Pre-format with \% so escape=FALSE passes it through correctly
-    Prob_Luck = paste0(formatC(pct_runs_below, format = "f", digits = 1), "\\%"),
+    Prob_Luck = fmt_prob(pct_runs_below),
+    # Same rule in both tails: the label follows the reported probability
     Interpretation = case_when(
-      percentile <= 10 & pct_runs_below < 5  ~ "Worse than luck (significant)",
-      percentile >= 90 & pct_runs_below > 95 ~ "Evidence of genuine skill",
-      percentile == 50                        ~ "Indistinguishable from luck",
-      TRUE                                    ~ "Consistent with zero-skill"
+      pct_runs_below < 5  ~ "Worse than luck (significant)",
+      pct_runs_below > 95 ~ "Better than luck (significant)",
+      TRUE                ~ "Consistent with zero skill"
     )
   )
 
@@ -704,14 +726,16 @@ fn_t9 <- paste(
   "For each fund, estimated monthly alpha is subtracted from the excess return",
   "series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled",
-  "with replacement, preserving cross-sectional factor return dependence.",
+  "with replacement and kept in the order drawn, the same draw applying to all",
+  "funds, preserving cross-sectional factor return dependence.",
   "The \\\\textcite{Carhart1997} four-factor model is re-estimated on each resampled series.",
   "\\\\textit{Actual} $t(\\\\hat{\\\\alpha})$: percentile of the empirical $t$-statistic",
   "distribution across active funds.",
   "\\\\textit{Simulated Mean}: average of that percentile across all iterations.",
   "\\\\textit{Prob.\\\\ Luck}: fraction of iterations in which the simulated percentile",
-  "falls below the actual value; values below 5\\\\% at lower percentiles indicate",
-  "underperformance unlikely to be explained by luck alone.",
+  "falls below the actual value; values below 5\\\\% (above 95\\\\%) indicate that the",
+  "actual percentile is worse (better) than zero-alpha luck would produce;",
+  "0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 4 of 10,000 iterations.",
   "Newey-West standard errors with a 6-month lag are used throughout."
 )
 
@@ -846,13 +870,13 @@ cat("=== 7b. BSW Four-Way Decomposition Table ===\n")
 GAMMA_GRID_REP <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 t_stats_rep    <- active_pi0$alpha_t_nw   # same population as pi_0_val
 
+# Tails counted from the same Student-t NW p-values (actual_p) as pi_0_val
 bsw_rep_df <- do.call(rbind, lapply(GAMMA_GRID_REP, function(g) {
-  t_thresh <- qnorm(1 - g / 2)
-  S_neg    <- mean(t_stats_rep < -t_thresh, na.rm = TRUE)
-  S_pos    <- mean(t_stats_rep >  t_thresh, na.rm = TRUE)
+  S_neg    <- mean(actual_p < g & t_stats_rep < 0)
+  S_pos    <- mean(actual_p < g & t_stats_rep > 0)
   F_luck   <- pi_0_val * g / 2
   data.frame(
-    gamma           = g * 100,
+    gamma           = round(g * 100),
     S_neg_pct       = S_neg    * 100,
     S_pos_pct       = S_pos    * 100,
     F_luck_pct      = F_luck   * 100,
@@ -861,12 +885,12 @@ bsw_rep_df <- do.call(rbind, lapply(GAMMA_GRID_REP, function(g) {
   )
 }))
 
-# Population estimates at gamma* = 0.20 (BSW recommended reference)
-pi_A_minus_rep <- bsw_rep_df$T_unskilled_pct[bsw_rep_df$gamma == 20]
-pi_A_plus_rep  <- bsw_rep_df$T_skilled_pct[bsw_rep_df$gamma == 20]
+# Population estimates at gamma* (BSW 2010, eq. 8)
+pi_A_minus_rep <- bsw_rep_df$T_unskilled_pct[bsw_rep_df$gamma == round(GAMMA_STAR * 100)]
+pi_A_plus_rep  <- bsw_rep_df$T_skilled_pct[bsw_rep_df$gamma == round(GAMMA_STAR * 100)]
 cat(sprintf(
-  "Population estimates (gamma* = 0.20):\n  pi^-_A (Genuinely Unskilled): %.1f%%\n  pi^+_A (Genuinely Skilled):   %.1f%%\n",
-  pi_A_minus_rep, pi_A_plus_rep
+  "Population estimates (gamma* = %.2f):\n  pi^-_A (Genuinely Unskilled): %.1f%%\n  pi^+_A (Genuinely Skilled):   %.1f%%\n",
+  GAMMA_STAR, pi_A_minus_rep, pi_A_plus_rep
 ))
 
 bsw_display <- bsw_rep_df %>%
@@ -885,8 +909,7 @@ fn_t10b <- paste(
   "$S^-_\\\\gamma$ ($S^+_\\\\gamma$): observed fraction of active funds with",
   "significantly negative (positive) Newey-West $t(\\\\hat{\\\\alpha})$ at",
   "two-sided significance level $\\\\gamma$, using full-period \\\\textcite{Carhart1997}",
-  "four-factor alphas. Critical values are from the standard normal distribution,",
-  "consistent with the large-sample approximation in \\\\textcite{BarrasScailletWermers2010}.",
+  "four-factor alphas and the same Student-$t$ $p$-values as $\\\\hat{\\\\pi}_0$.",
   "$F_\\\\gamma = \\\\hat{\\\\pi}_0 \\\\cdot \\\\gamma/2$: expected proportion of false",
   "discoveries per tail arising from zero-alpha funds,",
   paste0("where $\\\\hat{\\\\pi}_0 = ", pi0_str, "$ is the \\\\textcite{Storey2002} estimate"),
@@ -895,8 +918,10 @@ fn_t10b <- paste(
   "(significant negative alpha net of false discoveries).",
   "$T^+_\\\\gamma = S^+_\\\\gamma - F_\\\\gamma$: genuinely skilled funds",
   "(significant positive alpha net of false discoveries).",
-  "The row at $\\\\gamma = 0.20$ provides the population-level estimates",
-  "$\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$ following \\\\textcite{BarrasScailletWermers2010}, the canonical BSW significance level.",
+  paste0("The row at $\\\\gamma^* = ", formatC(GAMMA_STAR, format = "f", digits = 2),
+         "$ gives the population estimates $\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$"),
+  "(\\\\citealt{BarrasScailletWermers2010}, eq.~8, who take them at a sufficiently high",
+  "$\\\\gamma^*$ and report that pre-set values of 0.35 or 0.45 match their MSE-based choice).",
   "Negative $T^+_\\\\gamma$ entries indicate right-tail significance does not",
   "exceed the false-discovery rate at that threshold.",
   "The Storey estimator is conservative: it overestimates $\\\\hat{\\\\pi}_0$",

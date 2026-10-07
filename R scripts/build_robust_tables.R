@@ -1,5 +1,11 @@
 # =============================================================================
-# ROBUST APPENDIX TABLES BUILDER (v1.3)
+# ROBUST APPENDIX TABLES BUILDER (v1.4)
+#
+# v1.4 changes vs v1.3 (pipeline audit, Oct 2026)
+# -----------------------------------------------
+#   Table I.3 at GAMMA_STAR = 0.45 (BSW 2010, eq. 8), caption and note follow
+#   the constant; tail counts described as Student-t p-value based (matching
+#   the estimation scripts). Table I.2 note: "<0.1%" means 1-4 iterations.
 #
 # Purpose
 # -------
@@ -47,7 +53,7 @@ if (!exists("OUT_DIR", inherits = TRUE) || is.null(OUT_DIR)) {
 dir.create(OUT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 PERCENTILES_TO_SHOW <- c(1, 5, 10, 50, 90, 95, 99)
-GAMMA_STAR          <- 20
+GAMMA_STAR          <- 45   # percent; BSW (2010) eq. 8 gamma* = 0.45
 
 # --- 1. LOAD ALL OUTPUTS -----------------------------------------------------
 cat("=== Loading Excel outputs ===\n")
@@ -225,9 +231,9 @@ e1_tex <- c(
     "EW: equal-weighted portfolio ($1/N_t$ weight per fund per month). ",
     "VW: value-weighted portfolio with lagged TNA weights ",
     "$w_{i,t-1} = \\text{TNA}_{i,t-1}/\\sum_j \\text{TNA}_{j,t-1}$. ",
-    "Net returns are gross returns less one-twelfth of the static annual ",
-    "expense ratio each month, following \\textcite{Carhart1997} and ",
-    "\\textcite{Wermers2000}. ",
+    "Net returns are the funds' NAV-based total returns (net of expenses); ",
+    "gross returns add back one-twelfth of the static annual expense ratio ",
+    "each month, following \\textcite{FamaFrench2010}. ",
     "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; ",
     "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\%. ",
     "$\\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. ",
@@ -333,7 +339,7 @@ e2_tex <- c(
     "underperformance inconsistent with the zero-alpha null. ",
     "Entries of 0.0\\% indicate zero out of $B = 10{,}000$ iterations ",
     "produced a simulated $t$-statistic as extreme as the actual value; ",
-    "$<$0.1\\% indicates between 1 and 5 iterations. ",
+    "$<$0.1\\% indicates between 1 and 4 iterations. ",
     "\\textit{Carhart}: MKT-RF, SMB, HML, MOM. ",
     "\\textit{FF6}: MKT-RF, SMB, HML, RMW, CMA, MOM. ",
     "\\textit{C+PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded liquidity. ",
@@ -350,7 +356,7 @@ e2_tex <- c(
 write_tex(e2_tex, "table_bootstrap_comparison_robust.tex")
 
 # =============================================================================
-# 5. TABLE I.3:  BSW DECOMPOSITION COMPARISON AT GAMMA* = 0.20
+# 5. TABLE I.3:  BSW DECOMPOSITION COMPARISON AT GAMMA* (GAMMA_STAR)
 # =============================================================================
 cat("\n=== Table I.3: BSW Decomposition Comparison ===\n")
 
@@ -371,6 +377,7 @@ br_car <- get_bsw_row(car)
 br_ff6 <- get_bsw_row(ff6)
 br_c5  <- get_bsw_row(c5)
 pi0_car_str <- paste0(fmt1(br_car$pi0), "\\%")
+gstar_str   <- formatC(GAMMA_STAR / 100, format = "f", digits = 2)   # e.g. "0.45"
 
 make_e3_row <- function(label, br) {
   paste0(label, " & ", fmt1(br$pi0), "\\% & ", fmt1(br$S_neg), "\\% & ",
@@ -399,7 +406,7 @@ e3_tex <- c(
   "\\ifdim\\tabletempwidth>\\linewidth\\setlength{\\tabletempwidth}{\\linewidth}\\fi",
   "\\begin{minipage}{\\tabletempwidth}",
   "\\captionsetup{width=\\linewidth}",
-  "\\caption{\\label{tab:bsw_comparison_robust}BSW (2010) Decomposition Comparison at $\\gamma^* = 0.20$}",
+  paste0("\\caption{\\label{tab:bsw_comparison_robust}BSW (2010) Decomposition Comparison at $\\gamma^* = ", gstar_str, "$}"),
   "\\ifdim\\wd\\tabletempbox>\\linewidth",
   "  \\resizebox{\\linewidth}{!}{\\usebox{\\tabletempbox}}",
   "\\else",
@@ -409,13 +416,13 @@ e3_tex <- c(
   "\\begin{singlespace}\\footnotesize\\noindent",
   paste0(
     "\\textcite{BarrasScailletWermers2010} four-way decomposition of active funds ",
-    "at significance threshold $\\gamma^* = 0.20$. ",
+    "at significance threshold $\\gamma^* = ", gstar_str, "$ (eq.~8 of \\citealt{BarrasScailletWermers2010}). ",
     "$\\hat{\\pi}_0$: \\textcite{Storey2002} estimator of the zero-alpha fund ",
     "proportion at tuning parameter $\\lambda = 0.5$, derived from Newey-West ",
     "$t(\\hat{\\alpha})$ p-values on full-period per-fund alphas. ",
     "$S^-_{\\gamma^*}$ ($S^+_{\\gamma^*}$): observed fraction of active funds with ",
     "significantly negative (positive) $t(\\hat{\\alpha})$ at two-sided level ",
-    "$\\gamma^*$; critical values from $N(0,1)$. ",
+    "$\\gamma^*$, using the same Student-$t$ $p$-values as $\\hat{\\pi}_0$. ",
     "$F_{\\gamma^*} = \\hat{\\pi}_0 \\cdot \\gamma^*/2$: expected false-discovery ",
     "proportion per tail. ",
     "$T^-_{\\gamma^*} = S^-_{\\gamma^*} - F_{\\gamma^*}$: genuinely unskilled funds. ",

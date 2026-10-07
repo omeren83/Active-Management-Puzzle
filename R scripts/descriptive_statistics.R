@@ -437,7 +437,7 @@ fn_t2_base <- paste(
   "winsorised at the 1st/99th percentiles cross-sectionally.",
   "Flow is the \\\\textcite{SirriTufano1998} measure scaled by lagged TNA (\\\\%),",
   "winsorised at 1st/99th percentiles, with December excluded.",
-  "Net returns approximate gross returns less one-twelfth of the static annual expense ratio each month, following \\\\textcite{Carhart1997} and \\\\textcite{Wermers2000}.",
+  "Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \\\\textcite{FamaFrench2010}.",
   "Returns and flows are in \\\\%.",
   "Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns,",
   "$\\\\sqrt{12}\\\\cdot\\\\overline{r^{g}_{i,t}-r^{f}_{t}}/\\\\sigma(r^{g}_{i,t}-r^{f}_{t})$,",
@@ -728,4 +728,4 @@ ggsave("fig_fund_flows.pdf", plot = p_flows, width = 7.5, height = 4.2,
 ggsave("fig_fund_flows.png", plot = p_flows, width = 7.5, height = 4.2,
        dpi = 300)
 
-cat("Done. All outputs written to working directory.\n")
+cat("Done. All outputs written to working directory.\n")

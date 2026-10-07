@@ -1,6 +1,27 @@
 # =============================================================================
 # STRUCTURAL BREAK TEST: BAI-PERRON ON ROLLING ACTIVE FUND ALPHA SERIES
-# structural_break_test.R  (v1.2)
+# structural_break_test.R  (v1.3)
+#
+# v1.3 changes vs v1.2 (pipeline audit, Oct 2026):
+#   (a) MAX_BREAKS 5 -> 8. With 5, BIC was still falling at the search limit,
+#       so "five breaks" was the cap, not the BIC choice.
+#   (b) HAC lag for the break-date CIs and F-tests = 35 (MIN_SEG_MONTHS - 1):
+#       consecutive 36-month rolling alphas share 35 months, so the series is
+#       MA(35) by construction. v1.2 used floor(4(T/100)^(2/9)) = 5 and
+#       mislabelled it "Andrews (1991)".
+#   (c) LWZ criterion (Liu, Wu & Zidek 1997; used by Bai & Perron 2003)
+#       reported next to BIC; selection stays on BIC.
+#   (d) Regime SD column fixed (sd was computed after mean had overwritten
+#       the column, so it was always NA).
+#   (e) Robustness (D5): Bai-Perron on the NON-overlapping monthly EW active
+#       abnormal return (portfolio excess return minus full-sample Carhart
+#       factor component), HAC lag 12. Written to sheet "NonOverlap Robustness".
+#       Requires panel_incubation in session; skipped otherwise.
+#   NOTE ON DATING: a rolling-alpha break is dated at the END of a 36-month
+#   window. The underlying change can precede the reported date by up to 35
+#   months, and the first 35 months of each regime mix in the previous one.
+#   Choose sub-period boundaries with this in mind (subperiod_analysis.R
+#   reads them via SUBPERIOD_BREAKS and checks them against this output).
 #
 # v1.2 changes vs v1.1 (figure inline-text strip):
 #   fig_breaktest inline narrative text stripped per project-wide convention.
@@ -21,13 +42,8 @@
 #   flagged_funds.xlsx. The Bai-Perron break dates produced by this script
 #   therefore implicitly inherit the new sample definition.
 #
-#   IMPORTANT: After re-running alpha_estimation.R v2.7, the existing
-#   subperiod_analysis.R SUBPERIODS thresholds (Jan 2006, Nov 2011) become
-#   stale because the rolling alpha series itself shifts. This script must
-#   be re-run BEFORE subperiod_analysis.R, and the new break dates pasted
-#   into SUBPERIODS$P1$date_hi and SUBPERIODS$P2$date_hi (and the panel /
-#   window / months strings updated accordingly). subperiod_analysis.R v1.5
-#   enforces this with a hard stop on the panel_trimmed-era thresholds.
+#   (Superseded in v1.3: subperiod_analysis.R v1.6 reads the chosen
+#   boundaries from SUBPERIOD_BREAKS and checks them against this output.)
 #
 # PURPOSE:
 #   Formally tests for structural breaks in the monthly cross-sectional mean
@@ -83,15 +99,17 @@ OUTPUT_EXCEL <- "breaktest_results.xlsx"
 OUTPUT_FIG   <- "fig_breaktest.png"
 
 # Maximum number of structural breaks to test (BIC will select among 0..MAX_BREAKS)
-MAX_BREAKS   <- 5L
+MAX_BREAKS   <- 8L
 
 # Minimum segment length (months). 36 matches the rolling window width;
 # ensures each regime has enough observations for reliable alpha estimation.
 MIN_SEG_MONTHS <- 36L
 
-# Newey-West lag for HAC confidence intervals on break dates.
-# Rule: floor(4 * (T/100)^(2/9)), standard for monthly financial data.
-# Computed dynamically below once T is known.
+# Newey-West lag for HAC confidence intervals and F-tests: MIN_SEG_MONTHS - 1
+# (= 35), the overlap of consecutive 36-month rolling windows. Set below.
+
+# Robustness on the non-overlapping monthly abnormal-return series
+NONOVERLAP_HAC_LAG <- 12L
 
 # =============================================================================
 # 1. LOAD AND PREPARE THE SERIES
@@ -141,7 +159,7 @@ T_obs     <- nrow(alpha_ts_raw)
 start_yr  <- year(min(alpha_ts_raw$date))
 start_mo  <- month(min(alpha_ts_raw$date))
 h_frac    <- MIN_SEG_MONTHS / T_obs          # minimum segment as fraction of T
-nw_lag    <- floor(4 * (T_obs / 100)^(2/9)) # Andrews (1991) rule for monthly data
+nw_lag    <- MIN_SEG_MONTHS - 1L            # 35: overlap of 36-month windows (MA(35))
 cat(sprintf("T = %d | min segment = %d months (h = %.3f) | NW lag = %d\n",
             T_obs, MIN_SEG_MONTHS, h_frac, nw_lag))
 
@@ -173,6 +191,13 @@ print(bp_summary)
 bic_all   <- AIC(bp, k = log(T_obs))
 n_optimal <- as.integer(which.min(bic_all)) - 1L   # 0-indexed
 cat(sprintf("\nOptimal number of breaks by BIC: %d\n", n_optimal))
+if (n_optimal == MAX_BREAKS)
+  warning("BIC selects the maximum number of breaks searched; raise MAX_BREAKS.")
+
+# LWZ (Liu, Wu & Zidek 1997): heavier penalty, reported alongside BIC
+lwz_all   <- AIC(bp, k = 0.299 * log(T_obs)^2.1)
+n_lwz     <- as.integer(which.min(lwz_all)) - 1L
+cat(sprintf("Optimal number of breaks by LWZ: %d\n", n_lwz))
 
 # Refit with optimal break count
 bp_opt <- breakpoints(bp, breaks = n_optimal)
@@ -251,8 +276,8 @@ regime_means <- alpha_ts_raw %>%
     start_date  = min(date),
     end_date    = max(date),
     n_months    = n(),
+    sd_alpha    = sd(mean_alpha,   na.rm = TRUE),   # before mean_alpha is overwritten
     mean_alpha  = mean(mean_alpha, na.rm = TRUE),
-    sd_alpha    = sd(mean_alpha,   na.rm = TRUE),
     .groups     = "drop"
   )
 print(regime_means)
@@ -297,9 +322,11 @@ rss_all <- as.numeric(bp_summary$RSS["RSS", ])
 bic_tbl <- data.frame(
   n_breaks = 0:MAX_BREAKS,
   RSS      = round(rss_all, 4),
-  BIC      = round(as.numeric(bic_all), 4)
+  BIC      = round(as.numeric(bic_all), 4),
+  LWZ      = round(as.numeric(lwz_all), 4)
 )
-bic_tbl$optimal <- bic_tbl$n_breaks == n_optimal
+bic_tbl$optimal     <- bic_tbl$n_breaks == n_optimal
+bic_tbl$optimal_lwz <- bic_tbl$n_breaks == n_lwz
 print(bic_tbl)
 
 # =============================================================================
@@ -380,6 +407,54 @@ ggsave(OUTPUT_FIG, plot = p_break, width = 8.5, height = 4.8, dpi = 300)
 cat(sprintf("Written: %s\n", OUTPUT_FIG))
 
 # =============================================================================
+# 8b. ROBUSTNESS (D5): NON-OVERLAPPING MONTHLY ABNORMAL RETURN
+#     AR_t = EW active gross excess return_t - b' f_t, with b from one
+#     full-sample Carhart regression of that portfolio (so AR_t = alpha + e_t).
+#     No window overlap, so breaks are dated at the month they occur; the
+#     series is much noisier than the rolling one, so power is lower.
+# =============================================================================
+nonoverlap_df <- data.frame(item = "skipped: panel_incubation not in session",
+                            value = NA_character_)
+if (exists("panel_incubation")) {
+  cat("\n=== 8b. Robustness: non-overlapping monthly abnormal return ===\n")
+  ar_port <- panel_incubation %>%
+    filter(!excluded_perf, ap_group == "Active", !is.na(ret_gross)) %>%
+    group_by(date) %>%
+    summarise(r = mean(ret_gross), mkt = MKT_RF[1], smb = SMB[1], hml = HML[1],
+              mom = MOM[1], rf = RF[1], .groups = "drop") %>%
+    filter(!is.na(mom), !is.na(rf)) %>% arrange(date)
+  fit_ar <- lm(I(r - rf) ~ mkt + smb + hml + mom, data = ar_port)
+  ar_port$ar <- (ar_port$r - ar_port$rf -
+                   as.vector(as.matrix(ar_port[, c("mkt", "smb", "hml", "mom")]) %*%
+                               coef(fit_ar)[-1])) * 1200     # % p.a.
+  y_ar  <- ts(ar_port$ar, start = c(year(min(ar_port$date)), month(min(ar_port$date))),
+              frequency = 12)
+  bp_ar <- breakpoints(y_ar ~ 1, h = MIN_SEG_MONTHS / length(y_ar), breaks = MAX_BREAKS)
+  bic_ar <- AIC(bp_ar, k = log(length(y_ar)))
+  n_ar   <- as.integer(which.min(bic_ar)) - 1L
+  ar_dates <- if (n_ar == 0L) character(0) else
+    format(ar_port$date[breakpoints(bp_ar, breaks = n_ar)$breakpoints], "%b %Y")
+  # single-break global tests with HAC lag NONOVERLAP_HAC_LAG
+  fs_ar <- Fstats(y_ar ~ 1, from = 0.15, to = 0.85,
+                  vcov = function(x, ...) NeweyWest(x, lag = NONOVERLAP_HAC_LAG, prewhite = FALSE, ...))
+  sup_ar <- sctest(fs_ar, type = "supF")
+  sup_date <- format(ar_port$date[fs_ar$breakpoint], "%b %Y")   # argmax of the F sequence
+  cat(sprintf("  T = %d | BIC breaks = %d (%s) | supF = %.2f (p = %.3f) at %s\n",
+              length(y_ar), n_ar, paste(ar_dates, collapse = ", "),
+              sup_ar$statistic, sup_ar$p.value, sup_date))
+  nonoverlap_df <- data.frame(
+    item  = c("Series", "Sample", "T (months)", "Full-sample alpha (% p.a.)",
+              "BIC breaks (max searched)", "Break dates", "supF (HAC lag 12)", "supF p-value",
+              "supF break date"),
+    value = c("EW active gross abnormal return, non-overlapping",
+              paste(format(min(ar_port$date), "%b %Y"), "-", format(max(ar_port$date), "%b %Y")),
+              length(y_ar), round(coef(fit_ar)[1] * 1200, 3),
+              paste0(n_ar, " (", MAX_BREAKS, ")"),
+              if (n_ar == 0L) "none" else paste(ar_dates, collapse = ", "),
+              round(sup_ar$statistic, 3), round(sup_ar$p.value, 4), sup_date))
+}
+
+# =============================================================================
 # 9. EXPORT TO EXCEL
 # =============================================================================
 cat("\n=== 9. Writing Excel output ===\n")
@@ -395,6 +470,7 @@ colnames(sheet_breaks) <- c("Break #", "95% CI Lower", "Point Estimate", "95% CI
 
 # Sheet 2: Regime means
 sheet_regimes <- regime_means %>%
+  select(segment, start_date, end_date, n_months, mean_alpha, sd_alpha) %>%
   mutate(start_date = format(start_date, "%Y-%m-%d"),
          end_date   = format(end_date,   "%Y-%m-%d"),
          across(c(mean_alpha, sd_alpha), ~ round(.x, 4)))
@@ -403,9 +479,10 @@ colnames(sheet_regimes) <- c("Segment", "Start", "End", "N Months",
 
 # Sheet 3: BIC / RSS table
 sheet_bic <- bic_tbl %>%
-  mutate(across(c(RSS, BIC), ~ round(.x, 4)),
-         optimal = ifelse(optimal, "YES", ""))
-colnames(sheet_bic) <- c("N Breaks", "RSS", "BIC", "BIC Optimal")
+  mutate(across(c(RSS, BIC, LWZ), ~ round(.x, 4)),
+         optimal     = ifelse(optimal, "YES", ""),
+         optimal_lwz = ifelse(optimal_lwz, "YES", ""))
+colnames(sheet_bic) <- c("N Breaks", "RSS", "BIC", "LWZ", "BIC Optimal", "LWZ Optimal")
 
 # Sheet 4: Global F-statistics
 sheet_fstats <- fstat_df %>%
@@ -427,7 +504,8 @@ write_xlsx(
     "Regime Means"  = sheet_regimes,
     "BIC Table"     = sheet_bic,
     "F-Statistics"  = sheet_fstats,
-    "Monthly Series" = sheet_series
+    "Monthly Series" = sheet_series,
+    "NonOverlap Robustness" = nonoverlap_df
   ),
   path = OUTPUT_EXCEL
 )
@@ -446,7 +524,8 @@ cat(sprintf("Sample:       %s - %s (%d months)\n",
             T_obs))
 cat(sprintf("Method:       Bai-Perron (1998, 2003) | min seg: %d mo | NW lag: %d\n",
             MIN_SEG_MONTHS, nw_lag))
-cat(sprintf("Optimal breaks (BIC): %d\n\n", n_optimal))
+cat(sprintf("Optimal breaks (BIC): %d | LWZ: %d | max searched: %d\n\n",
+            n_optimal, n_lwz, MAX_BREAKS))
 
 cat("Break date estimates (95% HAC CI):\n")
 for (i in seq_len(nrow(ci_df))) {
@@ -473,4 +552,4 @@ for (i in seq_len(nrow(fstat_df))) {
               fstat_df$test[i], fstat_df$statistic[i], fstat_df$p_value[i]))
 }
 cat(paste(rep("=", 65), collapse = ""), "\n", sep = "")
-cat("[DONE] structural_break_test.R complete.\n")
+cat("[DONE] structural_break_test.R complete.\n")

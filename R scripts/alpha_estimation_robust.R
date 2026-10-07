@@ -1,5 +1,16 @@
 # =============================================================================
-# ROBUSTNESS ALPHA ESTIMATION: FF6 AND CARHART + PS LIQUIDITY (v1.4)
+# ROBUSTNESS ALPHA ESTIMATION: FF6 AND CARHART + PS LIQUIDITY (v1.5)
+#
+# v1.5 changes vs v1.4 (pipeline audit, Oct 2026)
+# -----------------------------------------------
+#   (a) Bootstrap kernel: resampled months enter in DRAW order
+#       (match(samp, t_idx)); v1.4 rebuilt them in calendar order with
+#       duplicates adjacent, which Newey-West read as autocorrelation.
+#   (b) Month draws made on the main process from BOOT_SEED (one draw list
+#       per spec), so results do not depend on the number of cores.
+#   (c) BSW: pi0 and S-/S+ from the Student-t NW p-values (alpha_p_nw);
+#       population estimates at GAMMA_STAR = 0.45 (BSW 2010, eq. 8).
+#   Gross and net portfolios use the same fund-months (rows need ret_gross).
 #
 # v1.4 changes vs v1.3
 # --------------------
@@ -81,6 +92,7 @@ PCTS <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50,
 
 GAMMA_GRID    <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5
+GAMMA_STAR    <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
 
 # Factor specifications. Carhart included so portfolio regressions for Table
 # I.1 are produced here for all three specs uniformly. The Carhart bootstrap
@@ -306,11 +318,12 @@ run_full_period_spec <- function(tk, factor_cols) {
 # of simulated t-stats (one per fund) summarised at the PCTS percentiles.
 # NW HAC SE used symmetrically with actual full-period regressions (v2.5
 # symmetry fix, carried over from alpha_estimation.R).
-one_boot_run <- function(run_id, bs_data, T_total, pcts_probs, min_obs, nw_lag) {
-  samp     <- sample.int(T_total, size = T_total, replace = TRUE)
-  samp_tab <- tabulate(samp, nbins = T_total)
+# samp: one pre-drawn vector of T_total month indices (with replacement).
+one_boot_run <- function(samp, bs_data, pcts_probs, min_obs, nw_lag) {
   t_sim <- vapply(bs_data, function(d) {
-    keep <- rep(seq_along(d$t_idx), times = samp_tab[d$t_idx])
+    # Fund rows for the drawn months in DRAW order; do not sort (adjacent
+    # duplicates would look like autocorrelation to Newey-West).
+    keep <- match(samp, d$t_idx); keep <- keep[!is.na(keep)]
     if (length(keep) < min_obs) return(NA_real_)
     y <- d$y_tilde[keep]
     X <- cbind(1, d$X_fac[keep, , drop = FALSE])
@@ -394,15 +407,14 @@ for (spec_name in names(SPECS)) {
   
   # 5c. Bootstrap execution
   cat("  [b] Bootstrap (", B_RUNS, "runs, NW lag =", NW_LAG_FULL, ")...\n")
+  # All month draws made here from one seed: independent of N_CORES
+  set.seed(BOOT_SEED)
+  samp_list <- replicate(B_RUNS, sample.int(T_total, T_total, replace = TRUE),
+                         simplify = FALSE)
   cl <- makeCluster(N_CORES)
-  clusterExport(cl,
-                c("bs_data", "T_total", "one_boot_run",
-                  "MIN_OBS_BS", "NW_LAG_FULL"),
-                envir = environment())
-  clusterSetRNGStream(cl, BOOT_SEED)
   boot_t0 <- Sys.time()
-  boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run,
-                            bs_data, T_total, PCTS / 100,
+  boot_results <- parLapply(cl, samp_list, one_boot_run,
+                            bs_data, PCTS / 100,
                             MIN_OBS_BS, NW_LAG_FULL)
   stopCluster(cl)
   cat("      Wall time:",
@@ -421,7 +433,7 @@ for (spec_name in names(SPECS)) {
   
   # 5d. BSW gamma-grid decomposition (same as alpha_estimation.R Section 7)
   cat("  [c] BSW gamma-grid decomposition...\n")
-  p_vals_bsw <- 2 * pnorm(-abs(active_fp$alpha_t_nw))
+  p_vals_bsw <- active_fp$alpha_p_nw    # Student-t NW p-values, as elsewhere
   n_bsw      <- sum(!is.na(p_vals_bsw))
   pi0_bsw    <- min(1.0,
                     sum(p_vals_bsw > LAMBDA_STOREY, na.rm = TRUE) /
@@ -429,12 +441,12 @@ for (spec_name in names(SPECS)) {
   t_stats_bsw <- active_fp$alpha_t_nw
   
   bsw_df <- do.call(rbind, lapply(GAMMA_GRID, function(g) {
-    t_thresh <- qnorm(1 - g / 2)
-    S_neg    <- mean(t_stats_bsw < -t_thresh, na.rm = TRUE)
-    S_pos    <- mean(t_stats_bsw >  t_thresh, na.rm = TRUE)
+    ok       <- !is.na(p_vals_bsw)
+    S_neg    <- mean(p_vals_bsw[ok] < g & t_stats_bsw[ok] < 0)
+    S_pos    <- mean(p_vals_bsw[ok] < g & t_stats_bsw[ok] > 0)
     F_luck   <- pi0_bsw * g / 2
     data.frame(
-      gamma           = g * 100,
+      gamma           = round(g * 100),
       S_neg_pct       = round(S_neg    * 100, 4),
       S_pos_pct       = round(S_pos    * 100, 4),
       F_luck_pct      = round(F_luck   * 100, 4),
@@ -442,17 +454,17 @@ for (spec_name in names(SPECS)) {
       T_skilled_pct   = round((S_pos - F_luck) * 100, 4)
     )
   }))
-  pi_A_minus <- bsw_df$T_unskilled_pct[bsw_df$gamma == 20]
-  pi_A_plus  <- bsw_df$T_skilled_pct[bsw_df$gamma == 20]
-  cat(sprintf("      pi0 = %.1f%% | pi_A-_gamma*=20 = %.1f%% | pi_A+_gamma*=20 = %.1f%%\n",
-              pi0_bsw * 100, pi_A_minus, pi_A_plus))
+  pi_A_minus <- bsw_df$T_unskilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)]
+  pi_A_plus  <- bsw_df$T_skilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)]
+  cat(sprintf("      pi0 = %.1f%% | pi_A- = %.1f%% | pi_A+ = %.1f%% (gamma* = %.2f)\n",
+              pi0_bsw * 100, pi_A_minus, pi_A_plus, GAMMA_STAR))
   
   bsw_meta <- data.frame(
     spec       = spec_name,
     lambda     = LAMBDA_STOREY,
     pi0_pct    = round(pi0_bsw * 100, 4),
     n_active   = n_bsw,
-    gamma_star = 20,
+    gamma_star = round(GAMMA_STAR * 100),
     pi_A_minus = pi_A_minus,
     pi_A_plus  = pi_A_plus
   )
@@ -600,4 +612,4 @@ cat("  alpha_fullperiod_Carhart.xlsx / alpha_fullperiod_FF6.xlsx / alpha_fullper
 cat("  bootstrap_results_Carhart.xlsx / bootstrap_results_FF6.xlsx / bootstrap_results_C5.xlsx\n")
 cat("    Each bootstrap_results_*.xlsx now contains a 'port_alpha' sheet (NEW v1.4)\n")
 cat("    with aggregate portfolio alphas for Active and Passive groups (Table I.1 inputs).\n")
-cat("  robust_alpha_summary.xlsx (diagnostic pooled cross-sectional means, FF6 and C5 only)\n")
+cat("  robust_alpha_summary.xlsx (diagnostic pooled cross-sectional means, FF6 and C5 only)\n")

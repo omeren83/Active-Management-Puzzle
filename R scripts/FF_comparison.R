@@ -1,5 +1,20 @@
 # =============================================================================
-# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.5
+# FAMA-FRENCH (2010) SUBPERIOD REPLICATION                                  v1.6
+#
+# v1.6 changes vs v1.5 (pipeline audit, Oct 2026):
+#   (a) Bootstrap kernel: resampled months enter in DRAW order
+#       (match(samp, t_idx)); v1.5 sorted them into calendar order with
+#       duplicates adjacent, which Newey-West read as autocorrelation and
+#       which shrank the simulated t-distribution.
+#   (b) Month draws made on the main process from BOOT_SEED (independent of
+#       N_CORES); cache key carries BOOT_KERNEL.
+#   (c) BSW tails S-/S+ from the same Student-t NW p-values as pi0; population
+#       estimates at GAMMA_STAR = 0.45 (BSW 2010, eq. 8).
+#   (d) Table C.2 labels follow the numbers in both tails; Prob. Luck printed
+#       with fmt_prob(); footnote states draw-order resampling.
+#   (e) Table C.1 N column counts portfolio constituents (funds with at least
+#       one return in the window), not funds with >= 24 months.
+#   Gross and net portfolios use the same fund-months (rows need ret_gross).
 #
 # v1.5 changes vs v1.4 (panel source fix):
 #   Panel source switched from panel_trimmed to panel_incubation. panel_trimmed
@@ -119,11 +134,22 @@ MIN_OBS_BS   <- 8L
 BOOT_SEED    <- 42L
 N_CORES      <- max(1L, detectCores() - 1L)
 USE_BOOT_CACHE <- TRUE
+BOOT_KERNEL    <- "v2.8-draw-order"  # part of the cache key; bump on resampling changes
 BOOT_CACHE_DIR <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
 dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 PCTS         <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 96, 97, 98, 99)
 GAMMA_GRID   <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5
+GAMMA_STAR    <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
+
+# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+fmt_prob <- function(x) {
+  v <- suppressWarnings(as.numeric(x))
+  ifelse(is.na(v), "--",
+    ifelse(v == 0,   "0.0\\%",
+    ifelse(v < 0.05, "$<$0.1\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+}
 
 cat("=== FF SUBPERIOD REPLICATION ===\n")
 cat("Sample window:", format(DATE_MIN_FF), "to", format(DATE_MAX_FF), "\n")
@@ -425,11 +451,12 @@ bs_data <- lapply(active_fp$Ticker, function(tk) {
 })
 names(bs_data) <- active_fp$Ticker
 
-one_boot_run <- function(run_id, bs_data, T_total, pcts_probs, min_obs, nw_lag) {
-  samp     <- sample.int(T_total, size = T_total, replace = TRUE)
-  samp_tab <- tabulate(samp, nbins = T_total)
+# samp: one pre-drawn vector of T_total month indices (with replacement).
+one_boot_run <- function(samp, bs_data, pcts_probs, min_obs, nw_lag) {
   t_sim <- vapply(bs_data, function(d) {
-    keep <- rep(seq_along(d$t_idx), times = samp_tab[d$t_idx])
+    # Fund rows for the drawn months in DRAW order; do not sort (adjacent
+    # duplicates would look like autocorrelation to Newey-West).
+    keep <- match(samp, d$t_idx); keep <- keep[!is.na(keep)]
     if (length(keep) < min_obs) return(NA_real_)
     y <- d$y_tilde[keep]
     X <- cbind(1, d$X_fac[keep, , drop = FALSE])
@@ -468,7 +495,8 @@ cache_key <- digest::digest(list(
   NW_LAG  = NW_LAG_FULL,
   MIN_OBS = MIN_OBS_BS,
   seed    = BOOT_SEED,
-  pcts    = PCTS
+  pcts    = PCTS,
+  kernel  = BOOT_KERNEL
 ))
 cache_file <- file.path(BOOT_CACHE_DIR, "ff_subperiod_bootstrap_cache.rds")
 
@@ -486,13 +514,14 @@ if (USE_BOOT_CACHE && file.exists(cache_file)) {
 
 if (!cached_ok) {
   cat("  Bootstrap (B =", B_RUNS, ", cores =", N_CORES, ") ...\n")
+  # All month draws made here from one seed: independent of N_CORES
+  set.seed(BOOT_SEED)
+  samp_list <- replicate(B_RUNS, sample.int(T_total, T_total, replace = TRUE),
+                         simplify = FALSE)
   cl <- makeCluster(N_CORES)
-  clusterExport(cl, c("bs_data", "T_total", "one_boot_run", "MIN_OBS_BS", "NW_LAG_FULL"),
-                envir = environment())
-  clusterSetRNGStream(cl, BOOT_SEED)
   boot_t0 <- Sys.time()
-  boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run,
-                            bs_data, T_total, PCTS / 100, MIN_OBS_BS, NW_LAG_FULL)
+  boot_results <- parLapply(cl, samp_list, one_boot_run,
+                            bs_data, PCTS / 100, MIN_OBS_BS, NW_LAG_FULL)
   stopCluster(cl)
   cat("  Bootstrap wall time:",
       round(as.numeric(difftime(Sys.time(), boot_t0, units = "secs")), 1), "sec\n")
@@ -531,13 +560,13 @@ pi_0_val   <- min(1.0, num_above / (total_n * (1 - LAMBDA_STOREY)))
 cat("  pi_0 estimate:", round(pi_0_val * 100, 1), "%\n")
 
 t_stats <- active_pi0$alpha_t_nw
+p_vals  <- active_pi0$alpha_p_nw   # same Student-t p-values as pi_0
 bsw_df <- do.call(rbind, lapply(GAMMA_GRID, function(g) {
-  t_thresh <- qnorm(1 - g / 2)
-  S_neg <- mean(t_stats < -t_thresh, na.rm = TRUE)
-  S_pos <- mean(t_stats >  t_thresh, na.rm = TRUE)
+  S_neg <- mean(p_vals < g & t_stats < 0)
+  S_pos <- mean(p_vals < g & t_stats > 0)
   F_luck <- pi_0_val * g / 2
   data.frame(
-    gamma           = g * 100,
+    gamma           = round(g * 100),
     S_neg_pct       = S_neg * 100,
     S_pos_pct       = S_pos * 100,
     F_luck_pct      = F_luck * 100,
@@ -634,6 +663,19 @@ alpha_agg <- bind_rows(
 ) %>%
   mutate(across(c(alpha_capm, alpha_ff3, alpha_car, alpha_car_net), ~ .x * 100))
 
+# Fund counts per group (N column): portfolio constituents, i.e. funds with
+# at least one non-missing return in the window (same rows as port_agg).
+n_port <- function(rows) n_distinct(ap$Ticker[rows & !is.na(ap$ret_gross)])
+n_funds_by_group <- list(
+  "Active"           = n_port(ap$ap_group == "Active"),
+  "Passive"          = n_port(ap$ap_group == "Passive"),
+  "Unknown"          = n_port(ap$ap_group == "Unknown"),
+  "Active + Passive" = n_port(ap$ap_group %in% c("Active", "Passive")),
+  "Full Sample"      = n_port(rep(TRUE, nrow(ap)))
+)
+
+alpha_agg$n_funds <- unlist(n_funds_by_group[alpha_agg$ap_group])   # read by build_ff_tables_manual.R
+
 # =============================================================================
 # 7. EXCEL EXPORTS
 # =============================================================================
@@ -646,9 +688,9 @@ write_xlsx(list(summary           = boot_summary,
                   lambda     = LAMBDA_STOREY,
                   pi0_pct    = round(pi_0_val * 100, 4),
                   n_active   = total_n,
-                  gamma_star = 20,
-                  pi_A_minus = bsw_df$T_unskilled_pct[bsw_df$gamma == 20],
-                  pi_A_plus  = bsw_df$T_skilled_pct[bsw_df$gamma == 20]
+                  gamma_star = round(GAMMA_STAR * 100),
+                  pi_A_minus = bsw_df$T_unskilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)],
+                  pi_A_plus  = bsw_df$T_skilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)]
                 )),
            "bootstrap_results_FF.xlsx")
 write_xlsx(alpha_agg, "portfolio_alphas_FF.xlsx")
@@ -662,15 +704,6 @@ cat("=== 8. Table 7 (FF) ===\n")
 # FF (2010)-style aggregate portfolio alpha. Source: alpha_agg (Section 6),
 # which now covers all five groups. Carhart (4-factor) alpha only; gross and
 # net separately. Two rows per group following FF (2010) Table II convention.
-
-# Fund counts per group (for the N column).
-n_funds_by_group <- list(
-  "Active"           = sum(alpha_full$ap_group == "Active",  na.rm = TRUE),
-  "Passive"          = sum(alpha_full$ap_group == "Passive", na.rm = TRUE),
-  "Unknown"          = sum(alpha_full$ap_group == "Unknown", na.rm = TRUE),
-  "Active + Passive" = sum(alpha_full$ap_group %in% c("Active","Passive"), na.rm = TRUE),
-  "Full Sample"      = nrow(alpha_full)
-)
 
 make_t7_rows_FF <- function(grp) {
   eg <- alpha_agg %>% filter(ap_group == grp, weighting == "EW")
@@ -716,8 +749,9 @@ fn_t7 <- paste(
   "EW: equal-weighted portfolio (each fund alive in month $t$ contributes",
   "$1/N_t$). VW: value-weighted portfolio with lagged TNA weights",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
-  "Net returns are computed as gross returns less one-twelfth of the static",
-  "annual expense ratio each month, following \\\\textcite{Carhart1997} and \\\\textcite{Wermers2000}.",
+  "Net returns are the funds' NAV-based total returns (net of expenses);",
+  "gross returns add back one-twelfth of the static annual expense ratio each month,",
+  "following \\\\textcite{FamaFrench2010}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
@@ -766,12 +800,12 @@ boot_tab <- boot_summary %>%
   mutate(
     Actual_t  = sapply(t_alpha_actual,   fmt, digits = 3),
     Sim_Mean  = sapply(t_alpha_sim_mean, fmt, digits = 3),
-    Prob_Luck = paste0(formatC(pct_runs_below, format = "f", digits = 1), "\\%"),
+    Prob_Luck = fmt_prob(pct_runs_below),
+    # Same rule in both tails: the label follows the reported probability
     Interpretation = case_when(
-      percentile <= 10 & pct_runs_below < 5  ~ "Worse than luck (significant)",
-      percentile >= 90 & pct_runs_below > 95 ~ "Evidence of genuine skill",
-      percentile == 50                        ~ "Indistinguishable from luck",
-      TRUE                                    ~ "Consistent with zero-skill"
+      pct_runs_below < 5  ~ "Worse than luck (significant)",
+      pct_runs_below > 95 ~ "Better than luck (significant)",
+      TRUE                ~ "Consistent with zero skill"
     )
   )
 
@@ -783,14 +817,16 @@ fn_t9 <- paste(
   "For each fund, estimated monthly alpha is subtracted from the excess return",
   "series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled",
-  "with replacement, preserving cross-sectional factor return dependence.",
+  "with replacement and kept in the order drawn, the same draw applying to all",
+  "funds, preserving cross-sectional factor return dependence.",
   "The Carhart (1997) four-factor model is re-estimated on each resampled series.",
   "\\\\textit{Actual} $t(\\\\hat{\\\\alpha})$: percentile of the empirical $t$-statistic",
   "distribution across active funds.",
   "\\\\textit{Simulated Mean}: average of that percentile across all iterations.",
   "\\\\textit{Prob.\\\\ Luck}: fraction of iterations in which the simulated percentile",
-  "falls below the actual value; values below 5\\\\% at lower percentiles indicate",
-  "underperformance unlikely to be explained by luck alone.",
+  "falls below the actual value; values below 5\\\\% (above 95\\\\%) indicate that the",
+  "actual percentile is worse (better) than zero-alpha luck would produce;",
+  "0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 4 of 10,000 iterations.",
   "Newey-West standard errors with a 6-month lag are used throughout.",
   "Compare with Fama and French (2010), Table III."
 )
@@ -911,8 +947,7 @@ fn_t10b <- paste(
   "$S^-_\\\\gamma$ ($S^+_\\\\gamma$): observed fraction of active funds with",
   "significantly negative (positive) Newey-West $t(\\\\hat{\\\\alpha})$ at",
   "two-sided significance level $\\\\gamma$, using full-period Carhart (1997)",
-  "four-factor alphas. Critical values are from the standard normal distribution,",
-  "consistent with the large-sample approximation in BSW (2010).",
+  "four-factor alphas and the same Student-$t$ $p$-values as $\\\\hat{\\\\pi}_0$.",
   "$F_\\\\gamma = \\\\hat{\\\\pi}_0 \\\\cdot \\\\gamma/2$: expected proportion of false",
   "discoveries per tail arising from zero-alpha funds,",
   paste0("where $\\\\hat{\\\\pi}_0 = ", pi0_str, "$ is the Storey (2002) estimate"),
@@ -921,8 +956,10 @@ fn_t10b <- paste(
   "(significant negative alpha net of false discoveries).",
   "$T^+_\\\\gamma = S^+_\\\\gamma - F_\\\\gamma$: genuinely skilled funds",
   "(significant positive alpha net of false discoveries).",
-  "The reference row ($\\\\gamma = 0.20$) provides the population-level estimates",
-  "$\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$ following BSW (2010).",
+  paste0("The row at $\\\\gamma^* = ", formatC(GAMMA_STAR, format = "f", digits = 2),
+         "$ gives the population estimates $\\\\hat{\\\\pi}^-_A$ and $\\\\hat{\\\\pi}^+_A$"),
+  "(BSW 2010, eq.~8: a sufficiently high $\\\\gamma^*$; pre-set 0.35 or 0.45 match",
+  "their MSE-based choice).",
   "Negative $T^+_\\\\gamma$ entries indicate right-tail significance does not",
   "exceed the false-discovery rate at that threshold.",
   paste0("Sample: $N = ", total_n, "$ actively managed funds, ", SAMPLE_LABEL, ";"),
@@ -1086,12 +1123,12 @@ cat("Subperiod              :", format(DATE_MIN_FF), "to", format(DATE_MAX_FF), 
 cat("Funds (full-period)    :", nrow(alpha_full), "\n")
 cat("Active funds (Carhart) :", n_active_bs, "\n")
 cat("pi_0 (Storey, lambda=0.5):", round(pi_0_val * 100, 1), "%\n")
-cat("BSW pi^-_A (gamma=0.20):", round(bsw_df$T_unskilled_pct[bsw_df$gamma == 20], 1), "%\n")
-cat("BSW pi^+_A (gamma=0.20):", round(bsw_df$T_skilled_pct[bsw_df$gamma == 20], 1), "%\n")
+cat("BSW pi^-_A (gamma*):", round(bsw_df$T_unskilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)], 1), "%\n")
+cat("BSW pi^+_A (gamma*):", round(bsw_df$T_skilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)], 1), "%\n")
 cat("\nLaTeX outputs (move into your tables/ subdirectory):\n")
 cat("  table_perf_aggregate_FF.tex        Table 7  (FF)\n")
 cat("  table_bootstrap_tails_FF.tex       Table 9  (FF)\n")
 cat("  table_pi0_estimate_FF.tex          Table 10 (FF)\n")
 cat("  table10b_bsw_decomposition_FF.tex  Table 11 (FF)\n")
 cat("  table_port_agg_alpha_FF.tex        Table 13 (FF)\n")
-cat("  fig_luck_vs_skill_combined_FF.png  Figure 3 (FF)\n")
+cat("  fig_luck_vs_skill_combined_FF.png  Figure 3 (FF)\n")

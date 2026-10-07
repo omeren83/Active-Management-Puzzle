@@ -1,5 +1,21 @@
 # =============================================================================
-# SUB-PERIOD ANALYSIS                                                      v1.5
+# SUB-PERIOD ANALYSIS                                                      v1.6
+#
+# v1.6 changes vs v1.5 (pipeline audit, Oct 2026):
+#   (a) Sub-period boundaries are no longer hand-typed. Set SUBPERIOD_BREAKS
+#       (last month of P1 and of P2, "YYYY-MM"); the script checks that each
+#       is a break date in breaktest_results.xlsx and stops otherwise. Window
+#       labels and month counts are built from the data; P3 ends at the last
+#       month with factor data (Jan 2026), so labels match the T in the
+#       tables. The v1.5 stale-date guard and stale status notes are removed.
+#   (b) Bootstrap kernel: months enter in DRAW order (match(samp, t_idx));
+#       draws made on the main process from BOOT_SEED (independent of
+#       N_CORES); cache key carries BOOT_KERNEL.
+#   (c) BSW tails from the same Student-t p-values as pi0; population
+#       estimates at GAMMA_STAR = 0.45 (BSW 2010, eq. 8).
+#   (d) Table D.3 labels follow the numbers in both tails; fmt_prob().
+#   (e) Table D.2 N column counts portfolio constituents.
+#   Gross and net portfolios use the same fund-months (rows need ret_gross).
 #
 # v1.5 changes vs v1.4 (Family C audit):
 #   (a) filter(!excluded_perf) added to the panel-prep stage of
@@ -56,22 +72,6 @@
 #   alpha_estimation.R v2.6 for rationale). Extends coverage through February
 #   2026 instead of capping at 2023.
 #
-#   >>> STATUS: v1.3 ACTION ITEMS ALL COMPLETE (as of commit 418d8c5) <<<
-#   The three prerequisite actions flagged in v1.3 for re-running this script
-#   on the new panel have all been performed:
-#     (1) alpha_estimation.R v2.6+ produces alpha_rolling.xlsx from
-#         panel_incubation  -- DONE.
-#     (2) structural_break_test.R has been re-run on the new alpha_rolling.xlsx
-#         and results are published in Table D.1. The adopted three-regime
-#         thresholds Dec 2005 and Nov 2011 are robust to the panel switch
-#         (both breaks retained under Bai-Perron on the extended series,
-#         within HAC confidence intervals of the original estimates). The
-#         SUBPERIODS P1/P2 boundaries are therefore kept; the P3 upper bound
-#         has been extended to 2026-01-31 per (3) -- DONE.
-#     (3) SUBPERIODS$P3$date_hi updated to 2026-01-31 to align with
-#         panel_incubation's Feb 2026 endpoint -- DONE.
-#   The block below is retained as a historical record of the panel switch
-#   rationale.
 #
 # v1.2 change vs v1.1:
 #   Added bootstrap caching layer to avoid re-running the 3x10,000-iteration
@@ -102,10 +102,8 @@
 # Tables 5, 6, 7, 8 and 10 estimated separately within each of three
 # sub-periods identified by the Bai-Perron structural break test (Section D.1).
 #
-# Sub-periods (per subperiod_methodology.docx, Section 6.1):
-#   P1: Jan 1995 - Jan 2006   (132 months, volatile dot-com era)
-#   P2: Feb 2006 - Nov 2011   ( 70 months, positive-alpha era)
-#   P3: Dec 2011 - Jan 2026   (170 months, structural compression era)
+# Sub-periods: three regimes split at the two break dates in SUBPERIOD_BREAKS,
+# chosen from structural_break_test.R output (breaktest_results.xlsx).
 #
 # Outputs (five LaTeX files, one per parallel):
 #   table_subperiod_perf_aggregate.tex    parallels Table 5
@@ -141,29 +139,13 @@ library(digest)   # used by bootstrap cache (v1.2)
 # =============================================================================
 # 0. CONFIGURATION
 # =============================================================================
-SUBPERIODS <- list(
-  P1 = list(
-    label   = "P1",
-    window  = "Jan 1995--Dec 2005",
-    panel   = "Panel A: P1 (Jan 1995--Dec 2005, 132 months)",
-    date_lo = as.Date("1995-01-01"),
-    date_hi = as.Date("2005-12-31")
-  ),
-  P2 = list(
-    label   = "P2",
-    window  = "Jan 2006--Sep 2011",                              # ← was Nov 2011
-    panel   = "Panel B: P2 (Jan 2006--Sep 2011, 69 months)",     # ← was 71 months
-    date_lo = as.Date("2006-01-01"),
-    date_hi = as.Date("2011-09-30")                               # ← was 2011-11-30
-  ),
-  P3 = list(
-    label   = "P3",
-    window  = "Oct 2011--Feb 2026",                              # ← was Dec 2011
-    panel   = "Panel C: P3 (Oct 2011--Feb 2026, 173 months)",    # ← was 171 months
-    date_lo = as.Date("2011-10-01"),                              # ← was 2011-12-01
-    date_hi = as.Date("2026-02-28")
-  )
-)
+# Last month of P1 and of P2 ("YYYY-MM"). Each must be a Bai-Perron break date
+# (window-end dating) in breaktest_results.xlsx, sheet "Break Dates". Update
+# after re-running structural_break_test.R; the script stops if they are not
+# among the detected breaks. P1 starts at the first month with returns and
+# factors; P3 ends at the last such month.
+SUBPERIOD_BREAKS <- c("2006-03", "2010-08")
+BREAKTEST_FILE   <- "breaktest_results.xlsx"
 
 MIN_OBS_FULL  <- 24L
 NW_LAG_FULL   <- 6L
@@ -177,10 +159,21 @@ PCTS          <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50,
 GAMMA_GRID    <- c(0.05, 0.10, 0.15, 0.20, 0.25,
                    0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5
+GAMMA_STAR    <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
+
+# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+fmt_prob <- function(x) {
+  v <- suppressWarnings(as.numeric(x))
+  ifelse(is.na(v), "--",
+    ifelse(v == 0,   "0.0\\%",
+    ifelse(v < 0.05, "$<$0.1\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+}
 
 # Bootstrap caching: saves ~25 minutes when re-running the script after the
 # bootstrap has already completed once. Set FALSE to force re-computation.
 USE_BOOT_CACHE <- TRUE
+BOOT_KERNEL    <- "v2.8-draw-order"  # part of the cache key; bump on resampling changes
 BOOT_CACHE_DIR <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
 dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 
@@ -445,12 +438,12 @@ estimate_subperiod <- function(sp, panel_source) {
   })
   names(bs_data) <- active_fp$Ticker
   
-  one_boot_run <- function(run_id, bs_data, T_total, pcts_probs,
-                           min_obs, nw_lag) {
-    samp     <- sample.int(T_total, size = T_total, replace = TRUE)
-    samp_tab <- tabulate(samp, nbins = T_total)
+  # samp: one pre-drawn vector of T_total month indices (with replacement).
+  one_boot_run <- function(samp, bs_data, pcts_probs, min_obs, nw_lag) {
     t_sim <- vapply(bs_data, function(d) {
-      keep <- rep(seq_along(d$t_idx), times = samp_tab[d$t_idx])
+      # Fund rows for the drawn months in DRAW order; do not sort (adjacent
+      # duplicates would look like autocorrelation to Newey-West).
+      keep <- match(samp, d$t_idx); keep <- keep[!is.na(keep)]
       if (length(keep) < min_obs) return(NA_real_)
       y <- d$y_tilde[keep]
       X <- cbind(1, d$X_fac[keep, , drop = FALSE])
@@ -489,7 +482,8 @@ estimate_subperiod <- function(sp, panel_source) {
     NW_LAG    = NW_LAG_FULL,
     MIN_OBS   = MIN_OBS_BS,
     seed      = BOOT_SEED,
-    pcts      = PCTS
+    pcts      = PCTS,
+    kernel    = BOOT_KERNEL
   ))
   cache_file <- file.path(BOOT_CACHE_DIR,
                           paste0("subperiod_bootstrap_cache_", sp$label, ".rds"))
@@ -508,14 +502,14 @@ estimate_subperiod <- function(sp, panel_source) {
   
   if (!cached_ok) {
     cat("  Bootstrap (B =", B_RUNS, ", cores =", N_CORES, ") ...\n")
+    # All month draws made here from one seed: independent of N_CORES
+    set.seed(BOOT_SEED)
+    samp_list <- replicate(B_RUNS, sample.int(T_total, T_total, replace = TRUE),
+                           simplify = FALSE)
     cl <- makeCluster(N_CORES)
-    clusterExport(cl, c("bs_data", "T_total", "one_boot_run",
-                        "MIN_OBS_BS", "NW_LAG_FULL"),
-                  envir = environment())
-    clusterSetRNGStream(cl, BOOT_SEED)
     boot_t0 <- Sys.time()
-    boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run,
-                              bs_data, T_total, PCTS / 100,
+    boot_results <- parLapply(cl, samp_list, one_boot_run,
+                              bs_data, PCTS / 100,
                               MIN_OBS_BS, NW_LAG_FULL)
     stopCluster(cl)
     cat("  Bootstrap wall time:",
@@ -547,13 +541,13 @@ estimate_subperiod <- function(sp, panel_source) {
       total_n, ")\n")
   
   t_stats <- active_pi0$alpha_t_nw
+  p_vals  <- active_pi0$alpha_p_nw   # same Student-t p-values as pi_0
   bsw_df <- do.call(rbind, lapply(GAMMA_GRID, function(g) {
-    t_thresh <- qnorm(1 - g / 2)
-    S_neg    <- mean(t_stats < -t_thresh, na.rm = TRUE)
-    S_pos    <- mean(t_stats >  t_thresh, na.rm = TRUE)
+    S_neg    <- mean(p_vals < g & t_stats < 0)
+    S_pos    <- mean(p_vals < g & t_stats > 0)
     F_luck   <- pi_0_val * g / 2
     data.frame(
-      gamma           = g * 100,
+      gamma           = round(g * 100),
       S_neg_pct       = S_neg  * 100,
       S_pos_pct       = S_pos  * 100,
       F_luck_pct      = F_luck * 100,
@@ -642,10 +636,21 @@ estimate_subperiod <- function(sp, panel_source) {
   ) %>%
     mutate(across(c(alpha_capm, alpha_ff3, alpha_car, alpha_car_net), ~ .x * 100))
   
+  # Portfolio constituents per group (N column of Table D.2)
+  n_port <- function(rows) n_distinct(ap$Ticker[rows & !is.na(ap$ret_gross)])
+  n_funds <- c(
+    "Active"           = n_port(ap$ap_group == "Active"),
+    "Passive"          = n_port(ap$ap_group == "Passive"),
+    "Unknown"          = n_port(ap$ap_group == "Unknown"),
+    "Active + Passive" = n_port(ap$ap_group %in% c("Active", "Passive")),
+    "Full Sample"      = n_port(rep(TRUE, nrow(ap)))
+  )
+
   list(
     label        = sp$label,
     window       = sp$window,
     panel        = sp$panel,
+    n_funds      = n_funds,
     alpha_full   = alpha_full,
     boot_summary = boot_summary,
     pi_0         = pi_0_val,
@@ -663,39 +668,46 @@ if (!exists("panel_incubation"))
   stop("panel_incubation not found in session. Run data_import_and_cleaning.R ",
        "(and flow_calculation.R) first.")
 
-# Stale-date audit: if the SUBPERIODS list still references the panel_trimmed
-# era thresholds (Jan-2006 / Nov-2011 / Dec-2023), HALT execution. v1.5
-# strengthens this from a runtime warning to a hard stop because the v1.2
-# cleaning pipeline introduces the perf-comparison subsample filter which
-# itself shifts the rolling alpha series; combining stale break dates with
-# a shifted alpha series would silently misalign every regime statistic in
-# the appendix. Set SKIP_STALE_DATE_CHECK <- TRUE in the global environment
-# to override (e.g. when the user has manually verified break stability
-# under the new universe).
-.subperiod_ends <- as.Date(c(SUBPERIODS$P1$date_hi,
-                             SUBPERIODS$P2$date_hi,
-                             SUBPERIODS$P3$date_hi))
-if (identical(.subperiod_ends,
-              as.Date(c("2006-01-31", "2011-11-30", "2026-01-31")))) {
-  if (!isTRUE(get0("SKIP_STALE_DATE_CHECK", envir = globalenv()))) {
-    stop(
-      "SUBPERIODS thresholds (2006-01-31, 2011-11-30, 2026-01-31) are from the ",
-      "panel_trimmed-era Bai-Perron run. Re-run structural_break_test.R on the ",
-      "current alpha_rolling.xlsx (produced by alpha_estimation.R v2.7+ with the ",
-      "perf-comparison subsample filter) and update SUBPERIODS$P*$date_hi with ",
-      "the new break dates before running this script. To override, set ",
-      "SKIP_STALE_DATE_CHECK <- TRUE in the global environment.",
-      call. = FALSE
-    )
-  } else {
-    message(
-      "subperiod_analysis.R: stale-date check overridden via SKIP_STALE_DATE_CHECK. ",
-      "Proceeding with panel_trimmed-era SUBPERIODS thresholds. Verify break ",
-      "stability under the new universe before interpreting results."
-    )
-  }
+# --- Build SUBPERIODS from SUBPERIOD_BREAKS and the data --------------------
+# Boundaries must be detected break dates (window-end dating of the rolling
+# alpha series; see structural_break_test.R).
+.bd <- readxl::read_excel(BREAKTEST_FILE, sheet = "Break Dates")
+.bd <- format(as.Date(.bd[["Point Estimate"]]), "%Y-%m")
+if (!all(SUBPERIOD_BREAKS %in% .bd))
+  stop("SUBPERIOD_BREAKS (", paste(SUBPERIOD_BREAKS, collapse = ", "),
+       ") are not all among the break dates in ", BREAKTEST_FILE, " (",
+       paste(.bd, collapse = ", "), "). Choose the boundaries from the current ",
+       "structural_break_test.R output and update SUBPERIOD_BREAKS.", call. = FALSE)
+stopifnot(length(SUBPERIOD_BREAKS) == 2L, SUBPERIOD_BREAKS[1] < SUBPERIOD_BREAKS[2])
+
+# Months with returns and all four factors define the sample span
+.months <- panel_incubation %>%
+  filter(!excluded_perf, !is.na(ret_gross), !is.na(MKT_RF), !is.na(SMB),
+         !is.na(HML), !is.na(MOM), !is.na(RF)) %>%
+  distinct(date) %>% arrange(date) %>% pull(date)
+.ym     <- format(.months, "%Y-%m")
+.first  <- floor_date(min(.months), "month")
+.last   <- ceiling_date(max(.months), "month") - days(1)
+.b1     <- ceiling_date(as.Date(paste0(SUBPERIOD_BREAKS[1], "-01")), "month") - days(1)
+.b2     <- ceiling_date(as.Date(paste0(SUBPERIOD_BREAKS[2], "-01")), "month") - days(1)
+
+make_sp <- function(lbl, letter, lo, hi) {
+  n_m <- sum(.months >= lo & .months <= hi)            # months that enter the regressions
+  win <- paste0(format(lo, "%b %Y"), "--", format(hi, "%b %Y"))
+  list(label   = lbl,
+       window  = win,
+       panel   = paste0("Panel ", letter, ": ", lbl, " (", win, ", ", n_m, " months)"),
+       date_lo = lo,
+       date_hi = hi)
 }
-rm(.subperiod_ends)
+SUBPERIODS <- list(
+  P1 = make_sp("P1", "A", .first,         .b1),
+  P2 = make_sp("P2", "B", .b1 + days(1),  .b2),
+  P3 = make_sp("P3", "C", .b2 + days(1),  .last)
+)
+cat("\nSub-periods (from SUBPERIOD_BREAKS):\n")
+for (.sp in SUBPERIODS) cat("  ", .sp$panel, "\n")
+rm(.bd, .months, .ym, .first, .last, .b1, .b2, .sp)
 
 results <- lapply(SUBPERIODS, estimate_subperiod,
                   panel_source = panel_incubation)
@@ -735,16 +747,7 @@ cat("\nWritten: subperiod_results.xlsx\n")
 # =============================================================================
 cat("\n=== 4. Table D.2 (perf aggregate, FF-style portfolio regression) ===\n")
 
-# Fund counts per group within each sub-period panel (for N column).
-build_n_funds <- function(alpha_full) {
-  c(
-    "Active"           = sum(alpha_full$ap_group == "Active",  na.rm = TRUE),
-    "Passive"          = sum(alpha_full$ap_group == "Passive", na.rm = TRUE),
-    "Unknown"          = sum(alpha_full$ap_group == "Unknown", na.rm = TRUE),
-    "Active + Passive" = sum(alpha_full$ap_group %in% c("Active","Passive"), na.rm = TRUE),
-    "Full Sample"      = nrow(alpha_full)
-  )
-}
+# N column: portfolio constituents per group (r$n_funds, from estimate_subperiod).
 
 make_d2_block <- function(alpha_agg, n_funds) {
   out <- list()
@@ -779,8 +782,7 @@ make_d2_block <- function(alpha_agg, n_funds) {
 }
 
 perf_data <- bind_rows(lapply(results,
-                              function(r) make_d2_block(r$alpha_agg,
-                                                        build_n_funds(r$alpha_full))))
+                              function(r) make_d2_block(r$alpha_agg, r$n_funds)))
 rownames(perf_data) <- NULL
 
 # 10 rows per sub-period panel (5 groups * 2 rows).
@@ -852,13 +854,12 @@ build_boot_block <- function(boot_summary) {
       Pct       = paste0(percentile, "\\%"),
       Actual_t  = sapply(t_alpha_actual,   fmt, digits = 3),
       Sim_Mean  = sapply(t_alpha_sim_mean, fmt, digits = 3),
-      Prob_Luck = paste0(formatC(pct_runs_below, format = "f", digits = 1),
-                         "\\%"),
+      Prob_Luck = fmt_prob(pct_runs_below),
+      # Same rule in both tails: the label follows the reported probability
       Interpretation = case_when(
-        percentile <= 10 & pct_runs_below < 5  ~ "Worse than luck",
-        percentile >= 90 & pct_runs_below > 95 ~ "Evidence of skill",
-        percentile == 50                        ~ "Indistinguishable",
-        TRUE                                    ~ "Consistent with zero-skill"
+        pct_runs_below < 5  ~ "Worse than luck",
+        pct_runs_below > 95 ~ "Better than luck",
+        TRUE                ~ "Consistent with zero skill"
       )
     ) %>%
     select(Pct, Actual_t, Sim_Mean, Prob_Luck, Interpretation)
@@ -885,15 +886,17 @@ fn_d3 <- paste(
   "within each sub-period. For each fund, estimated monthly alpha is subtracted",
   "from the excess return series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months (within the",
-  "sub-period window) are resampled with replacement, preserving cross-sectional",
+  "sub-period window) are resampled with replacement and kept in the order drawn,",
+  "the same draw applying to all funds, preserving cross-sectional",
   "factor return dependence. The \\\\textcite{Carhart1997} four-factor model is",
   "re-estimated on each resampled series.",
   "\\\\textit{Actual} $t(\\\\hat{\\\\alpha})$: percentile of the empirical",
   "$t$-statistic distribution across active funds in the sub-period.",
   "\\\\textit{Sim.\\\\ Mean}: average of that percentile across all iterations.",
   "\\\\textit{Prob.\\\\ Luck}: fraction of iterations in which the simulated",
-  "percentile falls below the actual value; values below 5\\\\% at lower",
-  "percentiles indicate underperformance unlikely to be explained by luck alone.",
+  "percentile falls below the actual value; values below 5\\\\% (above 95\\\\%)",
+  "indicate that the actual percentile is worse (better) than zero-alpha luck",
+  "would produce; 0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 4 of 10,000.",
   "Newey-West standard errors with a 6-month lag are used throughout.",
   paste0("Active fund counts: P1 $N = ", formatC(n_active_bs_vec[1], format = "d", big.mark = ","),
          "$; P2 $N = ", formatC(n_active_bs_vec[2], format = "d", big.mark = ","),
@@ -1036,13 +1039,14 @@ fn_d5 <- paste(
   "separately within each sub-period.",
   "$S^-_\\\\gamma$ ($S^+_\\\\gamma$): fraction of active funds with significantly",
   "negative (positive) Newey-West $t(\\\\hat{\\\\alpha})$ at two-sided level $\\\\gamma$,",
-  "using sub-period \\\\textcite{Carhart1997} alphas; critical values from $N(0,1)$.",
+  "using sub-period \\\\textcite{Carhart1997} alphas and the same Student-$t$ $p$-values as $\\\\hat{\\\\pi}_0$.",
   "$F_\\\\gamma = \\\\hat{\\\\pi}_0 \\\\cdot \\\\gamma/2$: expected false discoveries per tail,",
   "with $\\\\hat{\\\\pi}_0$ the sub-period \\\\textcite{Storey2002} estimator at",
   "$\\\\lambda = 0.5$ (Table~\\\\ref{tab:subperiod_pi0_estimate}).",
   "$T^\\\\pm_\\\\gamma = S^\\\\pm_\\\\gamma - F_\\\\gamma$: genuinely unskilled ($-$) or skilled ($+$).",
-  "The row at $\\\\gamma = 0.20$ gives population-level",
-  "$\\\\hat{\\\\pi}^-_A$, $\\\\hat{\\\\pi}^+_A$. Negative $T^+_\\\\gamma$ means right-tail",
+  paste0("The row at $\\\\gamma^* = ", formatC(GAMMA_STAR, format = "f", digits = 2),
+         "$ gives population-level"),
+  "$\\\\hat{\\\\pi}^-_A$, $\\\\hat{\\\\pi}^+_A$ (BSW 2010, eq.~8). Negative $T^+_\\\\gamma$ means right-tail",
   "significance does not exceed the false-discovery rate.",
   "Percentages of the sub-period active-fund universe.",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."

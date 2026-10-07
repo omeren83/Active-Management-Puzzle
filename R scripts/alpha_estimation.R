@@ -1,6 +1,28 @@
 # =============================================================================
-# ALPHA ESTIMATION, ROLLING REGRESSIONS, RANK CONSTRUCTION
-# AND FAMA-FRENCH (2010) BOOTSTRAP SIMULATION (v2.7 - Family B audit)
+# ALPHA ESTIMATION, ROLLING REGRESSIONS
+# AND FAMA-FRENCH (2010) BOOTSTRAP SIMULATION (v2.8 - pipeline audit)
+#
+# v2.8 changes vs v2.7 (pipeline audit, Oct 2026):
+#   (a) BOOTSTRAP KERNEL. v2.7 rebuilt each resampled series in calendar order
+#       with duplicated months adjacent (rep(seq_along(t_idx), times = ...)).
+#       Newey-West read the duplicates as autocorrelation and shrank simulated
+#       t-statistics (SD ~0.8 instead of ~1), so "worse/better than luck" was
+#       found too easily. Months now enter in draw order (match(samp, t_idx)).
+#   (b) RNG independent of core count: all month draws are made on the main
+#       process from BOOT_SEED and passed to the workers.
+#   (c) Cache key carries BOOT_KERNEL; bump it whenever resampling code changes.
+#   (d) BSW: pi0 and the tail counts S-/S+ use the same Student-t (n-5) NW
+#       p-values (alpha_p_nw) as alpha_reporting.R; v2.7 used normal p-values.
+#   (e) BSW population estimates pi_A-/pi_A+ at GAMMA_STAR = 0.45. BSW (2010,
+#       eq. 8) take them at a "sufficiently high" gamma* chosen by MSE and note
+#       that pre-set 0.35 or 0.45 give similar results; 0.20 is only the level
+#       they use to display the tails. At 0.20, pi0 + pi_A- + pi_A+ < 1.
+#   (f) Rolling window defined on a calendar-month index (t-35..t). Date
+#       arithmetic on last-business-day dates dropped a month in some windows.
+#   (g) Section 5 (rank construction, rank_data.xlsx) removed: unused downstream
+#       (panel_regressions_setup.R builds its own ranks).
+#   Inputs: ret_gross is now true gross (net index + ER/12, data_import v1.4);
+#   funds with no expense ratio have no gross return and drop out here.
 #
 # v2.7 changes vs v2.6 (Family B audit):
 #   (a) filter(!excluded_perf) added to the ap panel-prep stage. This restricts
@@ -86,6 +108,7 @@ BOOT_SEED    <- 42L
 USE_PARALLEL <- TRUE              
 N_CORES      <- max(1L, detectCores() - 1L)
 USE_BOOT_CACHE <- TRUE
+BOOT_KERNEL  <- "v2.8-draw-order"  # part of the cache key; bump on resampling changes
 BOOT_CACHE_DIR <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
 dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 
@@ -94,6 +117,7 @@ PCTS <- c(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 96, 97, 98, 99)
 # BSW gamma grid following Barras, Scaillet & Wermers (2010), Table III
 GAMMA_GRID   <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5              # Storey (2002) tuning parameter
+GAMMA_STAR    <- 0.45             # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
 
 # --- 1. DATA PREPARATION ---
 cat("=== 1. Data preparation ===\n")
@@ -102,7 +126,7 @@ ap <- panel_incubation %>%
   rename(mkt_rf = all_of(FACTOR_MKT), smb = all_of(FACTOR_SMB), hml = all_of(FACTOR_HML),
          mom = all_of(FACTOR_MOM), rf = all_of(FACTOR_RF), lipper = all_of(LIPPER_COL),
          exp_r  = all_of(EXP_COL)) %>%
-  mutate(ret_rank = ret_gross, excess_ret = ret_gross - rf,
+  mutate(ret_rank = ret_gross, excess_ret = ret_gross - rf,   # ret_rank: rolling vol input
          exp_r = suppressWarnings(as.numeric(exp_r)),
          # v2.7: derive tna locally so this script does not depend on
          # flow_calculation.R having been run first.
@@ -164,10 +188,11 @@ run_rolling_parallel <- function(tk, ap_list, MIN_OBS, NW_LAG) {
   library(lubridate)
   d <- ap_list[[tk]]; n <- nrow(d); if (n < MIN_OBS) return(NULL)
   dates <- d$date; excess <- d$excess_ret; ret_raw <- d$ret_rank
+  mi    <- year(dates) * 12L + month(dates)            # calendar-month index
   X_all <- cbind(1, d$mkt_rf, d$smb, d$hml, d$mom)
   res <- vector("list", n)
   for (i in seq_len(n)) {
-    win <- which(dates >= (dates[i] %m-% months(35)) & dates <= dates[i])
+    win <- which(mi >= mi[i] - 35L & mi <= mi[i])      # months t-35..t
     if (length(win) < MIN_OBS) next
     y <- excess[win]; X <- X_all[win, , drop=F]; n_w <- length(win)
     tryCatch({
@@ -194,16 +219,6 @@ clusterExport(cl, c("ap_split", "MIN_OBS_ROLL", "NW_LAG_ROLL", "run_rolling_para
 alpha_roll <- bind_rows(parLapply(cl, names(ap_split), run_rolling_parallel, ap_split, MIN_OBS_ROLL, NW_LAG_ROLL))
 stopCluster(cl)
 
-# --- 5. PERFORMANCE RANK CONSTRUCTION ---
-cat("=== 5. Rank construction ===\n")
-rank_annual <- ap %>%
-  group_by(Ticker) %>% arrange(date) %>%
-  mutate(cum_ret_12m = rollapplyr(1 + ret_rank, 12, prod, fill=NA, align="right") - 1) %>%
-  filter(month(date) == 12, !is.na(cum_ret_12m)) %>%
-  group_by(lipper, year = year(date)) %>%
-  mutate(rank_frac = (rank(cum_ret_12m, ties="average") - 1) / (n() - 1)) %>%
-  mutate(R_LOW = pmin(rank_frac, 0.2), R_MID = pmin(rank_frac - R_LOW, 0.6), R_HIGH = pmax(rank_frac - 0.8, 0))
-
 # --- 6. FAMA-FRENCH BOOTSTRAP ---
 # v2.5: simulated t-statistics now use Newey-West HAC standard errors with the
 # same lag (NW_LAG_FULL = 6) used for the actual full-period regressions in
@@ -220,10 +235,13 @@ bs_data <- lapply(active_fp$Ticker, function(tk) {
 names(bs_data) <- active_fp$Ticker
 # NW SE for the alpha intercept (returns scalar SE for the first regressor).
 # Inlined here so workers don't need access to nw_se() from the global env.
-one_boot_run <- function(run_id, bs_data, T_total, pcts_probs, min_obs, nw_lag) {
-  samp <- sample.int(T_total, size = T_total, replace = TRUE); samp_tab <- tabulate(samp, nbins = T_total)
+# samp: one pre-drawn vector of T_total month indices (with replacement).
+one_boot_run <- function(samp, bs_data, pcts_probs, min_obs, nw_lag) {
   t_sim <- vapply(bs_data, function(d) {
-    keep <- rep(seq_along(d$t_idx), times = samp_tab[d$t_idx])
+    # Fund rows for the drawn months, in DRAW order (i.i.d. under H0); months
+    # the fund did not exist are skipped. Do not sort: adjacent duplicates
+    # would look like autocorrelation to Newey-West.
+    keep <- match(samp, d$t_idx); keep <- keep[!is.na(keep)]
     if (length(keep) < min_obs) return(NA_real_)
     y <- d$y_tilde[keep]; X <- cbind(1, d$X_fac[keep, , drop = FALSE])
     tryCatch({
@@ -258,7 +276,8 @@ cache_key <- digest::digest(list(
   NW_LAG  = NW_LAG_FULL,
   MIN_OBS = MIN_OBS_BS,
   seed    = BOOT_SEED,
-  pcts    = PCTS
+  pcts    = PCTS,
+  kernel  = BOOT_KERNEL
 ))
 cache_file <- file.path(BOOT_CACHE_DIR, "fullperiod_bootstrap_cache.rds")
 
@@ -276,9 +295,12 @@ if (USE_BOOT_CACHE && file.exists(cache_file)) {
 
 if (!cached_ok) {
   cat("  Bootstrap (B =", B_RUNS, ", cores =", N_CORES, ") ...\n")
-  cl <- makeCluster(N_CORES); clusterExport(cl, c("bs_data", "T_total", "one_boot_run", "MIN_OBS_BS", "NW_LAG_FULL")); clusterSetRNGStream(cl, BOOT_SEED)
+  # All month draws made here from one seed: results do not depend on N_CORES
+  set.seed(BOOT_SEED)
+  samp_list <- replicate(B_RUNS, sample.int(T_total, T_total, replace = TRUE), simplify = FALSE)
+  cl <- makeCluster(N_CORES)
   boot_t0 <- Sys.time()
-  boot_results <- parLapply(cl, seq_len(B_RUNS), one_boot_run, bs_data, T_total, PCTS/100, MIN_OBS_BS, NW_LAG_FULL); stopCluster(cl)
+  boot_results <- parLapply(cl, samp_list, one_boot_run, bs_data, PCTS/100, MIN_OBS_BS, NW_LAG_FULL); stopCluster(cl)
   cat("  Bootstrap wall time:", round(as.numeric(difftime(Sys.time(), boot_t0, units = "secs")), 1), "sec\n")
   sim_matrix <- do.call(rbind, boot_results)
   if (USE_BOOT_CACHE) {
@@ -290,32 +312,30 @@ bootstrap_summary <- data.frame(percentile=PCTS, t_alpha_actual=as.numeric(quant
 
 # --- 7. BSW GAMMA-GRID DECOMPOSITION ---
 # Barras, Scaillet & Wermers (2010, Journal of Finance), Section II & Table III.
-# This block requires zero additional regressions; all inputs (alpha_t_nw) are
-# already computed. The pi0 estimate here uses normal-approximation p-values
-# on the unfiltered active fund set (same as bootstrap); a minor discrepancy
-# vs. alpha_reporting.R is possible if clean_data() there excludes any funds
-# with missing Lipper categories that are nonetheless present in active_fp.
+# No additional regressions. pi0 and the tail counts use the same two-sided
+# Student-t (n-5) Newey-West p-values (alpha_p_nw) as alpha_reporting.R, so
+# Table pi0, Table 10b and Table I.3 report one number.
 cat("=== 7. BSW Gamma-Grid Decomposition ===\n")
 
-# Storey (2002) pi0 from two-sided normal-approximation p-values
-p_vals_bsw <- 2 * pnorm(-abs(active_fp$alpha_t_nw))
+# Storey (2002) pi0 from two-sided Student-t NW p-values
+p_vals_bsw <- active_fp$alpha_p_nw
 n_bsw      <- sum(!is.na(p_vals_bsw))
 pi0_bsw    <- min(1.0,
                   sum(p_vals_bsw > LAMBDA_STOREY, na.rm = TRUE) /
                     (n_bsw * (1 - LAMBDA_STOREY)))
-cat("pi0 estimate (BSW block, normal approx):", round(pi0_bsw * 100, 1), "%\n")
+cat("pi0 estimate (BSW block):", round(pi0_bsw * 100, 1), "%\n")
 cat("Active funds entering BSW decomposition:", n_bsw, "\n")
 
 # Compute four-way decomposition across gamma grid
 t_stats_bsw <- active_fp$alpha_t_nw
 
 bsw_df <- do.call(rbind, lapply(GAMMA_GRID, function(g) {
-  t_thresh <- qnorm(1 - g / 2)                              # two-sided critical value
-  S_neg    <- mean(t_stats_bsw < -t_thresh, na.rm = TRUE)  # fraction: significantly negative alpha
-  S_pos    <- mean(t_stats_bsw >  t_thresh, na.rm = TRUE)  # fraction: significantly positive alpha
+  ok       <- !is.na(p_vals_bsw)
+  S_neg    <- mean(p_vals_bsw[ok] < g & t_stats_bsw[ok] < 0)  # significantly negative alpha
+  S_pos    <- mean(p_vals_bsw[ok] < g & t_stats_bsw[ok] > 0)  # significantly positive alpha
   F_luck   <- pi0_bsw * g / 2                              # expected false discoveries per tail (BSW Eq. 5)
   data.frame(
-    gamma           = g * 100,                              # stored as percent (5, 10, ..., 50)
+    gamma           = round(g * 100),                              # stored as percent (5, 10, ..., 50)
     S_neg_pct       = round(S_neg    * 100, 4),
     S_pos_pct       = round(S_pos    * 100, 4),
     F_luck_pct      = round(F_luck   * 100, 4),
@@ -324,18 +344,19 @@ bsw_df <- do.call(rbind, lapply(GAMMA_GRID, function(g) {
   )
 }))
 
-# Population estimates: T^-_gamma and T^+_gamma at gamma* = 0.20 (BSW standard)
-pi_A_minus <- bsw_df$T_unskilled_pct[bsw_df$gamma == 20]
-pi_A_plus  <- bsw_df$T_skilled_pct[bsw_df$gamma == 20]
-cat(sprintf("Population estimates at gamma* = 0.20:\n  pi^-_A (Unskilled): %.1f%%\n  pi^+_A (Skilled):   %.1f%%\n",
-            pi_A_minus, pi_A_plus))
+# Population estimates: T^-_gamma and T^+_gamma at gamma* (BSW 2010, eq. 8)
+pi_A_minus <- bsw_df$T_unskilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)]
+pi_A_plus  <- bsw_df$T_skilled_pct[bsw_df$gamma == round(GAMMA_STAR * 100)]
+stopifnot(length(pi_A_minus) == 1L)   # GAMMA_STAR must be on GAMMA_GRID
+cat(sprintf("Population estimates at gamma* = %.2f:\n  pi^-_A (Unskilled): %.1f%%\n  pi^+_A (Skilled):   %.1f%%\n  pi0 + pi^-_A + pi^+_A = %.1f%%\n",
+            GAMMA_STAR, pi_A_minus, pi_A_plus, pi0_bsw * 100 + pi_A_minus + pi_A_plus))
 
 # Metadata row for cross-script reference in alpha_reporting.R
 bsw_meta <- data.frame(
   lambda    = LAMBDA_STOREY,
   pi0_pct   = round(pi0_bsw * 100, 4),
   n_active  = n_bsw,
-  gamma_star = 20,                # reference gamma for population estimates
+  gamma_star = round(GAMMA_STAR * 100),  # gamma* for population estimates (percent)
   pi_A_minus = pi_A_minus,
   pi_A_plus  = pi_A_plus
 )
@@ -343,7 +364,6 @@ bsw_meta <- data.frame(
 # --- 8. SAVE OUTPUTS ---
 write_xlsx(alpha_full, "alpha_fullperiod.xlsx")
 write_xlsx(alpha_roll, "alpha_rolling.xlsx")
-write_xlsx(rank_annual, "rank_data.xlsx")
 write_xlsx(
   list(
     summary           = bootstrap_summary,
@@ -353,4 +373,4 @@ write_xlsx(
   ),
   "bootstrap_results.xlsx"
 )
-cat("=== ALL Done ===\n")
+cat("=== ALL Done ===\n")

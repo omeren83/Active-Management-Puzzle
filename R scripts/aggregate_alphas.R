@@ -1,5 +1,13 @@
 # =============================================================================
-# AGGREGATE PORTFOLIO ALPHAS - FF (2010) METHODOLOGY                     v1.2
+# AGGREGATE PORTFOLIO ALPHAS - FF (2010) METHODOLOGY                     v1.3
+#
+# v1.3 changes vs v1.2 (pipeline audit, Oct 2026):
+#   No code change. Inputs changed upstream (data_import_and_cleaning.R v1.4):
+#   ret_net is the NAV-based index return and ret_gross = ret_net + ER/12;
+#   neither is winsorised. ap_agg keeps rows with non-missing ret_gross, so
+#   the gross and net portfolios are built on exactly the same fund-months
+#   (funds without an expense ratio are excluded from both). Comment on the
+#   weighting scheme corrected.
 #
 # v1.2 changes vs v1.1 (Family B audit):
 #   filter(!excluded_perf) added to the ap_agg panel-prep stage so that
@@ -41,7 +49,7 @@
 # approach (with static mean-TNA weight) in Tables 7 and 8. The old approach
 # produced a weighted average of per-fund point estimates with a time-invariant
 # weight; the FF (2010) approach produces a single portfolio-level regression
-# with contemporaneous dollar weighting. These are fundamentally different
+# with lagged-TNA (beginning-of-month) dollar weighting. These are fundamentally different
 # estimators; the FF approach is the field standard for aggregate claims.
 #
 # Produces:
@@ -128,7 +136,7 @@ nw_se <- function(X, e, lag) {
   }, error = function(err) rep(NA_real_, k))
 }
 
-# Monthly contemporaneous weighted mean (used for VW portfolio returns)
+# Monthly lagged-TNA weighted mean (used for VW portfolio returns)
 wm_panel <- function(x, w) {
   v <- !is.na(x) & !is.na(w) & w > 0
   if (sum(v) == 0L) return(NA_real_)
@@ -314,4 +322,4 @@ write_xlsx(
 )
 cat("\n[SUCCESS] aggregate_alphas.xlsx written. ")
 
-cat("aggregate_alphas.R v1.1 complete.\n")
+cat("aggregate_alphas.R v1.1 complete.\n")
