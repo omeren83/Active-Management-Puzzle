@@ -6,13 +6,13 @@
 \toprule
 Percentile & Actual $t(\hat{\alpha})$ & Simulated Mean & Prob.\ Luck & Interpretation\\
 \midrule
-1 & -3.242 & -2.249 & 1.7\% & Worse than luck (significant)\\
-5 & -2.429 & -1.465 & 0.1\% & Worse than luck (significant)\\
-10 & -1.984 & -1.113 & 0.1\% & Worse than luck (significant)\\
-50 & -0.450 & 0.013 & 1.9\% & Indistinguishable from luck\\
-90 & 1.138 & 1.127 & 54.3\% & Consistent with zero-skill\\
-95 & 1.559 & 1.478 & 63.9\% & Consistent with zero-skill\\
-99 & 2.378 & 2.293 & 62.6\% & Consistent with zero-skill\\
+1 & -2.477 & -2.882 & 79.2\% & Consistent with zero skill\\
+5 & -1.871 & -1.889 & 48.5\% & Consistent with zero skill\\
+10 & -1.352 & -1.434 & 57.1\% & Consistent with zero skill\\
+50 & 0.019 & 0.018 & 50.5\% & Consistent with zero skill\\
+90 & 1.559 & 1.475 & 62.6\% & Consistent with zero skill\\
+95 & 2.047 & 1.940 & 64.0\% & Consistent with zero skill\\
+99 & 2.742 & 2.994 & 34.5\% & Consistent with zero skill\\
 \bottomrule
 \end{tabular}%
 }
@@ -28,7 +28,7 @@ Percentile & Actual $t(\hat{\alpha})$ & Simulated Mean & Prob.\ Luck & Interpret
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Bootstrap procedure follows Fama and French (2010, \textit{Journal of Finance}). Sample: actively managed funds, Jan 1995--Sep 2006 (Fama-French 2010 subperiod), minimum 24 monthly observations ($N = 805$ funds). For each fund, estimated monthly alpha is subtracted from the excess return series to construct a zero-alpha null return. In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled with replacement, preserving cross-sectional factor return dependence. The Carhart (1997) four-factor model is re-estimated on each resampled series. \textit{Actual} $t(\hat{\alpha})$: percentile of the empirical $t$-statistic distribution across active funds. \textit{Simulated Mean}: average of that percentile across all iterations. \textit{Prob.\ Luck}: fraction of iterations in which the simulated percentile falls below the actual value; values below 5\% at lower percentiles indicate underperformance unlikely to be explained by luck alone. Newey-West standard errors with a 6-month lag are used throughout. Compare with Fama and French (2010), Table III.
+Bootstrap procedure follows Fama and French (2010, \textit{Journal of Finance}). Sample: actively managed funds, Jan 1995--Sep 2006 (Fama-French 2010 subperiod), minimum 24 monthly observations ($N = 804$ funds). For each fund, estimated monthly alpha is subtracted from the excess return series to construct a zero-alpha null return. In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled with replacement and kept in the order drawn, the same draw applying to all funds, preserving cross-sectional factor return dependence. The Carhart (1997) four-factor model is re-estimated on each resampled series. \textit{Actual} $t(\hat{\alpha})$: percentile of the empirical $t$-statistic distribution across active funds. \textit{Simulated Mean}: average of that percentile across all iterations. \textit{Prob.\ Luck}: fraction of iterations in which the simulated percentile falls below the actual value; values below 5\% (above 95\%) indicate that the actual percentile is worse (better) than zero-alpha luck would produce; 0.0\% means no iteration and $<$0.1\% means 1 to 4 of 10,000 iterations. Newey-West standard errors with a 6-month lag are used throughout. Compare with Fama and French (2010), Table III.
 \end{singlespace}
 \end{minipage}
 \end{table}

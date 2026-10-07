@@ -6,13 +6,13 @@
 \toprule
 Percentile & Actual $t(\hat{\alpha})$ & Simulated Mean & Prob.\ Luck & Interpretation\\
 \midrule
-1 & -3.619 & -2.064 & 0.0\% & Worse than luck (significant)\\
-5 & -2.684 & -1.370 & 0.0\% & Worse than luck (significant)\\
-10 & -2.184 & -1.053 & 0.0\% & Worse than luck (significant)\\
-50 & -0.606 & -0.015 & 0.8\% & Indistinguishable from luck\\
-90 & 0.993 & 1.014 & 50.1\% & Consistent with zero-skill\\
-95 & 1.362 & 1.326 & 59.6\% & Consistent with zero-skill\\
-99 & 2.248 & 2.019 & 80.9\% & Consistent with zero-skill\\
+1 & -3.154 & -2.606 & 7.2\% & Consistent with zero skill\\
+5 & -2.128 & -1.745 & 11.2\% & Consistent with zero skill\\
+10 & -1.669 & -1.339 & 13.4\% & Consistent with zero skill\\
+50 & -0.188 & 0.006 & 24.9\% & Consistent with zero skill\\
+90 & 1.359 & 1.359 & 53.3\% & Consistent with zero skill\\
+95 & 1.740 & 1.770 & 50.0\% & Consistent with zero skill\\
+99 & 2.633 & 2.645 & 52.6\% & Consistent with zero skill\\
 \bottomrule
 \end{tabular}%
 }
@@ -28,7 +28,7 @@ Percentile & Actual $t(\hat{\alpha})$ & Simulated Mean & Prob.\ Luck & Interpret
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Bootstrap procedure follows \textcite{FamaFrench2010}. Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\_funds.xlsx, minimum 24 monthly observations ($N = 1815$ funds). For each fund, estimated monthly alpha is subtracted from the excess return series to construct a zero-alpha null return. In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled with replacement, preserving cross-sectional factor return dependence. The \textcite{Carhart1997} four-factor model is re-estimated on each resampled series. \textit{Actual} $t(\hat{\alpha})$: percentile of the empirical $t$-statistic distribution across active funds. \textit{Simulated Mean}: average of that percentile across all iterations. \textit{Prob.\ Luck}: fraction of iterations in which the simulated percentile falls below the actual value; values below 5\% at lower percentiles indicate underperformance unlikely to be explained by luck alone. Newey-West standard errors with a 6-month lag are used throughout.
+Bootstrap procedure follows \textcite{FamaFrench2010}. Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\_funds.xlsx, minimum 24 monthly observations ($N = 1800$ funds). For each fund, estimated monthly alpha is subtracted from the excess return series to construct a zero-alpha null return. In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled with replacement and kept in the order drawn, the same draw applying to all funds, preserving cross-sectional factor return dependence. The \textcite{Carhart1997} four-factor model is re-estimated on each resampled series. \textit{Actual} $t(\hat{\alpha})$: percentile of the empirical $t$-statistic distribution across active funds. \textit{Simulated Mean}: average of that percentile across all iterations. \textit{Prob.\ Luck}: fraction of iterations in which the simulated percentile falls below the actual value; values below 5\% (above 95\%) indicate that the actual percentile is worse (better) than zero-alpha luck would produce; 0.0\% means no iteration and $<$0.1\% means 1 to 4 of 10,000 iterations. Newey-West standard errors with a 6-month lag are used throughout.
 \end{singlespace}
 \end{minipage}
 \end{table}

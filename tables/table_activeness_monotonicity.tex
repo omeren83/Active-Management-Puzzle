@@ -8,17 +8,17 @@ Panel & $\alpha_{\text{Q1}}$ & $\alpha_{\text{Q5}}$ & $\alpha_{\text{Q5}}-\alpha
 \midrule
 \addlinespace[0.3em]
 \multicolumn{8}{l}{Panel A: $1-R^2$ Activeness}\\
-\hspace{1em}EW Gross & -0.598 & 0.096 & 0.694 & 0.023 & 0.031$^{**}$ & -0.321 & 0.742\\
-\hspace{1em}EW Net & -1.422 & -1.280 & 0.142 & -0.061 & 0.116 & -0.107 & 0.210\\
-\hspace{1em}VW Gross & -0.495 & 1.101 & 1.596 & -0.664 & 0.512 & -1.167 & 0.802\\
-\hspace{1em}VW Net & -1.047 & 0.279 & 1.326 & -0.731 & 0.558 & -1.026 & 0.738\\
+\hspace{1em}EW Gross & -0.680 & 1.139 & 1.819 & 0.183 & 0.016$^{**}$ & -0.842 & 0.953\\
+\hspace{1em}EW Net & -1.523 & -0.111 & 1.412 & 0.116 & 0.033$^{**}$ & -0.785 & 0.936\\
+\hspace{1em}VW Gross & -0.995 & 0.431 & 1.425 & -0.388 & 0.232 & -1.435 & 0.878\\
+\hspace{1em}VW Net & -1.590 & -0.381 & 1.209 & -0.405 & 0.242 & -1.342 & 0.854\\
 \addlinespace[0.3em]
 \hline
 \multicolumn{8}{l}{Panel B: Tracking Error Activeness}\\
-\hspace{1em}EW Gross & -0.636 & 0.170 & 0.806 & -0.114 & 0.224 & -0.516 & 0.951\\
-\hspace{1em}EW Net & -1.467 & -1.035 & 0.432 & -0.200 & 0.433 & -0.507 & 0.950\\
-\hspace{1em}VW Gross & -0.384 & 1.811 & 2.194 & -0.684 & 0.590 & -1.932 & 0.993\\
-\hspace{1em}VW Net & -0.961 & 0.976 & 1.937 & -0.668 & 0.569 & -1.864 & 0.991\\
+\hspace{1em}EW Gross & 0.251 & 0.338 & 0.087 & -0.066 & 0.149 & -0.091 & 0.238\\
+\hspace{1em}EW Net & -0.585 & -0.949 & -0.363 & -0.157 & 0.302 & 0.026 & 0.069$^{*}$\\
+\hspace{1em}VW Gross & -0.202 & -2.042 & -1.840 & -2.947 & 0.999 & -1.301 & 0.822\\
+\hspace{1em}VW Net & -0.797 & -2.971 & -2.174 & -3.082 & 0.999 & -1.265 & 0.812\\
 \bottomrule
 \end{tabular}%
 }
@@ -34,7 +34,7 @@ Panel & $\alpha_{\text{Q1}}$ & $\alpha_{\text{Q5}}$ & $\alpha_{\text{Q5}}-\alpha
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-\textcite{PattonTimmermann2010} monotonic relation (MR) bootstrap test for the Carhart alpha gradient across the five activeness quintiles, separately for each activeness measure and for each weighting $\times$ return-type combination (Active funds only). Test statistics: $J_{\uparrow} = \min_{q \geq 2}(\alpha_q - \alpha_{q-1})$ for the increasing-pattern alternative, $J_{\downarrow} = \min_{q \geq 2}(\alpha_{q-1} - \alpha_q)$ for the decreasing-pattern alternative. $p_{\uparrow}$ and $p_{\downarrow}$ are bootstrap p-values from $B = 1000$ calendar-month resamples under the least-favorable null configuration (each quintile's excess return series recentered by subtracting its full-sample Carhart alpha, imposing $\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern when the corresponding p-value is small. $\alpha_{\text{Q1}}$, $\alpha_{\text{Q5}}$, and $\alpha_{\text{Q5}}-\alpha_{\text{Q1}}$ are annualised Carhart alphas (\%). $J_{\uparrow}$ and $J_{\downarrow}$ are reported in annualised \% terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\%, 5\%, 1\%. Implementation follows the recentering procedure of \textcite{CremersPetajisto2009} and \textcite{AmihudGoyenko2013}. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\textcite{PattonTimmermann2010} monotonic relation (MR) bootstrap test for the Carhart alpha gradient across the five activeness quintiles, separately for each activeness measure and for each weighting $\times$ return-type combination (Active funds only). Test statistics: $J_{\uparrow} = \min_{q \geq 2}(\alpha_q - \alpha_{q-1})$ for the increasing-pattern alternative, $J_{\downarrow} = \min_{q \geq 2}(\alpha_{q-1} - \alpha_q)$ for the decreasing-pattern alternative. $p_{\uparrow}$ and $p_{\downarrow}$ are bootstrap p-values from $B = 1000$ stationary-bootstrap resamples of calendar months (stationary bootstrap of Politis and Romano 1994, mean block length 6) under the least-favorable null configuration (each quintile's excess return series recentered by subtracting its full-sample Carhart alpha, imposing $\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern when the corresponding p-value is small. $\alpha_{\text{Q1}}$, $\alpha_{\text{Q5}}$, and $\alpha_{\text{Q5}}-\alpha_{\text{Q1}}$ are annualised Carhart alphas (\%). $J_{\uparrow}$ and $J_{\downarrow}$ are reported in annualised \% terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\%, 5\%, 1\%. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

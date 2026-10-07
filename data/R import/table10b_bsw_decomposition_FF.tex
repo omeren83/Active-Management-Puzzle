@@ -8,16 +8,16 @@
 \cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-6}
 $\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma$\\
 \midrule
-5\% & 10.6 & 2.5 & 2.0 & 8.6 & 0.5\\
-10\% & 15.5 & 4.2 & 3.9 & 11.6 & 0.3\\
-15\% & 18.9 & 6.0 & 5.9 & 13.0 & 0.1\\
-20\% & 23.0 & 7.2 & 7.9 & 15.1 & -0.6\\
-25\% & 26.3 & 9.8 & 9.8 & 16.5 & 0.0\\
-30\% & 29.3 & 11.7 & 11.8 & 17.5 & -0.1\\
-35\% & 33.3 & 14.3 & 13.7 & 19.6 & 0.5\\
-40\% & 36.3 & 16.0 & 15.7 & 20.6 & 0.3\\
-45\% & 39.4 & 17.5 & 17.7 & 21.7 & -0.1\\
-50\% & 42.4 & 19.1 & 19.6 & 22.7 & -0.5\\
+5\% & 4.0 & 5.3 & 2.2 & 1.8 & 3.1\\
+10\% & 6.5 & 8.5 & 4.4 & 2.0 & 4.0\\
+15\% & 9.0 & 11.7 & 6.7 & 2.3 & 5.0\\
+20\% & 10.9 & 14.3 & 8.9 & 2.1 & 5.4\\
+25\% & 12.4 & 16.9 & 11.1 & 1.3 & 5.8\\
+30\% & 16.2 & 19.3 & 13.3 & 2.8 & 6.0\\
+35\% & 18.8 & 22.0 & 15.5 & 3.2 & 6.5\\
+40\% & 21.4 & 25.1 & 17.8 & 3.6 & 7.4\\
+45\% & 23.5 & 27.1 & 20.0 & 3.5 & 7.1\\
+50\% & 26.6 & 29.0 & 22.2 & 4.4 & 6.8\\
 \bottomrule
 \end{tabular}%
 }
@@ -33,7 +33,7 @@ $\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Decomposition follows Barras, Scaillet and Wermers (2010, \textit{Journal of Finance}), Section~II.B and Table~III. $S^-_\gamma$ ($S^+_\gamma$): observed fraction of active funds with significantly negative (positive) Newey-West $t(\hat{\alpha})$ at two-sided significance level $\gamma$, using full-period Carhart (1997) four-factor alphas. Critical values are from the standard normal distribution, consistent with the large-sample approximation in BSW (2010). $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected proportion of false discoveries per tail arising from zero-alpha funds, where $\hat{\pi}_0 = 78.5\%$ is the Storey (2002) estimate at $\lambda = 0.5$ (see Table~\ref{tab:pi0_estimate_FF}). $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled funds (significant negative alpha net of false discoveries). $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled funds (significant positive alpha net of false discoveries). The reference row ($\gamma = 0.20$) provides the population-level estimates $\hat{\pi}^-_A$ and $\hat{\pi}^+_A$ following BSW (2010). Negative $T^+_\gamma$ entries indicate right-tail significance does not exceed the false-discovery rate at that threshold. Sample: $N = 805$ actively managed funds, Jan 1995--Sep 2006 (Fama-French 2010 subperiod); Passive and Unknown funds excluded.
+Decomposition follows Barras, Scaillet and Wermers (2010, \textit{Journal of Finance}), Section~II.B and Table~III. $S^-_\gamma$ ($S^+_\gamma$): observed fraction of active funds with significantly negative (positive) Newey-West $t(\hat{\alpha})$ at two-sided significance level $\gamma$, using full-period Carhart (1997) four-factor alphas and the same Student-$t$ $p$-values as $\hat{\pi}_0$. $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected proportion of false discoveries per tail arising from zero-alpha funds, where $\hat{\pi}_0 = 88.8\%$ is the Storey (2002) estimate at $\lambda = 0.5$ (see Table~\ref{tab:pi0_estimate_FF}). $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled funds (significant negative alpha net of false discoveries). $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled funds (significant positive alpha net of false discoveries). The row at $\gamma^* = 0.45$ gives the population estimates $\hat{\pi}^-_A$ and $\hat{\pi}^+_A$ (BSW 2010, eq.~8: a sufficiently high $\gamma^*$; pre-set 0.35 or 0.45 match their MSE-based choice). Negative $T^+_\gamma$ entries indicate right-tail significance does not exceed the false-discovery rate at that threshold. Sample: $N = 804$ actively managed funds, Jan 1995--Sep 2006 (Fama-French 2010 subperiod); Passive and Unknown funds excluded.
 \end{singlespace}
 \end{minipage}
 \end{table}
