@@ -121,16 +121,16 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE    # data_import + flow_calculation
-RUN_PHASE_B_ALPHA         <- TRUE   # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- TRUE   # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- TRUE   # FF_comparison + build_ff_tables_manual
-RUN_PHASE_E_SUBPERIODS    <- TRUE    # structural_break_test + subperiod_analysis
-RUN_PHASE_F_SORTS_PERSIST <- FALSE   # portfolio_sorts + persistence_testing
-RUN_PHASE_G_ACTIVENESS    <- FALSE   # activeness_analysis
-RUN_PHASE_H_FACTOR_ROBUST <- TRUE   # alpha_estimation_robust + build_robust_tables
-RUN_PHASE_I_BEHAVIORAL    <- FALSE   # behavioral_state_variables (NEW)
-RUN_PHASE_J_PANEL_REG     <- FALSE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
-RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
+RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
+RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
+RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
+RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
+RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
+RUN_PHASE_G_ACTIVENESS    <- TRUE   # activeness_analysis
+RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
+RUN_PHASE_I_BEHAVIORAL    <- TRUE   # behavioral_state_variables (NEW)
+RUN_PHASE_J_PANEL_REG     <- TRUE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
+RUN_UTILITY_LIPPER        <- FALSE    # build_lipper_category (rarely re-run)
 
 # Phase J sub-toggle: force re-running panel_regressions_setup.R even if
 # panel_reg.rds is on disk. Default FALSE = use cached panel_reg.rds when
@@ -171,7 +171,7 @@ pipeline_log <- list()
   mtimes <- file.info(file.path(WORKING_DIR, files))$mtime
   setNames(mtimes, files)
 }
-tex_snapshot_before <- .snapshot_files("^table_.*\\.tex$")
+tex_snapshot_before <- .snapshot_files("^table[_0-9].*\\.tex$")
 fig_snapshot_before <- .snapshot_files("^fig_.*\\.png$")
 
 # Helper: source a script with timing and error handling.
@@ -529,7 +529,7 @@ if (!is.na(TABLES_OUT_DIR)) {
     sum(res)
   }
   
-  n_tex <- .sync_class("^table_.*\\.tex$", tex_snapshot_before, "table_*.tex")
+  n_tex <- .sync_class("^table[_0-9].*\\.tex$", tex_snapshot_before, "table_*.tex")
   n_fig <- .sync_class("^fig_.*\\.png$",   fig_snapshot_before, "fig_*.png")
   
   cat(sprintf("Sync complete: %d table(s), %d figure(s) copied.\n",

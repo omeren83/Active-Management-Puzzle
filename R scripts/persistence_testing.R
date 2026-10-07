@@ -439,7 +439,7 @@ ap <- panel_incubation %>%
          ap_group   = gsub("Agtive", "Active", ap_group),
          # Normalise date to first-of-month. Cohort bounds and hold_calendar
          # are month-start; if the source panel stores end-of-month dates
-         # (LSEG Excel header convention varies), naive date comparisons
+         # (Bloomberg Excel header convention varies), naive date comparisons
          # silently drop observations at the last day of the boundary month.
          # This alignment is idempotent if dates are already month-start.
          date       = floor_date(date, "month")) %>%

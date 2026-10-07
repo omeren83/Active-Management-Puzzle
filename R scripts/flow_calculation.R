@@ -2,7 +2,7 @@
 # FUND FLOW CALCULATION AND VALIDATION                                     v1.2
 #
 # v1.2 changes (pipeline audit, Oct 2026):
-#   - ret_net_raw is now the LSEG index return itself, which is NAV-based and
+#   - ret_net_raw is now the Bloomberg index return itself, which is NAV-based and
 #     net of fees (see data_import_and_cleaning.R v1.4). v1.1 subtracted ER/12
 #     from an already-net series, overstating flows by TNA_{t-1} * ER/12.
 #   - No flow is computed in a month where the TNA source switches between
@@ -16,7 +16,7 @@
 #
 # Computes Sirri-Tufano (1998) flows from TNA and unwinsorised net returns,
 # appends results to all three panels (panel_master, panel_incubation,
-# panel_trimmed), and validates against LSEG-supplied fund_flow values.
+# panel_trimmed), and validates against Bloomberg-supplied fund_flow values.
 #
 # Formula: Flow_{i,t} = TNA_{i,t} - TNA_{i,t-1} * (1 + R_{i,t})
 # where TNA = class_assets if available, else total_assets
@@ -37,8 +37,8 @@
 #   is_december       - TRUE for December obs (year-end distribution artifact)
 #   flow_calc_pct_win - flow_calc_pct winsorised at 1/99 pct (cut-offs from
 #                       non-December months), NA in December
-#   flow_lseg_pct     - LSEG fund_flow / tna_lag (for validation only)
-#   flow_lseg_pct_win - winsorised LSEG flow (for validation only)
+#   flow_lseg_pct     - Bloomberg fund_flow / tna_lag (for validation only)
+#   flow_lseg_pct_win - winsorised Bloomberg flow (for validation only)
 #
 # Reference: Sirri, E.R. & Tufano, P. (1998). Costly search and mutual fund
 #   flows. Journal of Finance, 53(5), 1589-1622.
@@ -101,7 +101,7 @@ compute_flows <- function(panel) {
     # cut-offs from non-December months only; December itself set to NA
     flow_calc_pct_win = if_else(is_december, NA_real_,
                                 winsorise(if_else(is_december, NA_real_, flow_calc_pct))),
-    # LSEG proportional flow on same TNA base (validation only)
+    # Bloomberg proportional flow on same TNA base (validation only)
     flow_lseg_pct     = if_else(
       !is.na(tna_lag) & tna_lag > 0 & !is.na(fund_flow),
       fund_flow / tna_lag,
@@ -131,16 +131,16 @@ n_switch <- panel_master %>% group_by(Ticker) %>% arrange(date) %>%
 cat("TNA source switches (panel_master, flow set to NA):", sum(n_switch$n), "\n")
 
 # =============================================================================
-# VALIDATION: compare calculated vs LSEG flows (panel_trimmed only)
+# VALIDATION: compare calculated vs Bloomberg flows (panel_trimmed only)
 #   Validation is informational - performed on panel_trimmed where
-#   LSEG flow coverage is highest.
+#   Bloomberg flow coverage is highest.
 # =============================================================================
 comparison <- panel_trimmed %>%
   filter(!is.na(flow_calc_pct_win) &
            !is.na(flow_lseg_pct_win) &
            !is_december)
 
-cat("\n--- VALIDATION: CALCULATED vs LSEG FLOWS (panel_trimmed) ---\n")
+cat("\n--- VALIDATION: CALCULATED vs Bloomberg FLOWS (panel_trimmed) ---\n")
 cat("Overlapping fund-months :", nrow(comparison), "\n")
 cat("Correlation             :",
     round(cor(comparison$flow_calc_pct_win,
@@ -173,11 +173,11 @@ comparison %>%
 # COVERAGE COMPARISON
 # =============================================================================
 cat("\n--- FLOW COVERAGE (panel_trimmed) ---\n")
-cat("fund-months with LSEG flow   :",
+cat("fund-months with Bloomberg flow   :",
     sum(!is.na(panel_trimmed$flow_lseg_pct_win)), "\n")
 cat("fund-months with calc. flow  :",
     sum(!is.na(panel_trimmed$flow_calc_pct_win)), "\n")
-cat("fund-months with LSEG only   :",
+cat("fund-months with Bloomberg only   :",
     sum(!is.na(panel_trimmed$flow_lseg_pct_win) &
           is.na(panel_trimmed$flow_calc_pct_win)), "\n")
 cat("fund-months with calc. only  :",

@@ -450,7 +450,7 @@ fn_primary <- paste0(
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
   "Performance segments $R^{\\\\text{LOW}}$, $R^{\\\\text{MID}}$, $R^{\\\\text{HIGH}}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
-  "gross returns. State variable in column (2) is $D^{\\\\text{MD,Det}}_t$ (= 1 if the ",
+  "net returns ending in $t-1$. State variable in column (2) is $D^{\\\\text{MD,Det}}_t$ (= 1 if the ",
   "residual of $\\\\log$(MD/MCAP) on a linear time trend is in the top 34\\\\%, ",
   "following Daniel-Klos-Pollet 2016 and Rapach-Ringgenberg-Zhou 2016); ",
   "column (3) is $D^{\\\\text{INV-PCR}}_t$ (= 1 in the bottom 34\\\\% of the CBOE ",

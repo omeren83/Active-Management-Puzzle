@@ -5,7 +5,7 @@
 #   - Fee quintiles formed every month within (date, ap_group), like Size and
 #     Momentum. v1.4 fixed them once on the whole-sample cross-section of
 #     funds, i.e. on a population that includes funds not yet alive. The
-#     expense ratio itself is still the static end-of-sample LSEG snapshot;
+#     expense ratio itself is still the static end-of-sample Bloomberg snapshot;
 #     the footnote now says so (a look-ahead proxy, disclosed).
 #   - Momentum signal built from net returns (ret_net, what investors observe;
 #     Carhart 1997 sorts on past net returns). Since data_import v1.4, gross
@@ -623,7 +623,7 @@ fn_d1 <- paste(
   "Quintile portfolios sorted monthly within group on $\\log(\\text{TNA}_{t-1})$",
   "(Size), cumulative 11-month net return ending $t-2$ skipping $t-1$",
   "(Momentum; \\citealt{JegadeeshTitman1993}; net returns), and annual Expense Ratio (Fee;",
-  "a static end-of-sample LSEG value, so the fee sort uses information not available in real time).",
+  "a static end-of-sample Bloomberg value, so the fee sort uses information not available in real time).",
   "EW: equal-weighted; VW: lagged-TNA-weighted. Returns in monthly \\%.",
   "EW Sharpe is the annualised Sharpe ratio of the quintile portfolio's",
   # Single \\ in the R string → single \ in the .tex file → correct LaTeX command.

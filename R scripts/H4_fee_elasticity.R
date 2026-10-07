@@ -491,7 +491,7 @@ fn_primary <- paste0(
   "for orthogonalised sentiment; column (3) substitutes the standardised ",
   "continuous index; column (4) substitutes the AAII bull-bear regime dummy. ",
   "ExpRatio is the fund's annual expense ratio in percent (1.0 = 1\\%), a static ",
-  "end-of-sample LSEG value. Lipper-",
+  "end-of-sample Bloomberg value. Lipper-",
   "category $\\\\times$ yearmo fixed effects absorb both sentiment main effects ",
   "($\\\\gamma$) and any style-month aggregate flow shocks; cross-fund expense-",
   "ratio variation within each (style, month) cell identifies $\\\\theta$ and ",

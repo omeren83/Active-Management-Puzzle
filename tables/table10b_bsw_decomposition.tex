@@ -1,4 +1,4 @@
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \sbox{\tabletempbox}{%
 \footnotesize
@@ -8,16 +8,16 @@
 \cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-6}
 $\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma$\\
 \midrule
-5\% & 13.1 & 1.7 & 2.0 & 11.1 & -0.2\\
-10\% & 19.7 & 2.9 & 3.9 & 15.8 & -1.0\\
-15\% & 23.6 & 4.2 & 5.9 & 17.8 & -1.6\\
-20\% & 28.9 & 5.8 & 7.8 & 21.1 & -2.0\\
-25\% & 33.3 & 7.5 & 9.8 & 23.5 & -2.3\\
-30\% & 37.3 & 9.5 & 11.7 & 25.6 & -2.2\\
-35\% & 40.2 & 10.3 & 13.7 & 26.6 & -3.3\\
-40\% & 42.8 & 11.8 & 15.6 & 27.2 & -3.8\\
-45\% & 44.6 & 12.8 & 17.6 & 27.0 & -4.7\\
-50\% & 47.2 & 14.0 & 19.5 & 27.7 & -5.5\\
+5\% & 5.9 & 3.6 & 2.2 & 3.8 & 1.4\\
+10\% & 10.1 & 6.1 & 4.4 & 5.7 & 1.8\\
+15\% & 14.1 & 8.8 & 6.5 & 7.5 & 2.2\\
+20\% & 16.1 & 11.4 & 8.7 & 7.4 & 2.7\\
+25\% & 18.8 & 13.4 & 10.9 & 7.9 & 2.6\\
+30\% & 21.9 & 15.4 & 13.1 & 8.8 & 2.4\\
+35\% & 24.5 & 17.2 & 15.2 & 9.3 & 2.0\\
+40\% & 27.6 & 19.4 & 17.4 & 10.2 & 2.0\\
+45\% & 30.6 & 21.1 & 19.6 & 11.0 & 1.5\\
+50\% & 33.1 & 23.4 & 21.8 & 11.3 & 1.6\\
 \bottomrule
 \end{tabular}%
 }
@@ -33,7 +33,8 @@ $\gamma$ & $S^-_\gamma$ & $S^+_\gamma$ & $F_\gamma$ & $T^-_\gamma$ & $T^+_\gamma
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Decomposition follows \textcite{BarrasScailletWermers2010}, Section~II.B and Table~III. $S^-_\gamma$ ($S^+_\gamma$): observed fraction of active funds with significantly negative (positive) Newey-West $t(\hat{\alpha})$ at two-sided significance level $\gamma$, using full-period \textcite{Carhart1997} four-factor alphas. Critical values are from the standard normal distribution, consistent with the large-sample approximation in \textcite{BarrasScailletWermers2010}. $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected proportion of false discoveries per tail arising from zero-alpha funds, where $\hat{\pi}_0 = 78.0\%$ is the \textcite{Storey2002} estimate at $\lambda = 0.5$ (see Table~\ref{tab:pi0_estimate}). $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled funds (significant negative alpha net of false discoveries). $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled funds (significant positive alpha net of false discoveries). The row at $\gamma = 0.20$ provides the population-level estimates $\hat{\pi}^-_A$ and $\hat{\pi}^+_A$ following \textcite{BarrasScailletWermers2010}, the canonical BSW significance level. Negative $T^+_\gamma$ entries indicate right-tail significance does not exceed the false-discovery rate at that threshold. The Storey estimator is conservative: it overestimates $\hat{\pi}_0$ when truly skilled funds exist, so $T^+_\gamma$ values are lower bounds. All quantities are percentages of the active-fund universe. Sample: $N = 1815$ actively managed funds, Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\_funds.xlsx; Passive and Unknown funds excluded.
+Decomposition follows \textcite{BarrasScailletWermers2010}, Section~II.B and Table~III. $S^-_\gamma$ ($S^+_\gamma$): observed fraction of active funds with significantly negative (positive) Newey-West $t(\hat{\alpha})$ at two-sided significance level $\gamma$, using full-period \textcite{Carhart1997} four-factor alphas and the same Student-$t$ $p$-values as $\hat{\pi}_0$. $F_\gamma = \hat{\pi}_0 \cdot \gamma/2$: expected proportion of false discoveries per tail arising from zero-alpha funds, where $\hat{\pi}_0 = 87.1\%$ is the \textcite{Storey2002} estimate at $\lambda = 0.5$ (see Table~\ref{tab:pi0_estimate}). $T^-_\gamma = S^-_\gamma - F_\gamma$: genuinely unskilled funds (significant negative alpha net of false discoveries). $T^+_\gamma = S^+_\gamma - F_\gamma$: genuinely skilled funds (significant positive alpha net of false discoveries). The row at $\gamma^* = 0.45$ gives the population estimates $\hat{\pi}^-_A$ and $\hat{\pi}^+_A$ (\citealt{BarrasScailletWermers2010}, eq.~8, who take them at a sufficiently high $\gamma^*$ and report that pre-set values of 0.35 or 0.45 match their MSE-based choice). Negative $T^+_\gamma$ entries indicate right-tail significance does not exceed the false-discovery rate at that threshold. The Storey estimator is conservative: it overestimates $\hat{\pi}_0$ when truly skilled funds exist, so $T^+_\gamma$ values are lower bounds. All quantities are percentages of the active-fund universe. Sample: $N = 1,800$ actively managed funds, Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\_funds.xlsx; Passive and Unknown funds excluded.
 \end{singlespace}
 \end{minipage}
 \end{table}
+

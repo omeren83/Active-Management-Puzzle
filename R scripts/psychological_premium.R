@@ -31,8 +31,8 @@
 #
 # v1.1 changes (May 2026):
 #   - Footnote expanded with alpha-basis-points conversion paragraph for
-#     Table 23. Calibration: EW Carhart alpha Q5-Q1 spread of 2.150% p.a.
-#     across midpoint-to-midpoint rank distance 0.8 = 269 bps per rank-point.
+#     Table 23. Calibration: EW Carhart alpha Q5-Q1 momentum spread (MOM_SPREAD_PCT,
+#     2.120% p.a. after the Oct 2026 re-run) over rank distance 0.8 = 265 bps per rank-point.
 #     Worked example: MAX12 R_MID, low/high sentiment = 14 / 58 bps per SD.
 #     Sourced from Table 12 (Active EW, Momentum); see fn variable below.
 # =============================================================================
@@ -395,7 +395,9 @@ colnames(ppf_df) <- c("Lottery", "Segment",
 rownames(ppf_df) <- NULL
 
 # Worked bp example (MAX12, R_MID) computed from current estimates
-BPS_PER_RANK <- 269
+# EW Carhart Q5-Q1 momentum spread, Active (table_port_mom_alpha); update if re-run
+MOM_SPREAD_PCT <- 2.120
+BPS_PER_RANK   <- round(MOM_SPREAD_PCT / 0.8 * 100)   # 265
 mid_lo <- abs(sp_max12$MID$SP_low)
 mid_hi <- abs(sp_max12$MID$SP_high)
 bps_lo <- as.integer(round(mid_lo * BPS_PER_RANK))
@@ -416,18 +418,18 @@ fn <- paste0(
   "\\\\textit{Conversion to alpha basis points.} To express the premium ",
   "in welfare-relevant units, the rank-to-alpha mapping is calibrated ",
   "using the equal-weighted Carhart four-factor alpha spread between the ",
-  "top and bottom momentum quintiles of the Active panel (Table~12, ",
-  "$Q5-Q1=2.150\\\\%$ p.a.). With a midpoint-to-midpoint rank distance of ",
-  "$0.8$, this implies approximately 269 basis points of annual Carhart ",
+  "top and bottom momentum quintiles of the Active panel (Table~\\\\ref{tab:port_mom_alpha}, ",
+  sprintf("$Q5-Q1=%.3f\\\\%%$ p.a.). With a midpoint-to-midpoint rank distance of ", MOM_SPREAD_PCT),
+  sprintf("$0.8$, this implies approximately %d basis points of annual Carhart ", BPS_PER_RANK),
   "alpha per rank-point. Applying this conversion at the middle rank ",
   sprintf(paste0(
     "segment, the MAX12 premium is approximately %d basis points of annual ",
     "alpha per standard deviation at low-sentiment regimes ",
-    "($|\\\\text{SP}_{\\\\text{low}}|\\\\times 269\\\\approx %.3f\\\\times 269$) ",
+    "($|\\\\text{SP}_{\\\\text{low}}|\\\\times %d\\\\approx %.3f\\\\times %d$) ",
     "and approximately %d basis points per standard deviation at ",
     "high-sentiment regimes ",
-    "($|\\\\text{SP}_{\\\\text{high}}|\\\\times 269\\\\approx %.3f\\\\times 269$). "),
-    bps_lo, mid_lo, bps_hi, mid_hi),
+    "($|\\\\text{SP}_{\\\\text{high}}|\\\\times %d\\\\approx %.3f\\\\times %d$). "),
+    bps_lo, BPS_PER_RANK, mid_lo, BPS_PER_RANK, bps_hi, BPS_PER_RANK, mid_hi, BPS_PER_RANK),
   "The conversion uses Jegadeesh--Titman momentum sorts as the closest ",
   "available rank-alpha mapping in the dissertation; the ",
   "within-Lipper-category mapping that drives the H1--H4 panel ",

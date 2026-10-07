@@ -100,7 +100,7 @@
 #
 # Standalone script producing Appendix D.2 tables: parallels of main-text
 # Tables 5, 6, 7, 8 and 10 estimated separately within each of three
-# sub-periods identified by the Bai-Perron structural break test (Section D.1).
+# sub-periods identified by the Bai-Perron structural break test (Appendix: sub-period analysis).
 #
 # Sub-periods: three regimes split at the two break dates in SUBPERIOD_BREAKS,
 # chosen from structural_break_test.R output (breaktest_results.xlsx).
@@ -801,11 +801,12 @@ fn_d2 <- paste(
   "sub-period, following \\\\textcite{FamaFrench2010}.",
   "EW: equal-weighted; VW: lagged-TNA-weighted",
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
-  "Net = gross $-$ expense/12 \\\\parencite{Carhart1997, Wermers2000}.",
+  "Net returns are NAV-based (net of expenses); gross returns add back one-twelfth",
+  "of the annual expense ratio each month \\\\parencite{FamaFrench2010}.",
   "Newey-West $t$-stats (6-month lag) in parentheses;",
   "$^{*}$, $^{**}$, $^{***}$: 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds; $T$: months in the regression.",
-  "Sub-period thresholds (Jan 2006, Oct 2011) from Bai-Perron test (Section D.1).",
+  "Sub-period boundaries are two of the Bai-Perron break dates (Appendix~\\\\ref{app:subperiod}).",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 

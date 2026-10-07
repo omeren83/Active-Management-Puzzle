@@ -23,7 +23,7 @@
 #
 # v1.4 changes (pipeline audit, Oct 2026):
 #   - Section 6 rolling stats (12m return for the performance rank, 36m vol,
-#     36m skew, 12m MAX) now use ret_net_raw. The LSEG index is net of fees
+#     36m skew, 12m MAX) now use ret_net_raw. The Bloomberg index is net of fees
 #     (data_import_and_cleaning.R v1.4), so ret_net_raw is the return investors
 #     observe and chase. Values match v1.3, whose gross column was this same
 #     index return (apart from months removed by the new data-error screen).
@@ -332,7 +332,7 @@ panel <- panel %>%
   ungroup()
 
 # --- 12. Merge behavioral state variables by year-month ---------------------
-# Panel dates are LSEG trading-calendar EOM (e.g., 1994-12-30 = Friday).
+# Panel dates are Bloomberg trading-calendar EOM (e.g., 1994-12-30 = Friday).
 # behavioral_state_vars dates are calendar EOM (e.g., 1994-12-31 = Saturday).
 # Joining on raw date drops ~30% of fund-months for months whose calendar EOM
 # falls on a weekend. Joining on (year, month) avoids the issue entirely:

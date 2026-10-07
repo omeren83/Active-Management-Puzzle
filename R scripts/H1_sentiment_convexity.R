@@ -375,7 +375,7 @@ fn_primary <- paste0(
   "fund flow (decimal). $t$-statistics in parentheses below each coefficient. ",
   "Performance segments $R^{\\\\text{LOW}}$, $R^{\\\\text{MID}}$, $R^{\\\\text{HIGH}}$ are constructed from ",
   "the lagged within-Lipper-category fractional rank of cumulative 12-month ",
-  "gross returns (Equations 6--8 of the proposal). Sentiment in column (2) is ",
+  "net returns ending in $t-1$. Sentiment in column (2) is ",
   "the regime dummy $D^{\\\\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised ",
   "sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler ",
   "2007); column (3) is the standardised Baker-Wurgler orthogonalised ",

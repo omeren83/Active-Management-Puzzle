@@ -2,7 +2,7 @@
 # FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.4
 #
 # v1.4 changes vs v1.3 (pipeline audit, Oct 2026):
-#   - RETURN INDEX IS NET OF FEES. The LSEG total-return index (sheet
+#   - RETURN INDEX IS NET OF FEES. The Bloomberg total-return index (sheet
 #     "gross_return") is NAV-based and therefore net of the expense ratio.
 #     Verified against published calendar-year NAV returns (MTCBX, TEMTX,
 #     HSLAX, 2021-2025: 15 of 15 fund-years agree to rounding). Step 9 now
@@ -67,7 +67,7 @@
 #     serial numbers, mirroring parse_col_dates. Prevents silent NA-coercion
 #     of valid dates after a locale or Excel reformat (Issue A.3).
 #   - Net-return approximation comment rewritten: BSW (2010) observe net
-#     directly from CRSP and DERIVE gross by adding back ER/12. The LSEG
+#     directly from CRSP and DERIVE gross by adding back ER/12. The Bloomberg
 #     pipeline observes gross only and DERIVES net by subtracting ER/12.
 #     The arithmetic wedge is identical; the direction is reversed. The
 #     convention itself goes back to Carhart (1997) and Wermers (2000)
@@ -82,7 +82,7 @@
 #     workbook contents. The Pure Style Rydex retention list (RYAVX, RYZAX,
 #     RYAZX, RYWAX, RYAWX) is now a no-op since no PASSIVE_INDEX flag exists
 #     to override; those funds pass through to the active/passive panel and
-#     are classified by their LSEG ap_group label.
+#     are classified by their Bloomberg ap_group label.
 #
 # Produces three panels:
 #   panel_master      - no incubation correction, no date trimming
@@ -97,7 +97,7 @@
 # Entire-Analysis exclusion is already applied at source.
 #
 # Cleaning applied to all panels:
-#   (1) Frozen tail removal - drops LSEG forward-filled post-closure obs
+#   (1) Frozen tail removal - drops Bloomberg forward-filled post-closure obs
 #   (2) Empty fund exclusion - drops funds with zero valid return obs
 #   (3) Evans (2010) incubation bias correction
 #   (4) Return data-error screen (v1.4; replaces pooled winsorisation)
@@ -147,7 +147,7 @@ parse_col_dates <- function(x) {
 
 # =============================================================================
 # HELPER 2: parse a single Inception_Date value
-#   Handles Excel serial numbers, ISO strings, and LSEG error markers.
+#   Handles Excel serial numbers, ISO strings, and Bloomberg error markers.
 #   Falls back gracefully if Excel reformats inception dates as text.
 # =============================================================================
 parse_inception_date <- function(x) {
@@ -241,7 +241,7 @@ cat("Macro panel:", nrow(macro_panel), "months |",
 
 # =============================================================================
 # 4. FROZEN TAIL REMOVAL (gross_return as master signal)
-#    Drops terminal blocks of repeated values - LSEG forward-fills closed
+#    Drops terminal blocks of repeated values - Bloomberg forward-fills closed
 #    funds. Only removes repeats AFTER the last genuine price movement,
 #    so legitimate mid-life identical consecutive returns are preserved.
 #
@@ -251,7 +251,7 @@ cat("Macro panel:", nrow(macro_panel), "months |",
 #    repeated value.
 #
 #    Known limitation: funds dying within 2 months of the data pull date
-#    may retain 1-2 carried obs (LSEG carry truncated before reaching the
+#    may retain 1-2 carried obs (Bloomberg carry truncated before reaching the
 #    threshold).
 # =============================================================================
 gross_clean <- fund_panel %>%
@@ -368,7 +368,7 @@ print(table(panel_trimmed$ap_group, useNA = "always"))
 #     [Defensive name-pattern net; load-bearing as of v1.3]
 #
 #     Background: daily-reset leveraged mutual funds (Rydex, ProFunds,
-#     Direxion) are classified as passive by LSEG (Actively_Managed_New = N)
+#     Direxion) are classified as passive by Bloomberg (Actively_Managed_New = N)
 #     because they mechanically track an index. However, they use equity swaps
 #     or futures to deliver a constant daily leverage multiple, resulting in
 #     annual turnover of 200-4000% and severe volatility decay over multi-year
@@ -401,13 +401,13 @@ LEVERAGED_KEYWORDS <- paste(
 
 # Note: ACTIVE_MISLABELLED and PURE_STYLE_RETAIN constants removed in v1.2.
 # As of v1.3, with PASSIVE_INDEX retired from flagged_funds.xlsx:
-#   - MOJAX, GENDX (LSEG-flagged "Active" but functionally pure index trackers)
+#   - MOJAX, GENDX (Bloomberg-flagged "Active" but functionally pure index trackers)
 #     are no longer in any exclusion sheet. They pass through to the analysis
-#     panel classified by their LSEG ap_group label. Their downstream effect
+#     panel classified by their Bloomberg ap_group label. Their downstream effect
 #     is small (low fund count, low TNA share) and falls within the noise
-#     of LSEG classification accuracy.
+#     of Bloomberg classification accuracy.
 #   - RYAVX/RYZAX/RYAZX/RYWAX/RYAWX (Pure Style Rydex passives) similarly
-#     pass through, classified ap_group == "Passive" by LSEG, and contribute
+#     pass through, classified ap_group == "Passive" by Bloomberg, and contribute
 #     to the passive cohort in descriptive and aggregate tables.
 # The user-curated workbook continues to govern Step 8c; the v1.2 inline
 # retention logic remains superseded.
@@ -415,7 +415,7 @@ LEVERAGED_KEYWORDS <- paste(
 # v1.4: Bloomberg truncates fund names ("ULTRSCTR PRFND", "PROFND", "US PF-INV"),
 # so the patterns above miss several UltraSector ProFunds. These abbreviations, plus
 # "leveraged", are unambiguous and are applied to ALL ap_groups (one ProFund,
-# IDPIX, is labelled Active by LSEG). "ultra" stays Passive-only because
+# IDPIX, is labelled Active by Bloomberg). "ultra" stays Passive-only because
 # genuine active funds use it (e.g. American Century Ultra, Wasatch Ultra Growth).
 LEVERAGED_ANY_GROUP <- "prfnd|prfund|profnd|profund|pf-inv|leveraged"
 
@@ -456,7 +456,7 @@ cat("  Removed             :", n_pass_before - n_pass_after, "\n")
 #       (i)  Exclude from Entire Analysis  (125 funds, v1.3): dropped at
 #            source. Covers GLOBAL_MANDATE / EM_MANDATE (non-US), LONG_SHORT,
 #            MARKET_NEUTRAL, BEAR_MARKET (violate the long-only assumption),
-#            and DATA_ERROR (the two confirmed LSEG errors QWVOX, VALLCEN).
+#            and DATA_ERROR (the two confirmed Bloomberg errors QWVOX, VALLCEN).
 #            v1.3 note: PASSIVE_INDEX (313 funds, formerly the bulk of this
 #            tier) has been retired; passive index funds now survive Step 8c
 #            and appear in descriptive, aggregate, and portfolio-sort
@@ -575,7 +575,7 @@ cat(sprintf("    excluded_h3   = TRUE : %d funds\n",
 
 # =============================================================================
 # 9. MONTHLY RETURNS FROM THE TOTAL-RETURN INDEX
-#    gross_return is the LSEG total-return index LEVEL. Despite the sheet name,
+#    gross_return is the Bloomberg total-return index LEVEL. Despite the sheet name,
 #    it is NAV-based and therefore NET of the expense ratio (v1.4; verified
 #    against published calendar-year NAV returns of MTCBX, TEMTX and HSLAX,
 #    2021-2025, 15 of 15 fund-years agree to rounding). The "net_return" sheet
@@ -623,7 +623,7 @@ cat("\nMonthly returns computed for all panels (index = net of fees).\n")
 #                            cannot double or halve relative to the median fund
 #       Rule B (final month): |log ratio| > 0.30 in the LAST month of a fund
 #                            that stops reporting before the data end -
-#                            liquidation/merger prints in the LSEG index
+#                            liquidation/merger prints in the Bloomberg index
 #
 #     Flags are computed once on panel_master (full fund histories, so "final
 #     month" is the true last month) and applied to all panels. Flagged months

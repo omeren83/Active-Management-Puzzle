@@ -616,10 +616,9 @@ fn_t8 <- paste(
   "$t$-statistics (6-month lag): $^{*}$, $^{**}$, $^{***}$ denote 10\\%, 5\\%,",
   "1\\% significance. $N$: unique funds contributing to the cell's portfolio",
   "series; $T$: number of monthly observations in the regression. Cells with",
-  "fewer than 3 funds are suppressed. Gross returns are preferred here over",
-  "net returns because the static annual expense ratio used to derive net",
-  "returns introduces a class-specific approximation error that would",
-  "contaminate the style-class breakdown.",
+  "fewer than 3 funds are suppressed. Gross returns are reported because",
+  "gross alpha measures managerial skill before fees; fee levels differ",
+  "systematically across style classes and would otherwise confound the comparison.",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\_funds.xlsx."
 )
 

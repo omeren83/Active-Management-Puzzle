@@ -294,7 +294,7 @@ latex_t1 <- counts_raw %>%
   footnote(
     general = paste(
       "Active and Passive classifications use the \\\\textit{Actively Managed}",
-      "field from LSEG static data. Unknown funds are excluded from all",
+      "field from Bloomberg static data. Unknown funds are excluded from all",
       "regression analyses. The Incubation-Corrected panel removes the first",
       "36 months of each fund's return history following \\\\textcite{Evans2010}.",
       "The Trimmed panel additionally restricts the sample to 1995--2023.",
@@ -302,10 +302,10 @@ latex_t1 <- counts_raw %>%
       "exclusions documented in Section~\\\\ref{sec:panel_construction}",
       "(long/short, market-neutral, bear-market or inverse strategies,",
       "non-U.S.\\\\ mandate, and confirmed data-error funds tagged in",
-      "flagged\\\\_funds.xlsx as Entire-Analysis exclusions): 110, 84,",
-      "and 80 share classes are dropped from the Master,",
+      "flagged\\\\_funds.xlsx as Entire-Analysis exclusions, the latter now including six funds with a non-standard expense structure): 115, 88,",
+      "and 85 share classes are dropped from the Master,",
       "Incubation-Corrected, and Trimmed panels respectively, yielding",
-      "analytical samples of 3,581 / 3,138 / 3,046. Per-hypothesis sample",
+      "analytical samples of 3,562 / 3,120 / 3,028. Per-hypothesis sample",
       "sizes (further restricted by the Perf-Comparison and H3 flag columns)",
       "are reported in each subsequent table."
     ),
@@ -385,7 +385,7 @@ build_t2 <- function(panel, panel_label) {
   fm <- fund_means(panel)
   # Winsorise turnover cross-sectionally at 1/99 pct before computing stats.
   # Raw turnover is a point-in-time static field and contains extreme outliers
-  # (ETF creation/redemption events, LSEG classification contamination) that
+  # (ETF creation/redemption events, Bloomberg classification contamination) that
   # inflate the mean and SD without reflecting genuine active trading activity.
   fm <- fm %>% mutate(turnover_r = winsorise(turnover_r))
   vars <- c("gross_ret", "net_ret", "log_tna",
@@ -433,7 +433,7 @@ fn_t2_base <- paste(
   "Fund-level time-series means are computed first; cross-sectional statistics",
   "are then computed across fund-level means. $N$ is the number of funds with at",
   "least one valid observation.",
-  "Expense Ratio and Turnover are point-in-time LSEG static values; Turnover is",
+  "Expense Ratio and Turnover are point-in-time Bloomberg static values; Turnover is",
   "winsorised at the 1st/99th percentiles cross-sectionally.",
   "Flow is the \\\\textcite{SirriTufano1998} measure scaled by lagged TNA (\\\\%),",
   "winsorised at 1st/99th percentiles, with December excluded.",
