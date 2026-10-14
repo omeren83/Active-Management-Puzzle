@@ -8,6 +8,8 @@
 #   - style_flow_lag, ActR2_lag and the sentiment *_lag variables are lagged
 #     by calendar month instead of by row, so the first post-incubation month
 #     is no longer lost to NA lags.
+#   - JLN macro uncertainty columns (JLN_UNC_*, D_UNC*) carried into
+#     panel_reg when present in behavioral_state_vars (jury request).
 #   - (final audit) Funds with a missing Inception_Date get age from their
 #     first observed month (17 active funds previously had log_Age = NA and
 #     silently left H1-H4).
@@ -434,6 +436,9 @@ panel_reg <- panel %>%
     D_SENT, D_PLS, D_VIX, D_SKEW, D_PCR,
     D_MD, D_MD_LEVEL, D_MD_DETREND,
     D_AAII, D_UMCSENT,
+    # JLN macro uncertainty (uncertainty_robustness.R only; absent -> skipped)
+    across(any_of(c("JLN_UNC_1M", "JLN_UNC_3M", "JLN_UNC_12M",
+                    "D_UNC1", "D_UNC3", "D_UNC12"))),
     # v1.3: flagged_funds.xlsx Step 8c flags carried through so that
     # H3-channel scripts can apply filter(!excluded_h3).
     excluded_perf, excluded_h3

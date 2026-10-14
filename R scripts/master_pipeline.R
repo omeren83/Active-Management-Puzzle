@@ -9,6 +9,7 @@
 #   - activeness_proxy_diagnostic.R skipped (with a note) when
 #     panel_incubation is not in the session.
 #   - All phases switched on for the Batch 4 full rerun.
+#   - Phase J runs uncertainty_robustness.R (JLN horse race, jury request).
 #   - (final audit) FORCE_PANEL_SETUP requires Phase A; the RDS-reuse branch
 #     drops any in-session panel_reg; warning when A is on and E is off.
 #
@@ -272,7 +273,8 @@ SCRIPT_INTEGRITY <- c(
   "H3_lottery_demand.R"           = "H3_lottery_demand",
   "H4_fee_elasticity.R"           = "H4_fee_elasticity",
   "psychological_premium.R"       = "psychological_premium",
-  "activeness_proxy_diagnostic.R" = "activeness_proxy_diagnostic"
+  "activeness_proxy_diagnostic.R" = "activeness_proxy_diagnostic",
+  "uncertainty_robustness.R"      = "uncertainty_robustness"
 )
 
 verify_pipeline_integrity <- function(scripts_dir = SCRIPTS_DIR,
@@ -506,6 +508,7 @@ if (RUN_PHASE_J_PANEL_REG) {
   run_script("H4_fee_elasticity.R",           "Phase J")
   run_script("panel_regressions_reporting.R", "Phase J")
   run_script("psychological_premium.R",       "Phase J")
+  run_script("uncertainty_robustness.R",      "Phase J")
 }
 
 

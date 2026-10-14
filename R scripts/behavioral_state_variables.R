@@ -1,5 +1,13 @@
-# behavioral_state_variables.R                                            v1.2
+# behavioral_state_variables.R                                            v1.3
 # =============================================================================
+# v1.3 changes (Oct 2026, jury request):
+#   - Macroeconomic uncertainty of Jurado, Ludvigson & Ng (2015, AER):
+#     JLN_UNC_1M / _3M / _12M (FRED JLNUM1M / JLNUM3M / JLNUM12M, rows 15-17
+#     of the sentiment sheet; provenance in data/R import/JLN_uncertainty/).
+#     Regime dummies D_UNC1 / D_UNC3 / D_UNC12 (top 34%, as the other states).
+#     Used only by uncertainty_robustness.R; H1-H4 are unchanged.
+#   - Sheet read with .name_repair = "minimal" (silences 376 "New names" lines).
+#
 # v1.2 changes (Family E pre-defense audit):
 #   - No code changes. This script builds the time-series of behavioral
 #     state variables (sentiment, VIX, SKEW, PCR, AAII, UMCSENT, margin
@@ -42,7 +50,8 @@ REGIME_PERCENTILE <- 0.66
 EXPECTED_SERIES <- c(
   "SENT_ORTH","PLS_SENT","VIX","SKEW","PUT_CALL_RATIO",
   "VOL_NYSE","VOL_AMEX","VOL_TOTAL","MARGIN_DEBT","TOTAL_MCAP",
-  "AAII_BULL","AAII_BEAR","UMCSENT"
+  "AAII_BULL","AAII_BEAR","UMCSENT",
+  "JLN_UNC_1M","JLN_UNC_3M","JLN_UNC_12M"
 )
 
 # --- 1. Load sheet -----------------------------------------------------------
@@ -63,7 +72,8 @@ if (actual_sheet != INPUT_SHEET) {
 
 raw <- suppressWarnings(read_excel(
   INPUT_FILE, sheet = actual_sheet, col_names = FALSE,
-  na = c("", "NA", "#N/A N/A", "#N/A Field Not Applicable")
+  na = c("", "NA", "#N/A N/A", "#N/A Field Not Applicable"),
+  .name_repair = "minimal"
 ))
 
 # Header row parsing (LSEG wide-by-row)
@@ -170,13 +180,18 @@ panel <- panel %>%
     D_MD_LEVEL   = make_dummy(MD_RATIO),    # NEW: level spec
     D_MD_DETREND = make_dummy(MD_DETREND),  # NEW: detrended (DKP/RRZ)
     D_AAII       = make_dummy(AAII_BB),
-    D_UMCSENT    = make_dummy(UMCSENT)
+    D_UMCSENT    = make_dummy(UMCSENT),
+    # JLN macro uncertainty regimes (NA-safe if the rows are absent)
+    D_UNC1       = if ("JLN_UNC_1M"  %in% names(.)) make_dummy(JLN_UNC_1M)  else NA_integer_,
+    D_UNC3       = if ("JLN_UNC_3M"  %in% names(.)) make_dummy(JLN_UNC_3M)  else NA_integer_,
+    D_UNC12      = if ("JLN_UNC_12M" %in% names(.)) make_dummy(JLN_UNC_12M) else NA_integer_
   )
 
 # --- 5. Print thresholds -----------------------------------------------------
 cat("\nRegime thresholds (66th pctile of in-sample distribution):\n")
 thr_vars <- c("SENT_ORTH","PLS_SENT","VIX","SKEW","PUT_CALL_RATIO",
-              "DMD_YOY","MD_RATIO","MD_DETREND","AAII_BB","UMCSENT")
+              "DMD_YOY","MD_RATIO","MD_DETREND","AAII_BB","UMCSENT",
+              "JLN_UNC_1M","JLN_UNC_3M","JLN_UNC_12M")
 thr_vars <- intersect(thr_vars, names(panel))
 thr_tbl <- sapply(thr_vars, function(v)
   quantile(panel[[v]], REGIME_PERCENTILE, na.rm = TRUE, names = FALSE))
@@ -189,9 +204,10 @@ ordered <- c(
   "VOL_NYSE","VOL_AMEX","VOL_TOTAL",
   "MARGIN_DEBT","TOTAL_MCAP","MD_RATIO","DMD_YOY","MD_DETREND",
   "AAII_BULL","AAII_BEAR","AAII_BB","UMCSENT",
+  "JLN_UNC_1M","JLN_UNC_3M","JLN_UNC_12M",
   "D_SENT","D_PLS","D_VIX","D_SKEW","D_PCR",
   "D_MD","D_MD_LEVEL","D_MD_DETREND",
-  "D_AAII","D_UMCSENT"
+  "D_AAII","D_UMCSENT","D_UNC1","D_UNC3","D_UNC12"
 )
 panel <- panel[, intersect(ordered, names(panel))]
 
