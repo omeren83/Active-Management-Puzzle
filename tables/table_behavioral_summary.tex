@@ -3,28 +3,28 @@
 \caption{\label{tab:behavioral_summary}Behavioral Hypotheses --- Summary of Primary-Spec Test Statistics}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
-\begin{tabular}[t]{llllrl}
+\begin{tabular}[t]{llllrll}
 \toprule
-Hypothesis & State proxy & Joint $\chi^2$ & Headline $z$ (1-sided $p$) & $N$ & Decision\\
+Hypothesis & State proxy & Joint $\chi^2$ & Headline $z$ ($p$, predicted sign) & $N$ & Joint test & Headline direction\\
 \midrule
-H1: Sent.-Convexity & $D^{\text{SENT}}$ & 7.73 (df=3, p=0.052) & -1.04 (p=0.851) & 303,471 & Reject (asym -)\\
-H1: Sent.-Convexity & $\text{SENT}^\perp$ & 11.93 (df=3, p=0.008) & -0.04 (p=0.518) & 303,471 & Reject (asym -)\\
-H1: Sent.-Convexity & $D^{\text{AAII}}$ & 12.55 (df=3, p=0.006) & +1.67 (p=0.048) & 303,471 & Reject (asym +)\\
-H2: Disp./IoC & $D^{\text{MD,Det}}$ & 17.97 (df=3, p=$<\!0.001$) & +2.14 (p=0.984) & 303,471 & Reject (BP margin-call ($\delta_1$ > 0))\\
-H2: Disp./IoC & $D^{\text{INV-PCR}}$ & 2.37 (df=3, p=0.500) & -0.93 (p=0.175) & 201,105 & Fail to reject (Disposition ($\delta_1$ < 0))\\
-H2: Disp./IoC & Discriminant & 14.29 (df=3, p=0.003) & +1.83 (p=0.966) & 303,471 & Reject (BP margin-call ($\delta_1$ > 0))\\
-H3: Lottery & ActR2 & 1.31 (df=2, p=0.518) & -0.29 (p=0.616) & 258,944 & Fail to reject (lottery amp -)\\
-H3: Lottery & ActSkew & 2.54 (df=2, p=0.281) & +0.99 (p=0.162) & 258,944 & Fail to reject (lottery amp +)\\
-H3: Lottery & MAX12 & 6.97 (df=2, p=0.031) & +1.98 (p=0.024) & 258,944 & Reject (lottery amp +)\\
-H4: Fee Elast. & $D^{\text{SENT}}$ & 3.53 (df=4, p=0.474) & -0.35 (p=0.636) & 302,410 & Fail to reject (fee amp -)\\
-H4: Fee Elast. & $\text{SENT}^\perp$ & 2.21 (df=4, p=0.698) & -0.43 (p=0.667) & 302,410 & Fail to reject (fee amp -)\\
-H4: Fee Elast. & $D^{\text{AAII}}$ & 3.36 (df=4, p=0.499) & +0.84 (p=0.201) & 302,410 & Fail to reject (fee amp +)\\
+H1: Sent.-Convexity & $D^{\text{SENT}}$ & 7.64 (df=3, p=0.054) & -0.89 (p=0.812) & 306,150 & Rejected & Not significant\\
+H1: Sent.-Convexity & $\text{SENT}^\perp$ & 11.54 (df=3, p=0.009) & +0.15 (p=0.440) & 306,150 & Rejected & Not significant\\
+H1: Sent.-Convexity & $D^{\text{AAII}}$ & 12.91 (df=3, p=0.005) & +1.91 (p=0.028) & 306,150 & Rejected & Steeper (asym.\ $+$)\\
+H2: Disp./IoC & $D^{\text{MD,Det}}$ & 17.34 (df=3, p=$<\!0.001$) & +2.09 (p=0.982) & 306,150 & Rejected & Margin-call ($\delta_1>0$)\\
+H2: Disp./IoC & $D^{\text{INV-PCR}}$ & 2.10 (df=3, p=0.551) & -0.93 (p=0.177) & 202,580 & Not rejected & Not significant\\
+H2: Disp./IoC & Discriminant & 13.67 (df=3, p=0.003) & +1.75 (p=0.960) & 306,150 & Rejected & Margin-call ($\delta_1>0$)\\
+H3: Lottery & ActR2 (rational-null control) & 1.34 (df=2, p=0.512) & -0.20 (p=0.578) & 261,329 & Not rejected & Not significant\\
+H3: Lottery & ActSkew & 2.37 (df=2, p=0.306) & +1.03 (p=0.152) & 261,329 & Not rejected & Not significant\\
+H3: Lottery & MAX12 & 6.84 (df=2, p=0.033) & +1.91 (p=0.028) & 261,329 & Rejected & Amplified ($\delta>0$)\\
+H4: Fee Elast. & $D^{\text{SENT}}$ & 3.86 (df=4, p=0.426) & -0.36 (p=0.640) & 305,079 & Not rejected & Not significant\\
+H4: Fee Elast. & $\text{SENT}^\perp$ & 2.94 (df=4, p=0.568) & -0.41 (p=0.657) & 305,079 & Not rejected & Not significant\\
+H4: Fee Elast. & $D^{\text{AAII}}$ & 3.02 (df=4, p=0.554) & +0.92 (p=0.178) & 305,079 & Not rejected & Not significant\\
 \bottomrule
 \end{tabular}
 
 }
 {\raggedright\noindent\footnotesize
 \begin{singlespace}
-Stars on individual coefficients are reported in the underlying tables. All specifications use the primary-spec aligned sample (contemporaneous state variables; fund FE for H1--H3; Lipper $\times$ yearmo FE for H4) with two-way clustering on Ticker and calendar month (Petersen 2009).
+Joint $\chi^2$: Wald test of the hypothesis's state-dependent terms, whose null is no state dependence: H1, the three rank-segment $\times$ state interactions; H2, the three rank-segment $\times$ margin-debt (or put--call) interactions, with the $D^{\text{SENT}}$ interactions as controls in the discriminant row; H3, the lottery measure and its interaction with $D^{\text{SENT}}$; H4, the four fee $\times$ sentiment terms. ``Joint test'' reports whether it is rejected at 10\%. A rejection shows that flows depend on the state; it does not by itself identify a psychological cause. Headline $z$: hypothesis-specific statistic (H1: $\delta_3-\delta_1$; H2: $\delta_1$; H3: lottery $\times$ $D^{\text{SENT}}$; H4: $\delta_F$) with its one-sided $p$-value in the behaviourally predicted direction. ``Headline direction'' names a direction only when the one-sided $p$-value in that direction is below 0.10 (for the opposite direction, $1-p$); otherwise ``Not significant''. For H2 the predicted sign is negative (disposition), and the opposite sign is the margin-call alternative of Brunnermeier and Pedersen (2009). The ActR2 row of H3 is a rational-null control: activeness is not a lottery feature. Each hypothesis is estimated on its own aligned sample (all regressors of its specifications non-missing), so $N$ differs across hypotheses; the H2 put--call rows use the shorter put--call ratio window. Primary specifications use contemporaneous state variables, fund FE for H1--H3 and Lipper $\times$ yearmo FE for H4, with two-way clustering on Ticker and calendar month (Petersen 2009). Coefficients are reported in the underlying tables.
 \end{singlespace}\par}
 \end{table}

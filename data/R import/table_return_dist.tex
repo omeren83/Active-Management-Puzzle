@@ -4,19 +4,19 @@
 \footnotesize
 \begin{tabular}[t]{llrrrrrrrrr}
 \toprule
-Panel & Group & $N$ & Mean & VW Mean & Median & SD & $P_{10}$ & $P_{90}$ & Skewness & Ex.\ Kurtosis\\
+Panel & Group & $N$ & Mean & VW Mean & Median & SD & $P_{10}$ & $P_{90}$ & Nonpar.\ Skew & Ex.\ Kurtosis\\
 \midrule
- & Active & 491,705 & 0.971 & 0.889 & 1.329 & 5.300 & -5.520 & 6.802 & -0.068 & 3.2452\\
+ & Active & 491,705 & 0.971 & 0.984 & 1.329 & 5.300 & -5.520 & 6.802 & -0.068 & 3.2452\\
 
-\multirow{-2}{*}{\raggedright\arraybackslash Master} & Passive & 58,303 & 0.903 & 1.012 & 1.361 & 5.097 & -5.663 & 6.573 & -0.090 & 2.8175\\
+\multirow{-2}{*}{\raggedright\arraybackslash Master} & Passive & 56,877 & 0.910 & 0.979 & 1.369 & 4.990 & -5.618 & 6.479 & -0.092 & 2.2617\\
 \cmidrule{1-11}
- & Active & 423,545 & 0.976 & 0.888 & 1.342 & 5.259 & -5.512 & 6.793 & -0.070 & 2.8971\\
+ & Active & 425,418 & 0.976 & 0.984 & 1.343 & 5.262 & -5.514 & 6.794 & -0.070 & 2.9023\\
 
-\multirow{-2}{*}{\raggedright\arraybackslash Incubation-Corrected} & Passive & 48,485 & 0.943 & 1.016 & 1.399 & 5.060 & -5.620 & 6.584 & -0.090 & 2.8456\\
+\multirow{-2}{*}{\raggedright\arraybackslash Incubation-Corrected} & Passive & 47,659 & 0.943 & 0.983 & 1.399 & 4.949 & -5.559 & 6.478 & -0.092 & 2.2754\\
 \cmidrule{1-11}
- & Active & 381,460 & 0.939 & 0.803 & 1.313 & 5.363 & -5.649 & 6.869 & -0.070 & 2.8667\\
+ & Active & 383,242 & 0.939 & 0.946 & 1.314 & 5.366 & -5.652 & 6.871 & -0.070 & 2.8716\\
 
-\multirow{-2}{*}{\raggedright\arraybackslash Trimmed (1995--2023)} & Passive & 43,106 & 0.887 & 0.881 & 1.347 & 5.187 & -5.806 & 6.732 & -0.089 & 2.8013\\
+\multirow{-2}{*}{\raggedright\arraybackslash Trimmed (1995--2023)} & Passive & 42,402 & 0.887 & 0.944 & 1.348 & 5.072 & -5.746 & 6.651 & -0.091 & 2.2318\\
 \bottomrule
 \end{tabular}%
 }
@@ -32,7 +32,7 @@ Panel & Group & $N$ & Mean & VW Mean & Median & SD & $P_{10}$ & $P_{90}$ & Skewn
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the lagged-TNA-weighted cross-sectional mean return, representing the return earned by a representative invested dollar. Skewness is Pearson's second coefficient: $(\bar{x}-\tilde{x})/s$. Excess kurtosis is the fourth standardised central moment minus 3. Unknown funds are excluded.
+Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the time-series average of the monthly lagged-TNA-weighted cross-sectional mean return, i.e.\ the average monthly return earned by a representative invested dollar. Nonpar.\ Skew is the nonparametric skew $(\bar{x}-\tilde{x})/s$ (mean minus median over the standard deviation; bounded by $\pm 1$), one third of Pearson's second skewness coefficient. It is not the third standardised moment. Excess kurtosis is the fourth standardised central moment minus 3. Unknown funds are excluded.
 \end{singlespace}
 \end{minipage}
 \end{table}

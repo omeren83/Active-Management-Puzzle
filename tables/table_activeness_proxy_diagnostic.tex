@@ -7,16 +7,16 @@
 \toprule
 Measure & Cov.\ (\%) & $\rho$ vs.\ ActR2 & Univ.\ $t$ (style FE) & Univ.\ $t$ (fund FE) & Horserace $t$ & $\alpha_{t+36}$-pred.\ $t$\\
 \midrule
-ActR2 & 92.1 & 1.000 & -0.16 & -0.90 & -0.40 & 2.56\\
-ActSkew & 98.9 & 0.099 & 4.77 & 2.33 & 4.09 & -1.49\\
-MAX12 & 99.7 & -0.062 & 3.71 & 4.70 & 2.19 & 0.15\\
-UpSkew & 88.3 & -0.050 & 1.70 & 1.63 & -0.15 & -1.69\\
+ActR2 & 92.1 & 1.000 & -0.22 & -0.60 & -0.46 & 2.80\\
+ActSkew & 98.6 & 0.101 & 5.15 & 2.62 & 4.48 & -1.36\\
+MAX12 & 99.7 & -0.067 & 3.40 & 4.53 & 1.74 & -0.00\\
+UpSkew & 98.9 & -0.049 & 1.88 & 1.89 & -0.07 & -1.77\\
 \bottomrule
 \end{tabular}
 
 }
 \end{table}
 \begin{singlespace}\footnotesize\noindent
-Aligned sample restricted to fund-month observations with all four measures and core controls non-NA. Two-way clustered standard errors on Ticker and calendar month. Coverage in column 2 reports the fraction of fund-months in panel\_reg with the measure non-NA (before alignment).\\ The ``winning'' proxy is identified by (i) high univariate $|t|$ under the FE structure that preserves its dominant variation source, (ii) survival in the horse race conditional on the others, and (iii) consistency with Amihud--Goyenko's (2013) future-alpha prediction. Future alpha: 36-month rolling Carhart alpha over months $t+1$ to $t+36$, which does not overlap the window used for the measures.
+Aligned sample restricted to fund-month observations with all four measures and core controls non-NA. Two-way clustered standard errors on Ticker and calendar month. Coverage in column 2 reports the fraction of H3-subsample, non-December fund-months with the measure non-NA (before alignment). All ActSkew, UpSkew (36-month windows) and MAX12 (12 months) are computed on full fund histories.\\ The ``winning'' proxy is identified by (i) high univariate $|t|$ under the FE structure that preserves its dominant variation source, (ii) survival in the horse race conditional on the others, and (iii) consistency with Amihud--Goyenko's (2013) future-alpha prediction. Future alpha: 36-month rolling Carhart alpha over months $t+1$ to $t+36$, which does not overlap the window used for the measures.
 \end{singlespace}
 

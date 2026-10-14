@@ -7,23 +7,23 @@
 \toprule
 Lottery & Segment & SP$_{\text{low}}$ [SE] & SP$_{\text{high}}$ [SE] & Diff [SE] & $p$ (1-sided)\\
 \midrule
-ActR2 & $R^{\text{LOW}}$ & 0.008 [0.010] & 0.014 [0.015] & 0.006 [0.014] & 0.684\\
-ActR2 & $R^{\text{MID}}$ & 0.022 [0.028] & 0.033 [0.033] & 0.011 [0.031] & 0.639\\
-ActR2 & $R^{\text{HIGH}}$ & 0.004 [0.005] & 0.006 [0.006] & 0.002 [0.005] & 0.648\\
+ActR2 & $R^{\text{LOW}}$ & 0.009 [0.010] & 0.014 [0.015] & 0.005 [0.014] & 0.645\\
+ActR2 & $R^{\text{MID}}$ & 0.024 [0.028] & 0.032 [0.033] & 0.008 [0.031] & 0.603\\
+ActR2 & $R^{\text{HIGH}}$ & 0.004 [0.005] & 0.006 [0.006] & 0.001 [0.005] & 0.608\\
 \midrule
-ActSkew & $R^{\text{LOW}}$ & -0.005 [0.010] & -0.028 [0.020] & -0.024 [0.022] & 0.140\\
-ActSkew & $R^{\text{MID}}$ & -0.013 [0.029] & -0.067 [0.045] & -0.054 [0.051] & 0.144\\
-ActSkew & $R^{\text{HIGH}}$ & -0.002 [0.005] & -0.013 [0.009] & -0.010 [0.010] & 0.151\\
+ActSkew & $R^{\text{LOW}}$ & -0.004 [0.010] & -0.028 [0.020] & -0.024 [0.022] & 0.137\\
+ActSkew & $R^{\text{MID}}$ & -0.010 [0.029] & -0.066 [0.045] & -0.056 [0.051] & 0.138\\
+ActSkew & $R^{\text{HIGH}}$ & -0.002 [0.005] & -0.012 [0.009] & -0.010 [0.010] & 0.146\\
 \midrule
-MAX12 & $R^{\text{LOW}}$ & -0.003 [0.010] & -0.056 [0.024] & -0.052 [0.024] & 0.016**\\
-MAX12 & $R^{\text{MID}}$ & -0.009 [0.027] & -0.133 [0.049] & -0.124 [0.053] & 0.009***\\
-MAX12 & $R^{\text{HIGH}}$ & -0.002 [0.005] & -0.025 [0.009] & -0.023 [0.010] & 0.011**\\
+MAX12 & $R^{\text{LOW}}$ & -0.004 [0.010] & -0.055 [0.024] & -0.051 [0.025] & 0.019**\\
+MAX12 & $R^{\text{MID}}$ & -0.011 [0.027] & -0.134 [0.049] & -0.122 [0.053] & 0.011**\\
+MAX12 & $R^{\text{HIGH}}$ & -0.002 [0.005] & -0.024 [0.009] & -0.022 [0.010] & 0.013**\\
 \bottomrule
 \end{tabular}
 
 }
 {\raggedright\noindent\footnotesize
 \begin{singlespace}
-Each row is computed from a separate joint regression of the form $\text{flow}=\beta_q R^q + \delta_q R^q D^{\text{SENT}} + \eta\,\text{AS}^z + \phi\,\text{AS}^z D^{\text{SENT}} + \text{controls} + \mu_i$, with $\text{AS}^z$ standardised within sample. Shadow Price units are rank points per standard deviation of the lottery measure. Standard errors via the delta method using the joint coefficient covariance from the underlying regression; clustered two-way on Ticker and yearmo. Stars refer to the 1-sided $p$: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. \smallskip \textit{Conversion to alpha basis points.} To express the premium in welfare-relevant units, the rank-to-alpha mapping is calibrated using the equal-weighted Carhart four-factor alpha spread between the top and bottom momentum quintiles of the Active panel (Table~\ref{tab:port_mom_alpha}, $Q5-Q1=2.120\%$ p.a.). With a midpoint-to-midpoint rank distance of $0.8$, this implies approximately 265 basis points of annual Carhart alpha per rank-point. Applying this conversion at the middle rank segment, the MAX12 premium is approximately 2 basis points of annual alpha per standard deviation at low-sentiment regimes ($|\text{SP}_{\text{low}}|\times 265\approx 0.009\times 265$) and approximately 35 basis points per standard deviation at high-sentiment regimes ($|\text{SP}_{\text{high}}|\times 265\approx 0.133\times 265$). The conversion uses Jegadeesh--Titman momentum sorts as the closest available rank-alpha mapping in the dissertation; the within-Lipper-category mapping that drives the H1--H4 panel regressions is conceptually similar but slightly attenuated, so the quoted basis-point figures should be read as orders of magnitude rather than precise estimates. \smallskip Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+Each row is computed from a separate joint regression of the form $\text{flow}=\beta_q R^q + \gamma D^{\text{SENT}} + \delta_q R^q D^{\text{SENT}} + \eta\,\text{AS}^z + \phi\,\text{AS}^z D^{\text{SENT}} + \text{controls} + \mu_i$ (fund fixed effects), with $\text{AS}^z$ standardised within sample. Shadow Price units are rank points per standard deviation of the lottery measure. Standard errors via the delta method using the joint coefficient covariance from the underlying regression; clustered two-way on Ticker and yearmo. The 1-sided $p$ tests Diff $<0$ (a larger premium under high sentiment); stars refer to it: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. \smallskip \textit{Conversion to alpha basis points.} To express the premium in welfare-relevant units, the rank-to-alpha mapping is calibrated using the equal-weighted Carhart four-factor alpha spread between the top and bottom momentum quintiles of the Active panel (Table~\ref{tab:port_mom_alpha}, $Q5-Q1=2.171\%$ p.a., $t=1.28$). With a midpoint-to-midpoint rank distance of $0.8$, this implies approximately 271 basis points of annual Carhart alpha per rank-point. Applying this conversion at the middle rank segment, the MAX12 premium is approximately 3 basis points of annual alpha per standard deviation at low-sentiment regimes ($|\text{SP}_{\text{low}}|\times 271\approx 0.011\times 271$) and approximately 36 basis points per standard deviation at high-sentiment regimes ($|\text{SP}_{\text{high}}|\times 271\approx 0.134\times 271$). The conversion uses Jegadeesh--Titman momentum sorts as the closest available rank-alpha mapping in the dissertation; the within-Lipper-category mapping that drives the H1--H4 panel regressions is conceptually similar but slightly attenuated, so the quoted basis-point figures should be read as orders of magnitude rather than precise estimates. The calibrating spread is itself not statistically significant, which reinforces this caution. \smallskip Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}\par}
 \end{table}
