@@ -1,4 +1,4 @@
-# uncertainty_robustness.R                                               v1.0
+# uncertainty_robustness.R                                               v1.1
 # =============================================================================
 # SENTIMENT OR UNCERTAINTY? Horse race between the behavioral state variables
 # of H1/H2 and the macroeconomic uncertainty index of Jurado, Ludvigson & Ng
@@ -26,6 +26,7 @@
 # Outputs (WORKING_DIR):
 #   table_unc_summary.tex   main text: joint tests with/without uncertainty
 #   table_unc_H1.tex        appendix: H1 coefficients (D_SENT, SENT_perp)
+#   table_unc_AAII.tex      appendix: H1 coefficients (D_AAII)
 #   table_unc_H2.tex        appendix: H2 coefficients (D_MD,Det)
 #   table_unc_horizons.tex  appendix: horizons h = 1, 3, 12
 #   uncertainty_robustness.rds
@@ -265,15 +266,19 @@ coef_table <- function(ids, caption, label, s_lbls) {
                                    format = "f", digits = 4)), collapse = " & "), " \\\\"))
   table_wrap(caption, label, paste0("l", strrep("c", length(mods))),
              c(hdr1, cmid, hdr2, "\\midrule", out, foot), paste0(
-    sprintf("Uncertainty horizon %s months. $S$: behavioral state variable; $U$: matched ", MAIN_H),
+    sprintf("Uncertainty horizon: %s month%s. $S$: behavioral state variable; $U$: matched ", MAIN_H, if (MAIN_H == "1") "" else "s"),
     "uncertainty measure ($D^{\\text{UNC}}$ for dummy states, standardised index for ",
     "the continuous sentiment index). $t$-statistics in parentheses; $^{*}$, $^{**}$, ",
-    "$^{***}$: significant at 10\\%, 5\\%, 1\\%. ", COMMON_NOTE), resize = TRUE)
+    "$^{***}$: significant at 10\\%, 5\\%, 1\\%. ", COMMON_NOTE), resize = length(ids) > 1)  # narrow tables keep natural size
 }
 writeLines(coef_table(c("H1_DSENT", "H1_SENT"),
                       "H1 With Macroeconomic Uncertainty: Coefficient Estimates", "unc_H1",
                       c("$D^{\\text{SENT}}$", "$\\text{SENT}^\\perp$")),
            file.path(WORKING_DIR, "table_unc_H1.tex"))
+writeLines(coef_table(c("H1_AAII"),
+                      "H1 (AAII) With Macroeconomic Uncertainty: Coefficient Estimates", "unc_AAII",
+                      c("$D^{\\text{AAII}}$")),
+           file.path(WORKING_DIR, "table_unc_AAII.tex"))
 writeLines(coef_table(c("H2_MD"),
                       "H2 With Macroeconomic Uncertainty: Coefficient Estimates", "unc_H2",
                       c("$D^{\\text{MD,Det}}$")),
@@ -281,7 +286,7 @@ writeLines(coef_table(c("H2_MD"),
 
 saveRDS(list(results = res, n = nrow(samp), main_h = MAIN_H),
         file.path(WORKING_DIR, "uncertainty_robustness.rds"))
-cat("Wrote table_unc_summary.tex, table_unc_horizons.tex, table_unc_H1.tex, table_unc_H2.tex\n")
+cat("Wrote table_unc_summary.tex, table_unc_horizons.tex, table_unc_H1.tex, table_unc_AAII.tex, table_unc_H2.tex\n")
 print(res %>% transmute(id, h, S_p_a = round(S_p_a, 3), S_p_c = round(S_p_c, 3),
                         U_p_c = round(U_p_c, 3), head_z_a = round(head_z_a, 2),
                         head_z_c = round(head_z_c, 2)), row.names = FALSE)

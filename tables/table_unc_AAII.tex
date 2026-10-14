@@ -1,0 +1,45 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{H1 (AAII) With Macroeconomic Uncertainty: Coefficient Estimates}
+\label{tab:unc_AAII}
+\begin{tabular}{lccc}
+\toprule
+ & \multicolumn{3}{c}{$S=$ $D^{\text{AAII}}$} \\
+\cmidrule(lr){2-4}
+ & $S$ & $U$ & $S$ and $U$ \\
+\midrule
+$R^{\text{LOW}}$ & 0.0413$^{***}$ & 0.0466$^{***}$ & 0.0478$^{***}$ \\
+ & (11.43) & (11.00) & (10.92) \\[2pt]
+$R^{\text{MID}}$ & 0.0144$^{***}$ & 0.0157$^{***}$ & 0.0146$^{***}$ \\
+ & (15.58) & (15.72) & (13.89) \\[2pt]
+$R^{\text{HIGH}}$ & 0.0825$^{***}$ & 0.0904$^{***}$ & 0.0865$^{***}$ \\
+ & (14.82) & (13.77) & (12.65) \\[2pt]
+$S$ & $-$0.0007 &  & $-$0.0004 \\
+ & ($-$0.44) &  & ($-$0.29) \\[2pt]
+$R^{\text{LOW}}\times S$ & $-$0.0040 &  & $-$0.0049 \\
+ & ($-$0.56) &  & ($-$0.72) \\[2pt]
+$R^{\text{MID}}\times S$ & 0.0043$^{**}$ &  & 0.0043$^{**}$ \\
+ & (2.53) &  & (2.52) \\[2pt]
+$R^{\text{HIGH}}\times S$ & 0.0163$^{*}$ &  & 0.0157$^{*}$ \\
+ & (1.79) &  & (1.72) \\[2pt]
+$U$ &  & 0.0039$^{***}$ & 0.0038$^{**}$ \\
+ &  & (2.59) & (2.57) \\[2pt]
+$R^{\text{LOW}}\times U$ &  & $-$0.0155$^{**}$ & $-$0.0157$^{***}$ \\
+ &  & ($-$2.56) & ($-$2.60) \\[2pt]
+$R^{\text{MID}}\times U$ &  & $-$0.0008 & $-$0.0006 \\
+ &  & ($-$0.46) & ($-$0.36) \\[2pt]
+$R^{\text{HIGH}}\times U$ &  & $-$0.0108 & $-$0.0101 \\
+ &  & ($-$1.20) & ($-$1.13) \\[2pt]
+\midrule
+Controls & Yes & Yes & Yes \\
+Fund FE & Yes & Yes & Yes \\
+$N$ & 307,610 & 307,610 & 307,610 \\
+Within $R^2$ & 0.0382 & 0.0382 & 0.0384 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Uncertainty horizon: 1 month. $S$: behavioral state variable; $U$: matched uncertainty measure ($D^{\text{UNC}}$ for dummy states, standardised index for the continuous sentiment index). $t$-statistics in parentheses; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. Sample: active funds, \textcite{Evans2010}-corrected panel, December excluded, lagged TNA of at least USD 5 million; one common sample of 307,617 fund-months (1,895 funds, 307 months) in which all state variables and all uncertainty horizons are available. Uncertainty: \textcite{JuradoLudvigsonNg2015} macroeconomic uncertainty (FRED JLNUM1M, JLNUM3M, JLNUM12M); $D^{\text{UNC}}$ is 1 when the index is in its top 34\%, and the continuous index is standardised within the sample. Specification as the H1/H2 primary tables: contemporaneous states, fund fixed effects, controls as in Table~\ref{tab:H1_regression}, standard errors two-way clustered on fund and calendar month.
+\end{singlespace}
+
