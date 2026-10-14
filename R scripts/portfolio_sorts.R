@@ -705,6 +705,9 @@ d2_table <- bind_rows(make_d2_rows("Active"), make_d2_rows("Passive"))
 fn_d2 <- paste(
   "Monthly EW and VW aggregate portfolio returns regressed on CAPM,",
   "Fama-French three-factor, and \\\\textcite{Carhart1997} four-factor models.",
+  "Net returns are the funds' NAV-based total returns (net of expenses);",
+  "gross returns add back one-twelfth of the static annual expense ratio each",
+  "month, following \\\\textcite{FamaFrench2010}.",
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",
   "Newey-West $t$-statistics (6-month lag) in parentheses.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\% respectively.",
@@ -873,7 +876,9 @@ fn_base <- paste(
   "the risk-free rate is omitted from the spread return because it",
   "cancels in the self-financing construction:",
   "$(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$.",
-  "EW: equal-weighted; VW: lagged-TNA-weighted.",
+  "EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds'",
+  "NAV-based total returns (net of expenses); gross returns add back one-twelfth",
+  "of the static annual expense ratio each month, following \\textcite{FamaFrench2010}.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient.",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\% respectively.",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap;",
@@ -890,8 +895,8 @@ fn_d4 <- paste(fn_base,
 fn_d5 <- paste(fn_base,
                "Fee sorted monthly within group on the static (end-of-sample) annual",
                "Expense Ratio; Q1 = lowest fee.",
-               "Leveraged and derivative-based passive funds excluded prior to sorting",
-               "(see Cleaning Step 6 in the data construction notes).")
+               "Leveraged and inverse index products are excluded before sorting",
+               "(Step 8b of the data construction).")
 
 s_d3 <- build_alpha_table(alpha_size, "Size",
                           "Alpha and Factor Loadings by Size Quintile (\\%, Annualised)",
@@ -912,4 +917,4 @@ cat("Written: table_port_size_alpha.tex\n")
 cat("Written: table_port_mom_alpha.tex\n")
 cat("Written: table_port_fee_alpha.tex\n")
 
-cat("\n[SUCCESS] portfolio_sorts.R v1.4 complete.\n")
+cat("\n[SUCCESS] portfolio_sorts.R v1.5 complete.\n")

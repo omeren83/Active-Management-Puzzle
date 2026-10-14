@@ -1,8 +1,16 @@
 # =============================================================================
-# MASTER PIPELINE ORCHESTRATOR                                             v1.6
+# MASTER PIPELINE ORCHESTRATOR                                             v1.7
 #
 # Runs the full dissertation analysis pipeline in the correct sequence.
 # Each phase can be toggled ON/OFF via the CONFIG section below.
+#
+# v1.7 (Batch 4, Oct 2026):
+#   - Phase A forces Phase B (alpha_rolling.xlsx feeds Phase J).
+#   - activeness_proxy_diagnostic.R skipped (with a note) when
+#     panel_incubation is not in the session.
+#   - All phases switched on for the Batch 4 full rerun.
+#   - (final audit) FORCE_PANEL_SETUP requires Phase A; the RDS-reuse branch
+#     drops any in-session panel_reg; warning when A is on and E is off.
 #
 # v1.6 (Oct 2026, pipeline audit):
 #   - Phase J runs activeness_proxy_diagnostic.R after H3 (its table was
@@ -121,16 +129,16 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE    # data_import + flow_calculation
-RUN_PHASE_B_ALPHA         <- FALSE   # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- FALSE   # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- FALSE   # FF_comparison + build_ff_tables_manual
-RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
-RUN_PHASE_F_SORTS_PERSIST <- TRUE   # portfolio_sorts + persistence_testing
-RUN_PHASE_G_ACTIVENESS    <- TRUE   # activeness_analysis
-RUN_PHASE_H_FACTOR_ROBUST <- FALSE   # alpha_estimation_robust + build_robust_tables
-RUN_PHASE_I_BEHAVIORAL    <- TRUE   # behavioral_state_variables (NEW)
-RUN_PHASE_J_PANEL_REG     <- TRUE    # panel_regressions_setup + H1..H4 + reporting (NEW; OFF until scripts exist)
-RUN_UTILITY_LIPPER        <- FALSE    # build_lipper_category (rarely re-run)
+RUN_PHASE_B_ALPHA         <- TRUE    # alpha_estimation + aggregate_alphas
+RUN_PHASE_C_REPORTING     <- TRUE    # alpha_reporting + descriptive_statistics
+RUN_PHASE_D_FF_BENCHMARK  <- TRUE    # FF_comparison + build_ff_tables_manual
+RUN_PHASE_E_SUBPERIODS    <- TRUE    # structural_break_test + subperiod_analysis
+RUN_PHASE_F_SORTS_PERSIST <- TRUE    # portfolio_sorts + persistence + activeness persistence
+RUN_PHASE_G_ACTIVENESS    <- TRUE    # activeness_analysis
+RUN_PHASE_H_FACTOR_ROBUST <- TRUE    # alpha_estimation_robust + build_robust_tables
+RUN_PHASE_I_BEHAVIORAL    <- TRUE    # behavioral_state_variables
+RUN_PHASE_J_PANEL_REG     <- TRUE    # panel_regressions_setup + H1..H4 + reporting + PPF
+RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
 
 # Phase J sub-toggle: force re-running panel_regressions_setup.R even if
 # panel_reg.rds is on disk. Default FALSE = use cached panel_reg.rds when
@@ -310,6 +318,23 @@ verify_pipeline_integrity <- function(scripts_dir = SCRIPTS_DIR,
 
 if (RUN_INTEGRITY_CHECK) verify_pipeline_integrity()
 
+# Safety: new panels make alpha_rolling.xlsx (Phase B; read by Phase J for
+# ActR2) and every downstream Excel output stale, so Phase A forces Phase B.
+if (RUN_PHASE_A_DATA && !RUN_PHASE_B_ALPHA) {
+  cat("NOTE: Phase A is on, so Phase B is switched on as well ",
+      "(alpha_rolling.xlsx must be rebuilt from the new panels).\n", sep = "")
+  RUN_PHASE_B_ALPHA <- TRUE
+}
+# breaktest_results.xlsx (Phase E) defines the regime panels of Phase F
+if (RUN_PHASE_A_DATA && RUN_PHASE_F_SORTS_PERSIST && !RUN_PHASE_E_SUBPERIODS)
+  warning("Phase A is on but Phase E is off: Phase F will use the existing ",
+          "breaktest_results.xlsx, built from the previous panels.", call. = FALSE)
+# A forced panel_reg rebuild must start from freshly built panels; otherwise
+# a stale session panel would be stamped as current
+if (RUN_PHASE_J_PANEL_REG && FORCE_PANEL_SETUP && !RUN_PHASE_A_DATA)
+  stop("FORCE_PANEL_SETUP = TRUE requires RUN_PHASE_A_DATA = TRUE (or set ",
+       "FORCE_PANEL_SETUP = FALSE to reuse a stamped panel_reg.rds).", call. = FALSE)
+
 pipeline_start <- Sys.time()
 
 
@@ -452,6 +477,8 @@ if (RUN_PHASE_J_PANEL_REG) {
            "scripts changed since it was built). Run Phases A and I with ",
            "FORCE_PANEL_SETUP <- TRUE.", call. = FALSE)
     cat("        -> panel_reg.rds upstream stamp matches current inputs.\n")
+    # Use the checked RDS, not any panel_reg left in the session
+    if (exists("panel_reg", envir = .GlobalEnv)) rm("panel_reg", envir = .GlobalEnv)
     cat("        -> If upstream panels have changed, set FORCE_PANEL_SETUP <- TRUE\n")
     cat("           and rerun Phase A + Phase I first.\n")
     setup_required <- FALSE
@@ -469,7 +496,13 @@ if (RUN_PHASE_J_PANEL_REG) {
   run_script("H1_sentiment_convexity.R",      "Phase J")
   run_script("H2_disposition_control.R",      "Phase J")
   run_script("H3_lottery_demand.R",           "Phase J")
-  run_script("activeness_proxy_diagnostic.R", "Phase J")
+  # Needs panel_incubation in the session (not available on the RDS path)
+  if (exists("panel_incubation", envir = .GlobalEnv)) {
+    run_script("activeness_proxy_diagnostic.R", "Phase J")
+  } else {
+    cat("Phase J: panel_incubation not in session -> skipping ",
+        "activeness_proxy_diagnostic.R (run Phase A to include it).\n", sep = "")
+  }
   run_script("H4_fee_elasticity.R",           "Phase J")
   run_script("panel_regressions_reporting.R", "Phase J")
   run_script("psychological_premium.R",       "Phase J")

@@ -1,5 +1,17 @@
 # =============================================================================
-# ACTIVENESS-CONDITIONED PERSISTENCE                                        v1.2
+# ACTIVENESS-CONDITIONED PERSISTENCE                                        v1.3
+#
+# v1.3 changes (Batch 4, Oct 2026):
+#   - Bootstrap inference added: the portfolio-level residual bootstrap of
+#     persistence_testing.R v1.3 (Fama & French 2010 applied to the pooled
+#     cell regressions). Each of the 33 series (3 terciles x [10 deciles +
+#     D1-D10]) has its alpha subtracted; pooled months are resampled jointly
+#     across all series in draw order; NW t re-estimated. The table's p
+#     column is now the one-tailed bootstrap p-value (p^C kept in the xlsx).
+#   - A fund is ranked only if it reports a return in the ranking month
+#     (form_hi), as in persistence_testing.R v1.4.
+#   - Footnote sample dates derived from COHORT_DEFS (were hard-coded and
+#     wrong); unsupported "non-normality attenuated" sentence removed.
 #
 # v1.2 changes vs v1.1 (filter-methodology revision, May 2026):
 #   No code change. flagged_funds.xlsx ledger updated upstream: H3_EXCLUDED
@@ -34,7 +46,8 @@
 # 10 x 3 bivariate sort: 10 alpha deciles x 3 activeness terciles.
 # Activeness measure: formation-window 1 - R^2 (cohort-local, NOT lifetime),
 # following Amihud & Goyenko (2013, RFS).
-# Inference: parametric Carhart with Newey-West (12-month lag); no bootstrap.
+# Inference: Carhart with Newey-West (12-month lag) plus portfolio-level
+# residual bootstrap (v1.3).
 #
 # Companion to persistence_testing.R: identical cohort definitions, formation
 # (36m) / holding (12m) windows, formation NW lag (3m), and active-fund-only
@@ -61,6 +74,8 @@ library(writexl)
 library(knitr)
 library(kableExtra)
 library(stringr)
+library(parallel)
+library(digest)
 
 # =============================================================================
 # 0. CONFIGURATION
@@ -77,6 +92,15 @@ N_TERCILES   <- 3L
 # number of funds. Tail cells (D1, D10) within T3 (most active) in early
 # cohorts are the realistic binding constraint.
 MIN_CELL_FUNDS <- 5L
+
+# Bootstrap (same settings as persistence_testing.R)
+B_RUNS         <- 10000L
+BOOT_SEED      <- 42L
+N_CORES        <- max(1L, detectCores() - 1L)
+USE_BOOT_CACHE <- TRUE
+BOOT_CACHE_DIR <- file.path(".", paste0("cache_", Sys.info()[["nodename"]]))
+BOOT_KERNEL    <- "v1.3-portfolio-null"   # part of the cache key
+dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)
 
 # Cohort definitions (mirror persistence_testing.R Section 0)
 COHORT_DEFS <- data.frame(
@@ -239,6 +263,7 @@ for (cid in USABLE_COHORTS) {
   run_form <- function(tk) {
     d <- form_by_fund[[tk]]; n <- nrow(d)
     if (n < MIN_OBS_FORM) return(NULL)
+    if (!any(d$date == cd$form_hi)) return(NULL)   # alive in ranking month
     y <- d$excess_ret
     X <- cbind(1, d$mkt_rf, d$smb, d$hml, d$mom)
     fit <- fast_ols(y, X); if (is.null(fit)) return(NULL)
@@ -405,6 +430,109 @@ estimates <- bind_rows(c(cell_estimates, spread_estimates)) %>%
 rownames(estimates) <- NULL
 
 # =============================================================================
+# 4b. BOOTSTRAP (portfolio-level residual bootstrap, as persistence_testing.R)
+#     Null imposed on each pooled cell regression: y~ = y - alpha_hat.
+#     One month draw per iteration shared by all 33 series (keeps cross-cell
+#     dependence); NW t of the intercept re-estimated, lag capped at n - 1.
+# =============================================================================
+cat("=== 3b. Bootstrap of cell and spread alphas ===\n")
+
+nw_t_alpha <- function(y, X, lag) {
+  Tn <- length(y); L <- min(lag, Tn - 1L)
+  tryCatch({
+    XtX_inv <- solve(crossprod(X))
+    beta    <- XtX_inv %*% crossprod(X, y)
+    e       <- as.vector(y - X %*% beta)
+    sc      <- X * e
+    S       <- crossprod(sc) / Tn
+    if (L > 0L) for (j in seq_len(L)) {
+      G <- crossprod(sc[(j + 1):Tn, , drop = FALSE], sc[1:(Tn - j), , drop = FALSE]) / Tn
+      S <- S + (1 - j / (L + 1)) * (G + t(G))
+    }
+    beta[1] / sqrt(max((Tn * XtX_inv %*% S %*% XtX_inv)[1, 1], 0))
+  }, error = function(e) NA_real_)
+}
+
+one_boot_iter <- function(samp, Yn, X, nw_lag, min_obs) {
+  vapply(seq_len(ncol(Yn)), function(j) {
+    y <- Yn[samp, j]; ok <- is.finite(y)
+    if (sum(ok) < min_obs) return(NA_real_)
+    nw_t_alpha(y[ok], X[samp[ok], , drop = FALSE], nw_lag)
+  }, numeric(1))
+}
+
+# Series matrix: rows = pooled holding months; columns = (tercile, decile),
+# decile 11 = D1 - D10 within the tercile
+col_keys <- expand.grid(decile = c(seq_len(N_DECILES), 11L),
+                        tercile = seq_len(N_TERCILES))[, c("tercile", "decile")]
+pool_dates <- sort(unique(all_returns$date))
+Y <- matrix(NA_real_, length(pool_dates), nrow(col_keys))
+for (j in seq_len(nrow(col_keys))) {
+  tv <- col_keys$tercile[j]; dv <- col_keys$decile[j]
+  if (dv <= N_DECILES) {
+    s_j <- all_returns %>% filter(tercile == tv, decile == dv)
+    Y[match(s_j$date, pool_dates), j] <- s_j$ew_excess
+  } else {
+    Y[, j] <- Y[, which(col_keys$tercile == tv & col_keys$decile == 1L)] -
+              Y[, which(col_keys$tercile == tv & col_keys$decile == N_DECILES)]
+  }
+}
+Xb <- cbind(1, as.matrix(factors_ts[match(pool_dates, factors_ts$date),
+                                    c("mkt_rf", "smb", "hml", "mom")]))
+
+# Impose H0 column by column
+Yn <- Y
+for (j in seq_len(ncol(Y))) {
+  ok <- is.finite(Y[, j])
+  if (sum(ok) < 12L) { Yn[, j] <- NA_real_; next }
+  a_hat <- solve(crossprod(Xb[ok, , drop = FALSE]),
+                 crossprod(Xb[ok, , drop = FALSE], Y[ok, j]))[1]
+  Yn[, j] <- Y[, j] - a_hat
+}
+
+cache_key  <- digest(list(Yn = round(Yn, 10), X = round(Xb, 10), B = B_RUNS,
+                          seed = BOOT_SEED, nw = NW_LAG_HOLD, kernel = BOOT_KERNEL))
+cache_file <- file.path(BOOT_CACHE_DIR, "activeness_persistence_bootstrap_cache.rds")
+sim <- NULL
+if (USE_BOOT_CACHE && file.exists(cache_file)) {
+  cached <- tryCatch(readRDS(cache_file), error = function(e) NULL)
+  if (!is.null(cached) && identical(cached$key, cache_key)) {
+    cat("  [cache hit]\n"); sim <- cached$sim
+  }
+}
+if (is.null(sim)) {
+  cat(sprintf("  Bootstrapping %d series (B = %d, T = %d) ...\n",
+              ncol(Y), B_RUNS, nrow(Y)))
+  t0 <- Sys.time()
+  set.seed(BOOT_SEED)                       # draws independent of N_CORES
+  samp_list <- replicate(B_RUNS, sample.int(nrow(Y), nrow(Y), replace = TRUE),
+                         simplify = FALSE)
+  cl <- makeCluster(N_CORES)
+  clusterExport(cl, "nw_t_alpha", envir = environment())
+  sim <- do.call(rbind, parLapply(cl, samp_list, one_boot_iter, Yn, Xb,
+                                  NW_LAG_HOLD, 12L))
+  stopCluster(cl)
+  cat(sprintf("  wall time: %.1f sec\n",
+              as.numeric(difftime(Sys.time(), t0, units = "secs"))))
+  if (USE_BOOT_CACHE) saveRDS(list(key = cache_key, sim = sim), cache_file)
+}
+
+# Right/left-tail bootstrap p-values; p_boot = tail in the observed direction
+estimates$p_boot_right <- NA_real_
+estimates$p_boot_left  <- NA_real_
+for (j in seq_len(nrow(col_keys))) {
+  r <- which(estimates$tercile == col_keys$tercile[j] &
+             estimates$decile  == col_keys$decile[j])
+  if (length(r) != 1L || is.na(estimates$t_alpha[r])) next
+  sj <- sim[, j]; sj <- sj[is.finite(sj)]
+  if (!length(sj)) next
+  estimates$p_boot_right[r] <- mean(sj > estimates$t_alpha[r])
+  estimates$p_boot_left[r]  <- mean(sj < estimates$t_alpha[r])
+}
+estimates$p_boot <- ifelse(estimates$t_alpha >= 0,
+                           estimates$p_boot_right, estimates$p_boot_left)
+
+# =============================================================================
 # 5. DIAGNOSTICS: cell sizes and pooled month coverage
 # =============================================================================
 cat("=== 4. Diagnostics ===\n")
@@ -455,11 +583,11 @@ sheets <- list(
   config                 = data.frame(
     parameter = c("FORM_MONTHS", "HOLD_MONTHS", "MIN_OBS_FORM",
                   "NW_LAG_FORM", "NW_LAG_HOLD", "N_DECILES", "N_TERCILES",
-                  "MIN_CELL_FUNDS", "USABLE_COHORTS", "ACTIVENESS_MEASURE",
-                  "ACTIVENESS_DEFINITION"),
+                  "MIN_CELL_FUNDS", "B_RUNS", "BOOT_SEED", "USABLE_COHORTS",
+                  "ACTIVENESS_MEASURE", "ACTIVENESS_DEFINITION"),
     value     = c(FORM_MONTHS, HOLD_MONTHS, MIN_OBS_FORM,
                   NW_LAG_FORM, NW_LAG_HOLD, N_DECILES, N_TERCILES,
-                  MIN_CELL_FUNDS,
+                  MIN_CELL_FUNDS, B_RUNS, BOOT_SEED,
                   paste(USABLE_COHORTS, collapse = ","),
                   "1 - R^2 (Carhart 4-factor, formation window)",
                   "Cohort-local: ranked within each cohort's 36-month formation period")
@@ -491,7 +619,7 @@ build_panel_rows <- function(est) {
       Decile  = lbl,
       Alpha   = fmt_alpha_pct(r$alpha_m, r$t_alpha),
       tAlpha  = paste0("(", fmt(r$t_alpha, 2), ")"),
-      pC      = fmt_p(r$p_alpha),
+      pB      = fmt_p(r$p_boot),
       bM      = add_stars(fmt(r$b_mkt, 3), r$t_mkt),
       bS      = add_stars(fmt(r$b_smb, 3), r$t_smb),
       bH      = add_stars(fmt(r$b_hml, 3), r$t_hml),
@@ -525,21 +653,35 @@ pack_tab <- data.frame(
   stringsAsFactors = FALSE
 )
 
+# Sample-window strings derived from the cohort definitions
+.uc       <- COHORT_DEFS[COHORT_DEFS$cohort_id %in% USABLE_COHORTS, ]
+FORM_SPAN <- paste0(format(min(.uc$form_lo), "%b %Y"), "--",
+                    format(max(.uc$hold_hi), "%b %Y"))
+HOLD_YRS  <- paste(format(.uc$hold_lo, "%Y"), collapse = ", ")
 fn_text <- paste(
   "Activeness-conditioned persistence test: $10 \\times 3$ bivariate sort.",
-  "At each cohort ranking date, all eligible active funds are sorted into",
+  "At each cohort ranking date, active funds that report a return in the",
+  "ranking month are sorted into",
   "three terciles by formation-period $1 - R^2$ from a 36-month",
   "\\textcite{Carhart1997} four-factor regression (T1 = lowest activeness,",
   "T3 = highest), and within each tercile into ten deciles by formation-period",
   "alpha $t$-statistic (Newey-West, 3-month lag). D1 contains the highest-ranked",
   "funds, D10 the lowest. Equal-weighted holding-period (12-month) gross",
-  "excess returns are pooled across the seven non-overlapping cohorts of",
-  "Table~\\ref{tab:persistence} (Jan 1995--Feb 2026) and regressed on the",
+  "excess returns are pooled across the",
+  sprintf("%s non-overlapping cohorts of Table~\\ref{tab:persistence}",
+          c("one", "two", "three", "four", "five", "six", "seven", "eight",
+            "nine")[length(USABLE_COHORTS)]),
+  sprintf("(holding years %s) and regressed on the", HOLD_YRS),
   "\\textcite{Carhart1997} four factors with Newey-West $t$-statistics",
   "(12-month lag).",
   "$\\hat{\\alpha}$: monthly, \\%.",
-  "$p^C$: one-tailed parametric $p$-value from the holding-period alpha",
-  "$t$-statistic under normality, in the direction of the observed effect.",
+  "$p_B$: one-tailed bootstrap $p$-value in the direction of the observed",
+  "$t$-statistic, from the residual bootstrap of \\textcite{FamaFrench2010}",
+  "applied to the pooled cell regressions as in Table~\\ref{tab:persistence}:",
+  "each series has its estimated alpha removed, pooled months are resampled",
+  sprintf("jointly across all 33 series (%s draws), and the Newey-West $t$ is",
+          format(B_RUNS, big.mark = ",")),
+  "re-estimated.",
   "ExpR: mean expense ratio (\\%) of cell constituents, averaged across cohorts.",
   "D1$-$D10 is the within-tercile long-short spread.",
   "Significance stars on $\\hat{\\alpha}$ and factor loadings reflect Newey-West",
@@ -547,13 +689,9 @@ fn_text <- paste(
   "The activeness measure is the formation-window $1 - R^2$ following",
   "\\textcite{AmihudGoyenko2013}; tercile breakpoints are computed within each",
   "cohort to avoid look-ahead contamination.",
-  "Bootstrap inference (cf.\\ Table~\\ref{tab:persistence}) is omitted because",
-  "this is a secondary conditional test; non-normality of decile-portfolio",
-  "returns is most severe in unconditional tail sorts, which conditioning on",
-  "activeness already attenuates.",
-  "Sample: Active funds in the \\textcite{Evans2010}-corrected",
-  "panel\\_incubation, Jan 1995--Feb 2026; H3 / activeness subsample",
-  "per flagged\\_funds.xlsx."
+  "Sample: active funds in the \\textcite{Evans2010}-corrected",
+  sprintf("panel\\_incubation, formation and holding windows %s;", FORM_SPAN),
+  "H3 / activeness subsample per flagged\\_funds.xlsx."
 )
 
 k <- full_data %>%
@@ -565,7 +703,7 @@ k <- full_data %>%
       caption   = "Activeness-Conditioned Persistence Test",
       label     = "activeness_persistence",
       col.names = c("Decile",
-                    "$\\hat{\\alpha}$", "$t(\\hat{\\alpha})$", "$p^C$",
+                    "$\\hat{\\alpha}$", "$t(\\hat{\\alpha})$", "$p_B$",
                     "$\\beta_{\\text{MKT}}$", "$\\beta_{\\text{SMB}}$",
                     "$\\beta_{\\text{HML}}$", "$\\beta_{\\text{MOM}}$",
                     "$\\bar{R}^2$", "ExpR"),
@@ -598,12 +736,13 @@ for (tval in seq_len(N_TERCILES)) {
   d10 <- est[est$decile == N_DECILES, ]
   sp  <- est[est$decile == 11L,       ]
   if (nrow(d1) == 0L || nrow(d10) == 0L) next
-  cat(sprintf("  T%d: D1 alpha = %s%% (t=%s, p=%s); D10 alpha = %s%% (t=%s, p=%s); D1-D10 alpha = %s%% (t=%s)\n",
+  cat(sprintf("  T%d: D1 alpha = %s%% (t=%s, pB=%s); D10 alpha = %s%% (t=%s, pB=%s); D1-D10 alpha = %s%% (t=%s, pB=%s)\n",
               tval,
-              fmt(d1$alpha_m * 100, 3), fmt(d1$t_alpha, 2), fmt_p(d1$p_alpha),
-              fmt(d10$alpha_m * 100, 3), fmt(d10$t_alpha, 2), fmt_p(d10$p_alpha),
+              fmt(d1$alpha_m * 100, 3), fmt(d1$t_alpha, 2), fmt_p(d1$p_boot),
+              fmt(d10$alpha_m * 100, 3), fmt(d10$t_alpha, 2), fmt_p(d10$p_boot),
               if (nrow(sp) > 0) fmt(sp$alpha_m * 100, 3) else "--",
-              if (nrow(sp) > 0) fmt(sp$t_alpha, 2) else "--"))
+              if (nrow(sp) > 0) fmt(sp$t_alpha, 2) else "--",
+              if (nrow(sp) > 0) fmt_p(sp$p_boot) else "--"))
 }
 cat("\nOutputs:\n")
 cat("  activeness_persistence_results.xlsx\n")

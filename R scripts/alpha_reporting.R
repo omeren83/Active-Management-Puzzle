@@ -5,7 +5,7 @@
 #   (a) Table 9 labels follow the numbers in both tails: Prob. Luck < 5% ->
 #       "Worse than luck (significant)", > 95% -> "Better than luck
 #       (significant)". Prob. Luck printed with fmt_prob() so "0.0%" (no
-#       iteration) and "<0.1%" (1-4 iterations) are distinguished.
+#       iteration) and "<0.1%" (1-9 iterations) are distinguished.
 #   (b) Table 9 footnote states that resampled months keep their draw order.
 #   (c) Table 10b: S-/S+ counted from the same Student-t NW p-values as pi0
 #       (v8.5 used normal critical values); population estimates pi_A-/pi_A+
@@ -201,13 +201,17 @@ fmt <- function(x, digits = 3) {
 
 fmt1 <- function(x) formatC(round(as.numeric(x), 1), format = "f", digits = 1)
 
-# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+# Prob. Luck (percent of B runs)
 fmt_prob <- function(x) {
+  # Exact 0 / 100; (0, 0.1) -> "<0.1%" and (99.9, 100) -> ">99.9%", so that
+  # 1-9 or B-9..B-1 of B = 10,000 runs never round to 0.0% / 0.1% / 100.0%
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--",
-    ifelse(v == 0,   "0.0\\%",
-    ifelse(v < 0.05, "$<$0.1\\%",
-           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+    ifelse(v <= 0,    "0.0\\%",
+    ifelse(v < 0.1,   "$<$0.1\\%",
+    ifelse(v >= 100,  "100.0\\%",
+    ifelse(v > 99.9,  "$>$99.9\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))))
 }
 
 GAMMA_STAR <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
@@ -722,7 +726,7 @@ fn_t9 <- paste(
   "Bootstrap procedure follows \\\\textcite{FamaFrench2010}.",
   "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\\\\_funds.xlsx,",
   paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
-  "For each fund, estimated monthly alpha is subtracted from the excess return",
+  "For each fund, estimated monthly alpha is subtracted from the gross excess return",
   "series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled",
   "with replacement and kept in the order drawn, the same draw applying to all",
@@ -734,7 +738,7 @@ fn_t9 <- paste(
   "\\\\textit{Prob.\\\\ Luck}: fraction of iterations in which the simulated percentile",
   "falls below the actual value; values below 5\\\\% (above 95\\\\%) indicate that the",
   "actual percentile is worse (better) than zero-alpha luck would produce;",
-  "0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 4 of 10,000 iterations.",
+  "0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 9 of 10,000 iterations (and $>$99.9\\\\% means 9,991 to 9,999).",
   "Newey-West standard errors with a 6-month lag are used throughout."
 )
 
@@ -818,7 +822,7 @@ fn_t10 <- paste(
   "The proportion of true zero-alpha funds ($\\\\hat{\\\\pi}_0$) is estimated",
   "following \\\\textcite{Storey2002} and \\\\textcite{BarrasScailletWermers2010},",
   "using p-values from Newey-West $t$-tests on",
-  "full-period \\\\textcite{Carhart1997} four-factor alphas.",
+  "full-period \\\\textcite{Carhart1997} four-factor alphas on gross returns.",
   "The estimator is $\\\\hat{\\\\pi}_0 = |\\\\{p_i > \\\\lambda\\\\}| \\\\,/\\\\, [N(1-\\\\lambda)]$,",
   "where $\\\\lambda = 0.5$ is the standard tuning parameter following \\\\textcite{Storey2002}.",
   "Funds with p-values exceeding $\\\\lambda$ are unlikely to have non-zero true alpha;",
@@ -858,11 +862,8 @@ cat("Active funds (pi0/BSW population):", total_n, "\n")
 # Barras, Scaillet & Wermers (2010, JF), Section II.B & Table III.
 # All inputs already in memory from Section 7; zero additional computation.
 #
-# Note on critical values: S^- and S^+ are thresholded against qnorm(1-g/2),
-# i.e. the normal approximation, consistent with BSW (2010). The pi_0_val
-# itself is derived from t-distribution p-values (alpha_p_nw), which is more
-# precise for individual funds; the discrepancy between the two approaches is
-# negligible given sample sizes in the hundreds.
+# Note on critical values: S^- and S^+ use the same Student-t p-values
+# (alpha_p_nw) as pi_0, so the decomposition is internally consistent.
 # =============================================================================
 cat("=== 7b. BSW Four-Way Decomposition Table ===\n")
 
@@ -908,7 +909,7 @@ fn_t10b <- paste(
   "$S^-_\\\\gamma$ ($S^+_\\\\gamma$): observed fraction of active funds with",
   "significantly negative (positive) Newey-West $t(\\\\hat{\\\\alpha})$ at",
   "two-sided significance level $\\\\gamma$, using full-period \\\\textcite{Carhart1997}",
-  "four-factor alphas and the same Student-$t$ $p$-values as $\\\\hat{\\\\pi}_0$.",
+  "four-factor alphas on gross returns and the same Student-$t$ $p$-values as $\\\\hat{\\\\pi}_0$.",
   "$F_\\\\gamma = \\\\hat{\\\\pi}_0 \\\\cdot \\\\gamma/2$: expected proportion of false",
   "discoveries per tail arising from zero-alpha funds,",
   paste0("where $\\\\hat{\\\\pi}_0 = ", pi0_str, "$ is the \\\\textcite{Storey2002} estimate"),

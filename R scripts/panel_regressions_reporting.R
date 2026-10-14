@@ -1,5 +1,14 @@
-# panel_regressions_reporting.R                                        v1.1
+# panel_regressions_reporting.R                                        v1.2
 # =============================================================================
+# v1.2 changes (Batch 4, Oct 2026):
+#   - "Decision" column split into "Joint test" (joint Wald test at 10%)
+#     and "Headline direction" (named only if the one-sided p in that
+#     direction is < 0.10; the opposite tail uses 1 - p). v1.1 attached a
+#     direction label to every row from the sign of z alone.
+#   - H2 opposite tail labelled as the Brunnermeier-Pedersen margin-call
+#     alternative; H3 ActR2 row labelled "rational-null control".
+#   - Footnote states that each hypothesis has its own aligned sample.
+#
 # v1.1 changes (Family E pre-defense audit):
 #   - No code changes. This script consumes pre-saved H1_models / H2_models /
 #     H3_models / H4_models objects (or the corresponding .rds files) and
@@ -33,8 +42,7 @@
 #       - H4: 1-sided positive z on the ExpRatio x SENT interaction
 #             delta_F (sentiment relaxes fee discipline if delta_F > 0)
 #
-#   * The "Conclusion" column flags the direction of the headline result.
-#     The detailed interpretation of each test is left to the dissertation
+#   * Detailed interpretation of each test is left to the dissertation
 #     prose (Sections 5.2-5.5).
 # =============================================================================
 
@@ -84,125 +92,103 @@ fmt_n <- function(n) {
   formatC(n, format = "d", big.mark = ",")
 }
 
-# Decision tag from joint p and a directional signal. "Reject" if joint p
-# crosses a 10% threshold; appended interpretation depends on the
-# hypothesis-specific direction stored in `dir_tag`.
-decision <- function(joint_p, dir_tag) {
+# Joint test: rejects "no state dependence" (see footnote for the terms) at 10%.
+joint_tag <- function(joint_p) {
   if (is.null(joint_p) || is.na(joint_p)) return("--")
-  base <- if (joint_p < 0.10) "Reject" else "Fail to reject"
-  if (!is.null(dir_tag) && nzchar(dir_tag)) paste0(base, " (", dir_tag, ")")
-  else base
+  if (joint_p < 0.10) "Rejected" else "Not rejected"
+}
+# Direction: tagged only when the one-sided p in a given direction is < 0.10.
+# p_pred = one-sided p in the behaviourally predicted direction; the opposite
+# tail is 1 - p_pred.
+direction_tag <- function(p_pred, lbl_pred, lbl_opp) {
+  if (is.null(p_pred) || is.na(p_pred)) return("--")
+  if (p_pred < 0.10)       lbl_pred
+  else if (1 - p_pred < 0.10) lbl_opp
+  else                     "Not significant"
+}
+add_row <- function(hyp, state, chi, p_joint, df, z, p_pred, n, lbl_pred, lbl_opp) {
+  c(hyp, state, fmt_chi2(chi, p_joint, df), fmt_z(z, p_pred), fmt_n(n),
+    joint_tag(p_joint), direction_tag(p_pred, lbl_pred, lbl_opp))
 }
 
 # --- 3. Build summary rows ---------------------------------------------------
 rows <- list()
 
 # ---- H1: Sentiment-Convexity ----
+# Headline: asymmetry z = (delta_3 - delta_1)/SE; predicted sign positive.
 if (!is.null(H1_models)) {
   pri <- H1_models$primary
   n1 <- nobs(pri$m2)
   for (key in c("t2", "t3", "t4")) {
     tt <- pri$tests[[key]]
-    state_lbl <- switch(
-      key,
+    state_lbl <- switch(key,
       "t2" = "$D^{\\text{SENT}}$",
       "t3" = "$\\text{SENT}^\\perp$",
-      "t4" = "$D^{\\text{AAII}}$"
-    )
-    dir_tag <- if (!is.na(tt$asym_z) && tt$asym_z > 0) "asym +" else "asym -"
-    rows[[length(rows) + 1L]] <- c(
-      "H1: Sent.-Convexity",
-      state_lbl,
-      fmt_chi2(tt$joint_chi2, tt$joint_p, df = 3L),
-      fmt_z(tt$asym_z, tt$asym_p_1sd),
-      fmt_n(n1),
-      decision(tt$joint_p, dir_tag)
-    )
+      "t4" = "$D^{\\text{AAII}}$")
+    rows[[length(rows) + 1L]] <- add_row(
+      "H1: Sent.-Convexity", state_lbl, tt$joint_chi2, tt$joint_p, 3L,
+      tt$asym_z, tt$asym_p_1sd, n1,
+      "Steeper (asym.\\ $+$)", "Flatter (asym.\\ $-$)")
   }
 }
 
 # ---- H2: Disposition / Illusion-of-Control ----
-# Headline test: delta_1 z, 1-sided LEFT tail (disposition prediction).
-# Positive z with high left-tail p = BP margin-call alternative.
+# Headline: delta_1 z; predicted (disposition) sign negative, so p_pred is
+# the LEFT tail; the right tail 1 - p_pred is the Brunnermeier-Pedersen
+# margin-call alternative.
 if (!is.null(H2_models)) {
   pri <- H2_models$primary
   for (key in c("t2", "t3", "t4")) {
     tt <- pri$tests[[key]]
     if (is.null(tt)) next
-    state_lbl <- switch(
-      key,
+    state_lbl <- switch(key,
       "t2" = "$D^{\\text{MD,Det}}$",
       "t3" = "$D^{\\text{INV-PCR}}$",
-      "t4" = "Discriminant"
-    )
+      "t4" = "Discriminant")
     # model for test tK is mK (t2 -> m2, t3 -> m3, t4 -> m4)
     n_used <- if (!is.null(tt$n)) tt$n else nobs(pri[[sub("^t", "m", key)]])
-    dir_tag <- if (is.na(tt$d1_z)) "" else
-               if (tt$d1_z > 0) "BP margin-call ($\\delta_1$ > 0)"
-               else "Disposition ($\\delta_1$ < 0)"
-    rows[[length(rows) + 1L]] <- c(
-      "H2: Disp./IoC",
-      state_lbl,
-      fmt_chi2(tt$joint_chi2, tt$joint_p, df = 3L),
-      fmt_z(tt$d1_z, tt$main_p_1sd),
-      fmt_n(n_used),
-      decision(tt$joint_p, dir_tag)
-    )
+    rows[[length(rows) + 1L]] <- add_row(
+      "H2: Disp./IoC", state_lbl, tt$joint_chi2, tt$joint_p, 3L,
+      tt$d1_z, tt$main_p_1sd, n_used,
+      "Disposition ($\\delta_1<0$)", "Margin-call ($\\delta_1>0$)")
   }
 }
 
 # ---- H3: Lottery Demand ----
-# Headline: 1-sided positive z on Lottery x D_SENT interaction.
-# H3 v2.0 varies lottery MEASURE across columns (not sentiment proxy):
-# t2=ActR2 (rational-channel null), t3=ActSkew, t4=MAX12.
+# Headline: Lottery x D_SENT interaction; predicted sign positive.
+# t2 = ActR2 is the rational-null control (activeness, not a lottery feature).
 if (!is.null(H3_models)) {
   pri <- H3_models$primary
   n3 <- nobs(pri$m2)
   for (key in c("t2", "t3", "t4")) {
     tt <- pri$tests[[key]]
-    state_lbl <- switch(
-      key,
-      "t2" = "ActR2",
+    state_lbl <- switch(key,
+      "t2" = "ActR2 (rational-null control)",
       "t3" = "ActSkew",
-      "t4" = "MAX12"
-    )
-    dir_tag <- if (is.na(tt$delta_z)) "" else
-               if (tt$delta_z > 0) "lottery amp +" else "lottery amp -"
-    rows[[length(rows) + 1L]] <- c(
-      "H3: Lottery",
-      state_lbl,
-      fmt_chi2(tt$joint_chi2, tt$joint_p, df = 2L),
-      fmt_z(tt$delta_z, tt$delta_p_1sd),
-      fmt_n(n3),
-      decision(tt$joint_p, dir_tag)
-    )
+      "t4" = "MAX12")
+    rows[[length(rows) + 1L]] <- add_row(
+      "H3: Lottery", state_lbl, tt$joint_chi2, tt$joint_p, 2L,
+      tt$delta_z, tt$delta_p_1sd, n3,
+      "Amplified ($\\delta>0$)", "Dampened ($\\delta<0$)")
   }
 }
 
 # ---- H4: Fee Elasticity ----
-# Headline: 1-sided positive z on ExpRatio x SENT.
+# Headline: ExpRatio x SENT; predicted sign positive (fee discipline relaxes).
 if (!is.null(H4_models)) {
   pri <- H4_models$primary
   n4 <- nobs(pri$m2)
   for (key in c("t2", "t3", "t4")) {
     tt <- pri$tests[[key]]
-    state_lbl <- switch(
-      key,
+    state_lbl <- switch(key,
       "t2" = "$D^{\\text{SENT}}$",
       "t3" = "$\\text{SENT}^\\perp$",
-      "t4" = "$D^{\\text{AAII}}$"
-    )
+      "t4" = "$D^{\\text{AAII}}$")
     df_used <- if (!is.null(tt$df)) tt$df else 4L
-    dir_tag <- if (is.na(tt$delta_z)) "" else
-               if (tt$delta_z > 0) "fee amp +" else "fee amp -"
-    rows[[length(rows) + 1L]] <- c(
-      "H4: Fee Elast.",
-      state_lbl,
-      fmt_chi2(tt$joint_chi2, tt$joint_p, df = df_used),
-      fmt_z(tt$delta_z, tt$delta_p_1sd),
-      fmt_n(n4),
-      decision(tt$joint_p, dir_tag)
-    )
+    rows[[length(rows) + 1L]] <- add_row(
+      "H4: Fee Elast.", state_lbl, tt$joint_chi2, tt$joint_p, df_used,
+      tt$delta_z, tt$delta_p_1sd, n4,
+      "Relaxed ($\\delta_F>0$)", "Tightened ($\\delta_F<0$)")
   }
 }
 
@@ -212,16 +198,35 @@ if (length(rows) == 0L) {
 
 summary_df <- as.data.frame(do.call(rbind, rows), stringsAsFactors = FALSE)
 colnames(summary_df) <- c("Hypothesis", "State proxy", "Joint $\\chi^2$",
-                          "Headline $z$ (1-sided $p$)", "$N$", "Decision")
+                          "Headline $z$ ($p$, predicted sign)", "$N$",
+                          "Joint test", "Headline direction")
 rownames(summary_df) <- NULL
 
 # --- 4. Build kableExtra table ------------------------------------------------
 caption <- "Behavioral Hypotheses --- Summary of Primary-Spec Test Statistics"
 fn <- paste0(
-  "Stars on individual coefficients are reported in the underlying tables. ",
-  "All specifications use the primary-spec aligned sample (contemporaneous ",
-  "state variables; fund FE for H1--H3; Lipper $\\\\times$ yearmo FE for H4) ",
-  "with two-way clustering on Ticker and calendar month (Petersen 2009)."
+  "Joint $\\\\chi^2$: Wald test of the hypothesis's state-dependent terms, whose ",
+  "null is no state dependence: H1, the three rank-segment $\\\\times$ state ",
+  "interactions; H2, the three rank-segment $\\\\times$ margin-debt (or put--call) ",
+  "interactions, with the $D^{\\\\text{SENT}}$ interactions as controls in the ",
+  "discriminant row; H3, the lottery measure and its interaction with ",
+  "$D^{\\\\text{SENT}}$; H4, the four fee $\\\\times$ sentiment terms. ``Joint test'' ",
+  "reports whether it is rejected at 10\\\\%. A rejection shows that flows depend ",
+  "on the state; it does not by itself identify a psychological cause. Headline $z$: hypothesis-specific statistic (H1: ",
+  "$\\\\delta_3-\\\\delta_1$; H2: $\\\\delta_1$; H3: lottery $\\\\times$ ",
+  "$D^{\\\\text{SENT}}$; H4: $\\\\delta_F$) with its one-sided $p$-value in the ",
+  "behaviourally predicted direction. ``Headline direction'' names a direction ",
+  "only when the one-sided $p$-value in that direction is below 0.10 (for the ",
+  "opposite direction, $1-p$); otherwise ``Not significant''. For H2 the ",
+  "predicted sign is negative (disposition), and the opposite sign is the ",
+  "margin-call alternative of Brunnermeier and Pedersen (2009). The ActR2 row ",
+  "of H3 is a rational-null control: activeness is not a lottery feature. ",
+  "Each hypothesis is estimated on its own aligned sample (all regressors of its ",
+  "specifications non-missing), so $N$ differs across hypotheses; the H2 ",
+  "put--call rows use the shorter put--call ratio window. Primary ",
+  "specifications use contemporaneous state variables, fund FE for H1--H3 and ",
+  "Lipper $\\\\times$ yearmo FE for H4, with two-way clustering on Ticker and ",
+  "calendar month (Petersen 2009). Coefficients are reported in the underlying tables."
 )
 
 # Phase 2.8 (19 May 2026): Extract tablenotes from threeparttable and re-emit
@@ -253,7 +258,7 @@ threeparttable_note_after_compact <- function(s) {
 ktab <- kbl(
   summary_df, format = "latex", booktabs = TRUE,
   caption = caption, label = "behavioral_summary",
-  align = c("l", "l", "l", "l", "r", "l"),
+  align = c("l", "l", "l", "l", "r", "l", "l"),
   escape = FALSE, linesep = ""
 ) %>%
   kable_styling(latex_options = c("hold_position", "scale_down")) %>%

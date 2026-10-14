@@ -1,5 +1,9 @@
-# H2_disposition_control.R                                              v3.1
+# H2_disposition_control.R                                              v3.2
 # =============================================================================
+# v3.2 (Batch 4, Oct 2026): PCR window in the footnote computed from the
+#   estimation sample (was hard-coded "2003-10 to 2019-10"); robustness-table
+#   note made neutral (it asserted a result before the numbers were seen).
+#
 # v3.1 changes vs v3.0 (Family E pre-defense audit):
 #   - No filter change. Per data_import_and_cleaning.R Step 8c convention,
 #     Entire-Analysis exclusions in flagged_funds.xlsx are dropped from the
@@ -359,6 +363,11 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
   mods <- list(m1 = m1, m2 = m2, m3 = m3, m4 = m4)
   mod_keys <- c("m1", "m2", "m3", "m4")
   body_rows <- list()
+  # Timing-robustness table: D^SENT rows refer to the lagged regime
+  if (spec_id == "TIMING ROBUSTNESS")
+    row_specs <- lapply(row_specs, function(r) {
+      r$label <- gsub("D^{\\text{SENT}}", "D^{\\text{SENT}}_{t-1}", r$label, fixed = TRUE)
+      r })
   for (spec in row_specs) {
     vals <- vector("list", length(mod_keys))
     for (j in seq_along(mod_keys)) {
@@ -444,6 +453,9 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
 }
 
 # --- 5. Captions and footnotes -----------------------------------------------
+# PCR estimation window from the data (first and last month of samp_pcr)
+PCR_WIN <- paste(format(min(samp_pcr$date), "%Y-%m"), "to",
+                 format(max(samp_pcr$date), "%Y-%m"))
 cap_primary <- "H2: Disposition / Illusion-of-Control Hypothesis"
 fn_primary <- paste0(
   "The dependent variable is the Sirri-Tufano (1998) winsorised proportional ",
@@ -460,8 +472,8 @@ fn_primary <- paste0(
   "$D^{\\\\text{SENT}}_t$ (= 1 if SENT$^\\\\perp$ is in the top 34\\\\%) with full rank ",
   "interactions. All controls lagged one period; time-invariant fund ",
   "characteristics (expense ratio, load dummy, turnover) included but ",
-  "absorbed by fund FE. Cols (1)-(2) and (4) use the full margin-debt ",
-  "sample; col (3) uses the PCR sample (2003-10 to 2019-10). Standard ",
+  "absorbed by fund FE. Cols (1)-(2) and (4) use the margin-debt sample (all months with the margin-debt and sentiment regimes available), ",
+  "sample; col (3) uses the PCR sample (", PCR_WIN, "). Standard ",
   "errors two-way clustered on Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
@@ -491,9 +503,10 @@ fn_robust <- paste0(
   "effects and do not appear in the table; time-invariant controls (expense ",
   "ratio, load dummy, turnover) are now identified because there is no fund ",
   "FE. Standard errors two-way clustered on Ticker and calendar month ",
-  "(Petersen 2009). The robustness of $\\\\delta^{\\\\text{MD}}_1>0$ across both ",
-  "identification strategies points toward a margin-call alternative ",
-  "(Brunnermeier \\\\& Pedersen 2009) rather than disposition psychology. ",
+  "(Petersen 2009). The sign of $\\\\delta^{\\\\text{MD}}_1$ under this ",
+  "identification can be compared with Table~\\\\ref{tab:H2_regression}: a ",
+  "negative sign is the disposition prediction, a positive sign the ",
+  "margin-call alternative (Brunnermeier \\\\& Pedersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
   "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",

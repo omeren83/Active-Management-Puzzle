@@ -1,5 +1,15 @@
 # =============================================================================
-# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.4
+# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.6
+#
+# v1.6 changes (final audit, Oct 2026):
+#   - Evans cutoff compared by calendar month, not by date. Panel dates are
+#     trading-day month-ends, so a cutoff on e.g. the 31st (weekend) excluded
+#     the whole cutoff month for 201 funds (37 months dropped instead of 36).
+#
+# v1.5 changes (Batch 4, Oct 2026):
+#   - Explicit LEVERAGED_TICKERS list (Step 8b), applied to all ap_groups.
+#   - Returns computed on panel_master and joined into the truncated panels,
+#     so the first post-incubation month keeps its return (Step 9).
 #
 # v1.4 changes vs v1.3 (pipeline audit, Oct 2026):
 #   - RETURN INDEX IS NET OF FEES. The Bloomberg total-return index (sheet
@@ -319,9 +329,11 @@ evans_cutoff <- static %>%
   left_join(first_obs, by = "Ticker") %>%
   mutate(
     ref_date     = if_else(!is.na(Inception_Date), Inception_Date, first_obs_date),
-    evans_cutoff = ref_date %m+% months(EVANS_MONTHS)
+    evans_cutoff = ref_date %m+% months(EVANS_MONTHS),
+    # v1.6: calendar-month index of the cutoff (first month kept)
+    evans_mi     = year(evans_cutoff) * 12L + month(evans_cutoff)
   ) %>%
-  select(Ticker, evans_cutoff)
+  select(Ticker, evans_cutoff, evans_mi)
 
 # =============================================================================
 # 7. PRODUCE THREE PANELS (pre-classification)
@@ -331,10 +343,12 @@ evans_cutoff <- static %>%
 panel_master <- base_panel
 
 # Panel 2: Incubation-corrected - Evans 36-month filter, no date trim
+# Month-level comparison: keep from the cutoff month onwards (dates are
+# trading-day month-ends, so a date comparison could skip the cutoff month)
 panel_incubation <- base_panel %>%
   left_join(evans_cutoff, by = "Ticker") %>%
-  filter(date >= evans_cutoff) %>%
-  select(-evans_cutoff)
+  filter(year(date) * 12L + month(date) >= evans_mi) %>%
+  select(-evans_cutoff, -evans_mi)
 
 # Panel 3: Trimmed - Evans filter + 1995-2023 sample period
 panel_trimmed <- panel_incubation %>%
@@ -419,20 +433,32 @@ LEVERAGED_KEYWORDS <- paste(
 # genuine active funds use it (e.g. American Century Ultra, Wasatch Ultra Growth).
 LEVERAGED_ANY_GROUP <- "prfnd|prfund|profnd|profund|pf-inv|leveraged"
 
+# v1.5: leveraged/inverse funds whose truncated Bloomberg names match no
+# pattern above. Candidates came from a full-sample market-beta screen and
+# were confirmed by name review (Direxion "BL"/"BEAR", Rydex, Potomac abbreviations).
+# Applied to ALL ap_groups (incl. Unknown). Broad words such as "plus" or "short" are NOT
+# used as patterns because they match genuine long-only active funds.
+LEVERAGED_TICKERS <- paste(c("DXRLX", "DXSLX", "DXNLX",   # Passive: Direxion "BL" leveraged
+                             "RYMKX",                    # Passive: Rydex Russell 2000 1.5x
+                             "DXNSX", "RYURX",           # Passive: bear / inverse S&P, NDX
+                             "PSPSX", "PDOSX",           # Unknown: bear / short
+                             "2543480D", "PNETX"),       # Unknown: Potomac Internet short/plus
+                           "US Equity")
+
+is_leveraged <- function(Ticker, Name, ap_group) {
+  (ap_group == "Passive" & grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE)) |
+    grepl(LEVERAGED_ANY_GROUP, Name, ignore.case = TRUE) |
+    Ticker %in% LEVERAGED_TICKERS
+}
+
 exclude_leveraged <- function(panel) {
-  panel %>%
-    filter(
-      !(ap_group == "Passive" &
-          grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE)),
-      !grepl(LEVERAGED_ANY_GROUP, Name, ignore.case = TRUE)
-    )
+  panel %>% filter(!is_leveraged(Ticker, Name, ap_group))
 }
 
 cat("\nStep 8b removes (panel_master, all groups):\n")
 print(as.data.frame(panel_master %>%
   distinct(Ticker, Name, ap_group) %>%
-  filter((ap_group == "Passive" & grepl(LEVERAGED_KEYWORDS, Name, ignore.case = TRUE)) |
-           grepl(LEVERAGED_ANY_GROUP, Name, ignore.case = TRUE)) %>%
+  filter(is_leveraged(Ticker, Name, ap_group)) %>%
   arrange(ap_group, Name)), row.names = FALSE)
 
 n_pass_before <- n_distinct(panel_trimmed$Ticker[panel_trimmed$ap_group == "Passive"])
@@ -453,10 +479,11 @@ cat("  Removed             :", n_pass_before - n_pass_after, "\n")
 #     flagged_funds.xlsx is the canonical, user-curated exclusion workbook.
 #     It encodes the dissertation's three-tier scope discipline:
 #
-#       (i)  Exclude from Entire Analysis  (125 funds, v1.3): dropped at
+#       (i)  Exclude from Entire Analysis (counts: see workbook): dropped at
 #            source. Covers GLOBAL_MANDATE / EM_MANDATE (non-US), LONG_SHORT,
 #            MARKET_NEUTRAL, BEAR_MARKET (violate the long-only assumption),
-#            and DATA_ERROR (the two confirmed Bloomberg errors QWVOX, VALLCEN).
+#            DATA_ERROR (the two confirmed Bloomberg errors QWVOX, VALLCEN)
+#            and NONSTANDARD_EXPENSE (six funds).
 #            v1.3 note: PASSIVE_INDEX (313 funds, formerly the bulk of this
 #            tier) has been retired; passive index funds now survive Step 8c
 #            and appear in descriptive, aggregate, and portfolio-sort
@@ -464,16 +491,16 @@ cat("  Removed             :", n_pass_before - n_pass_after, "\n")
 #            persistence, H1-H4) are unaffected because they apply their
 #            own ap_group == "Active" guards downstream.
 #
-#       (ii) Exclude from Perf Comparison  (292 funds, v1.3): NOT dropped
+#       (ii) Exclude from Perf Comparison (counts: see workbook): NOT dropped
 #            here. Tagged on the surviving panel with excluded_perf = TRUE
 #            so that aggregate-alpha, bootstrap, FDR, persistence,
 #            sub-period, robust factor model, and portfolio-sort scripts
 #            can apply filter(!excluded_perf). After PASSIVE_INDEX retirement
-#            this sheet is dominated by SECTOR_FUND (169) and the long-short
+#            this sheet is dominated by SECTOR_FUND and the long-short
 #            / market-neutral / global-mandate residuals.
 #
-#       (iii) Exclude from H3 Only  (155 funds, v1.3): tagged with
-#            excluded_h3 = TRUE. As of v1.3 contains SECTOR_FUND (149) and
+#       (iii) Exclude from H3 Only (counts: see workbook): tagged with
+#            excluded_h3 = TRUE. As of v1.3 contains SECTOR_FUND and
 #            COVERED_CALL_OVERLAY (6) only. H3_EXCLUDED (90 funds in
 #            Equity Income / Specialty Diversified / Specialty Miscellaneous
 #            Lipper categories) was retired: its original Cremers-Petajisto
@@ -590,7 +617,11 @@ cat(sprintf("    excluded_h3   = TRUE : %d funds\n",
 #    ret_net_raw is unaffected (no imputation). Returns exclude sales loads,
 #    as in CRSP-based studies.
 #
-#    First observation per fund in each panel is NA (no lagged index).
+#    v1.5: returns are computed once on panel_master (full histories) and
+#    joined into the incubation and trimmed panels. Computing them within
+#    each truncated panel set the first post-incubation month to NA (its
+#    lagged index lies before the Evans cutoff), losing one return per fund.
+#    Only each fund's first month in the full data is NA.
 # =============================================================================
 compute_returns <- function(panel) {
   panel %>%
@@ -605,9 +636,18 @@ compute_returns <- function(panel) {
     ungroup()
 }
 
-panel_master     <- compute_returns(panel_master)
-panel_incubation <- compute_returns(panel_incubation)
-panel_trimmed    <- compute_returns(panel_trimmed)
+panel_master <- compute_returns(panel_master)
+
+# Join master returns into the truncated panels by (Ticker, date)
+ret_lookup <- panel_master %>% select(Ticker, date, ret_net_raw, ret_gross_raw)
+join_returns <- function(panel) {
+  out <- panel %>% left_join(ret_lookup, by = c("Ticker", "date"))
+  stopifnot(nrow(out) == nrow(panel))
+  out
+}
+panel_incubation <- join_returns(panel_incubation)
+panel_trimmed    <- join_returns(panel_trimmed)
+rm(ret_lookup)
 
 cat("\nMonthly returns computed for all panels (index = net of fees).\n")
 

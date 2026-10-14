@@ -1,4 +1,9 @@
-# psychological_premium.R                                              v1.3
+# psychological_premium.R                                              v1.4
+# v1.4 (Batch 4, Oct 2026): D_SENT_lag added to the sample filter, so the
+#   PPF sample is identical to the H3 regression sample. Calibration spread
+#   and its t read from portfolio_alphas.xlsx (was hard-coded 2.120); the
+#   note flags an insignificant spread; formula in the note includes the
+#   D^SENT main effect and states the one-sided alternative (Diff < 0).
 # =============================================================================
 # v1.3 changes (filter-methodology revision, May 2026):
 #   No code change. flagged_funds.xlsx ledger updated upstream: H3_EXCLUDED
@@ -32,8 +37,8 @@
 # v1.1 changes (May 2026):
 #   - Footnote expanded with alpha-basis-points conversion paragraph for
 #     Table 23. Calibration: EW Carhart alpha Q5-Q1 momentum spread (MOM_SPREAD_PCT,
-#     2.120% p.a. after the Oct 2026 re-run) over rank distance 0.8 = 265 bps per rank-point.
-#     Worked example: MAX12 R_MID, low/high sentiment = 14 / 58 bps per SD.
+#     read from portfolio_alphas.xlsx since v1.4) over rank distance 0.8.
+#     Worked example computed at run time (MAX12, R_MID); see fn below.
 #     Sourced from Table 12 (Active EW, Momentum); see fn variable below.
 # =============================================================================
 # =============================================================================
@@ -126,7 +131,9 @@ core_rhs <- c("flow", "R_LOW", "R_MID", "R_HIGH",
 samp <- panel_reg %>%
   filter(!excluded_h3) %>%
   filter(!is_december) %>%
-  filter(if_all(all_of(c(core_rhs, "ActR2", "ActSkew", "MAX12", "D_SENT")),
+  # D_SENT_lag included so the sample is identical to the H3 sample
+  filter(if_all(all_of(c(core_rhs, "ActR2", "ActSkew", "MAX12",
+                         "D_SENT", "D_SENT_lag")),
                 ~ !is.na(.))) %>%
   mutate(Ticker = as.factor(Ticker), yearmo = as.factor(yearmo))
 
@@ -395,9 +402,23 @@ colnames(ppf_df) <- c("Lottery", "Segment",
 rownames(ppf_df) <- NULL
 
 # Worked bp example (MAX12, R_MID) computed from current estimates
-# EW Carhart Q5-Q1 momentum spread, Active (table_port_mom_alpha); update if re-run
-MOM_SPREAD_PCT <- 2.120
-BPS_PER_RANK   <- round(MOM_SPREAD_PCT / 0.8 * 100)   # 265
+# EW Carhart Q5-Q1 momentum spread, Active, read from portfolio_alphas.xlsx
+# (written by portfolio_sorts.R, Phase F); quintile 6 = Q5-Q1 spread.
+PORT_ALPHAS_FILE <- file.path(WORKING_DIR, "portfolio_alphas.xlsx")
+if (file.exists(PORT_ALPHAS_FILE)) {
+  .mom <- readxl::read_excel(PORT_ALPHAS_FILE, sheet = "momentum")
+  .mom <- .mom[.mom$ap_group == "Active" & .mom$weighting == "EW" & .mom$quintile == 6, ]
+  stopifnot(nrow(.mom) == 1L)
+  MOM_SPREAD_PCT <- 100 * .mom$alpha_car      # annualised, %
+  MOM_SPREAD_T   <- .mom$t_car
+  rm(.mom)
+} else {
+  stop("portfolio_alphas.xlsx not found in WORKING_DIR; run Phase F ",
+       "(portfolio_sorts.R) before psychological_premium.R.")
+}
+cat(sprintf("Calibration: momentum Q5-Q1 EW Carhart alpha = %.3f%% p.a. (t = %.2f)\n",
+            MOM_SPREAD_PCT, MOM_SPREAD_T))
+BPS_PER_RANK   <- round(MOM_SPREAD_PCT / 0.8 * 100)
 mid_lo <- abs(sp_max12$MID$SP_low)
 mid_hi <- abs(sp_max12$MID$SP_high)
 bps_lo <- as.integer(round(mid_lo * BPS_PER_RANK))
@@ -406,20 +427,22 @@ bps_hi <- as.integer(round(mid_hi * BPS_PER_RANK))
 caption <- "Psychological Premium (Shadow Price) Estimates"
 fn <- paste0(
   "Each row is computed from a separate joint regression of the form ",
-  "$\\\\text{flow}=\\\\beta_q R^q + \\\\delta_q R^q D^{\\\\text{SENT}} + ",
+  "$\\\\text{flow}=\\\\beta_q R^q + \\\\gamma D^{\\\\text{SENT}} + \\\\delta_q R^q D^{\\\\text{SENT}} + ",
   "\\\\eta\\\\,\\\\text{AS}^z + \\\\phi\\\\,\\\\text{AS}^z D^{\\\\text{SENT}} + ",
-  "\\\\text{controls} + \\\\mu_i$, with $\\\\text{AS}^z$ standardised within ",
+  "\\\\text{controls} + \\\\mu_i$ (fund fixed effects), with $\\\\text{AS}^z$ standardised within ",
   "sample. Shadow Price units are rank points per standard deviation of ",
   "the lottery measure. Standard errors via the delta method using the ",
   "joint coefficient covariance from the underlying regression; clustered ",
   "two-way on Ticker and yearmo. ",
-  "Stars refer to the 1-sided $p$: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
+  "The 1-sided $p$ tests Diff $<0$ (a larger premium under high sentiment); ",
+  "stars refer to it: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "\\\\smallskip ",
   "\\\\textit{Conversion to alpha basis points.} To express the premium ",
   "in welfare-relevant units, the rank-to-alpha mapping is calibrated ",
   "using the equal-weighted Carhart four-factor alpha spread between the ",
   "top and bottom momentum quintiles of the Active panel (Table~\\\\ref{tab:port_mom_alpha}, ",
-  sprintf("$Q5-Q1=%.3f\\\\%%$ p.a.). With a midpoint-to-midpoint rank distance of ", MOM_SPREAD_PCT),
+  sprintf("$Q5-Q1=%.3f\\\\%%$ p.a., $t=%.2f$). With a midpoint-to-midpoint rank distance of ",
+          MOM_SPREAD_PCT, MOM_SPREAD_T),
   sprintf("$0.8$, this implies approximately %d basis points of annual Carhart ", BPS_PER_RANK),
   "alpha per rank-point. Applying this conversion at the middle rank ",
   sprintf(paste0(
@@ -436,6 +459,9 @@ fn <- paste0(
   "regressions is conceptually similar but slightly attenuated, so the ",
   "quoted basis-point figures should be read as orders of magnitude ",
   "rather than precise estimates. ",
+  if (abs(MOM_SPREAD_T) < 1.645)
+    "The calibrating spread is itself not statistically significant, which reinforces this caution. "
+  else "",
   "\\\\smallskip ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
   "no date cap; H3 / activeness subsample per flagged\\\\_funds.xlsx."

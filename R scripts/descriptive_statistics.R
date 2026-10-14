@@ -280,6 +280,14 @@ counts_raw <- bind_rows(
   mutate(Total = Active + Passive + Unknown) %>%
   select(Panel, Active, Passive, Unknown, Total)
 
+# Entire-Analysis drops and analytical sample sizes, computed (not typed)
+fmtc   <- function(x) formatC(x, format = "d", big.mark = ",")
+n_pre  <- c(n_distinct(panel_master_pre8c$Ticker), n_distinct(panel_incubation_pre8c$Ticker),
+            n_distinct(panel_trimmed_pre8c$Ticker))
+n_post <- c(n_distinct(panel_master$Ticker), n_distinct(panel_incubation$Ticker),
+            n_distinct(panel_trimmed$Ticker))
+n_drop <- n_pre - n_post
+
 latex_t1 <- counts_raw %>%
   kbl(
     format    = "latex",
@@ -298,14 +306,17 @@ latex_t1 <- counts_raw %>%
       "regression analyses. The Incubation-Corrected panel removes the first",
       "36 months of each fund's return history following \\\\textcite{Evans2010}.",
       "The Trimmed panel additionally restricts the sample to 1995--2023.",
+      "Leveraged and inverse index products are removed before these counts.",
       "Counts reflect the cleaned data universe before analytical-scope",
       "exclusions documented in Section~\\\\ref{sec:panel_construction}",
       "(long/short, market-neutral, bear-market or inverse strategies,",
       "non-U.S.\\\\ mandate, and confirmed data-error funds tagged in",
-      "flagged\\\\_funds.xlsx as Entire-Analysis exclusions, the latter now including six funds with a non-standard expense structure): 115, 88,",
-      "and 85 share classes are dropped from the Master,",
+      "flagged\\\\_funds.xlsx as Entire-Analysis exclusions, the latter now including six funds with a non-standard expense structure):",
+      sprintf("%s, %s, and %s share classes are dropped from the Master,",
+              fmtc(n_drop[1]), fmtc(n_drop[2]), fmtc(n_drop[3])),
       "Incubation-Corrected, and Trimmed panels respectively, yielding",
-      "analytical samples of 3,562 / 3,120 / 3,028. Per-hypothesis sample",
+      sprintf("analytical samples of %s / %s / %s. Per-hypothesis sample",
+              fmtc(n_post[1]), fmtc(n_post[2]), fmtc(n_post[3])),
       "sizes (further restricted by the Perf-Comparison and H3 flag columns)",
       "are reported in each subsequent table."
     ),
@@ -467,8 +478,8 @@ fn_t2_master <- paste(
 fn_t2_trimmed <- paste(
   fn_t2_base,
   "\\\\textcite{Evans2010} 36-month incubation correction applied and sample restricted",
-  "to 1995--2023. This is the panel used for panel-level regressions (H1--H4) where",
-  "alignment with factor and sentiment series availability motivates the date cap."
+  "to 1995--2023. It is used for robustness only; the main analyses, including",
+  "the panel regressions (H1--H4), use the incubation-corrected panel."
 )
 
 make_t2_kbl <- function(data, cap, lab, add_footnote = FALSE, fn_text = fn_t2) {
@@ -532,17 +543,25 @@ write_tex(latex_t2_trimmed, "table_desc_stats_trimmed.tex", small = TRUE)
 # 4. TABLE 3: PANEL-LEVEL GROSS RETURN DISTRIBUTION
 # =============================================================================
 ret_dist <- function(panel, panel_label) {
+  # VW Mean: time-series average of the monthly lagged-TNA-weighted mean
+  # (a pooled dollar-weighted mean would overweight recent, larger months)
+  vw <- panel %>%
+    filter(ap_group %in% c("Active", "Passive")) %>%
+    group_by(ap_group, date) %>%
+    summarise(vw_t = wm(ret_gross, tna_lag), .groups = "drop") %>%
+    group_by(ap_group) %>%
+    summarise(VW_Mean = fmt(mean(vw_t, na.rm = TRUE) * 100), .groups = "drop")
   panel %>%
     filter(ap_group %in% c("Active", "Passive")) %>%
     group_by(ap_group) %>%
     summarise(
       N        = fmt2(sum(!is.na(ret_gross))),
       Mean     = fmt(mean(ret_gross   * 100, na.rm = TRUE)),
-      VW_Mean  = fmt(wm(ret_gross, tna_lag) * 100),
       Median   = fmt(median(ret_gross * 100, na.rm = TRUE)),
       SD       = fmt(sd(ret_gross     * 100, na.rm = TRUE)),
       P10      = fmt(pct(ret_gross    * 100, 0.10)),
       P90      = fmt(pct(ret_gross    * 100, 0.90)),
+      # nonparametric skew (mean - median)/sd, NOT the moment skewness
       Skew     = fmt((mean(ret_gross, na.rm = TRUE) -
                         median(ret_gross, na.rm = TRUE)) /
                        sd(ret_gross, na.rm = TRUE)),
@@ -551,6 +570,7 @@ ret_dist <- function(panel, panel_label) {
                      digits = 4),
       .groups = "drop"
     ) %>%
+    left_join(vw, by = "ap_group") %>%
     mutate(Panel = panel_label)
 }
 
@@ -568,7 +588,7 @@ latex_t3 <- t3 %>%
     caption   = "Distribution of Monthly Gross Returns: Active vs.\\ Passive Funds",
     label     = "return_dist",
     col.names = c("Panel", "Group", "$N$", "Mean", "VW Mean", "Median",
-                  "SD", "$P_{10}$", "$P_{90}$", "Skewness", "Ex.\\ Kurtosis"),
+                  "SD", "$P_{10}$", "$P_{90}$", "Nonpar.\\ Skew", "Ex.\\ Kurtosis"),
     align     = c("l", "l", "r", "r", "r", "r", "r", "r", "r", "r", "r"),
     escape    = FALSE
   ) %>%
@@ -578,10 +598,13 @@ latex_t3 <- t3 %>%
     general = paste(
       "Statistics computed at the fund-month level across all valid gross",
       "return observations, expressed as percentages. $N$ is the number of",
-      "fund-month observations. VW Mean is the lagged-TNA-weighted cross-sectional",
-      "mean return, representing the return earned by a representative invested dollar.",
-      "Skewness is Pearson's second coefficient:",
-      "$(\\\\bar{x}-\\\\tilde{x})/s$.",
+      "fund-month observations. VW Mean is the time-series average of the monthly",
+      "lagged-TNA-weighted cross-sectional mean return, i.e.\\\\ the average monthly",
+      "return earned by a representative invested dollar.",
+      "Nonpar.\\\\ Skew is the nonparametric skew",
+      "$(\\\\bar{x}-\\\\tilde{x})/s$ (mean minus median over the standard",
+      "deviation; bounded by $\\\\pm 1$), one third of Pearson's second",
+      "skewness coefficient. It is not the third standardised moment.",
       "Excess kurtosis is the fourth standardised central moment minus 3.",
       "Unknown funds are excluded."
     ),

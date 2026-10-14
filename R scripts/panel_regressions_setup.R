@@ -1,5 +1,19 @@
-# panel_regressions_setup.R                                              v1.5
+# panel_regressions_setup.R                                              v1.6
 # =============================================================================
+# v1.6 changes (Batch 4, Oct 2026):
+#   - age_lag is the age at date t-1 (calendar), not a row lag, so the first
+#     post-incubation month keeps log_Age.
+#   - Leave-one-out style flow also defined for fund-months with a missing
+#     own flow (category mean of the other funds); previously NA.
+#   - style_flow_lag, ActR2_lag and the sentiment *_lag variables are lagged
+#     by calendar month instead of by row, so the first post-incubation month
+#     is no longer lost to NA lags.
+#   - (final audit) Funds with a missing Inception_Date get age from their
+#     first observed month (17 active funds previously had log_Age = NA and
+#     silently left H1-H4).
+#   - Upstream returns and flows now include the first post-incubation month
+#     (data_import_and_cleaning.R v1.5, flow_calculation.R v1.3).
+#
 # v1.5 changes (pipeline audit, Oct 2026, Batch 3):
 #   - JANUARIES RESTORED. Style flow is now built from a December-inclusive
 #     winsorised flow (.f_sty). v1.4 used flow_calc_pct_win, which is NA in
@@ -8,7 +22,7 @@
 #     is excluded by design), leaving February-November only.
 #   - $5M FILTER implemented as the text states: fund-months with lagged TNA
 #     below MIN_TNA_LAG (USD millions) are dropped at the very end (14b), after
-#     all lags (including the row-based sentiment lags) are built.
+#     all lags (including the sentiment lags) are built.
 #   - Rolling return statistics (12m return for the rank, 36m vol, 36m skew,
 #     12m MAX) computed on each fund's full return history in panel_master
 #     and joined by (Ticker, date). On panel_incubation the Evans filter
@@ -56,7 +70,7 @@
 # against the Berk-Green (2004) rational null.
 #
 # CONFIG (top of script):
-#   PANEL_CHOICE  one of: "trimmed" (default), "incubation", "master"
+#   PANEL_CHOICE  one of: "incubation" (default), "trimmed", "master"
 #   SUBSET        one of: "active"  (default), "passive", "all"
 #   MIN_CAT_SIZE  minimum funds per (date, Lipper_Category) cell to compute
 #                 a fractional rank (default 5)
@@ -79,10 +93,10 @@
 #                  Turnover, style_flow_lag
 #   Activeness:    ActR2 (1 - rolling Carhart R²), ActSkew (36m skewness)
 #   State vars:    SENT_ORTH, PLS_SENT, VIX, SKEW, PUT_CALL_RATIO, AAII_BB,
-#                  UMCSENT, MD_RATIO, DMD_YOY, plus 8 D_* regime dummies
+#                  UMCSENT, MD_RATIO, DMD_YOY, plus 10 D_* regime dummies
 #
 # NOTES:
-#   - Ranking is within-Lipper-category, monthly, on lagged 12-month gross
+#   - Ranking is within-Lipper-category, monthly, on lagged 12-month net
 #     return. Funds with NA Lipper_Category are dropped (Sirri-Tufano /
 #     Cheng et al. 2025 standard).
 #   - Performance and rank are computed AFTER the SUBSET filter is applied,
@@ -237,11 +251,18 @@ stopifnot(!anyDuplicated(roll_stats[c("Ticker", "date")]))
 panel <- panel %>%
   left_join(roll_stats, by = c("Ticker", "date")) %>%
   arrange(Ticker, date) %>%
-  group_by(Ticker) %>%
-  mutate(age_months = as.numeric(difftime(date, as.Date(Inception_Date),
-                                          units = "days")) / 30.4375,
-         age_lag    = lag(age_months, 1)) %>%
-  ungroup()
+  # Age reference: Inception_Date; first observed month when it is missing
+  # (same fallback as the Evans filter in data_import_and_cleaning.R)
+  left_join(stats_src %>% group_by(Ticker) %>%
+              summarise(.first_obs = min(date), .groups = "drop"),
+            by = "Ticker") %>%
+  mutate(.age_ref   = coalesce(as.Date(Inception_Date), .first_obs),
+         age_months = as.numeric(difftime(date, .age_ref, units = "days")) / 30.4375,
+         # age at t-1 by calendar date (row lag was NA in each fund's first
+         # panel month, i.e. the first post-incubation month)
+         age_lag    = as.numeric(difftime(date %m-% months(1), .age_ref,
+                                          units = "days")) / 30.4375) %>%
+  select(-.first_obs, -.age_ref)
 
 # --- 8. Within-Lipper-category fractional rank on lagged cumret -------------
 # Position-based rank divided by category size with the (rank - 0.5) / N
@@ -275,24 +296,41 @@ if (!exists("winsorise")) {
     pmax(pmin(x, q[2]), q[1])
   }
 }
-panel <- panel %>% mutate(.f_sty = winsorise(flow_calc_pct))
+# Month index (consecutive integers) for calendar-based lags below
+month_idx <- function(d) year(d) * 12L + month(d)
+panel <- panel %>% mutate(.f_sty = winsorise(flow_calc_pct), .mi = month_idx(date))
 panel <- panel %>%
   group_by(date, Lipper_Category) %>%
   mutate(
     .style_n     = sum(!is.na(.f_sty)),
     .style_total = sum(.f_sty, na.rm = TRUE),
-    style_flow   = if_else(
-      !is.na(.f_sty) & .style_n > 1,
-      (.style_total - .f_sty) / (.style_n - 1),
-      NA_real_
+    # leave-one-out mean; a fund with no own flow is already left out
+    style_flow   = case_when(
+      is.na(.f_sty)  & .style_n >= 1 ~ .style_total / .style_n,
+      !is.na(.f_sty) & .style_n >  1 ~ (.style_total - .f_sty) / (.style_n - 1),
+      TRUE                           ~ NA_real_
     )
   ) %>%
-  ungroup() %>%
-  select(-.style_n, -.style_total, -.f_sty) %>%
-  arrange(Ticker, date) %>%
-  group_by(Ticker) %>%
-  mutate(style_flow_lag = lag(style_flow, 1)) %>%
   ungroup()
+# Lag by calendar month, not by row: in a fund's first panel month (first
+# post-incubation month) the lag is the t-1 category mean of the other funds.
+sty_cat <- panel %>%
+  group_by(Lipper_Category, .mi) %>%
+  summarise(.tot_p = sum(.f_sty, na.rm = TRUE), .n_p = sum(!is.na(.f_sty)),
+            .groups = "drop") %>%
+  mutate(.mi = .mi + 1L)                                  # value for month t
+sty_own <- panel %>%
+  transmute(Ticker, .mi = .mi + 1L, .own_p = .f_sty)      # own flow at t-1
+panel <- panel %>%
+  left_join(sty_cat, by = c("Lipper_Category", ".mi")) %>%
+  left_join(sty_own, by = c("Ticker", ".mi")) %>%
+  mutate(style_flow_lag = case_when(
+    is.na(.n_p)                     ~ NA_real_,
+    is.na(.own_p) & .n_p >= 1       ~ .tot_p / .n_p,
+    !is.na(.own_p) & .n_p > 1       ~ (.tot_p - .own_p) / (.n_p - 1),
+    TRUE                            ~ NA_real_)) %>%
+  select(-.style_n, -.style_total, -.f_sty, -.tot_p, -.n_p, -.own_p)
+rm(sty_cat, sty_own)
 
 # --- 10. log_TNA and log_Age (lagged; defensive against zero/negative) ------
 # tna_lag is already TNA_{t-1} from flow_calculation.R -- do not lag again.
@@ -325,11 +363,10 @@ if (!file.exists(ALPHA_ROLLING_FILE)) {
   panel <- left_join(panel, ar, by = c("Ticker", "date"),
                      relationship = "one-to-one")
 }
-panel <- panel %>%
-  arrange(Ticker, date) %>%
-  group_by(Ticker) %>%
-  mutate(ActR2_lag = lag(ActR2, 1)) %>%
-  ungroup()
+# Lag by calendar month (value from month t-1 of the same fund)
+act_prev <- panel %>% transmute(Ticker, .mi = .mi + 1L, ActR2_lag = ActR2)
+panel <- panel %>% left_join(act_prev, by = c("Ticker", ".mi"))
+rm(act_prev)
 
 # --- 12. Merge behavioral state variables by year-month ---------------------
 # Panel dates are Bloomberg trading-calendar EOM (e.g., 1994-12-30 = Friday).
@@ -435,28 +472,24 @@ cat("\nEst. sample (flow + core controls all non-NA, ex-December): ",
 # / saveRDS().
 #
 # This creates lagged versions of every sentiment variable for use as the
-# PRIMARY specification in H1/H2 (Huang et al. 2015 timing convention).
-# Contemporaneous versions remain available for the timing robustness check.
+# TIMING ROBUSTNESS tables of H1-H4 (Huang et al. 2015 timing convention).
+# The primary specifications use the contemporaneous state variables.
 # =============================================================================
 
-# Lagged behavioral state variables (one-period lag, within fund)
+# Lagged behavioral state variables (one-month lag of the monthly series).
 # Following Huang, Jiang, Tu, and Zhou (2015, RFS) timing convention.
+# v1.6: lagged on the market-level monthly series and joined by month, so a
+# fund's first panel month is not lost (a within-fund row lag was NA there).
+SENT_LAG_VARS <- c("SENT_ORTH", "PUT_CALL_RATIO", "AAII_BB", "D_SENT", "D_AAII",
+                   "D_MD_DETREND", "D_MD_LEVEL", "D_MD")
+bsv_lag <- bsv_full %>%
+  transmute(.mi = month_idx(date) + 1L,                    # value for month t
+            across(all_of(SENT_LAG_VARS), ~ .x, .names = "{.col}_lag"))
+stopifnot(!anyDuplicated(bsv_lag$.mi))
 panel_reg <- panel_reg %>%
-  arrange(Ticker, date) %>%
-  group_by(Ticker) %>%
-  mutate(
-    # Continuous series lagged
-    SENT_ORTH_lag      = dplyr::lag(SENT_ORTH,      1),
-    PUT_CALL_RATIO_lag = dplyr::lag(PUT_CALL_RATIO, 1),
-    AAII_BB_lag        = dplyr::lag(AAII_BB,        1),
-    # Regime dummies lagged
-    D_SENT_lag         = dplyr::lag(D_SENT,         1),
-    D_AAII_lag         = dplyr::lag(D_AAII,         1),
-    D_MD_DETREND_lag   = dplyr::lag(D_MD_DETREND,   1),
-    D_MD_LEVEL_lag     = dplyr::lag(D_MD_LEVEL,     1),
-    D_MD_lag           = dplyr::lag(D_MD,           1)
-  ) %>%
-  ungroup()
+  mutate(.mi = month_idx(date)) %>%
+  left_join(bsv_lag, by = ".mi", relationship = "many-to-one") %>%
+  select(-.mi)
 
 cat("Added lagged sentiment columns (suffix _lag).\n")
 

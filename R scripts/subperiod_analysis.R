@@ -161,13 +161,17 @@ GAMMA_GRID    <- c(0.05, 0.10, 0.15, 0.20, 0.25,
 LAMBDA_STOREY <- 0.5
 GAMMA_STAR    <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
 
-# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+# Prob. Luck (percent of B runs)
 fmt_prob <- function(x) {
+  # Exact 0 / 100; (0, 0.1) -> "<0.1%" and (99.9, 100) -> ">99.9%", so that
+  # 1-9 or B-9..B-1 of B = 10,000 runs never round to 0.0% / 0.1% / 100.0%
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--",
-    ifelse(v == 0,   "0.0\\%",
-    ifelse(v < 0.05, "$<$0.1\\%",
-           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+    ifelse(v <= 0,    "0.0\\%",
+    ifelse(v < 0.1,   "$<$0.1\\%",
+    ifelse(v >= 100,  "100.0\\%",
+    ifelse(v > 99.9,  "$>$99.9\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))))
 }
 
 # Bootstrap caching: saves ~25 minutes when re-running the script after the
@@ -469,6 +473,9 @@ estimate_subperiod <- function(sp, panel_source) {
     }, numeric(1L), USE.NAMES = FALSE)
     quantile(t_sim[!is.na(t_sim)], probs = pcts_probs, na.rm = TRUE)
   }
+  # The function uses only its arguments: detach it from this function's
+  # environment so parLapply does not ship the whole panel to every worker
+  environment(one_boot_run) <- globalenv()
   
   # Cache key: hash inputs that determine bootstrap output. If any changes
   # (fund set, date range, B_RUNS, NW_LAG, seed), cache is invalidated.
@@ -885,7 +892,7 @@ n_active_bs_vec <- sapply(results, function(r)
 fn_d3 <- paste(
   "Bootstrap procedure follows \\\\textcite{FamaFrench2010}, applied separately",
   "within each sub-period. For each fund, estimated monthly alpha is subtracted",
-  "from the excess return series to construct a zero-alpha null return.",
+  "from the gross excess return series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months (within the",
   "sub-period window) are resampled with replacement and kept in the order drawn,",
   "the same draw applying to all funds, preserving cross-sectional",
@@ -897,7 +904,7 @@ fn_d3 <- paste(
   "\\\\textit{Prob.\\\\ Luck}: fraction of iterations in which the simulated",
   "percentile falls below the actual value; values below 5\\\\% (above 95\\\\%)",
   "indicate that the actual percentile is worse (better) than zero-alpha luck",
-  "would produce; 0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 4 of 10,000.",
+  "would produce; 0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 9 of 10,000 (and $>$99.9\\\\% means 9,991 to 9,999).",
   "Newey-West standard errors with a 6-month lag are used throughout.",
   paste0("Active fund counts: P1 $N = ", formatC(n_active_bs_vec[1], format = "d", big.mark = ","),
          "$; P2 $N = ", formatC(n_active_bs_vec[2], format = "d", big.mark = ","),
@@ -970,7 +977,7 @@ fn_d4 <- paste(
   "The proportion of true zero-alpha active funds ($\\\\hat{\\\\pi}_0$) estimated",
   "separately within each sub-period, following \\\\textcite{Storey2002} and",
   "\\\\textcite{BarrasScailletWermers2010}, using $p$-values from Newey-West",
-  "$t$-tests on sub-period \\\\textcite{Carhart1997} four-factor alphas.",
+  "$t$-tests on sub-period \\\\textcite{Carhart1997} four-factor alphas on gross returns.",
   "The estimator is $\\\\hat{\\\\pi}_0 = |\\\\{p_i > \\\\lambda\\\\}| \\\\,/\\\\, [N(1-\\\\lambda)]$,",
   "where $\\\\lambda = 0.5$ is the standard tuning parameter.",
   "$N$: number of active funds with $\\\\geq 24$ monthly observations within the",
@@ -1142,7 +1149,8 @@ d6_packs <- data.frame(
 )
 
 fn_d6 <- paste(
-  "Monthly EW and VW aggregate portfolio returns regressed on CAPM,",
+  "Monthly EW and VW aggregate portfolio gross returns (net plus one-twelfth of",
+  "the expense ratio) regressed on CAPM,",
   "Fama-French three-factor, and \\\\textcite{Carhart1997} four-factor models,",
   "estimated separately within each sub-period.",
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",

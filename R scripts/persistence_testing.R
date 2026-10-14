@@ -1,5 +1,11 @@
 # =============================================================================
-# PERSISTENCE TESTING                                                      v1.3
+# PERSISTENCE TESTING                                                      v1.4
+#
+# v1.4 changes (Batch 4, Oct 2026):
+#   - A fund enters the formation ranking only if it reports a return in the
+#     ranking month (form_hi). Funds that died during the formation window
+#     were previously ranked and entered the decile cut-offs.
+#   - Cohort-8 comment corrected (one usable holding month, Jan 2026).
 #
 # v1.3 changes vs v1.2 (pipeline audit, Oct 2026):
 #   (a) BOOTSTRAP NULL IMPOSED. v1.2 resampled fund-level holding residuals
@@ -57,7 +63,7 @@
 #   - Active funds only, gross returns, Evans-corrected panel_incubation.
 #   - Formation: 36 months, NW_LAG = 3, min 24 obs per methodology 2.3.
 #   - Holding:   12 months, pooled across cohorts, NW_LAG = 12 (capped at
-#                (T-1)/2 for small panels), equal-weighted decile portfolios.
+#                T-1 for small panels), equal-weighted decile portfolios.
 #   - Bootstrap: B = 10000 iterations, shared tau(t) within each cohort to
 #                preserve cross-sectional correlation (KTWW convention).
 #                NA-propagation naturally handles within-holding deaths.
@@ -84,8 +90,8 @@
 # OUTPUTS:
 #   persistence_results.xlsx   - all panels' raw numeric results + audit
 #                                (alpha, t, bootstrap quantiles, loadings,
-#                                 moments, expense ratio) across 6 panels.
-#   table_persistence.tex      - single longtable, 6 panels x 11 rows each,
+#                                 moments, expense ratio) across all panels.
+#   table_persistence.tex      - single longtable, one block of 11 rows per panel,
 #                                 small-font landscape-ready layout.
 #   persistence_bootstrap_cache_{A..F}.rds - one cache per panel.
 #
@@ -132,8 +138,8 @@ dir.create(BOOT_CACHE_DIR, showWarnings = FALSE)  # no-op if already exists
 
 # Cohort ranking dates -- end of year k; formation = 36m ending on the ranking
 # date, holding = 12m starting the first of the following month. Cohort 8
-# carries 2 holding-period months in the panel_incubation window (through
-# Feb 2026) and is excluded from inference per methodology Section 2.2.
+# has one usable holding month (Jan 2026; the factor data end in Jan 2026)
+# and is excluded from inference per methodology Section 2.2.
 COHORT_DEFS <- data.frame(
   cohort_id     = 1:8,
   rank_date     = as.Date(c("1997-12-31", "2001-12-31", "2005-12-31",
@@ -185,6 +191,7 @@ PANELS <- list(
            title = "Panel B: Full sample, raw-alpha ranking (robustness)",
            cohorts = USABLE_COHORTS, rank_var = "alpha")
 )
+OMITTED_REGIMES <- integer(0)   # regimes without enough cohorts (no panel)
 for (r in 1:3) {
   coh_r <- .cd$cohort_id[.cd$reg_lo == r & .cd$reg_hi == r]
   if (length(coh_r) >= MIN_PANEL_COHORTS) {
@@ -196,6 +203,7 @@ for (r in 1:3) {
   } else {
     cat(sprintf("Regime P%d: %d cohort(s) fully inside -- regime panel omitted.\n",
                 r, length(coh_r)))
+    OMITTED_REGIMES <- c(OMITTED_REGIMES, r)
   }
 }
 coh_x <- .cd$cohort_id[.cd$reg_lo != .cd$reg_hi]
@@ -493,6 +501,8 @@ estimate_cohort <- function(cd) {
   run_form <- function(tk) {
     d <- form_by_fund[[tk]]; n <- nrow(d)
     if (n < MIN_OBS_FORM) return(NULL)
+    # v1.4: fund must be alive (report a return) in the ranking month
+    if (!any(d$date == cd$form_hi)) return(NULL)
     y <- d$excess_ret
     X <- cbind(1, d$mkt_rf, d$smb, d$hml, d$mom)
     fit <- fast_ols(y, X); if (is.null(fit)) return(NULL)
@@ -704,7 +714,7 @@ run_carhart_on_decile <- function(series, factors_ts) {
 build_actual_panel <- function(panel, cohorts_by_id, factors_ts) {
   out <- list()
   series_by_dec <- vector("list", N_DECILES)
-  n_funds_per_dec <- integer(N_DECILES)
+  n_funds_per_dec <- numeric(N_DECILES)
   exp_ratio_per_dec <- numeric(N_DECILES)
   
   # NA-filled stats row with the correct column schema. Emitted whenever a
@@ -737,9 +747,8 @@ build_actual_panel <- function(panel, cohorts_by_id, factors_ts) {
       out[[paste0("D", d)]] <- est
       next
     }
-    # Count unique fund-membership (sum of alive-counts weighted by cohort count)
-    n_funds_per_dec[d] <- sum(s$n_funds_alive, na.rm = TRUE) /
-      max(length(unique(s$cohort_id)), 1L)
+    # Average number of live funds per holding month (as in activeness_persistence)
+    n_funds_per_dec[d] <- mean(s$n_funds_alive, na.rm = TRUE)
     # Average constituent expense ratio across cohorts
     exp_ratio_per_dec[d] <- mean(s$exp_ratio_avg, na.rm = TRUE)
     est <- run_carhart_on_decile(s, factors_ts)
@@ -1005,7 +1014,7 @@ cat("Written: persistence_results.xlsx\n")
 # =============================================================================
 # 9. BUILD LATEX TABLE
 # =============================================================================
-# Single longtable: 6 panels x 11 rows each (10 deciles + spread).
+# Single longtable: one block per panel, 11 rows each (10 deciles + spread).
 # Column set (14 cols) -- tight enough for landscape small-font layout:
 #   Decile, alpha_m (%), t(alpha), p^C_{1t}, p^R_B, p^L_B,
 #   b_MKT, b_SMB, b_HML, b_MOM, adj R2, ExpR, JB_p
@@ -1075,14 +1084,16 @@ fn_text <- paste(
   "12-month holding non-overlapping cohorts, ranked by formation-period",
   "\\textcite{Carhart1997} four-factor alpha $t$-statistic (Newey-West, 3-month",
   "lag) except Panel B, which ranks by raw alpha as a robustness check.",
-  "Equal-weighted decile portfolios pooled across cohorts; alpha and factor",
+  "Equal-weighted decile portfolios of gross excess returns (net return plus",
+  "one-twelfth of the annual expense ratio) pooled across cohorts; alpha and factor",
   "loadings estimated jointly on pooled holding-period returns by OLS with",
   "Newey-West $t$-statistics (12-month lag).",
   "$\\hat{\\alpha}$: monthly, \\%.",
   "$p^C$: one-tailed parametric $p$-value from the holding-period alpha",
   "$t$-statistic under normality.",
   "$p^R_B$, $p^L_B$: right- and left-tail bootstrap $p$-values",
-  "($B = 10{,}000$), computed as the fraction of simulated decile",
+  sprintf("($B = %s$), computed as the fraction of simulated decile",
+          format(B_RUNS, big.mark = "{,}")),
   "$t(\\hat{\\alpha})$ under the zero-true-alpha null that exceed (fall below)",
   "the observed $t$-statistic. The null is imposed on each decile regression",
   "by subtracting its estimated alpha; pooled holding months are then resampled",
@@ -1096,11 +1107,19 @@ fn_text <- paste(
   "Significance stars on $\\hat{\\alpha}$ and factor loadings reflect",
   "Newey-West $t$-statistics: $^{*}$, $^{**}$, $^{***}$ at 10\\%, 5\\%, 1\\%.",
   "Sample: Active funds in the \\textcite{Evans2010}-corrected",
-  paste0("panel\\_incubation, ", format(min(factors_ts$date), "%b %Y"), "--",
-         format(max(factors_ts$date), "%b %Y"), "; performance-comparison subsample"),
+  # formation start of the first to holding end of the last usable cohort
+  paste0("panel\\_incubation, ",
+         format(min(COHORT_DEFS$form_lo[COHORT_DEFS$cohort_id %in% USABLE_COHORTS]), "%b %Y"),
+         "--",
+         format(max(COHORT_DEFS$hold_hi[COHORT_DEFS$cohort_id %in% USABLE_COHORTS]), "%b %Y"),
+         "; performance-comparison subsample"),
   "per flagged\\_funds.xlsx.",
   "Regime panels contain only cohorts whose formation and holding windows lie",
-  "inside one regime; Panel F contains the cohorts that cross a regime boundary."
+  "inside one regime; Panel F contains the cohorts that cross a regime boundary.",
+  if (length(OMITTED_REGIMES))
+    sprintf("No panel is reported for %s, which contains fewer than %s complete cohorts.",
+            paste0("P", OMITTED_REGIMES, collapse = " and "),
+            c("one", "two", "three", "four")[MIN_PANEL_COHORTS]) else ""
 )
 
 k <- full_data %>%
@@ -1152,5 +1171,5 @@ for (pnm in names(results_per_panel)) {
 }
 cat("\nOutputs:\n")
 cat("  persistence_results.xlsx  (audit + downstream numeric data)\n")
-cat("  table_persistence.tex     (single longtable, 6 panels)\n")
+cat("  table_persistence.tex     (single longtable, all panels)\n")
 cat("  persistence_bootstrap_cache_*.rds  (per-panel caches)\n")

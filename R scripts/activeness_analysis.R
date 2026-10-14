@@ -107,9 +107,8 @@
 #       sqrt(12) * sd(ret_gross_i - ret_bench_b(i)). Following the
 #       interpretation of Cremers & Petajisto (2009, RFS).
 #
-# Quintile assignment is fund-level (time-series average of activeness),
-# matching the static-fee precedent in portfolio_sorts.R Tables 14-16. Active
-# funds only; passive sorts are uninformative by construction.
+# Quintile assignment is monthly on the lagged activeness measure (v1.4).
+# Active funds only; passive sorts are uninformative by construction.
 #
 # Inputs:
 #   panel_incubation (session)        Evans-corrected panel from Phase A. Provides

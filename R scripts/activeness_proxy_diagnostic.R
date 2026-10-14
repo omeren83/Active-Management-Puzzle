@@ -1,5 +1,9 @@
-# activeness_proxy_diagnostic.R                                        v1.1
+# activeness_proxy_diagnostic.R                                        v1.2
 # =============================================================================
+# v1.2 (final audit, Oct 2026): UpSkew built on panel_master (full histories),
+#   matching ActSkew/MAX12; it was on panel_incubation, so its 36-month window
+#   started ~36 months later and its coverage was understated.
+#
 # v1.1 changes (pipeline audit, Oct 2026):
 #   - Sample restricted to the H3 / activeness subsample (!excluded_h3), like
 #     H3_lottery_demand.R.
@@ -100,8 +104,16 @@ upskew_fun <- function(r) {
   mean(((r_pos - m) / sigma_up)^3)
 }
 
-cat("\nConstructing UpSkew from panel_incubation (MAX12 already in panel_reg via panel_regressions_setup.R)...\n")
-extra_proxies <- panel_incubation %>%
+# UpSkew on full fund histories (panel_master), as ActSkew/MAX12 in
+# panel_regressions_setup.R, so 36-month windows are not cut by the Evans filter
+upskew_src <- if (exists("panel_master")) panel_master else {
+  warning("panel_master not in session; UpSkew built on panel_incubation ",
+          "(36-month windows start after the incubation cut).")
+  panel_incubation
+}
+cat("\nConstructing UpSkew from full fund histories (MAX12 already in panel_reg via panel_regressions_setup.R)...\n")
+extra_proxies <- upskew_src %>%
+  filter(Ticker %in% unique(panel_reg$Ticker)) %>%
   arrange(Ticker, date) %>%
   group_by(Ticker) %>%
   mutate(
@@ -351,7 +363,8 @@ fn <- paste0(
   "Aligned sample restricted to fund-month observations with all four ",
   "measures and core controls non-NA. Two-way clustered standard errors on ",
   "Ticker and calendar month. Coverage in column 2 reports the fraction of ",
-  "fund-months in panel\\\\_reg with the measure non-NA (before alignment).\\\\\\\\ ",
+  "H3-subsample, non-December fund-months with the measure non-NA (before alignment). All ",
+  "ActSkew, UpSkew (36-month windows) and MAX12 (12 months) are computed on full fund histories.\\\\\\\\ ",
   "The ``winning'' proxy is identified by (i) high univariate $|t|$ under ",
   "the FE structure that preserves its dominant variation source, (ii) ",
   "survival in the horse race conditional on the others, and (iii) ",

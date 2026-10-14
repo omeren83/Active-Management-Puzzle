@@ -5,7 +5,7 @@
 # -----------------------------------------------
 #   Table I.3 at GAMMA_STAR = 0.45 (BSW 2010, eq. 8), caption and note follow
 #   the constant; tail counts described as Student-t p-value based (matching
-#   the estimation scripts). Table I.2 note: "<0.1%" means 1-4 iterations.
+#   the estimation scripts). Table I.2 note: "<0.1%" means 1-9 iterations.
 #
 # Purpose
 # -------
@@ -76,6 +76,17 @@ car <- load_spec("Carhart", "Carhart 4-Factor")
 ff6 <- load_spec("FF6",     "FF 6-Factor")
 c5  <- load_spec("C5",      "Carhart + PSL")
 
+# Sample windows from the regression month counts (first return month Jan 1995;
+# Dec 1994 enters only as the lag for the first return).
+SAMPLE_START <- as.Date("1995-01-01")
+win_str <- function(spec) {
+  Tm <- spec$port_alpha$t_months[spec$port_alpha$Group == "Active"][1]
+  paste0(format(SAMPLE_START, "%b %Y"), "--",
+         format(seq(SAMPLE_START, by = "month", length.out = Tm)[Tm], "%b %Y"))
+}
+WIN_CAR <- win_str(car); WIN_FF6 <- win_str(ff6); WIN_C5 <- win_str(c5)
+if (WIN_CAR != WIN_FF6) warning("Carhart and FF6 windows differ: ", WIN_CAR, " vs ", WIN_FF6)
+
 cat("Carhart port_alpha rows:", nrow(car$port_alpha),
     "| FF6:", nrow(ff6$port_alpha),
     "| C5:",  nrow(c5$port_alpha), "\n")
@@ -95,11 +106,15 @@ fmt1 <- function(x) {
 }
 
 fmt_prob <- function(x) {
+  # Exact 0 / 100; (0, 0.1) -> "<0.1%" and (99.9, 100) -> ">99.9%", so that
+  # 1-9 or B-9..B-1 of B = 10,000 runs never round to 0.0% / 0.1% / 100.0%
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--",
-    ifelse(v == 0,   "0.0\\%",
-    ifelse(v < 0.05, "$<$0.1\\%",
-           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+    ifelse(v <= 0,    "0.0\\%",
+    ifelse(v < 0.1,   "$<$0.1\\%",
+    ifelse(v >= 100,  "100.0\\%",
+    ifelse(v > 99.9,  "$>$99.9\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))))
 }
 
 # Significance stars from two-sided t-statistic.
@@ -247,8 +262,8 @@ e1_tex <- c(
     "\\textcite{PastorStambaugh2003} traded liquidity factor. ",
     "SMB is held constant at the \\textcite{FamaFrench1993} construction ",
     "(single $2\\times3$ size--BM sort) across all specifications. ",
-    "Carhart and FF 6-Factor: Dec 1994--Feb 2026. ",
-    "Carhart + PSL: Dec 1994--Dec 2024 (constrained by Pastor liquidity data release). ",
+    "Carhart and FF 6-Factor: ", WIN_CAR, ". ",
+    "Carhart + PSL: ", WIN_C5, " (constrained by the Pastor--Stambaugh liquidity data release). ",
     "Sample: Incubation-corrected panel (\\citealt{Evans2010}), no date cap; ",
     "performance-comparison subsample per flagged\\_funds.xlsx."
   ),
@@ -329,7 +344,7 @@ e2_tex <- c(
     "fraction of $B = 10{,}000$ \\textcite{FamaFrench2010} bootstrap ",
     "iterations in which the simulated percentile falls below the actual value. ",
     "Bootstrap procedure: for each fund, estimated monthly alpha is subtracted ",
-    "from the excess return series to construct a zero-alpha null; calendar ",
+    "from the gross excess return series to construct a zero-alpha null; calendar ",
     "months are then resampled with replacement, preserving cross-sectional ",
     "factor return dependence; the factor model is re-estimated on each ",
     "resampled series. Newey-West HAC standard errors (6-month lag) are ",
@@ -337,9 +352,9 @@ e2_tex <- c(
     "the symmetry requirement of \\textcite{FamaFrench2010}. ",
     "Values of Prob.\\ Luck below 5\\% at lower percentiles indicate ",
     "underperformance inconsistent with the zero-alpha null. ",
-    "Entries of 0.0\\% indicate zero out of $B = 10{,}000$ iterations ",
-    "produced a simulated $t$-statistic as extreme as the actual value; ",
-    "$<$0.1\\% indicates between 1 and 4 iterations. ",
+    "Entries of 0.0\\% mean that no iteration's simulated percentile fell below ",
+    "the actual value (100.0\\%: all did); ",
+    "$<$0.1\\% indicates between 1 and 9 iterations, $>$99.9\\% between 9,991 and 9,999. ",
     "\\textit{Carhart}: MKT-RF, SMB, HML, MOM. ",
     "\\textit{FF6}: MKT-RF, SMB, HML, RMW, CMA, MOM. ",
     "\\textit{C+PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded liquidity. ",
@@ -347,7 +362,7 @@ e2_tex <- c(
     "Incubation-corrected panel (\\citealt{Evans2010}), no date cap; ",
     "performance-comparison subsample per flagged\\_funds.xlsx; ",
     "minimum 24 monthly observations. ",
-    "Full sample window for Carhart and FF6; Dec 1994--Dec 2024 for C+PSL."
+    "Window: ", WIN_CAR, " for Carhart and FF6; ", WIN_C5, " for C+PSL."
   ),
   "\\end{singlespace}",
   "\\end{minipage}",
@@ -419,7 +434,7 @@ e3_tex <- c(
     "at significance threshold $\\gamma^* = ", gstar_str, "$ (eq.~8 of \\citealt{BarrasScailletWermers2010}). ",
     "$\\hat{\\pi}_0$: \\textcite{Storey2002} estimator of the zero-alpha fund ",
     "proportion at tuning parameter $\\lambda = 0.5$, derived from Newey-West ",
-    "$t(\\hat{\\alpha})$ p-values on full-period per-fund alphas. ",
+    "$t(\\hat{\\alpha})$ p-values on full-period per-fund gross-return alphas. ",
     "$S^-_{\\gamma^*}$ ($S^+_{\\gamma^*}$): observed fraction of active funds with ",
     "significantly negative (positive) $t(\\hat{\\alpha})$ at two-sided level ",
     "$\\gamma^*$, using the same Student-$t$ $p$-values as $\\hat{\\pi}_0$. ",
@@ -435,7 +450,9 @@ e3_tex <- c(
     "\\textit{FF 6-Factor}: \\citealt{FamaFrench2015} five-factor plus momentum. ",
     "\\textit{Carhart + PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded liquidity. ",
     "Sample: Incubation-corrected panel (\\citealt{Evans2010}), no date cap; ",
-    "performance-comparison subsample per flagged\\_funds.xlsx; Passive and Unknown funds excluded."
+    "performance-comparison subsample per flagged\\_funds.xlsx; Passive and Unknown funds excluded; ",
+    "minimum 24 monthly observations. Window: ", WIN_CAR, " for Carhart and FF6; ",
+    WIN_C5, " for C+PSL."
   ),
   "\\end{singlespace}",
   "\\end{minipage}",

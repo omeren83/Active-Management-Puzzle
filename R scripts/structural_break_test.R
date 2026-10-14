@@ -1,6 +1,13 @@
 # =============================================================================
 # STRUCTURAL BREAK TEST: BAI-PERRON ON ROLLING ACTIVE FUND ALPHA SERIES
-# structural_break_test.R  (v1.3)
+# structural_break_test.R  (v1.4)
+#
+# v1.4 (final audit, Oct 2026): break-date CIs use het.err = FALSE, i.e. one
+#   HAC (lag 35) error variance estimated on the full 350-month series. With
+#   the default het.err = TRUE, strucchange re-estimated the lag-35 HAC
+#   variance inside each 36-64-month segment, which is degenerate ("more
+#   weights than observations") and produced intervals that were too narrow.
+#   Fstats() now uses its exact argument name vcov. (was partial-matched).
 #
 # v1.3 changes vs v1.2 (pipeline audit, Oct 2026):
 #   (a) MAX_BREAKS 5 -> 8. With 5, BIC was still falling at the search limit,
@@ -48,8 +55,8 @@
 # PURPOSE:
 #   Formally tests for structural breaks in the monthly cross-sectional mean
 #   of 36-month rolling Carhart (1997) four-factor gross alpha, Active funds.
-#   This is the same series plotted in Figure 2 (before 12-month smoothing),
-#   and motivates the sub-period thresholds for the dissertation appendix.
+#   (Figure 2 is a rolling portfolio regression; this series is the EW mean
+#   of fund-level rolling alphas.) It motivates the sub-period thresholds for the dissertation appendix.
 #
 # METHOD:
 #   Bai and Perron (1998, Econometrica; 2003, JAE) multiple structural break
@@ -231,7 +238,10 @@ if (n_optimal == 0L) {
 } else {
   # confint() with vcov. requires the original breakpointsfull object (bp),
   # NOT the refitted bp_opt which is class "breakpoints". Pass breaks= here.
-  ci_bp <- confint(bp, breaks = n_optimal, vcov. = nw_vcov, level = 0.95)
+  # het.err = FALSE: one full-sample HAC variance (segments are too short
+  # for a lag-35 HAC estimate each)
+  ci_bp <- confint(bp, breaks = n_optimal, vcov. = nw_vcov, het.err = FALSE,
+                   level = 0.95)
   
   # Extract CI matrix and convert index positions to calendar dates.
   # ci_bp$confint rows = breaks, cols = [lower, bp, upper] as integer indices.
@@ -297,7 +307,7 @@ print(regime_means)
 cat("\n=== 6. Global F-statistics (single-break null) ===\n")
 
 # Trim 15% from each end for F-sequence stability (standard in the literature)
-fs <- Fstats(y_ts ~ 1, from = 0.15, to = 0.85, vcov = nw_vcov)
+fs <- Fstats(y_ts ~ 1, from = 0.15, to = 0.85, vcov. = nw_vcov)  # exact arg name
 
 f_sup  <- sctest(fs, type = "supF")
 f_mean <- sctest(fs, type = "aveF")
@@ -332,7 +342,7 @@ print(bic_tbl)
 # =============================================================================
 # 8. ANNOTATED FIGURE: SMOOTHED SERIES + BREAK DATES + 95% CI BANDS
 #
-#    Uses the 12-month smoothed series (as in Figure 2) for visual consistency.
+#    Plots the 12-month trailing mean of the series for readability.
 #    Vertical dashed lines = BP point estimates; shaded bands = 95% HAC CIs.
 #    This figure goes into the appendix to justify the sub-period thresholds.
 # =============================================================================
@@ -365,7 +375,7 @@ p_break <- ggplot(alpha_ts_raw, aes(x = date)) +
   geom_step(data = regime_step, aes(y = regime_mean_val),
             colour = "#E74C3C", linetype = "solid", linewidth = 0.6,
             direction = "hv") +
-  # Smoothed alpha series (matches Figure 2)
+  # Smoothed alpha series (12-month trailing mean, for readability)
   geom_line(aes(y = smooth_alpha), colour = "#2166AC", linewidth = 0.85,
             na.rm = TRUE) +
   scale_y_continuous(labels = function(x) paste0(x, "%")) +
@@ -436,7 +446,7 @@ if (exists("panel_incubation")) {
     format(ar_port$date[breakpoints(bp_ar, breaks = n_ar)$breakpoints], "%b %Y")
   # single-break global tests with HAC lag NONOVERLAP_HAC_LAG
   fs_ar <- Fstats(y_ar ~ 1, from = 0.15, to = 0.85,
-                  vcov = function(x, ...) NeweyWest(x, lag = NONOVERLAP_HAC_LAG, prewhite = FALSE, ...))
+                  vcov. = function(x, ...) NeweyWest(x, lag = NONOVERLAP_HAC_LAG, prewhite = FALSE, ...))
   sup_ar <- sctest(fs_ar, type = "supF")
   sup_date <- format(ar_port$date[fs_ar$breakpoint], "%b %Y")   # argmax of the F sequence
   cat(sprintf("  T = %d | BIC breaks = %d (%s) | supF = %.2f (p = %.3f) at %s\n",

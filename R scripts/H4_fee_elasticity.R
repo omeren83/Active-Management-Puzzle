@@ -223,8 +223,8 @@ get_coef <- function(mod, parts) {
 # Always 4 columns (Baseline + D_SENT + SENT_ORTH cont + D_AAII). The full
 # triple-interaction is included in cols 2-4; only the focal coefficients
 # (R_q main, ExpRatio main, ExpRatio x STATE, R_q x ExpRatio x STATE) are
-# displayed. Lower-order R_q x STATE and R_q x ExpRatio are estimated for
-# valid triple-interaction inference and suppressed for table clarity.
+# displayed together with the lower-order R_q x STATE and R_q x ExpRatio
+# terms (v2.0: no longer suppressed).
 # Phase B helper (compact form): extract tablenotes from a threeparttable
 # float and re-emit them AFTER \end{table} as a flowing paragraph (NOT a
 # minipage --- minipage is unbreakable and overflowed page bottoms).
@@ -490,8 +490,8 @@ fn_primary <- paste0(
   "Baker-Wurgler (2007) construction: $D^{\\\\text{SENT}}_t$ is the top-34\\\\% indicator ",
   "for orthogonalised sentiment; column (3) substitutes the standardised ",
   "continuous index; column (4) substitutes the AAII bull-bear regime dummy. ",
-  "ExpRatio is the fund's annual expense ratio in percent (1.0 = 1\\%), a static ",
-  "end-of-sample Bloomberg value. Lipper-",
+  "ExpRatio is the fund's annual expense ratio in percent (1.0 = 1\\\\%), a static ",
+  "end-of-sample Bloomberg value; fund-months with a non-positive expense ratio are excluded. Lipper-",
   "category $\\\\times$ yearmo fixed effects absorb both sentiment main effects ",
   "($\\\\gamma$) and any style-month aggregate flow shocks; cross-fund expense-",
   "ratio variation within each (style, month) cell identifies $\\\\theta$ and ",

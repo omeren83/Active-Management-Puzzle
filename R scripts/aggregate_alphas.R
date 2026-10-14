@@ -322,4 +322,4 @@ write_xlsx(
 )
 cat("\n[SUCCESS] aggregate_alphas.xlsx written. ")
 
-cat("aggregate_alphas.R v1.1 complete.\n")
+cat("aggregate_alphas.R v1.3 complete.\n")

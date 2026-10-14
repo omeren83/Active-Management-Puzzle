@@ -122,7 +122,8 @@ library(kableExtra)
 # =============================================================================
 DATE_MIN_FF  <- as.Date("1995-01-01")   # earliest month with usable data
 DATE_MAX_FF  <- as.Date("2006-09-30")   # FF (2010) sample end (Sep 2006)
-SAMPLE_LABEL <- "Jan 1995--Sep 2006 (Fama-French 2010 subperiod)"
+SAMPLE_LABEL <- paste("Jan 1995--Sep 2006 (Fama-French 2010 subperiod),",
+                      "performance-comparison subsample per flagged\\\\_funds.xlsx")
 
 # Estimation parameters mirror alpha_estimation.R v2.4 exactly so the
 # subperiod and full-sample numbers are directly comparable.
@@ -142,13 +143,17 @@ GAMMA_GRID   <- c(0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50)
 LAMBDA_STOREY <- 0.5
 GAMMA_STAR    <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
 
-# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+# Prob. Luck (percent of B runs)
 fmt_prob <- function(x) {
+  # Exact 0 / 100; (0, 0.1) -> "<0.1%" and (99.9, 100) -> ">99.9%", so that
+  # 1-9 or B-9..B-1 of B = 10,000 runs never round to 0.0% / 0.1% / 100.0%
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--",
-    ifelse(v == 0,   "0.0\\%",
-    ifelse(v < 0.05, "$<$0.1\\%",
-           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+    ifelse(v <= 0,    "0.0\\%",
+    ifelse(v < 0.1,   "$<$0.1\\%",
+    ifelse(v >= 100,  "100.0\\%",
+    ifelse(v > 99.9,  "$>$99.9\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))))
 }
 
 cat("=== FF SUBPERIOD REPLICATION ===\n")
@@ -759,7 +764,7 @@ fn_t7 <- paste(
   "The Active + Passive row aggregates only the two classified groups.",
   paste0("Sample: ", SAMPLE_LABEL, ".",
          " The subperiod is the maximum overlap between this study's data window",
-         " (Dec 1994 onwards) and the Fama and French (2010, \\\\textit{Journal of",
+         " (returns from Jan 1995) and the Fama and French (2010, \\\\textit{Journal of",
          " Finance}) sample (Jan 1984--Sep 2006), enabling direct comparison with",
          " their Tables I--III.")
 )
@@ -814,7 +819,7 @@ fn_t9 <- paste(
   "\\\\textit{Journal of Finance}).",
   paste0("Sample: actively managed funds, ", SAMPLE_LABEL, ","),
   paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
-  "For each fund, estimated monthly alpha is subtracted from the excess return",
+  "For each fund, estimated monthly alpha is subtracted from the gross excess return",
   "series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled",
   "with replacement and kept in the order drawn, the same draw applying to all",
@@ -826,7 +831,7 @@ fn_t9 <- paste(
   "\\\\textit{Prob.\\\\ Luck}: fraction of iterations in which the simulated percentile",
   "falls below the actual value; values below 5\\\\% (above 95\\\\%) indicate that the",
   "actual percentile is worse (better) than zero-alpha luck would produce;",
-  "0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 4 of 10,000 iterations.",
+  "0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 9 of 10,000 iterations (and $>$99.9\\\\% means 9,991 to 9,999).",
   "Newey-West standard errors with a 6-month lag are used throughout.",
   "Compare with Fama and French (2010), Table III."
 )
@@ -890,7 +895,7 @@ fn_t10 <- paste(
   "The proportion of true zero-alpha funds ($\\\\hat{\\\\pi}_0$) is estimated",
   "following Storey (2002) and Barras, Scaillet and Wermers (2010,",
   "\\\\textit{Journal of Finance}), using p-values from Newey-West $t$-tests on",
-  "full-period Carhart (1997) four-factor alphas.",
+  "full-period Carhart (1997) four-factor alphas on gross returns.",
   "The estimator is $\\\\hat{\\\\pi}_0 = |\\\\{p_i > \\\\lambda\\\\}| \\\\,/\\\\, [N(1-\\\\lambda)]$,",
   "where $\\\\lambda = 0.5$ is the standard tuning parameter following Storey (2002).",
   "Funds with p-values exceeding $\\\\lambda$ are unlikely to have non-zero true alpha;",
@@ -947,7 +952,7 @@ fn_t10b <- paste(
   "$S^-_\\\\gamma$ ($S^+_\\\\gamma$): observed fraction of active funds with",
   "significantly negative (positive) Newey-West $t(\\\\hat{\\\\alpha})$ at",
   "two-sided significance level $\\\\gamma$, using full-period Carhart (1997)",
-  "four-factor alphas and the same Student-$t$ $p$-values as $\\\\hat{\\\\pi}_0$.",
+  "four-factor alphas on gross returns and the same Student-$t$ $p$-values as $\\\\hat{\\\\pi}_0$.",
   "$F_\\\\gamma = \\\\hat{\\\\pi}_0 \\\\cdot \\\\gamma/2$: expected proportion of false",
   "discoveries per tail arising from zero-alpha funds,",
   paste0("where $\\\\hat{\\\\pi}_0 = ", pi0_str, "$ is the Storey (2002) estimate"),
@@ -1082,7 +1087,8 @@ make_d2_rows <- function(grp) {
 d2_table <- bind_rows(make_d2_rows("Active"), make_d2_rows("Passive"))
 
 fn_d2 <- paste(
-  "Monthly EW and VW aggregate portfolio returns regressed on CAPM,",
+  "Monthly EW and VW aggregate portfolio gross returns (net plus one-twelfth of",
+  "the expense ratio) regressed on CAPM,",
   "Fama-French three-factor, and Carhart (1997) four-factor models.",
   "Alphas annualised ($\\\\times 12$) and expressed as \\\\%.",
   "Newey-West $t$-statistics (6-month lag) in parentheses.",

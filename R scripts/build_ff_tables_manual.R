@@ -119,13 +119,17 @@ fmt0 <- function(x) {
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--", formatC(round(v, 0), format = "f", digits = 0))
 }
-# Prob. Luck (percent of B runs): 0 -> "0.0%", below 0.05 -> "<0.1%"
+# Prob. Luck (percent of B runs)
 fmt_prob <- function(x) {
+  # Exact 0 / 100; (0, 0.1) -> "<0.1%" and (99.9, 100) -> ">99.9%", so that
+  # 1-9 or B-9..B-1 of B = 10,000 runs never round to 0.0% / 0.1% / 100.0%
   v <- suppressWarnings(as.numeric(x))
   ifelse(is.na(v), "--",
-    ifelse(v == 0,   "0.0\\%",
-    ifelse(v < 0.05, "$<$0.1\\%",
-           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))
+    ifelse(v <= 0,    "0.0\\%",
+    ifelse(v < 0.1,   "$<$0.1\\%",
+    ifelse(v >= 100,  "100.0\\%",
+    ifelse(v > 99.9,  "$>$99.9\\%",
+           paste0(formatC(round(v, 1), format = "f", digits = 1), "\\%"))))))
 }
 GAMMA_STAR <- 0.45   # BSW (2010) eq. 8: gamma* for pi_A-/pi_A+
 
@@ -251,7 +255,7 @@ t7_tex <- c(
     "$T$: number of monthly observations in the regression. ",
     "The Active + Passive row aggregates only the two classified groups. ",
     "Sample: ", SAMPLE_LABEL, ". The subperiod is the maximum overlap ",
-    "between this study's data window (Dec 1994 onwards) and the ",
+    "between this study's data window (returns from Jan 1995) and the ",
     "\\textcite{FamaFrench2010} sample (Jan 1984--Sep 2006), enabling ",
     "direct comparison with their Tables I--III."
   ),
@@ -303,7 +307,7 @@ t9_tex <- c(
     "Sample: actively managed funds, ",
     SAMPLE_LABEL, ", minimum 24 monthly observations ($N = ", n_active_bs,
     "$ funds). For each fund, estimated monthly alpha is subtracted from ",
-    "the excess return series to construct a zero-alpha null return. ",
+    "the gross excess return series to construct a zero-alpha null return. ",
     "In each of $B = 10{,}000$ bootstrap iterations, calendar months are ",
     "resampled with replacement and kept in the order drawn, the same draw ",
     "applying to all funds, preserving cross-sectional factor return ",
@@ -315,7 +319,7 @@ t9_tex <- c(
     "the simulated percentile falls below the actual value; values below ",
     "5\\% (above 95\\%) indicate that the actual percentile is worse (better) ",
     "than zero-alpha luck would produce; 0.0\\% means no iteration and ",
-    "$<$0.1\\% means 1 to 4 of 10,000 iterations. Newey--West standard errors with a 6-month ",
+    "$<$0.1\\% means 1 to 9 of 10,000 iterations ($>$99.9\\% means 9,991 to 9,999). Newey--West standard errors with a 6-month ",
     "lag are used throughout. Compare with \\textcite{FamaFrench2010}, Table~III."
   ),
   "\\end{tablenotes}",
@@ -364,7 +368,7 @@ t10_tex <- c(
     "\\item The proportion of true zero-alpha funds ($\\hat{\\pi}_0$) is ",
     "estimated following \\textcite{Storey2002} and \\textcite{BarrasScailletWermers2010}, ",
     "using p-values from Newey--West ",
-    "$t$-tests on full-period \\textcite{Carhart1997} four-factor alphas. The ",
+    "$t$-tests on full-period \\textcite{Carhart1997} four-factor alphas on gross returns. The ",
     "estimator is $\\hat{\\pi}_0 = |\\{p_i > \\lambda\\}| \\,/\\, [N(1-\\lambda)]$, ",
     "where $\\lambda = 0.5$ is the standard tuning parameter following ",
     "\\textcite{Storey2002}. Funds with p-values exceeding $\\lambda$ are unlikely to ",
@@ -425,7 +429,7 @@ t11_tex <- c(
     "$S^-_\\gamma$ ($S^+_\\gamma$): observed fraction of active funds with ",
     "significantly negative (positive) Newey--West $t(\\hat{\\alpha})$ at ",
     "two-sided significance level $\\gamma$, using full-period \\textcite{Carhart1997} ",
-    "four-factor alphas and the same Student-$t$ $p$-values as $\\hat{\\pi}_0$. ",
+    "four-factor alphas on gross returns and the same Student-$t$ $p$-values as $\\hat{\\pi}_0$. ",
     "$F_\\gamma = \\hat{\\pi}_0 \\cdot \\gamma/2$: expected proportion ",
     "of false discoveries per tail arising from zero-alpha funds, where ",
     "$\\hat{\\pi}_0 = ", fmt1(pi0_pct), "\\%$ is the \\textcite{Storey2002} estimate ",
@@ -495,7 +499,7 @@ t13_tex <- c(
   "\\begin{tablenotes}",
   "\\footnotesize",
   paste0(
-    "\\item Monthly EW and VW aggregate portfolio returns regressed on CAPM, ",
+    "\\item Monthly EW and VW aggregate portfolio gross returns regressed on CAPM, ",
     "Fama--French three-factor, and \\textcite{Carhart1997} four-factor models. ",
     "Alphas annualised ($\\times 12$) and expressed as \\%. Newey--West ",
     "$t$-statistics (6-month lag) in parentheses. $^{*}$, $^{**}$, $^{***}$: ",
