@@ -1,4 +1,4 @@
-# uncertainty_robustness.R                                               v1.1
+# uncertainty_robustness.R                                               v1.2
 # =============================================================================
 # SENTIMENT OR UNCERTAINTY? Horse race between the behavioral state variables
 # of H1/H2 and the macroeconomic uncertainty index of Jurado, Ludvigson & Ng
@@ -29,6 +29,7 @@
 #   table_unc_AAII.tex      appendix: H1 coefficients (D_AAII)
 #   table_unc_H2.tex        appendix: H2 coefficients (D_MD,Det)
 #   table_unc_horizons.tex  appendix: horizons h = 1, 3, 12
+#   table_unc_H3.tex        appendix: H3 lottery demand and PPF (v1.2, Part 2)
 #   uncertainty_robustness.rds
 #
 # Dependencies: dplyr, fixest
@@ -284,9 +285,197 @@ writeLines(coef_table(c("H2_MD"),
                       c("$D^{\\text{MD,Det}}$")),
            file.path(WORKING_DIR, "table_unc_H2.tex"))
 
-saveRDS(list(results = res, n = nrow(samp), main_h = MAIN_H),
+# =============================================================================
+# PART 2 (v1.2) -- H3 lottery demand and the Psychological Premium Framework
+# with the uncertainty control. Added after the H1/H2 horse race (not
+# pre-committed): H3 and the PPF condition on the same D_SENT regime that
+# loses significance above. Same pairing (D_SENT with D_UNC) and horizons.
+# =============================================================================
+LOTTERY <- c(ActR2 = "ActR2", ActSkew = "ActSkew", MAX12 = "MAX12")
+
+# H3 / PPF sample: identical filters to H3_lottery_demand.R and
+# psychological_premium.R, plus the uncertainty dummies
+samp3 <- panel_reg %>%
+  filter(!excluded_h3, !is_december) %>%
+  filter(if_all(all_of(c(core, LOTTERY, "D_SENT", "D_SENT_lag",
+                         paste0("D_UNC", HORIZONS))), ~ !is.na(.))) %>%
+  mutate(across(c(D_SENT, all_of(paste0("D_UNC", HORIZONS))), as.numeric),
+         Ticker = as.factor(Ticker), yearmo = as.factor(yearmo))
+for (v in c("ActSkew", "MAX12")) {               # 1/99 winsorisation, as H3
+  q <- quantile(samp3[[v]], c(0.01, 0.99), names = FALSE)
+  samp3[[v]] <- pmin(pmax(samp3[[v]], q[1]), q[2])
+}
+for (v in LOTTERY) samp3[[v]] <- as.numeric(scale(samp3[[v]]))   # z-scores
+cat(sprintf("\nH3/PPF uncertainty sample: %d fund-months | %d funds | %d months\n",
+            nrow(samp3), nlevels(droplevels(samp3$Ticker)), nlevels(droplevels(samp3$yearmo))))
+
+fit3 <- function(L, states, seg_states = character(0)) {  # seg_states: R^q x state (PPF)
+  rhs <- c("R_LOW", "R_MID", "R_HIGH", CONTROLS, L, states,
+           paste0(L, ":", states), unlist(lapply(seg_states, inter)))
+  feols(as.formula(paste("flow ~", paste(rhs, collapse = " + "), "|", FE)),
+        data = samp3, cluster = ~ Ticker + yearmo)
+}
+zone <- function(m, nm) {                        # z and 1-sided p (positive) for one coefficient
+  b <- coef(m); V <- vcov(m); i <- idx(b, nm); z <- unname(b[i] / sqrt(V[i, i]))
+  c(b = unname(b[i]), z = z, p = pnorm(z, lower.tail = FALSE))
+}
+joint2 <- function(m, L, S) {                    # H3 joint chi2(2): lottery main + lottery x S
+  b <- coef(m); V <- vcov(m); k <- c(idx(b, L), idx(b, paste0(L, ":", S)))
+  chi <- as.numeric(t(b[k]) %*% solve(V[k, k]) %*% b[k])
+  c(chi2 = chi, p = pchisq(chi, 2, lower.tail = FALSE))
+}
+
+# --- 8. H3 horse race ----------------------------------------------------------
+res3 <- list()
+for (L in LOTTERY) {
+  m_a <- fit3(L, "D_SENT")
+  for (h in HORIZONS) {
+    U <- paste0("D_UNC", h)
+    m_b <- fit3(L, U); m_c <- fit3(L, c("D_SENT", U))
+    res3[[paste(L, h)]] <- data.frame(
+      L = L, h = as.integer(h),
+      J_chi_a = joint2(m_a, L, "D_SENT")[1], J_p_a = joint2(m_a, L, "D_SENT")[2],
+      J_chi_c = joint2(m_c, L, "D_SENT")[1], J_p_c = joint2(m_c, L, "D_SENT")[2],
+      amp_b_a = zone(m_a, paste0(L, ":D_SENT"))[1],
+      amp_z_a = zone(m_a, paste0(L, ":D_SENT"))[2], amp_p_a = zone(m_a, paste0(L, ":D_SENT"))[3],
+      amp_b_c = zone(m_c, paste0(L, ":D_SENT"))[1],
+      amp_z_c = zone(m_c, paste0(L, ":D_SENT"))[2], amp_p_c = zone(m_c, paste0(L, ":D_SENT"))[3],
+      uamp_z_b = zone(m_b, paste0(L, ":", U))[2], uamp_p_b = zone(m_b, paste0(L, ":", U))[3],
+      uamp_z_c = zone(m_c, paste0(L, ":", U))[2], uamp_p_c = zone(m_c, paste0(L, ":", U))[3],
+      n = nobs(m_c), row.names = NULL)
+  }
+  r <- res3[[paste(L, MAIN_H)]]
+  cat(sprintf("  H3 %-7s amp z %+.2f (p=%.3f) alone -> %+.2f (p=%.3f) with U | U amp z alone %+.2f\n",
+              L, r$amp_z_a, r$amp_p_a, r$amp_z_c, r$amp_p_c, r$uamp_z_b))
+}
+res3 <- bind_rows(res3)
+
+# --- 9. PPF (MAX12) with uncertainty ------------------------------------------
+# SP(S,U) = -(eta + phi*S + psi*U) / (beta_q + delta_q*S + gamma_q*U).
+# Sentiment contrast at low uncertainty (U = 0): Diff_S = SP(1,0) - SP(0,0),
+# the PPF Diff holding uncertainty fixed. Uncertainty contrast at low
+# sentiment: Diff_U = SP(0,1) - SP(0,0). Delta-method SEs (numerical gradient).
+sp_fun <- function(b, q, S, U, Uv) {
+  g <- function(nm) if (is.null(nm)) 0 else b[[nm]]
+  eta <- b[["MAX12"]]; beta <- b[[paste0("R_", q)]]
+  num <- eta + S * g(.nm(b, "MAX12:D_SENT")) + U * if (is.null(Uv)) 0 else g(.nm(b, paste0("MAX12:", Uv)))
+  den <- beta + S * g(.nm(b, paste0("R_", q, ":D_SENT"))) +
+         U * if (is.null(Uv)) 0 else g(.nm(b, paste0("R_", q, ":", Uv)))
+  -num / den
+}
+.nm <- function(b, nm) {                          # name as stored by fixest
+  if (nm %in% names(b)) return(nm)
+  r <- paste(rev(strsplit(nm, ":")[[1]]), collapse = ":")
+  if (r %in% names(b)) return(r)
+  stop("Coefficient not found: ", nm)
+}
+dm <- function(m, f) {                            # delta method for scalar f(b)
+  b <- coef(m); V <- vcov(m); est <- f(b)
+  gr <- vapply(seq_along(b), function(j) {
+    e <- 1e-6 * max(1, abs(b[j])); bp <- b; bm <- b; bp[j] <- b[j] + e; bm[j] <- b[j] - e
+    (f(bp) - f(bm)) / (2 * e) }, numeric(1))
+  c(est = est, se = sqrt(as.numeric(t(gr) %*% V %*% gr)))
+}
+PORT_ALPHAS_FILE <- file.path(WORKING_DIR, "portfolio_alphas.xlsx")
+BPS_PER_RANK <- NA_real_
+if (file.exists(PORT_ALPHAS_FILE)) {                # same calibration as psychological_premium.R
+  .mom <- readxl::read_excel(PORT_ALPHAS_FILE, sheet = "momentum")
+  .mom <- .mom[.mom$ap_group == "Active" & .mom$weighting == "EW" & .mom$quintile == 6, ]
+  if (nrow(.mom) == 1L) BPS_PER_RANK <- round(100 * .mom$alpha_car / 0.8 * 100)
+  rm(.mom)
+}
+if (is.na(BPS_PER_RANK)) warning("portfolio_alphas.xlsx not found: basis points not reported.")
+
+ppf <- list()
+m_ppf_a <- fit3("MAX12", "D_SENT", seg_states = "D_SENT")
+for (h in HORIZONS) {
+  U <- paste0("D_UNC", h)
+  m_ppf_c <- fit3("MAX12", c("D_SENT", U), seg_states = c("D_SENT", U))
+  for (q in c("LOW", "MID", "HIGH")) {
+    lo_a <- dm(m_ppf_a, function(b) sp_fun(b, q, 0, 0, NULL))
+    hi_a <- dm(m_ppf_a, function(b) sp_fun(b, q, 1, 0, NULL))
+    df_a <- dm(m_ppf_a, function(b) sp_fun(b, q, 1, 0, NULL) - sp_fun(b, q, 0, 0, NULL))
+    lo_c <- dm(m_ppf_c, function(b) sp_fun(b, q, 0, 0, U))
+    hi_c <- dm(m_ppf_c, function(b) sp_fun(b, q, 1, 0, U))
+    df_c <- dm(m_ppf_c, function(b) sp_fun(b, q, 1, 0, U) - sp_fun(b, q, 0, 0, U))
+    du_c <- dm(m_ppf_c, function(b) sp_fun(b, q, 0, 1, U) - sp_fun(b, q, 0, 0, U))
+    ppf[[paste(h, q)]] <- data.frame(
+      h = as.integer(h), seg = q,
+      lo_a = lo_a[1], hi_a = hi_a[1], diff_a = df_a[1], diff_se_a = df_a[2],
+      diff_p_a = pnorm(df_a[1] / df_a[2]),            # 1-sided, Diff < 0
+      lo_c = lo_c[1], hi_c = hi_c[1], diff_c = df_c[1], diff_se_c = df_c[2],
+      diff_p_c = pnorm(df_c[1] / df_c[2]),
+      du_c = du_c[1], du_se_c = du_c[2], du_p_c = pnorm(du_c[1] / du_c[2]),
+      row.names = NULL)
+  }
+}
+ppf <- bind_rows(ppf)
+pm <- ppf %>% filter(h == as.integer(MAIN_H), seg == "MID")
+cat(sprintf("  PPF MAX12 MID: Diff %.3f (p=%.3f) alone -> %.3f (p=%.3f) with U; uncertainty Diff %.3f (p=%.3f)\n",
+            pm$diff_a, pm$diff_p_a, pm$diff_c, pm$diff_p_c, pm$du_c, pm$du_p_c))
+
+# --- 10. Appendix table: H3 and PPF with uncertainty --------------------------
+f3 <- function(x) { s <- formatC(x, format = "f", digits = 3); sub("^-", "$-$", s) }
+pse <- function(est, se) sprintf("%s [%s]", f3(est), formatC(se, format = "f", digits = 3))
+bp  <- function(x) if (is.na(BPS_PER_RANK)) "--" else as.character(round(abs(x) * BPS_PER_RANK))
+r1 <- res3 %>% filter(h == as.integer(MAIN_H))
+body3 <- c(
+  " & \\multicolumn{2}{c}{Joint $\\chi^2_2$ ($p$)} & \\multicolumn{2}{c}{Amplification $z$ ($p$)} & \\multicolumn{2}{c}{$\\text{AS}\\times U$ $z$ ($p$)} \\\\",
+  "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}\\cmidrule(lr){6-7}",
+  "Panel A: H3 & Without $U$ & With $U$ & Without $U$ & With $U$ & $U$ alone & With $S$ \\\\",
+  "\\midrule",
+  vapply(seq_len(nrow(r1)), function(i) with(r1[i, ], paste0(
+    L, " & ", chi_cell(J_chi_a, J_p_a), " & ", chi_cell(J_chi_c, J_p_c), " & ",
+    z_cell(amp_z_a, amp_p_a), " & ", z_cell(amp_z_c, amp_p_c), " & ",
+    z_cell(uamp_z_b, uamp_p_b), " & ", z_cell(uamp_z_c, uamp_p_c), " \\\\")), character(1)),
+  "\\midrule",
+  " & \\multicolumn{3}{c}{Without $U$} & \\multicolumn{3}{c}{With $U$ (at $D^{\\text{UNC}}=0$)} \\\\",
+  "\\cmidrule(lr){2-4}\\cmidrule(lr){5-7}",
+  "Panel B: PPF, MAX12 & SP$_{\\text{low}}$ & SP$_{\\text{high}}$ & Diff [SE] ($p$) & SP$_{\\text{low}}$ & SP$_{\\text{high}}$ & Diff [SE] ($p$) \\\\",
+  "\\midrule",
+  vapply(c("LOW", "MID", "HIGH"), function(q) with(ppf[ppf$h == as.integer(MAIN_H) & ppf$seg == q, ],
+    paste0("$R^{\\text{", q, "}}$ & ", f3(lo_a), " & ", f3(hi_a), " & ",
+           pse(diff_a, diff_se_a), " (", fp(diff_p_a), ") & ", f3(lo_c), " & ", f3(hi_c), " & ",
+           pse(diff_c, diff_se_c), " (", fp(diff_p_c), ") \\\\")), character(1)),
+  with(pm, paste0("\\multicolumn{7}{l}{$R^{\\text{MID}}$, basis points per SD of MAX12: ",
+                  bp(lo_a), " / ", bp(hi_a), " without $U$; ", bp(lo_c), " / ", bp(hi_c),
+                  " with $U$. Uncertainty contrast at low sentiment: ",
+                  pse(du_c, du_se_c), " (", fp(du_p_c), ").} \\\\")))
+r3h <- res3 %>% filter(L == "MAX12"); p3h <- ppf %>% filter(seg == "MID")
+note3 <- paste0(
+  "$U=D^{\\text{UNC}}$ at the ", MAIN_H, "-month horizon. Panel A re-estimates the H3 ",
+  "specification of Table~\\ref{tab:H3_regression} (lottery proxy AS, $D^{\\text{SENT}}$, ",
+  "AS$\\times D^{\\text{SENT}}$, rank segments, controls, fund fixed effects) without and with ",
+  "$U$ and AS$\\times U$. Joint $\\chi^2_2$: AS and AS$\\times D^{\\text{SENT}}$. Amplification: ",
+  "AS$\\times D^{\\text{SENT}}$, one-sided $p$ for a positive sign; the last two columns test ",
+  "AS$\\times U$ in a model with $U$ in place of $D^{\\text{SENT}}$ and in the joint model. ",
+  "Panel B re-estimates the Psychological Premium regression for MAX12 ",
+  "(Table~\\ref{tab:psychological_premium}) adding $U$, $R^q\\times U$ and MAX12$\\times U$; ",
+  "shadow prices with $U$ are evaluated at low uncertainty, so Diff is the sentiment contrast ",
+  "holding uncertainty fixed. Diff standard errors by the delta method; one-sided $p$ for ",
+  "Diff $<0$. Uncertainty contrast: SP at $D^{\\text{UNC}}=1$ minus SP at $D^{\\text{UNC}}=0$, ",
+  "both at $D^{\\text{SENT}}=0$ and $R^{\\text{MID}}$. ",
+  if (!is.na(BPS_PER_RANK)) sprintf("Basis points use the calibration of Table~\\ref{tab:psychological_premium} (%d bp per rank point). ", as.integer(BPS_PER_RANK)) else "",
+  sprintf(paste0("At the 3- and 12-month horizons the MAX12 amplification $z$ with $U$ is %s and %s, ",
+                 "and the $R^{\\text{MID}}$ Diff is %s ($p$ = %s) and %s ($p$ = %s). "),
+          z_cell(r3h$amp_z_c[r3h$h == 3], r3h$amp_p_c[r3h$h == 3]),
+          z_cell(r3h$amp_z_c[r3h$h == 12], r3h$amp_p_c[r3h$h == 12]),
+          f3(p3h$diff_c[p3h$h == 3]), fp(p3h$diff_p_c[p3h$h == 3]),
+          f3(p3h$diff_c[p3h$h == 12]), fp(p3h$diff_p_c[p3h$h == 12])),
+  "Sample: the H3 sample (active funds, H3 / activeness subsample, December excluded) ",
+  sprintf("with the uncertainty indicators available: %s fund-months (%s funds). ",
+          formatC(nrow(samp3), format = "d", big.mark = ","),
+          formatC(nlevels(droplevels(samp3$Ticker)), format = "d", big.mark = ",")),
+  "Lottery proxies winsorised at 1/99\\% (ActSkew, MAX12) and standardised in the sample. ",
+  "Standard errors two-way clustered on fund and calendar month.")
+writeLines(table_wrap("H3 and the Psychological Premium With Macroeconomic Uncertainty",
+                      "unc_H3", "lcccccc", body3, note3, resize = TRUE),
+           file.path(WORKING_DIR, "table_unc_H3.tex"))
+
+
+saveRDS(list(results = res, h3 = res3, ppf = ppf, n = nrow(samp), n3 = nrow(samp3), main_h = MAIN_H),
         file.path(WORKING_DIR, "uncertainty_robustness.rds"))
-cat("Wrote table_unc_summary.tex, table_unc_horizons.tex, table_unc_H1.tex, table_unc_AAII.tex, table_unc_H2.tex\n")
+cat("Wrote table_unc_summary.tex, table_unc_horizons.tex, table_unc_H1.tex, table_unc_AAII.tex, table_unc_H2.tex, table_unc_H3.tex\n")
 print(res %>% transmute(id, h, S_p_a = round(S_p_a, 3), S_p_c = round(S_p_c, 3),
                         U_p_c = round(U_p_c, 3), head_z_a = round(head_z_a, 2),
                         head_z_c = round(head_z_c, 2)), row.names = FALSE)
