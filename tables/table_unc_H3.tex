@@ -10,23 +10,23 @@
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
 Panel A: H3 & Without $U$ & With $U$ & Without $U$ & With $U$ & $U$ alone & With $S$ \\
 \midrule
-ActR2 & 1.34 (0.512) & 2.05 (0.358) & $-$0.20 (0.578) & $-$0.48 (0.684) & +0.47 (0.321) & +0.73 (0.234) \\
-ActSkew & 2.37 (0.306) & 0.31 (0.856) & +1.03 (0.152) & +0.54 (0.293) & +1.19 (0.117) & +0.79 (0.215) \\
-MAX12 & 6.84 (0.033) & 5.50 (0.064) & +1.91 (0.028) & +1.84 (0.033) & +0.13 (0.446) & $-$0.77 (0.779) \\
+ActR2 & 1.34 (0.512) & 2.06 (0.357) & $-$0.20 (0.579) & $-$0.48 (0.685) & +0.47 (0.321) & +0.73 (0.234) \\
+ActSkew & 2.37 (0.306) & 0.31 (0.856) & +1.03 (0.152) & +0.54 (0.293) & +1.19 (0.118) & +0.79 (0.216) \\
+MAX12 & 6.86 (0.032) & 5.50 (0.064) & +1.91 (0.028) & +1.84 (0.033) & +0.14 (0.446) & $-$0.77 (0.779) \\
 \midrule
  & \multicolumn{3}{c}{Without $U$} & \multicolumn{3}{c}{With $U$ (at $D^{\text{UNC}}=0$)} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
 Panel B: PPF, MAX12 & SP$_{\text{low}}$ & SP$_{\text{high}}$ & Diff [SE] ($p$) & SP$_{\text{low}}$ & SP$_{\text{high}}$ & Diff [SE] ($p$) \\
 \midrule
 $R^{\text{LOW}}$ & $-$0.004 & $-$0.055 & $-$0.051 [0.025] (0.019) & $-$0.009 & $-$0.049 & $-$0.040 [0.021] (0.027) \\
-$R^{\text{MID}}$ & $-$0.011 & $-$0.134 & $-$0.122 [0.053] (0.011) & $-$0.027 & $-$0.164 & $-$0.138 [0.071] (0.026) \\
-$R^{\text{HIGH}}$ & $-$0.002 & $-$0.024 & $-$0.022 [0.010] (0.013) & $-$0.005 & $-$0.033 & $-$0.028 [0.014] (0.025) \\
+$R^{\text{MID}}$ & $-$0.011 & $-$0.134 & $-$0.122 [0.053] (0.011) & $-$0.027 & $-$0.165 & $-$0.138 [0.071] (0.026) \\
+$R^{\text{HIGH}}$ & $-$0.002 & $-$0.025 & $-$0.022 [0.010] (0.013) & $-$0.005 & $-$0.033 & $-$0.028 [0.014] (0.025) \\
 \multicolumn{7}{l}{$R^{\text{MID}}$, basis points per SD of MAX12: 3 / 36 without $U$; 7 / 45 with $U$. Uncertainty contrast at low sentiment: 0.033 [0.049] (0.748).} \\
 \bottomrule
 \end{tabular}
 }
 \end{table}
 \begin{singlespace}\footnotesize\noindent
-$U=D^{\text{UNC}}$ at the 1-month horizon. Panel A re-estimates the H3 specification of Table~\ref{tab:H3_regression} (lottery proxy AS, $D^{\text{SENT}}$, AS$\times D^{\text{SENT}}$, rank segments, controls, fund fixed effects) without and with $U$ and AS$\times U$. Joint $\chi^2_2$: AS and AS$\times D^{\text{SENT}}$. Amplification: AS$\times D^{\text{SENT}}$, one-sided $p$ for a positive sign; the last two columns test AS$\times U$ in a model with $U$ in place of $D^{\text{SENT}}$ and in the joint model. Panel B re-estimates the Psychological Premium regression for MAX12 (Table~\ref{tab:psychological_premium}) adding $U$, $R^q\times U$ and MAX12$\times U$; shadow prices with $U$ are evaluated at low uncertainty, so Diff is the sentiment contrast holding uncertainty fixed. Diff standard errors by the delta method; one-sided $p$ for Diff $<0$. Uncertainty contrast: SP at $D^{\text{UNC}}=1$ minus SP at $D^{\text{UNC}}=0$, both at $D^{\text{SENT}}=0$ and $R^{\text{MID}}$. Basis points use the calibration of Table~\ref{tab:psychological_premium} (271 bp per rank point). At the 3- and 12-month horizons the MAX12 amplification $z$ with $U$ is +1.85 (0.032) and +1.81 (0.035), and the $R^{\text{MID}}$ Diff is $-$0.146 ($p$ = 0.027) and $-$0.144 ($p$ = 0.031). Sample: the H3 sample (active funds, H3 / activeness subsample, December excluded) with the uncertainty indicators available: 261,337 fund-months (1,672 funds). Lottery proxies winsorised at 1/99\% (ActSkew, MAX12) and standardised in the sample. Standard errors two-way clustered on fund and calendar month.
+$U=D^{\text{UNC}}$ at the 1-month horizon. Panel A re-estimates the H3 specification of Table~\ref{tab:H3_regression} (lottery proxy AS, $D^{\text{SENT}}$, AS$\times D^{\text{SENT}}$, rank segments, controls, fund fixed effects) without and with $U$ and AS$\times U$. Joint $\chi^2_2$: AS and AS$\times D^{\text{SENT}}$. Amplification: AS$\times D^{\text{SENT}}$, one-sided $p$ for a positive sign; the last two columns test AS$\times U$ in a model with $U$ in place of $D^{\text{SENT}}$ and in the joint model. Panel B re-estimates the Psychological Premium regression for MAX12 (Table~\ref{tab:psychological_premium}) adding $U$, $R^q\times U$ and MAX12$\times U$; shadow prices with $U$ are evaluated at low uncertainty, so Diff is the sentiment contrast holding uncertainty fixed. Diff standard errors by the delta method; one-sided $p$ for Diff $<0$. Uncertainty contrast: SP at $D^{\text{UNC}}=1$ minus SP at $D^{\text{UNC}}=0$, both at $D^{\text{SENT}}=0$ and $R^{\text{MID}}$. Basis points use the calibration of Table~\ref{tab:psychological_premium} (271 bp per rank point). At the 3- and 12-month horizons the MAX12 amplification $z$ with $U$ is +1.85 (0.032) and +1.82 (0.035), and the $R^{\text{MID}}$ Diff is $-$0.146 ($p$ = 0.027) and $-$0.144 ($p$ = 0.031). Sample: the H3 sample (active funds, H3 / activeness subsample, December excluded) with the uncertainty indicators available: 261,337 fund-months (1,672 funds). Lottery proxies winsorised at 1/99\% (ActSkew, MAX12) and standardised in the sample. Standard errors two-way clustered on fund and calendar month.
 \end{singlespace}
 
