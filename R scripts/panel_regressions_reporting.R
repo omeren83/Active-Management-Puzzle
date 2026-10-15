@@ -150,7 +150,7 @@ if (!is.null(H2_models)) {
     rows[[length(rows) + 1L]] <- add_row(
       "H2: Disp./IoC", state_lbl, tt$joint_chi2, tt$joint_p, 3L,
       tt$d1_z, tt$main_p_1sd, n_used,
-      "Disposition ($\\delta_1<0$)", "Margin-call ($\\delta_1>0$)")
+      "Disposition ($\\delta_{\\text{LOW}}<0$)", "Margin-call ($\\delta_{\\text{LOW}}>0$)")
   }
 }
 
@@ -188,7 +188,7 @@ if (!is.null(H4_models)) {
     rows[[length(rows) + 1L]] <- add_row(
       "H4: Fee Elast.", state_lbl, tt$joint_chi2, tt$joint_p, df_used,
       tt$delta_z, tt$delta_p_1sd, n4,
-      "Relaxed ($\\delta_F>0$)", "Tightened ($\\delta_F<0$)")
+      "Relaxed ($\\eta>0$)", "Tightened ($\\eta<0$)")
   }
 }
 
@@ -213,8 +213,8 @@ fn <- paste0(
   "$D^{\\\\text{SENT}}$; H4, the four fee $\\\\times$ sentiment terms. ``Joint test'' ",
   "reports whether it is rejected at 10\\\\%. A rejection shows that flows depend ",
   "on the state; it does not by itself identify a psychological cause. Headline $z$: hypothesis-specific statistic (H1: ",
-  "$\\\\delta_3-\\\\delta_1$; H2: $\\\\delta_1$; H3: lottery $\\\\times$ ",
-  "$D^{\\\\text{SENT}}$; H4: $\\\\delta_F$) with its one-sided $p$-value in the ",
+  "$\\\\delta_{\\\\text{HIGH}}-\\\\delta_{\\\\text{LOW}}$; H2: $\\\\delta_{\\\\text{LOW}}$; H3: lottery $\\\\times$ ",
+  "$D^{\\\\text{SENT}}$; H4: $\\\\eta$) with its one-sided $p$-value in the ",
   "behaviourally predicted direction. ``Headline direction'' names a direction ",
   "only when the one-sided $p$-value in that direction is below 0.10 (for the ",
   "opposite direction, $1-p$); otherwise ``Not significant''. For H2 the ",
@@ -225,7 +225,7 @@ fn <- paste0(
   "specifications non-missing), so $N$ differs across hypotheses; the H2 ",
   "put--call rows use the shorter put--call ratio window. Primary ",
   "specifications use contemporaneous state variables, fund FE for H1--H3 and ",
-  "Lipper $\\\\times$ yearmo FE for H4, with two-way clustering on Ticker and ",
+  "Lipper $\\\\times$ year-month FE for H4, with two-way clustering on Ticker and ",
   "calendar month (Petersen 2009). Coefficients are reported in the underlying tables."
 )
 

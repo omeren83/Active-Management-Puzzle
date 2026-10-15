@@ -1,5 +1,10 @@
 # =============================================================================
-# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.6
+# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.7
+#
+# v1.7 changes (Oct 2026):
+#   - ACTIVE_OVERRIDE: MOJAX (tactical momentum) and GENDX (Gotham enhanced
+#     index, security selection) are flagged N by Bloomberg but are not index
+#     trackers; classified Active so they leave the passive benchmark.
 #
 # v1.6 changes (final audit, Oct 2026):
 #   - Evans cutoff compared by calendar month, not by date. Panel dates are
@@ -358,10 +363,14 @@ panel_trimmed <- panel_incubation %>%
 # 8. ACTIVE/PASSIVE CLASSIFICATION
 #    Y = Active, N = Passive, everything else = Unknown
 # =============================================================================
+# Bloomberg flags these N, but they are not index trackers (see Chapter 3)
+ACTIVE_OVERRIDE <- c("MOJAX US Equity", "GENDX US Equity")
+
 classify_ap <- function(panel) {
   panel %>%
     mutate(
       ap_group = case_when(
+        Ticker %in% ACTIVE_OVERRIDE         ~ "Active",
         Actively_Managed_New == "Y" ~ "Active",
         Actively_Managed_New == "N" ~ "Passive",
         TRUE                        ~ "Unknown"
@@ -415,11 +424,9 @@ LEVERAGED_KEYWORDS <- paste(
 
 # Note: ACTIVE_MISLABELLED and PURE_STYLE_RETAIN constants removed in v1.2.
 # As of v1.3, with PASSIVE_INDEX retired from flagged_funds.xlsx:
-#   - MOJAX, GENDX (Bloomberg-flagged "Active" but functionally pure index trackers)
-#     are no longer in any exclusion sheet. They pass through to the analysis
-#     panel classified by their Bloomberg ap_group label. Their downstream effect
-#     is small (low fund count, low TNA share) and falls within the noise
-#     of Bloomberg classification accuracy.
+#   - MOJAX, GENDX (Bloomberg-flagged "N" but not index trackers) are in no
+#     exclusion sheet; since v1.7 they are classified Active via ACTIVE_OVERRIDE
+#     (Section 8).
 #   - RYAVX/RYZAX/RYAZX/RYWAX/RYAWX (Pure Style Rydex passives) similarly
 #     pass through, classified ap_group == "Passive" by Bloomberg, and contribute
 #     to the passive cohort in descriptive and aggregate tables.

@@ -2,17 +2,17 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Same sample, dependent variable, and rank construction as Table~\ref{tab:H4_regression}. Yearmo fixed effects absorb all time-aggregate variation (including sentiment main effects, market-wide flow waves, and risk-on/risk-off cycles) but leave both within- and between-style cross-fund variation in expense ratios available for identification. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item Same sample, dependent variable, and rank construction as Table~\ref{tab:H4_regression}. Year-month fixed effects absorb all time-aggregate variation (including sentiment main effects, market-wide flow waves, and risk-on/risk-off cycles) but leave both within- and between-style cross-fund variation in expense ratios available for identification. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
 \setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
-\caption{\label{tab:H4_robustness}H4 Robustness --- Yearmo-Only Fixed Effects}\\
+\caption{\label{tab:H4_robustness}H4 Robustness --- Year-Month-Only Fixed Effects}\\
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
 \endfirsthead
-\caption[]{H4 Robustness --- Yearmo-Only Fixed Effects \textit{(continued)}}\\
+\caption[]{H4 Robustness --- Year-Month-Only Fixed Effects \textit{(continued)}}\\
 \toprule
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
@@ -63,8 +63,8 @@ Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
 Style flow & 0.1000*** & 0.0999*** & 0.0999*** & 0.1000***\\
  & (4.41) & (4.41) & (4.41) & (4.41)\\
 \midrule
-FE: yearmo & Yes & Yes & Yes & Yes\\
-Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+FE: year-month & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 305,083 & 305,083 & 305,083 & 305,083\\
 $R^2$ (within) & 0.032 & 0.032 & 0.032 & 0.032\\
 Joint test ($\chi^2_4$, $p$) & -- & 3.51 (0.476) & 3.50 (0.477) & 3.24 (0.519)\\

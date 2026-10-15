@@ -414,12 +414,12 @@ build_h4_table <- function(samp, fe_string,
   # FE label depends on fe_string. Lipper^yearmo for primary,
   # yearmo-only for FE-robust.
   fe_label <- if (grepl("Lipper", fe_string, fixed = TRUE)) {
-    "FE: Lipper $\\times$ yearmo"
+    "FE: Lipper $\\times$ year-month"
   } else {
-    "FE: yearmo"
+    "FE: year-month"
   }
   fe_row    <- c(fe_label, rep("Yes", 4))
-  clust_row <- c("Cluster (Ticker, yearmo)", rep("Yes", 4))
+  clust_row <- c("Cluster (fund, month)", rep("Yes", 4))
   n_row     <- c("$N$",
                  formatC(nobs(m1), format="d", big.mark=","),
                  formatC(nobs(m2), format="d", big.mark=","),
@@ -492,12 +492,12 @@ fn_primary <- paste0(
   "continuous index; column (4) substitutes the AAII bull-bear regime dummy. ",
   "ExpRatio is the fund's annual expense ratio in percent (1.0 = 1\\\\%), a static ",
   "end-of-sample Bloomberg value; fund-months with a non-positive expense ratio are excluded. Lipper-",
-  "category $\\\\times$ yearmo fixed effects absorb both sentiment main effects ",
-  "($\\\\gamma$) and any style-month aggregate flow shocks; cross-fund expense-",
+  "category $\\\\times$ year-month fixed effects absorb both sentiment main effects ",
+  "($\\\\lambda$) and any style-month aggregate flow shocks; cross-fund expense-",
   "ratio variation within each (style, month) cell identifies $\\\\theta$ and ",
   "the fee interactions. Standard errors two-way clustered on Ticker and ",
   "calendar month (Petersen 2009). The joint $\\\\chi^2_4$ test covers all four ",
-  "fee-amplified-sentiment terms ($\\\\delta_F$ and the three $\\\\delta^F_q$). ",
+  "fee-amplified-sentiment terms ($\\\\eta$ and the three $\\\\delta^F_q$). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
   "no date cap; Entire-Analysis exclusions per flagged\\\\_funds.xlsx applied ",
@@ -517,10 +517,10 @@ fn_lagged <- paste0(
   "at source."
 )
 
-cap_robust <- "H4 Robustness --- Yearmo-Only Fixed Effects"
+cap_robust <- "H4 Robustness --- Year-Month-Only Fixed Effects"
 fn_robust <- paste0(
   "Same sample, dependent variable, and rank construction as ",
-  "Table~\\\\ref{tab:H4_regression}. Yearmo fixed effects absorb all ",
+  "Table~\\\\ref{tab:H4_regression}. Year-month fixed effects absorb all ",
   "time-aggregate variation (including sentiment main effects, market-wide ",
   "flow waves, and risk-on/risk-off cycles) but leave both within- and ",
   "between-style cross-fund variation in expense ratios available for ",

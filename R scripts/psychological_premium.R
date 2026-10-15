@@ -433,7 +433,7 @@ fn <- paste0(
   "sample. Shadow Price units are rank points per standard deviation of ",
   "the lottery measure. Standard errors via the delta method using the ",
   "joint coefficient covariance from the underlying regression; clustered ",
-  "two-way on Ticker and yearmo. ",
+  "two-way on fund and calendar month. ",
   "The 1-sided $p$ tests Diff $<0$ (a larger premium under high sentiment); ",
   "stars refer to it: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "\\\\smallskip ",

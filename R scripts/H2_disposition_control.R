@@ -385,9 +385,9 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
   colnames(body_df) <- c("Variable", "(1)", "(2)", "(3)", "(4)")
   rownames(body_df) <- NULL
 
-  fe_label <- if (show_lambda) "Fund FE" else "FE: Lipper $\\times$ yearmo"
+  fe_label <- if (show_lambda) "Fund FE" else "FE: Lipper $\\times$ year-month"
   fe_row    <- c(fe_label, rep("Yes", 4))
-  clust_row <- c("Cluster (Ticker, yearmo)", rep("Yes", 4))
+  clust_row <- c("Cluster (fund, month)", rep("Yes", 4))
   n_row     <- c("$N$",
                  formatC(nobs(m1), format="d", big.mark=","),
                  formatC(nobs(m2), format="d", big.mark=","),
@@ -472,8 +472,8 @@ fn_primary <- paste0(
   "$D^{\\\\text{SENT}}_t$ (= 1 if SENT$^\\\\perp$ is in the top 34\\\\%) with full rank ",
   "interactions. All controls lagged one period; time-invariant fund ",
   "characteristics (expense ratio, load dummy, turnover) included but ",
-  "absorbed by fund FE. Cols (1)-(2) and (4) use the margin-debt sample (all months with the margin-debt and sentiment regimes available), ",
-  "sample; col (3) uses the PCR sample (", PCR_WIN, "). Standard ",
+  "absorbed by fund FE. Cols (1)-(2) and (4) use the margin-debt sample (all months with the margin-debt and sentiment regimes available); ",
+  "col (3) uses the PCR sample (", PCR_WIN, "). Standard ",
   "errors two-way clustered on Ticker and calendar month (Petersen 2009). ",
   "Stars: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
@@ -499,7 +499,7 @@ cap_robust <- "H2 Robustness --- Style $\\times$ Time Fixed Effects"
 fn_robust <- paste0(
   "Sample, dependent variable, rank construction, and column specifications ",
   "identical to Table~\\\\ref{tab:H2_regression}. State main effects (and ",
-  "$D^{\\\\text{SENT}}_t$ in col 4) are absorbed by the Lipper $\\\\times$ yearmo fixed ",
+  "$D^{\\\\text{SENT}}_t$ in col 4) are absorbed by the Lipper $\\\\times$ year-month fixed ",
   "effects and do not appear in the table; time-invariant controls (expense ",
   "ratio, load dummy, turnover) are now identified because there is no fund ",
   "FE. Standard errors two-way clustered on Ticker and calendar month ",

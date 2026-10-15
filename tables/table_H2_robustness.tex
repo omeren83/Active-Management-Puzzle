@@ -2,7 +2,7 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Sample, dependent variable, rank construction, and column specifications identical to Table~\ref{tab:H2_regression}. State main effects (and $D^{\text{SENT}}_t$ in col 4) are absorbed by the Lipper $\times$ yearmo fixed effects and do not appear in the table; time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The sign of $\delta^{\text{MD}}_1$ under this identification can be compared with Table~\ref{tab:H2_regression}: a negative sign is the disposition prediction, a positive sign the margin-call alternative (Brunnermeier \& Pedersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item Sample, dependent variable, rank construction, and column specifications identical to Table~\ref{tab:H2_regression}. State main effects (and $D^{\text{SENT}}_t$ in col 4) are absorbed by the Lipper $\times$ year-month fixed effects and do not appear in the table; time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The sign of $\delta^{\text{MD}}_1$ under this identification can be compared with Table~\ref{tab:H2_regression}: a negative sign is the disposition prediction, a positive sign the margin-call alternative (Brunnermeier \& Pedersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
 \setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H2_robustness}H2 Robustness --- Style $\times$ Time Fixed Effects}\\
@@ -55,8 +55,8 @@ Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
 Style flow & -0.2545* & -0.2558* & -0.3522 & -0.2559*\\
  & (-1.66) & (-1.66) & (-1.26) & (-1.66)\\
 \midrule
-FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
-Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+FE: Lipper $\times$ year-month & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 306,152 & 306,152 & 202,585 & 306,152\\
 $R^2$ (within) & 0.033 & 0.034 & 0.038 & 0.034\\
 Joint test ($\chi^2_3$, $p$) & -- & 21.17 ($<\!0.001$) & 1.08 (0.781) & 18.57 ($<\!0.001$)\\

@@ -2,7 +2,7 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lower-order interaction coefficients ($R^q\times$ Sent.\ and $R^q\times$ Exp.\ ratio) are reported alongside the headline triple interactions to support full interpretation. Sentiment regimes follow Baker-Wurgler (2007) construction: $D^{\text{SENT}}_t$ is the top-34\% indicator for orthogonalised sentiment; column (3) substitutes the standardised continuous index; column (4) substitutes the AAII bull-bear regime dummy. ExpRatio is the fund's annual expense ratio in percent (1.0 = 1\%), a static end-of-sample Bloomberg value; fund-months with a non-positive expense ratio are excluded. Lipper-category $\times$ yearmo fixed effects absorb both sentiment main effects ($\gamma$) and any style-month aggregate flow shocks; cross-fund expense-ratio variation within each (style, month) cell identifies $\theta$ and the fee interactions. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms ($\delta_F$ and the three $\delta^F_q$). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lower-order interaction coefficients ($R^q\times$ Sent.\ and $R^q\times$ Exp.\ ratio) are reported alongside the headline triple interactions to support full interpretation. Sentiment regimes follow Baker-Wurgler (2007) construction: $D^{\text{SENT}}_t$ is the top-34\% indicator for orthogonalised sentiment; column (3) substitutes the standardised continuous index; column (4) substitutes the AAII bull-bear regime dummy. ExpRatio is the fund's annual expense ratio in percent (1.0 = 1\%), a static end-of-sample Bloomberg value; fund-months with a non-positive expense ratio are excluded. Lipper-category $\times$ year-month fixed effects absorb both sentiment main effects ($\lambda$) and any style-month aggregate flow shocks; cross-fund expense-ratio variation within each (style, month) cell identifies $\theta$ and the fee interactions. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms ($\eta$ and the three $\delta^F_q$). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{TableNotes}
 \setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H4_regression}H4: Fee Elasticity Hypothesis}\\
@@ -63,8 +63,8 @@ Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
 Style flow & -0.2503 & -0.2515 & -0.2512 & -0.2494\\
  & (-1.63) & (-1.64) & (-1.64) & (-1.63)\\
 \midrule
-FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
-Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+FE: Lipper $\times$ year-month & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 305,079 & 305,079 & 305,079 & 305,079\\
 $R^2$ (within) & 0.034 & 0.034 & 0.034 & 0.034\\
 Joint test ($\chi^2_4$, $p$) & -- & 3.86 (0.426) & 2.94 (0.568) & 3.02 (0.554)\\

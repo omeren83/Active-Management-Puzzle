@@ -896,7 +896,7 @@ fn_d5 <- paste(fn_base,
                "Fee sorted monthly within group on the static (end-of-sample) annual",
                "Expense Ratio; Q1 = lowest fee.",
                "Leveraged and inverse index products are excluded before sorting",
-               "(Step 8b of the data construction).")
+               "(Appendix~\\ref{app:data_cleaning}, Step 6).")
 
 s_d3 <- build_alpha_table(alpha_size, "Size",
                           "Alpha and Factor Loadings by Size Quintile (\\%, Annualised)",

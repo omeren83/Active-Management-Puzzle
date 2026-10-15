@@ -338,9 +338,9 @@ build_h3_table <- function(samp, fe_string, state_var,
   colnames(body_df) <- c("Variable", "(1)", "(2)", "(3)", "(4)")
   rownames(body_df) <- NULL
 
-  fe_label <- if (show_state_main) "Fund FE" else "FE: Lipper $\\times$ yearmo"
+  fe_label <- if (show_state_main) "Fund FE" else "FE: Lipper $\\times$ year-month"
   fe_row    <- c(fe_label, rep("Yes", 4))
-  clust_row <- c("Cluster (Ticker, yearmo)", rep("Yes", 4))
+  clust_row <- c("Cluster (fund, month)", rep("Yes", 4))
   n_row     <- c("$N$",
                  formatC(nobs(m1), format="d", big.mark=","),
                  formatC(nobs(m2), format="d", big.mark=","),
@@ -435,7 +435,7 @@ fn_robust <- paste0(
   "Same sample, dependent variable, and lottery measure construction as ",
   "Table~\\\\ref{tab:H3_regression}. Sentiment regime $D^{\\\\text{SENT}}$ remains ",
   "contemporaneous. The state main effect ($\\\\gamma$) is absorbed by the ",
-  "Lipper $\\\\times$ yearmo fixed effects and so does not appear in the ",
+  "Lipper $\\\\times$ year-month fixed effects and so does not appear in the ",
   "table. Time-invariant controls (expense ratio, load dummy, turnover) ",
   "are now identified because there is no fund FE. Standard errors two-way ",
   "clustered on Ticker and calendar month. ",

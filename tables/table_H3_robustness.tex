@@ -2,7 +2,7 @@
 
 \begin{ThreePartTable}
 \begin{TableNotes}
-\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{\text{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ yearmo fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{\text{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ year-month fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{TableNotes}
 \setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
 \caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects}\\
@@ -47,8 +47,8 @@ Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
 Style flow & -2.1439*** & -2.1441*** & -2.1255*** & -2.1378***\\
  & (-4.25) & (-4.25) & (-4.23) & (-4.24)\\
 \midrule
-FE: Lipper $\times$ yearmo & Yes & Yes & Yes & Yes\\
-Cluster (Ticker, yearmo) & Yes & Yes & Yes & Yes\\
+FE: Lipper $\times$ year-month & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 261,306 & 261,306 & 261,306 & 261,306\\
 $R^2$ (within) & 0.037 & 0.037 & 0.038 & 0.037\\
 Joint test ($\chi^2_2$, $p$) & -- & 0.08 (0.961) & 37.28 ($<\!0.001$) & 9.04 (0.011)\\

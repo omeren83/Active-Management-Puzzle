@@ -311,7 +311,7 @@ latex_t1 <- counts_raw %>%
       "exclusions documented in Section~\\\\ref{sec:panel_construction}",
       "(long/short, market-neutral, bear-market or inverse strategies,",
       "non-U.S.\\\\ mandate, and confirmed data-error funds tagged in",
-      "flagged\\\\_funds.xlsx as Entire-Analysis exclusions, the latter now including six funds with a non-standard expense structure):",
+      "flagged\\\\_funds.xlsx as Entire-Analysis exclusions, the latter including six funds with a non-standard expense structure):",
       sprintf("%s, %s, and %s share classes are dropped from the Master,",
               fmtc(n_drop[1]), fmtc(n_drop[2]), fmtc(n_drop[3])),
       "Incubation-Corrected, and Trimmed panels respectively, yielding",
