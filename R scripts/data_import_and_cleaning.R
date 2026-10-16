@@ -1,5 +1,16 @@
 # =============================================================================
-# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.7
+# FUND DATA IMPORT & PANEL CONSTRUCTION                                    v1.8
+#
+# v1.8 changes (Oct 2026; pre-committed 16 Oct 2026):
+#   - Funds without a Bloomberg active/passive flag (almost all pre-2012
+#     closures) are classified from unknown_classification.xlsx (built by
+#     classify_unknown_funds.R: rule + manual review) instead of being left
+#     "Unknown"; this removes the survivor-only pre-2012 active sample.
+#     AP_CLASSIFICATION = "bloomberg" restores the old flag-only behaviour
+#     (robustness).
+#   - Their exclusions (sector, global, long/short, covered call; same scopes
+#     as flagged_funds.xlsx) are added to the Step 8c ledgers; their missing
+#     Lipper category ("#N/A N/A") is set to NA.
 #
 # v1.7 changes (Oct 2026):
 #   - ACTIVE_OVERRIDE: MOJAX (tactical momentum) and GENDX (Gotham enhanced
@@ -131,6 +142,8 @@ library(writexl)
 
 FILE          <- "fund_data.xlsx"
 FLAGGED_FILE  <- "flagged_funds.xlsx"   # exclusion ledger (8c)
+UNKNOWN_CLASS_FILE <- "unknown_classification.xlsx"   # v1.8: unflagged funds
+if (!exists("AP_CLASSIFICATION")) AP_CLASSIFICATION <- "reclassified"  # or "bloomberg"
 DATE_MIN_DATA <- as.Date("1994-12-01")  # include Dec 1994 for lag computation
 DATE_MIN      <- as.Date("1995-01-01")  # actual sample start for analysis
 DATE_MAX      <- as.Date("2023-12-31")  # sample end (panel_trimmed)
@@ -366,8 +379,14 @@ panel_trimmed <- panel_incubation %>%
 # Bloomberg flags these N, but they are not index trackers (see Chapter 3)
 ACTIVE_OVERRIDE <- c("MOJAX US Equity", "GENDX US Equity")
 
+# v1.8: classification of unflagged funds (rule + manual review)
+stopifnot(AP_CLASSIFICATION %in% c("reclassified", "bloomberg"))
+unk_class <- if (AP_CLASSIFICATION == "reclassified") {
+  read_excel(UNKNOWN_CLASS_FILE, sheet = "Classification")
+} else NULL
+
 classify_ap <- function(panel) {
-  panel %>%
+  out <- panel %>%
     mutate(
       ap_group = case_when(
         Ticker %in% ACTIVE_OVERRIDE         ~ "Active",
@@ -376,6 +395,13 @@ classify_ap <- function(panel) {
         TRUE                        ~ "Unknown"
       )
     )
+  if (is.null(unk_class)) return(out)
+  # Unflagged funds take their final class; missing Lipper category -> NA
+  idx <- match(out$Ticker, unk_class$Ticker)
+  hit <- out$ap_group == "Unknown" & !is.na(idx)
+  out$ap_group[hit] <- unk_class$final_class[idx[hit]]
+  out$Lipper_Category[hit & out$Lipper_Category %in% c("#N/A N/A", "#N/A", "N/A", "")] <- NA
+  out
 }
 
 panel_master     <- classify_ap(panel_master)
@@ -541,6 +567,16 @@ get_tickers <- function(df) {
 tickers_entire <- get_tickers(flagged_entire)
 tickers_perf   <- get_tickers(flagged_perf)
 tickers_h3     <- get_tickers(flagged_h3)
+
+# v1.8: exclusions of reclassified unflagged funds (same scopes)
+if (!is.null(unk_class)) {
+  tickers_entire <- unique(c(tickers_entire, unk_class$Ticker[unk_class$exclude_entire]))
+  tickers_perf   <- unique(c(tickers_perf,   unk_class$Ticker[unk_class$exclude_perf]))
+  tickers_h3     <- unique(c(tickers_h3,     unk_class$Ticker[unk_class$exclude_h3]))
+  cat(sprintf("Unflagged funds reclassified: %d active, %d passive (exclusions: entire %d, perf %d, H3 %d)\n",
+              sum(unk_class$final_class == "Active"), sum(unk_class$final_class == "Passive"),
+              sum(unk_class$exclude_entire), sum(unk_class$exclude_perf), sum(unk_class$exclude_h3)))
+}
 
 # SECTOR_FUND in Perf Comparison contributes to excluded_h3 too (per dissertation)
 sector_in_perf <- if ("Flag(s)" %in% names(flagged_perf)) {

@@ -737,15 +737,17 @@ make_t7_rows_FF <- function(grp) {
   rbind(coef_row, t_row)
 }
 
-t7_display <- do.call(rbind, lapply(
-  c("Active", "Passive", "Unknown", "Active + Passive", "Full Sample"),
-  make_t7_rows_FF
-))
+# No Unknown funds after reclassification (data_import v1.8): drop Unknown
+# and Full Sample (= Active + Passive)
+grp_t7_FF <- if (n_funds_by_group[["Unknown"]] > 0)
+  c("Active", "Passive", "Unknown", "Active + Passive", "Full Sample") else
+  c("Active", "Passive", "Active + Passive")
+t7_display <- do.call(rbind, lapply(grp_t7_FF, make_t7_rows_FF))
 rownames(t7_display) <- NULL
 
 # Horizontal rule after Unknown's t-stat row (row 6) separates individual
 # groups from the combined aggregates.
-unknown_tstat_row_FF <- 6L
+unknown_tstat_row_FF <- 2L * sum(grp_t7_FF %in% c("Active", "Passive", "Unknown"))
 
 fn_t7 <- paste(
   "Annualised \\\\textcite{Carhart1997} four-factor alpha (\\\\%) from regressing",

@@ -276,7 +276,10 @@ counts_raw <- bind_rows(
   fund_counts(panel_incubation_pre8c, "Incubation-Corrected"),
   fund_counts(panel_trimmed_pre8c,    "Trimmed (1995--2023)")
 ) %>%
-  pivot_wider(names_from = ap_group, values_from = n, values_fill = 0) %>%
+  pivot_wider(names_from = ap_group, values_from = n, values_fill = 0)
+# Unknown column may be absent after reclassification (data_import v1.8)
+for (.g in c("Active", "Passive", "Unknown")) if (is.null(counts_raw[[.g]])) counts_raw[[.g]] <- 0L
+counts_raw <- counts_raw %>%
   mutate(Total = Active + Passive + Unknown) %>%
   select(Panel, Active, Passive, Unknown, Total)
 
@@ -302,8 +305,10 @@ latex_t1 <- counts_raw %>%
   footnote(
     general = paste(
       "Active and Passive classifications use the \\\\textit{Actively Managed}",
-      "field from Bloomberg static data. Unknown funds are excluded from all",
-      "regression analyses. The Incubation-Corrected panel removes the first",
+      "field from Bloomberg static data. Funds without the flag (mostly funds closed",
+      "before 2012) are classified by name, Lipper category and benchmark tracking",
+      "(Appendix~\\\\ref{app:data_cleaning}); Unknown counts any that remain, and these are",
+      "excluded from all analyses. The Incubation-Corrected panel removes the first",
       "36 months of each fund's return history following \\\\textcite{Evans2010}.",
       "The Trimmed panel additionally restricts the sample to 1995--2023.",
       "Leveraged and inverse index products are removed before these counts.",

@@ -481,6 +481,10 @@ t7$Group <- factor(t7$Group,
                    levels = c("Active", "Passive", "Unknown",
                               "Active + Passive", "Full Sample"))
 t7 <- t7 %>% arrange(Group)
+# Unflagged funds reclassified (data_import v1.8): no Unknown group, and Full
+# Sample would repeat Active + Passive, so both rows are dropped
+if (!"Unknown" %in% as.character(t7$Group))
+  t7 <- t7 %>% filter(Group != "Full Sample") %>% droplevels()
 
 # Build interleaved (coefficient, t-statistic) rows.
 make_t7_rows <- function(r) {
@@ -513,7 +517,7 @@ rownames(t7_display) <- NULL
 
 # Horizontal rule after Unknown's t-stat row (row 6) separates individual
 # groups from the combined aggregates below.
-unknown_tstat_row <- 2L * which(levels(t7$Group) == "Unknown")
+unknown_tstat_row <- 2L * sum(as.character(t7$Group) %in% c("Active", "Passive", "Unknown"))
 
 fn_t7 <- paste(
   "Annualised \\\\textcite{Carhart1997} four-factor alpha (\\\\%) from regressing",

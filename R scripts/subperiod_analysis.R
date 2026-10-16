@@ -762,6 +762,8 @@ make_d2_block <- function(alpha_agg, n_funds) {
     eg <- alpha_agg %>% filter(ap_group == grp, weighting == "EW")
     vg <- alpha_agg %>% filter(ap_group == grp, weighting == "VW")
     if (nrow(eg) == 0L || nrow(vg) == 0L) next
+    # No Unknown funds (data_import v1.8): skip Unknown and Full Sample
+    if (grp %in% c("Unknown", "Full Sample") && n_funds[["Unknown"]] == 0L) next
     out[[paste0(grp, "_c")]] <- data.frame(
       Group    = grp,
       N        = formatC(n_funds[[grp]], format = "d", big.mark = ","),
@@ -792,12 +794,13 @@ perf_data <- bind_rows(lapply(results,
                               function(r) make_d2_block(r$alpha_agg, r$n_funds)))
 rownames(perf_data) <- NULL
 
-# 10 rows per sub-period panel (5 groups * 2 rows).
-ROWS_PP <- 10L
+# Rows per sub-period panel: 2 per group shown (10, or 6 without Unknown)
+ROWS_PP_vec <- vapply(results, function(r) nrow(make_d2_block(r$alpha_agg, r$n_funds)), integer(1))
+N_INDIV_vec <- vapply(results, function(r) 2L + (r$n_funds[["Unknown"]] > 0L), integer(1))
 perf_packs <- data.frame(
   label = sapply(results, `[[`, "panel"),
-  start = (seq_along(results) - 1L) * ROWS_PP + 1L,
-  end   = seq_along(results) * ROWS_PP,
+  start = cumsum(ROWS_PP_vec) - ROWS_PP_vec + 1L,
+  end   = cumsum(ROWS_PP_vec),
   stringsAsFactors = FALSE
 )
 
@@ -843,7 +846,7 @@ for (i in seq_len(nrow(perf_packs))) {
     pack_rows(perf_packs$label[i], perf_packs$start[i], perf_packs$end[i],
               bold = FALSE, italic = TRUE,
               hline_before = (i > 1), hline_after = FALSE) %>%
-    row_spec(perf_packs$start[i] + 5L, hline_after = TRUE)
+    row_spec(perf_packs$start[i] + 2L * N_INDIV_vec[i] - 1L, hline_after = TRUE)
 }
 
 writeLines(clean_latex(as.character(latex_d2), resize = TRUE),

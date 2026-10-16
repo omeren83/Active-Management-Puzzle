@@ -1,5 +1,13 @@
 # =============================================================================
-# MASTER PIPELINE ORCHESTRATOR                                             v1.8
+# MASTER PIPELINE ORCHESTRATOR                                             v1.9
+#
+# v1.9 (Oct 2026; pre-committed 16 Oct 2026):
+#   - Unflagged ("Unknown") funds are classified in Phase A from
+#     unknown_classification.xlsx (data_import_and_cleaning.R v1.8).
+#     RUN_UTILITY_CLASSIFY rebuilds that file (classify_unknown_funds.R).
+#   - Phase J ends with classification_robustness.R (headline results under
+#     the Bloomberg-flag-only classification vs reclassified), run only when
+#     results_bloomberg_only/ exists in WORKING_DIR.
 #
 # v1.8 (defense extensions, Oct 2026; pre-committed 15 Oct 2026):
 #   - Phase E adds breaktest_terciles.R, same_sample_subperiods.R and
@@ -146,6 +154,7 @@ RUN_PHASE_H_FACTOR_ROBUST <- TRUE    # alpha_estimation_robust + build_robust_ta
 RUN_PHASE_I_BEHAVIORAL    <- TRUE    # behavioral_state_variables
 RUN_PHASE_J_PANEL_REG     <- TRUE    # panel_regressions_setup + H1..H4 + reporting + PPF
 RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
+RUN_UTILITY_CLASSIFY      <- FALSE   # classify_unknown_funds (after Phase A; rarely re-run)
 
 # Phase J sub-toggle: force re-running panel_regressions_setup.R even if
 # panel_reg.rds is on disk. Default FALSE = use cached panel_reg.rds when
@@ -284,7 +293,9 @@ SCRIPT_INTEGRITY <- c(
   "breaktest_terciles.R"          = "PAST-PERFORMANCE TERCILE",
   "same_sample_subperiods.R"      = "SAME-SAMPLE SUB-PERIOD",
   "value_added.R"                 = "DOLLAR VALUE ADDED",
-  "panel_regime_stepwise.R"       = "panel_regime_stepwise"
+  "panel_regime_stepwise.R"       = "panel_regime_stepwise",
+  "classify_unknown_funds.R"      = "UNKNOWN-FUND CLASSIFICATION",
+  "classification_robustness.R"   = "CLASSIFICATION ROBUSTNESS"
 )
 
 verify_pipeline_integrity <- function(scripts_dir = SCRIPTS_DIR,
@@ -525,12 +536,22 @@ if (RUN_PHASE_J_PANEL_REG) {
   run_script("psychological_premium.R",       "Phase J")
   run_script("uncertainty_robustness.R",      "Phase J")
   run_script("panel_regime_stepwise.R",       "Phase J")   # v1.8
+  # v1.9: needs the saved Bloomberg-flag-only outputs
+  if (dir.exists(file.path(WORKING_DIR, "results_bloomberg_only"))) {
+    run_script("classification_robustness.R", "Phase J")
+  } else {
+    cat("Phase J: results_bloomberg_only/ not found -> skipping classification_robustness.R\n")
+  }
 }
 
 
 # =============================================================================
 # UTILITY - LIPPER CATEGORY BUILD (standalone)
 # =============================================================================
+if (RUN_UTILITY_CLASSIFY) {
+  require_session_object("panel_master", "classify_unknown_funds.R")
+  run_script("classify_unknown_funds.R", "Utility")
+}
 if (RUN_UTILITY_LIPPER) {
   run_script("build_lipper_category.R", "Utility")
 }
