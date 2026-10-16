@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Behavioral Flow Effects Before and After 2010: Category $\times$ Month Fixed Effects}
+\label{tab:regime_pooled_fe}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+Hyp. & State & To Aug 2010 & After & Change & Headline, before & Headline, after & $N$ \\
+\midrule
+H1 & $D^{\text{SENT}}$ & 8.90 (0.031) & 45.01 ($<$0.001) & 29.23 ($<$0.001) & $-$0.0362 ($-$1.89) & 0.0075 (0.62) & 306,153 \\
+H1 & $\text{SENT}^\perp$ & 9.48 (0.024) & 30.86 ($<$0.001) & 27.52 ($<$0.001) & $-$0.0071 ($-$0.73) & 0.0045 (0.91) & 306,153 \\
+H1 & $D^{\text{AAII}}$ & 1.30 (0.728) & 10.08 (0.018) & 1.11 (0.775) & 0.0055 (0.30) & 0.0247 (2.02) & 306,153 \\
+H2 & $D^{\text{MD,Det}}$ & 0.68 (0.877) & 33.57 ($<$0.001) & 10.10 (0.018) & 0.0055 (0.44) & 0.0152 (2.08) & 306,153 \\
+H3 & MAX12 $\times D^{\text{SENT}}$ & 1.29 (0.524) & 7.27 (0.026) & 0.54 (0.762) & 0.0007 (0.53) & 0.0001 (0.17) & 261,306 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Each row re-estimates the primary specification with every behavioral regressor (rank segments, state, lottery measure and their interactions) also interacted with $\text{Post}$, a dummy for months after August 2010 (the P2/P3 boundary of Table~\ref{tab:breaktest}). Columns 3--5: Wald tests ($\chi^2$, $p$) that the tested terms (H1, H2: the three $R^q\times S$ interactions; H3: MAX12 and MAX12 $\times D^{\text{SENT}}$) are zero before August 2010, zero after (sum of the base and $\times\text{Post}$ coefficients), and unchanged (the $\times\text{Post}$ terms, $\delta_{\text{post}}$). Headline: H1, $\delta_{\text{HIGH}}-\delta_{\text{LOW}}$; H2, $\delta_{\text{LOW}}$; H3, the MAX12 $\times D^{\text{SENT}}$ coefficient; H4, $\delta_F$ (ExpRatio $\times$ state); $z$-statistics in parentheses. Fixed effects: Lipper category $\times$ month instead of fund; the state and Post main effects are absorbed. Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for H1--H3, Lipper category $\times$ month fixed effects for H4; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
+\end{singlespace}
+

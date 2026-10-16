@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Behavioral Flow Effects Before and After the 2010 Regime Change}
+\label{tab:regime_pooled}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+Hyp. & State & To Aug 2010 & After & Change & Headline, before & Headline, after & $N$ \\
+\midrule
+H1 & $D^{\text{SENT}}$ & 9.03 (0.029) & 43.27 ($<$0.001) & 31.49 ($<$0.001) & $-$0.0347 ($-$1.89) & 0.0039 (0.31) & 306,150 \\
+H1 & $\text{SENT}^\perp$ & 8.33 (0.040) & 36.16 ($<$0.001) & 27.25 ($<$0.001) & $-$0.0052 ($-$0.57) & 0.0030 (0.61) & 306,150 \\
+H1 & $D^{\text{AAII}}$ & 1.92 (0.590) & 10.54 (0.014) & 1.38 (0.711) & 0.0054 (0.29) & 0.0264 (2.14) & 306,150 \\
+H2 & $D^{\text{MD,Det}}$ & 1.46 (0.691) & 29.69 ($<$0.001) & 10.49 (0.015) & 0.0043 (0.34) & 0.0177 (2.42) & 306,150 \\
+H3 & MAX12 $\times D^{\text{SENT}}$ & 0.70 (0.703) & 3.42 (0.181) & 0.07 (0.968) & 0.0011 (0.64) & 0.0007 (1.02) & 261,329 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Each row re-estimates the primary specification with every behavioral regressor (rank segments, state, lottery measure and their interactions) also interacted with $\text{Post}$, a dummy for months after August 2010 (the P2/P3 boundary of Table~\ref{tab:breaktest}). Columns 3--5: Wald tests ($\chi^2$, $p$) that the tested terms (H1, H2: the three $R^q\times S$ interactions; H3: MAX12 and MAX12 $\times D^{\text{SENT}}$) are zero before August 2010, zero after (sum of the base and $\times\text{Post}$ coefficients), and unchanged (the $\times\text{Post}$ terms, $\delta_{\text{post}}$). Headline: H1, $\delta_{\text{HIGH}}-\delta_{\text{LOW}}$; H2, $\delta_{\text{LOW}}$; H3, the MAX12 $\times D^{\text{SENT}}$ coefficient; H4, $\delta_F$ (ExpRatio $\times$ state); $z$-statistics in parentheses. Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for H1--H3, Lipper category $\times$ month fixed effects for H4; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
+\end{singlespace}
+

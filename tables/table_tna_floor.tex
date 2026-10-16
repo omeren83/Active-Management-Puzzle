@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Sensitivity of the Behavioral Flow Tests to the TNA Floor}
+\label{tab:tna_floor}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+Hyp. & State & \multicolumn{2}{c}{USD 5M (baseline)} & \multicolumn{2}{c}{USD 1M} & \multicolumn{2}{c}{No floor} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+ & & Joint $\chi^2$ ($p$) & $N$ & Joint $\chi^2$ ($p$) & $N$ & Joint $\chi^2$ ($p$) & $N$ \\
+\midrule
+H1 & $D^{\text{SENT}}$ & 7.61 (0.055) & 306,150 & 7.70 (0.053) & 319,178 & 6.64 (0.084) & 324,166 \\
+H1 & $\text{SENT}^\perp$ & 11.47 (0.009) & 306,150 & 10.49 (0.015) & 319,178 & 8.35 (0.039) & 324,166 \\
+H1 & $D^{\text{AAII}}$ & 12.92 (0.005) & 306,150 & 11.19 (0.011) & 319,178 & 12.08 (0.007) & 324,166 \\
+H2 & $D^{\text{MD,Det}}$ & 17.31 ($<$0.001) & 306,150 & 14.96 (0.002) & 319,178 & 13.45 (0.004) & 324,166 \\
+H3 & MAX12 $\times D^{\text{SENT}}$ & 6.86 (0.032) & 261,329 & 7.73 (0.021) & 271,004 & 7.93 (0.019) & 274,133 \\
+H4 & $D^{\text{SENT}}$ & 3.93 (0.416) & 305,080 & 6.71 (0.152) & 318,031 & 8.26 (0.083) & 323,018 \\
+H4 & $\text{SENT}^\perp$ & 2.95 (0.566) & 305,080 & 3.73 (0.443) & 318,031 & 4.89 (0.298) & 323,018 \\
+H4 & $D^{\text{AAII}}$ & 3.05 (0.549) & 305,080 & 4.47 (0.346) & 318,031 & 3.67 (0.452) & 323,018 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Headline joint tests of the primary H1--H4 specifications when fund-months are kept if lagged TNA is at least USD 5 million (baseline, as in the main tables), at least USD 1 million, or positive. Tested terms: H1, H2 the three $R^q\times S$ interactions ($\chi^2_3$); H3 MAX12 and MAX12 $\times D^{\text{SENT}}$ ($\chi^2_2$); H4 ExpRatio $\times S$ and the three $R^q\times$ExpRatio$\times S$ terms ($\chi^2_4$). Standardisation and winsorisation are redone within each sample. Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for H1--H3, Lipper category $\times$ month fixed effects for H4; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
+\end{singlespace}
+

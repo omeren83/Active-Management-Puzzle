@@ -1,0 +1,28 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Luck Versus Skill of the Same Funds Across Regimes}
+\label{tab:same_sample_skill}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+Sample & Regime & Funds & $\hat\pi_0$ & $\hat\pi_A^-$ & $\hat\pi_A^+$ & Prob.\ luck, 5th pct. & Prob.\ luck, 95th pct. \\
+\midrule
+All active funds & P1 & 776 & 87.1 & 0.4 & 11.7 & 63.2\% & 73.0\% \\
+ & P2 & 1,029 & 80.9 & -0.2 & 19.2 & 50.1\% & 76.6\% \\
+ & P3 & 1,812 & 80.7 & 23.9 & -5.6 & 5.8\% & 10.5\% \\
+\midrule
+Same funds, P2 and P3 & P2 & 1,029 & 80.9 & -0.2 & 19.2 & 50.1\% & 76.6\% \\
+ & P3 & 1,029 & 84.9 & 20.0 & -5.5 & 6.8\% & 26.0\% \\
+\midrule
+Same funds, P1--P3 & P1 & 775 & 87.2 & 0.2 & 11.7 & 65.1\% & 73.2\% \\
+ & P2 & 775 & 81.0 & -1.5 & 20.3 & 51.2\% & 83.0\% \\
+ & P3 & 775 & 84.4 & 21.0 & -6.1 & 7.5\% & 32.1\% \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Per-fund Carhart alphas on gross returns within each regime (at least 24 observations). $\hat\pi_0$: \textcite{Storey2002} zero-alpha proportion ($\lambda=0.5$); $\hat\pi_A^-$, $\hat\pi_A^+$: \textcite{BarrasScailletWermers2010} unskilled and skilled proportions at $\gamma^*=0.45$. Prob.\ luck: share of $B=10{,}000$ \textcite{FamaFrench2010} bootstrap runs in which the simulated 5th (95th) percentile of $t(\hat\alpha)$ lies below the actual one; below 5\% (above 95\%) means worse (better) than luck. Settings as in Tables~\ref{tab:subperiod_bootstrap_tails} and \ref{tab:subperiod_bsw_decomposition}. Regimes: P1 Jan 1995--Mar 2006, P2 Apr 2006--Aug 2010, P3 Sep 2010--Jan 2026 (Table~\ref{tab:breaktest}). Same funds: active funds with at least 24 monthly returns in each listed regime; these funds survived across the regime boundary, so their alpha levels are biased upward relative to the full cross-section, and the change, not the level, is the object of interest. Sample: active funds, \textcite{Evans2010}-corrected panel, performance-comparison subsample.
+\end{singlespace}
+

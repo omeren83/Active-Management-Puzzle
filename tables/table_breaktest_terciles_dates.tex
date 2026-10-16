@@ -1,0 +1,45 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Bai--Perron Break Dates by Past-Performance Tercile}
+\label{tab:breaktest_terciles_dates}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Series & Break & Lower 95\% & Estimate & Upper 95\% \\
+\midrule
+T1 (bottom) & 1 & Dec 1998 & Feb 2003 & Apr 2010 \\
+ & 2 & Sep 2002 & Feb 2006 & Jul 2009 \\
+ & 3 & Jun 2000 & Feb 2009 & Oct 2017 \\
+ & 4 & Dec 1999 & Apr 2012 & Aug 2024 \\
+ & 5 & Dec 2004 & May 2018 & Jan 2026 \\
+ & 6 & Mar 2018 & Jan 2023 & Jan 2026 \\
+T2 & 1 & Dec 1998 & Mar 2003 & Jun 2007 \\
+ & 2 & Dec 1998 & Mar 2006 & Jan 2019 \\
+ & 3 & Jul 2007 & Sep 2010 & Nov 2013 \\
+ & 4 & Nov 2018 & Jan 2023 & Jan 2026 \\
+T3 (top) & 1 & Jul 2001 & Dec 2002 & May 2004 \\
+ & 2 & May 2004 & Dec 2005 & Jul 2007 \\
+ & 3 & Oct 2008 & Aug 2010 & Jun 2012 \\
+ & 4 & Feb 2011 & Dec 2015 & Oct 2020 \\
+ & 5 & Mar 2014 & Dec 2018 & Sep 2023 \\
+ & 6 & Oct 2020 & Jan 2023 & Apr 2025 \\
+All funds & 1 & Feb 2000 & Mar 2003 & Apr 2006 \\
+ & 2 & Jun 2002 & Mar 2006 & Dec 2009 \\
+ & 3 & Apr 2008 & Aug 2010 & Dec 2012 \\
+ & 4 & Apr 2009 & Dec 2021 & Jan 2026 \\
+T1 $-$ T3 & 1 & Oct 2001 & Sep 2002 & Aug 2003 \\
+ & 2 & Oct 2005 & Jan 2007 & Apr 2008 \\
+ & 3 & Jun 2009 & Jan 2010 & Aug 2010 \\
+ & 4 & Dec 2011 & Jan 2013 & Feb 2014 \\
+ & 5 & Apr 2015 & Jan 2016 & Oct 2016 \\
+ & 6 & Jul 2018 & Jan 2019 & Jul 2019 \\
+ & 7 & Oct 2022 & Jan 2023 & Apr 2023 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Break dates selected by BIC for each series of Table~\ref{tab:breaktest_terciles}, dated at the end of the 36-month window; 95\% confidence intervals use one full-sample Newey--West variance with 35 lags. Each month $m$, active funds are sorted into terciles on the $t$-statistic of their 36-month rolling \textcite{Carhart1997} alpha ending in $m-1$ (at least 24 observations; the persistence-test signal); equal-weighted tercile portfolios of gross returns are held in $m$. Series: 36-calendar-month rolling Carhart alpha of each portfolio (at least 24 observations, \% p.a.), Dec 1998--Jan 2026 ($T=326$). \textit{All funds}: the same construction without the sort. Sample: active funds, \textcite{Evans2010}-corrected panel, performance-comparison subsample.
+\end{singlespace}
+

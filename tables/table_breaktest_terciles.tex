@@ -1,0 +1,23 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Structural Breaks in Rolling Alpha by Past-Performance Tercile}
+\label{tab:breaktest_terciles}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccccccc}
+\toprule
+Series & Mean to Aug 2010 & Mean after & Shift & HAC $t$ & sup-$F$ ($p$) & BIC & LWZ & Nearest BIC break [95\% CI] \\
+\midrule
+T1 (bottom) & 0.01 & $-$1.11 & $-$1.12$^{***}$ & $-$2.65 & 9.71 (0.030) & 6 & 1 & Feb 2009 [Jun 2000, Oct 2017] \\
+T2 & 1.22 & $-$0.43 & $-$1.65$^{***}$ & $-$4.10 & 20.56 ($<$0.001) & 4 & 3 & Sep 2010 [Jul 2007, Nov 2013] \\
+T3 (top) & 2.03 & $-$0.08 & $-$2.11$^{***}$ & $-$3.87 & 19.39 ($<$0.001) & 6 & 4 & Aug 2010 [Oct 2008, Jun 2012] \\ \midrule
+All funds & 1.08 & $-$0.54 & $-$1.62$^{***}$ & $-$3.99 & 16.76 (0.001) & 4 & 3 & Aug 2010 [Apr 2008, Dec 2012] \\
+T1 $-$ T3 & $-$2.02 & $-$1.02 & 1.00$^{**}$ & 2.16 & 15.39 (0.002) & 7 & 7 & Jan 2010 [Jun 2009, Aug 2010] \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+\textit{Shift}: coefficient on a post-Aug 2010 dummy in a regression of the series on a constant and the dummy (the date is the P2/P3 boundary from Table~\ref{tab:breaktest}, not re-estimated here), Newey--West standard errors with 35 lags. sup-$F$: \textcite{Andrews1993} test of one break at an unknown date. BIC, LWZ: number of \textcite{Bai2003} breaks selected (at most 8, minimum segment 36 months). Stars on the shift: $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$. Each month $m$, active funds are sorted into terciles on the $t$-statistic of their 36-month rolling \textcite{Carhart1997} alpha ending in $m-1$ (at least 24 observations; the persistence-test signal); equal-weighted tercile portfolios of gross returns are held in $m$. Series: 36-calendar-month rolling Carhart alpha of each portfolio (at least 24 observations, \% p.a.), Dec 1998--Jan 2026 ($T=326$). \textit{All funds}: the same construction without the sort. Sample: active funds, \textcite{Evans2010}-corrected panel, performance-comparison subsample.
+\end{singlespace}
+

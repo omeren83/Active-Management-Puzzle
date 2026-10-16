@@ -1,0 +1,33 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Behavioral Flow Tests Estimated Separately by Regime}
+\label{tab:regime_separate}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lllcccccc}
+\toprule
+Hyp. & State & Regime & Months & State months & Joint $\chi^2$ ($p$) & Headline ($z$) & $N$ \\
+\midrule
+H1 & $D^{\text{SENT}}$ & P1 & 91 & 41 & 2.11 (0.550) & 0.0058 (0.21) & 30,677 \\
+ &  & P2 & 49 & 18 & 4.83 (0.184) & $-$0.0436 ($-$1.80) & 49,279 \\
+ &  & P3 & 166 & 32 & 38.92 ($<$0.001) & 0.0029 (0.23) & 226,181 \\ \midrule
+H1 & $\text{SENT}^\perp$ & P1 & 91 & cont. & 0.83 (0.843) & 0.0076 (0.46) & 30,677 \\
+ &  & P2 & 49 & cont. & 2.02 (0.568) & $-$0.0129 ($-$1.09) & 49,279 \\
+ &  & P3 & 166 & cont. & 35.14 ($<$0.001) & 0.0030 (0.60) & 226,181 \\ \midrule
+H1 & $D^{\text{AAII}}$ & P1 & 91 & 48 & 0.68 (0.878) & 0.0007 (0.03) & 30,677 \\
+ &  & P2 & 49 & 8 & 2.28 (0.516)$^{\dagger}$ & 0.0168 (0.63) & 49,279 \\
+ &  & P3 & 166 & 36 & 11.62 (0.009) & 0.0274 (2.19) & 226,181 \\ \midrule
+H2 & $D^{\text{MD,Det}}$ & P1 & 91 & 0 & n.e. & n.e. & 30,682 \\
+ &  & P2 & 49 & 38 & 2.68 (0.444) & 0.0025 (0.17) & 49,279 \\
+ &  & P3 & 166 & 71 & 24.13 ($<$0.001) & 0.0155 (2.12) & 226,181 \\ \midrule
+H3 & MAX12 $\times D^{\text{SENT}}$ & P1 & 91 & 41 & 19.64 ($<$0.001) & 0.0028 (1.35) & 23,650 \\
+ &  & P2 & 49 & 18 & 1.98 (0.372) & $-$0.0014 ($-$0.45) & 40,768 \\
+ &  & P3 & 166 & 32 & 1.78 (0.410) & 0.0009 (1.28) & 196,897 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Primary specification estimated within each regime (P1 to Mar 2006, P2 to Aug 2010, P3 after). \textit{Months}: sample months in the regime; \textit{State months}: months in which the state dummy equals one (cont.: continuous index). n.e.: not estimable because the state does not vary within the regime. $^{\dagger}$: fewer than 12 state months (low power). Headline: H1, $\delta_{\text{HIGH}}-\delta_{\text{LOW}}$; H2, $\delta_{\text{LOW}}$; H3, the MAX12 $\times D^{\text{SENT}}$ coefficient; H4, $\delta_F$ (ExpRatio $\times$ state); $z$-statistics in parentheses. Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for H1--H3, Lipper category $\times$ month fixed effects for H4; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
+\end{singlespace}
+

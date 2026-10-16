@@ -1,5 +1,8 @@
-# panel_regressions_setup.R                                              v1.6
+# panel_regressions_setup.R                                              v1.7
 # =============================================================================
+# v1.7 (Oct 2026): fund-months below the TNA floor saved to
+#   panel_reg_below_floor.rds for the floor sensitivity in
+#   panel_regime_stepwise.R; panel_reg itself is unchanged.
 # v1.6 changes (Batch 4, Oct 2026):
 #   - age_lag is the age at date t-1 (calendar), not a row lag, so the first
 #     post-incubation month keeps log_Age.
@@ -501,6 +504,10 @@ cat("Added lagged sentiment columns (suffix _lag).\n")
 # --- 14b. $5M lagged-TNA filter (after ALL lags, incl. the sentiment lags
 # above, so no lag spans a removed month). log_TNA = log(TNA_{t-1}).
 n_pre_tna <- nrow(panel_reg)
+# v1.7: fund-months below the floor saved for the TNA-floor sensitivity
+# (panel_regime_stepwise.R, Appendix J); not used by H1-H4
+saveRDS(panel_reg %>% filter(!is.na(log_TNA), log_TNA < log(MIN_TNA_LAG)),
+        file.path(WORKING_DIR, "panel_reg_below_floor.rds"))
 panel_reg <- panel_reg %>% filter(!is.na(log_TNA), log_TNA >= log(MIN_TNA_LAG))
 cat(sprintf("Lagged-TNA filter (>= USD %sM): %d -> %d fund-months (-%d)\n",
             MIN_TNA_LAG, n_pre_tna, nrow(panel_reg), n_pre_tna - nrow(panel_reg)))

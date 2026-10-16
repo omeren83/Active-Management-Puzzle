@@ -1,5 +1,8 @@
-# uncertainty_robustness.R                                               v1.2
+# uncertainty_robustness.R                                               v1.3
 # =============================================================================
+# v1.3 (Oct 2026): basis points use the native rank-space calibration in
+#   rank_calibration.xlsx (psychological_premium.R v1.5), not the momentum
+#   spread.
 # SENTIMENT OR UNCERTAINTY? Horse race between the behavioral state variables
 # of H1/H2 and the macroeconomic uncertainty index of Jurado, Ludvigson & Ng
 # (2015, AER). Added at a jury member's request (Oct 2026).
@@ -376,15 +379,15 @@ dm <- function(m, f) {                            # delta method for scalar f(b)
     (f(bp) - f(bm)) / (2 * e) }, numeric(1))
   c(est = est, se = sqrt(as.numeric(t(gr) %*% V %*% gr)))
 }
-PORT_ALPHAS_FILE <- file.path(WORKING_DIR, "portfolio_alphas.xlsx")
+# Native rank-space calibration written by psychological_premium.R (v1.5)
+RANK_CAL_FILE <- file.path(WORKING_DIR, "rank_calibration.xlsx")
 BPS_PER_RANK <- NA_real_
-if (file.exists(PORT_ALPHAS_FILE)) {                # same calibration as psychological_premium.R
-  .mom <- readxl::read_excel(PORT_ALPHAS_FILE, sheet = "momentum")
-  .mom <- .mom[.mom$ap_group == "Active" & .mom$weighting == "EW" & .mom$quintile == 6, ]
-  if (nrow(.mom) == 1L) BPS_PER_RANK <- round(100 * .mom$alpha_car / 0.8 * 100)
-  rm(.mom)
+if (file.exists(RANK_CAL_FILE)) {
+  .cal <- readxl::read_excel(RANK_CAL_FILE, sheet = "native")
+  BPS_PER_RANK <- round(.cal$alpha[.cal$portfolio == "Q5-Q1"] / 0.8 * 100)
+  rm(.cal)
 }
-if (is.na(BPS_PER_RANK)) warning("portfolio_alphas.xlsx not found: basis points not reported.")
+if (is.na(BPS_PER_RANK)) warning("rank_calibration.xlsx not found: basis points not reported.")
 
 ppf <- list()
 m_ppf_a <- fit3("MAX12", "D_SENT", seg_states = "D_SENT")

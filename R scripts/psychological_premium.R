@@ -1,4 +1,13 @@
-# psychological_premium.R                                              v1.4
+# psychological_premium.R                                              v1.5
+# v1.5 (defense extension, Oct 2026; pre-committed 15 Oct 2026, Özsöylev B6):
+#   Rank-to-alpha calibration in the native rank space: active funds sorted
+#   monthly into quintiles of rank_lag (the within-Lipper-category trailing
+#   12-month rank used in the flow regressions; bins of width 0.2 = the
+#   R^LOW / R^HIGH segments), EW net-return Carhart alpha, Q5-Q1 / 0.8 = alpha
+#   per rank point. Primary calibration; the momentum mapping is kept as a
+#   comparison. Written to rank_calibration.xlsx (read by
+#   uncertainty_robustness.R). Needs panel_incubation for returns; without it
+#   the last rank_calibration.xlsx is reused with a warning.
 # v1.4 (Batch 4, Oct 2026): D_SENT_lag added to the sample filter, so the
 #   PPF sample is identical to the H3 regression sample. Calibration spread
 #   and its t read from portfolio_alphas.xlsx (was hard-coded 2.120); the
@@ -401,6 +410,55 @@ colnames(ppf_df) <- c("Lottery", "Segment",
                       "$p$ (1-sided)")
 rownames(ppf_df) <- NULL
 
+# Native rank-space calibration (v1.5): quintiles of rank_lag, held in month t
+RANK_CAL_FILE <- file.path(WORKING_DIR, "rank_calibration.xlsx")
+NW_LAG_CAL    <- 6L   # as the portfolio sorts
+if (exists("panel_incubation")) {
+  .r <- panel_reg %>% filter(!is.na(rank_lag)) %>%
+    select(Ticker, date, rank_lag) %>%
+    inner_join(panel_incubation %>%
+                 select(Ticker, date, ret_net, MKT_RF, SMB, HML, MOM, RF),
+               by = c("Ticker", "date")) %>%
+    filter(!is.na(ret_net), !is.na(MKT_RF), !is.na(MOM), !is.na(RF)) %>%
+    mutate(ym = format(date, "%Y-%m"),
+           q  = findInterval(rank_lag, c(0.2, 0.4, 0.6, 0.8)) + 1L)
+  .p <- .r %>% group_by(ym, q) %>%
+    summarise(ret = mean(ret_net), n = n(), MKT_RF = first(MKT_RF), SMB = first(SMB),
+              HML = first(HML), MOM = first(MOM), RF = first(RF), .groups = "drop")
+  .alpha <- function(y, d) {      # Carhart alpha (% p.a.) and NW t
+    X <- cbind(1, d$MKT_RF, d$SMB, d$HML, d$MOM)
+    b <- solve(crossprod(X), crossprod(X, y)); e <- as.vector(y - X %*% b)
+    Tn <- length(y); Xi <- solve(crossprod(X)); sc <- X * e; S <- crossprod(sc) / Tn
+    for (j in seq_len(NW_LAG_CAL)) {
+      G <- crossprod(sc[(j + 1):Tn, , drop = FALSE], sc[1:(Tn - j), , drop = FALSE]) / Tn
+      S <- S + (1 - j / (NW_LAG_CAL + 1)) * (G + t(G))
+    }
+    c(alpha = 1200 * b[1], t = b[1] / sqrt((Tn * Xi %*% S %*% Xi)[1, 1]), months = Tn)
+  }
+  .w <- tidyr::pivot_wider(.p %>% select(ym, q, ret), names_from = q, values_from = ret,
+                           names_prefix = "Q") %>%
+    inner_join(.p %>% distinct(ym, MKT_RF, SMB, HML, MOM, RF), by = "ym") %>%
+    filter(!is.na(Q1), !is.na(Q5)) %>% arrange(ym)
+  rank_cal <- bind_rows(lapply(c(paste0("Q", 1:5), "Q5-Q1"), function(k) {
+    y <- if (k == "Q5-Q1") .w$Q5 - .w$Q1 else .w[[k]] - .w$RF
+    ok <- !is.na(y); a <- .alpha(y[ok], .w[ok, ])
+    data.frame(portfolio = k, alpha = a[["alpha"]], t = a[["t"]], months = a[["months"]],
+               mean_funds = if (k == "Q5-Q1") NA_real_ else mean(.p$n[.p$q == as.integer(substr(k, 2, 2))]))
+  }))
+  writexl::write_xlsx(list(native = rank_cal), RANK_CAL_FILE)
+  rm(.r, .p, .w, .alpha)
+} else if (file.exists(RANK_CAL_FILE)) {
+  warning("panel_incubation not in session: reusing ", basename(RANK_CAL_FILE),
+          " from a previous run.", call. = FALSE)
+  rank_cal <- as.data.frame(readxl::read_excel(RANK_CAL_FILE, sheet = "native"))
+} else {
+  stop("Native rank calibration needs panel_incubation (run Phase A) or ",
+       "rank_calibration.xlsx from a previous run.")
+}
+print(rank_cal, digits = 3)
+NATIVE_SPREAD_PCT <- rank_cal$alpha[rank_cal$portfolio == "Q5-Q1"]
+NATIVE_SPREAD_T   <- rank_cal$t[rank_cal$portfolio == "Q5-Q1"]
+
 # Worked bp example (MAX12, R_MID) computed from current estimates
 # EW Carhart Q5-Q1 momentum spread, Active, read from portfolio_alphas.xlsx
 # (written by portfolio_sorts.R, Phase F); quintile 6 = Q5-Q1 spread.
@@ -416,9 +474,10 @@ if (file.exists(PORT_ALPHAS_FILE)) {
   stop("portfolio_alphas.xlsx not found in WORKING_DIR; run Phase F ",
        "(portfolio_sorts.R) before psychological_premium.R.")
 }
-cat(sprintf("Calibration: momentum Q5-Q1 EW Carhart alpha = %.3f%% p.a. (t = %.2f)\n",
-            MOM_SPREAD_PCT, MOM_SPREAD_T))
-BPS_PER_RANK   <- round(MOM_SPREAD_PCT / 0.8 * 100)
+cat(sprintf("Calibration: native rank Q5-Q1 EW Carhart alpha = %.3f%% p.a. (t = %.2f); momentum comparison %.3f%% (t = %.2f)\n",
+            NATIVE_SPREAD_PCT, NATIVE_SPREAD_T, MOM_SPREAD_PCT, MOM_SPREAD_T))
+BPS_PER_RANK   <- round(NATIVE_SPREAD_PCT / 0.8 * 100)    # primary (v1.5)
+BPS_PER_RANK_MOM <- round(MOM_SPREAD_PCT / 0.8 * 100)    # comparison
 mid_lo <- abs(sp_max12$MID$SP_low)
 mid_hi <- abs(sp_max12$MID$SP_high)
 bps_lo <- as.integer(round(mid_lo * BPS_PER_RANK))
@@ -439,11 +498,13 @@ fn <- paste0(
   "\\\\smallskip ",
   "\\\\textit{Conversion to alpha basis points.} To express the premium ",
   "in welfare-relevant units, the rank-to-alpha mapping is calibrated ",
-  "using the equal-weighted Carhart four-factor alpha spread between the ",
-  "top and bottom momentum quintiles of the Active panel (Table~\\\\ref{tab:port_mom_alpha}, ",
-  sprintf("$Q5-Q1=%.3f\\\\%%$ p.a., $t=%.2f$). With a midpoint-to-midpoint rank distance of ",
-          MOM_SPREAD_PCT, MOM_SPREAD_T),
-  sprintf("$0.8$, this implies approximately %d basis points of annual Carhart ", BPS_PER_RANK),
+  "in the rank space of the flow regressions: each month, active funds are ",
+  "sorted into quintiles of their within-Lipper-category trailing 12-month ",
+  "return rank (the $R$ of the H1--H4 regressions; bins of width 0.2) and the ",
+  "equal-weighted portfolios are held for the month. The net-return Carhart ",
+  sprintf("alpha spread is $Q5-Q1=%.3f\\\\%%$ p.a. ($t=%.2f$); with a midpoint-to-midpoint ",
+          NATIVE_SPREAD_PCT, NATIVE_SPREAD_T),
+  sprintf("rank distance of $0.8$, this implies approximately %d basis points of annual Carhart ", BPS_PER_RANK),
   "alpha per rank-point. Applying this conversion at the middle rank ",
   sprintf(paste0(
     "segment, the MAX12 premium is approximately %d basis points of annual ",
@@ -453,13 +514,12 @@ fn <- paste0(
     "high-sentiment regimes ",
     "($|\\\\text{SP}_{\\\\text{high}}|\\\\times %d\\\\approx %.3f\\\\times %d$). "),
     bps_lo, BPS_PER_RANK, mid_lo, BPS_PER_RANK, bps_hi, BPS_PER_RANK, mid_hi, BPS_PER_RANK),
-  "The conversion uses Jegadeesh--Titman momentum sorts as the closest ",
-  "available rank-alpha mapping in the dissertation; the ",
-  "within-Lipper-category mapping that drives the H1--H4 panel ",
-  "regressions is conceptually similar but slightly attenuated, so the ",
-  "quoted basis-point figures should be read as orders of magnitude ",
+  sprintf(paste0("For comparison, the Jegadeesh--Titman momentum quintile spread ",
+                 "(Table~\\\\ref{tab:port_mom_alpha}; $%.3f\\\\%%$, $t=%.2f$) implies %d basis points ",
+                 "per rank point. "), MOM_SPREAD_PCT, MOM_SPREAD_T, as.integer(BPS_PER_RANK_MOM)),
+  "The quoted basis-point figures should be read as orders of magnitude ",
   "rather than precise estimates. ",
-  if (abs(MOM_SPREAD_T) < 1.645)
+  if (abs(NATIVE_SPREAD_T) < 1.645)
     "The calibrating spread is itself not statistically significant, which reinforces this caution. "
   else "",
   "\\\\smallskip ",
@@ -504,7 +564,8 @@ if (DO_BOOTSTRAP && !is.null(boot_results)) {
 
 PPF_results <- list(
   ActR2 = sp_actr2, ActSkew = sp_actskew, MAX12 = sp_max12,
-  bootstrap = boot_results, table = ppf_df
+  bootstrap = boot_results, table = ppf_df,
+  rank_calibration = rank_cal, bps_per_rank = BPS_PER_RANK, bps_per_rank_mom = BPS_PER_RANK_MOM
 )
 assign("PPF_results", PPF_results, envir = .GlobalEnv)
 saveRDS(PPF_results, file.path(WORKING_DIR, "PPF_results.rds"))

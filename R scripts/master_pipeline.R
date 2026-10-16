@@ -1,5 +1,11 @@
 # =============================================================================
-# MASTER PIPELINE ORCHESTRATOR                                             v1.7
+# MASTER PIPELINE ORCHESTRATOR                                             v1.8
+#
+# v1.8 (defense extensions, Oct 2026; pre-committed 15 Oct 2026):
+#   - Phase E adds breaktest_terciles.R, same_sample_subperiods.R and
+#     value_added.R (all need panel_incubation).
+#   - Phase J adds panel_regime_stepwise.R (regime, stepwise, TNA floor).
+#   - Integrity map extended accordingly.
 #
 # Runs the full dissertation analysis pipeline in the correct sequence.
 # Each phase can be toggled ON/OFF via the CONFIG section below.
@@ -274,7 +280,11 @@ SCRIPT_INTEGRITY <- c(
   "H4_fee_elasticity.R"           = "H4_fee_elasticity",
   "psychological_premium.R"       = "psychological_premium",
   "activeness_proxy_diagnostic.R" = "activeness_proxy_diagnostic",
-  "uncertainty_robustness.R"      = "uncertainty_robustness"
+  "uncertainty_robustness.R"      = "uncertainty_robustness",
+  "breaktest_terciles.R"          = "PAST-PERFORMANCE TERCILE",
+  "same_sample_subperiods.R"      = "SAME-SAMPLE SUB-PERIOD",
+  "value_added.R"                 = "DOLLAR VALUE ADDED",
+  "panel_regime_stepwise.R"       = "panel_regime_stepwise"
 )
 
 verify_pipeline_integrity <- function(scripts_dir = SCRIPTS_DIR,
@@ -389,6 +399,11 @@ if (RUN_PHASE_D_FF_BENCHMARK) {
 if (RUN_PHASE_E_SUBPERIODS) {
   run_script("structural_break_test.R", "Phase E")
   run_script("subperiod_analysis.R",    "Phase E")
+  # Defense extensions (v1.8): need panel_incubation and the break dates
+  require_session_object("panel_incubation", "Phase E extensions")
+  run_script("breaktest_terciles.R",     "Phase E")
+  run_script("same_sample_subperiods.R", "Phase E")
+  run_script("value_added.R",            "Phase E")
 }
 
 
@@ -509,6 +524,7 @@ if (RUN_PHASE_J_PANEL_REG) {
   run_script("panel_regressions_reporting.R", "Phase J")
   run_script("psychological_premium.R",       "Phase J")
   run_script("uncertainty_robustness.R",      "Phase J")
+  run_script("panel_regime_stepwise.R",       "Phase J")   # v1.8
 }
 
 

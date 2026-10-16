@@ -1,0 +1,38 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Stepwise Specifications of the Behavioral Flow Tests}
+\label{tab:stepwise}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lllccccc}
+\toprule
+Hyp. & State & & (1) Rank segments & (2) + State main effect & (3) + Interactions & (4) + Controls & (5) + Fund FE \\
+\midrule
+H1 & $D^{\text{SENT}}$ & Joint $\chi^2$ ($p$) & -- & -- & 7.14 (0.068) & 6.49 (0.090) & 7.61 (0.055) \\
+ & & Headline ($z$) & -- & -- & $-$0.0105 ($-$0.95) & $-$0.0105 ($-$0.96) & $-$0.0097 ($-$0.89) \\
+ & & $R^2$ & 0.024 & 0.024 & 0.024 & 0.034 & 0.038 \\
+ & & $N$ & 306,157 & 306,157 & 306,157 & 306,157 & 306,150 \\ \midrule
+H1 & $\text{SENT}^\perp$ & Joint $\chi^2$ ($p$) & -- & -- & 9.37 (0.025) & 9.39 (0.025) & 11.47 (0.009) \\
+ & & Headline ($z$) & -- & -- & 0.0000 (0.00) & 0.0001 (0.02) & 0.0006 (0.14) \\
+ & & $R^2$ & 0.024 & 0.024 & 0.024 & 0.034 & 0.038 \\
+ & & $N$ & 306,157 & 306,157 & 306,157 & 306,157 & 306,150 \\ \midrule
+H1 & $D^{\text{AAII}}$ & Joint $\chi^2$ ($p$) & -- & -- & 11.08 (0.011) & 11.11 (0.011) & 12.92 (0.005) \\
+ & & Headline ($z$) & -- & -- & 0.0187 (1.79) & 0.0186 (1.78) & 0.0200 (1.91) \\
+ & & $R^2$ & 0.024 & 0.024 & 0.024 & 0.034 & 0.038 \\
+ & & $N$ & 306,157 & 306,157 & 306,157 & 306,157 & 306,150 \\ \midrule
+H2 & $D^{\text{MD,Det}}$ & Joint $\chi^2$ ($p$) & -- & -- & 19.36 ($<$0.001) & 19.38 ($<$0.001) & 17.31 ($<$0.001) \\
+ & & Headline ($z$) & -- & -- & 0.0134 (2.11) & 0.0115 (1.79) & 0.0134 (2.09) \\
+ & & $R^2$ & 0.024 & 0.024 & 0.025 & 0.034 & 0.038 \\
+ & & $N$ & 306,157 & 306,157 & 306,157 & 306,157 & 306,150 \\ \midrule
+H3 & MAX12 $\times D^{\text{SENT}}$ & Joint $\chi^2$ ($p$) & -- & -- & 3.11 (0.211) & 0.16 (0.923) & 6.86 (0.032) \\
+ & & Headline ($z$) & -- & -- & $-$0.0003 ($-$0.49) & 0.0002 (0.30) & 0.0013 (1.91) \\
+ & & $R^2$ & 0.027 & 0.028 & 0.028 & 0.036 & 0.041 \\
+ & & $N$ & 261,337 & 261,337 & 261,337 & 261,337 & 261,329 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Regressors added in a fixed order: (1) rank segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$; (2) state main effect (H3: also MAX12); (3) tested interactions; (4) controls; (5) fund fixed effects (= primary specification). Same estimation sample in all columns. $R^2$: within $R^2$ in column (5), $R^2$ otherwise. Headline: H1, $\delta_{\text{HIGH}}-\delta_{\text{LOW}}$; H2, $\delta_{\text{LOW}}$; H3, the MAX12 $\times D^{\text{SENT}}$ coefficient; H4, $\delta_F$ (ExpRatio $\times$ state); $z$-statistics in parentheses. Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for H1--H3, Lipper category $\times$ month fixed effects for H4; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
+\end{singlespace}
+

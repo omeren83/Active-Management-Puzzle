@@ -1,0 +1,36 @@
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Dollar Value Added by Active Funds}
+\label{tab:value_added}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+ & Full sample & P1 (Jan 1995--Mar 2006) & P2 (Apr 2006--Aug 2010) & P3 (Sep 2010--Jan 2026) \\
+\midrule
+\multicolumn{5}{l}{\textit{A. Value added (gross returns)}} \\
+Aggregate, USD m per year & 11,268.0 & 13,848.8$^{*}$ & 11,370.1 & 9,355.5 \\
+\quad $t$-statistic & 1.27 & 1.81 & 0.24 & 0.96 \\
+Per fund, life-weighted mean & 12.35$^{***}$ & 55.95$^{***}$ & 11.41 & 6.81$^{**}$ \\
+\quad $t$-statistic & 2.85 & 3.01 & 1.24 & 2.12 \\
+Per fund, median & $-$0.43 & 1.31 & 0.64 & $-$0.60 \\
+Funds with positive value added (\%) & 33.7 & 61.8 & 59.4 & 30.4 \\
+\midrule
+\multicolumn{5}{l}{\textit{B. Value delivered to investors (net returns)}} \\
+Aggregate, USD m per year & $-$3,189.5 & 6,285.9 & $-$7,729.5 & $-$8,803.4 \\
+\quad $t$-statistic & $-$0.36 & 0.87 & $-$0.16 & $-$0.89 \\
+Per fund, life-weighted mean & $-$3.50 & 25.40 & $-$7.75 & $-$6.41$^{***}$ \\
+\quad $t$-statistic & $-$1.02 & 1.47 & $-$0.85 & $-$2.67 \\
+Per fund, median & $-$1.97 & $-$0.04 & $-$0.22 & $-$2.07 \\
+Funds with positive value added (\%) & 15.7 & 49.2 & 44.6 & 13.5 \\
+\midrule
+Funds & 1,806 & 859 & 1,117 & 1,805 \\
+Months & 373 & 135 & 53 & 185 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\begin{singlespace}\footnotesize\noindent
+Value added follows \textcite{BerkVanBinsbergen2015}: $V_{it}=q_{i,t-1}(R_{it}-r^f_t-\hat\beta_i'F_t)$, where $q_{i,t-1}$ is lagged TNA, $R_{it}$ the gross (Panel A) or net (Panel B) return and $\hat\beta_i$ the fund's full-sample \textcite{Carhart1997} loadings (gross returns, at least 24 months). Unlike \textcite{BerkVanBinsbergen2015}, the benchmark is the Carhart factor portfolios rather than Vanguard index funds, which are not costless to track, and the loadings are estimated in sample. Amounts in USD million per year at 2025 prices (CPI-U, all items; October 2025, not published, interpolated). Aggregate: monthly sum over funds, time-series mean $\times 12$, Newey--West $t$-statistic (6 lags). Per fund: mean of $V_{it}$ over each fund's months $\times 12$, averaged across funds with weights proportional to months alive; $t$-statistic clustered by fund. $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$. Regimes as in Table~\ref{tab:breaktest}. Sample: active funds, \textcite{Evans2010}-corrected panel, performance-comparison subsample.
+\end{singlespace}
+
