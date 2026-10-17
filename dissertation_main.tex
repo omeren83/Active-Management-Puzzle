@@ -105,6 +105,27 @@
 % italic in the List of Symbols and gave a bolded appearance to math glyphs.
 %\setmathfont{STIX Two Math}
 \setmathfont{Libertinus Math}
+% Letters, digits and basic operators in math are taken from the text font
+% (Times New Roman), so inline quantities such as $B = 10{,}000$ or
+% $\gamma^* = 0.45$ match the surrounding prose. Libertinus Math still
+% supplies the math parameters, large operators, delimiters and symbols.
+\setmathfont{Times New Roman}[range={up/{Latin,latin,num,Greek,greek},"002B,"003D,"2212,"002D,"003C,"003E,"00D7,"0025,"002C,"002E,"0028,"0029,"005B,"005D,"002F,"00B1,"2264,"2265,"2248,"2190,"2191,"2192,"2193}]
+\setmathfont{Times New Roman Italic}[range={it/{Latin,latin,Greek,greek}}]
+\setmathfont{Times New Roman Bold}[range={bfup/{Latin,latin,num,Greek,greek}}]
+\setmathfont{Times New Roman Bold Italic}[range={bfit/{Latin,latin,Greek,greek}}]
+% Symbol font holding the text font (used below for the minus sign).
+\edef\tmpdecl{\noexpand\DeclareSymbolFont{tnrtext}{TU}{\rmdefault}{m}{n}}\tmpdecl
+% Significance stars ($^{***}$) and other asterisks in math: use the text
+% asterisk of Times New Roman instead of the math font's centred U+2217.
+\AtBeginDocument{%
+  \begingroup\lccode`\~=`\*\lowercase{\endgroup\def~{\text{\raisebox{-0.45ex}{*}}}}%
+  \mathcode`\*="8000\relax
+  % Minus sign: unicode-math re-assigns it to the math font at the start of
+  % the document, overriding the range above; map it to the Times minus
+  % (U+2212), still as a binary operator.
+  \Umathcode`\-=2 \symtnrtext "2212\relax
+  \Umathcode"2212=2 \symtnrtext "2212\relax
+}
 % =============================================================================
 % PHASE 3.A PATCH 1 — Math typography fix
 % Date: 11 May 2026
@@ -222,6 +243,12 @@
 % SBE Part 5.2.2 (p.33): individual entries SINGLE-spaced, double-space BETWEEN
 % entries. \printbibliography otherwise inherits \doublespacing from the body.
 \AtBeginBibliography{\singlespacing}
+% DOIs/URLs: allow breaks after any character instead of stretching the
+% inter-character glue, which printed long DOIs as "https : / / doi . org".
+\setcounter{biburlnumpenalty}{9000}
+\setcounter{biburlucpenalty}{9000}
+\setcounter{biburllcpenalty}{9000}
+\AtBeginBibliography{\Urlmuskip=0mu\relax}
 \setlength{\bibitemsep}{\baselineskip}   % one full double-line gap between entries
 \setlength{\bibhang}{1.27cm}             % hanging indent matches \parindent
 
@@ -1403,8 +1430,8 @@ The fourth is fee elasticity. Under a rational Bayesian updating rule,
 investors should be uniformly negatively elastic to fees: a higher fee, all
 else equal, lowers the manager's expected net alpha and should reduce
 flow. The behavioral alternative permits heterogeneity: some clienteles
-may interpret high fees as a signal of quality
-\parencite{DelGuercioTkac2008}, others may exhibit fee-insensitivity
+may respond to the marketing that higher fees finance
+\parencite{SirriTufano1998}, others may exhibit fee-insensitivity
 through inertia \parencite{ChoiLaibsonMadrian2010}. H4 tests whether
 flow--fee elasticity varies across performance segments and sentiment
 regimes in a manner inconsistent with a single rational updating rule.
@@ -1636,8 +1663,9 @@ strictly negative and homogeneous across investor clienteles.
 \textcite{ChoiLaibsonMadrian2010} provide experimental evidence that even
 sophisticated investors fail to minimise fees when selecting among
 otherwise-identical S\&P 500 index funds, suggesting fee inertia.
-\textcite{DelGuercioTkac2008} show that institutional and retail
-clienteles exhibit materially different fee sensitivities. H4 tests
+\textcite{DelGuercioTkac2002} show that the flows of retail (mutual fund)
+and institutional (pension fund) clienteles respond to performance in
+materially different ways. H4 tests
 whether flow--fee elasticity is heterogeneous across performance
 segments and sentiment regimes in a manner inconsistent with a single
 rational updating rule.
@@ -4086,9 +4114,9 @@ sensitivity should be invariant to sentiment regime: the unconditional
 fee--sentiment interaction $\eta$ and the three rank-conditioned triple
 interactions $\delta^F_{\text{LOW}}$, $\delta^F_{\text{MID}}$, and
 $\delta^F_{\text{HIGH}}$ should be jointly zero. The behavioral
-alternative permits heterogeneity: \textcite{DelGuercioTkac2008}
-document that institutional and retail clienteles exhibit materially
-different fee sensitivities, and \textcite{ChoiLaibsonMadrian2010}
+alternative permits heterogeneity: \textcite{DelGuercioTkac2002}
+document that retail and institutional clienteles evaluate managers
+differently, and \textcite{ChoiLaibsonMadrian2010}
 document that even sophisticated investors fail to minimise fees among
 otherwise-identical S\&P 500 index funds. The behavioral prediction is
 therefore a non-zero joint $\chi^2$ on the triple interactions.
@@ -4145,10 +4173,12 @@ interaction $\phi_{\text{HIGH}}$ ($R^{\text{HIGH}} \times
 columns): among top-performing funds, higher fees
 attenuate, but do not reverse, the fee penalty. The loser-segment
 interaction $\phi_{\text{LOW}}$ is negative but insignificant. A natural
-reading is the fee-as-quality-signal channel of \textcite{DelGuercioTkac2008}
-and \textcite{SirriTufano1998}: a high-fee fund that nevertheless reaches
-the top of its style has cleared a larger gross-alpha hurdle, and
-investors may infer that it is more skilled. Because the corresponding
+reading is the search-cost channel of \textcite{SirriTufano1998}, who
+find that the flow--performance relation is most pronounced for funds
+with higher marketing effort, measured by higher fees. A second, not
+mutually exclusive, reading is that a high-fee fund that nevertheless
+reaches the top of its style has cleared a larger gross-alpha hurdle,
+from which investors may infer that it is more skilled. Because the corresponding
 triple interactions with sentiment are insignificant at 5\% under every
 proxy, this pattern does not vary with sentiment and does not threaten
 the H4 null.
