@@ -8,13 +8,13 @@
 \cmidrule(l{3pt}r{3pt}){4-5} \cmidrule(l{3pt}r{3pt}){6-7}
 Group & $N$ & $T$ & EW & VW & EW & VW\\
 \midrule
-Active & 2,571 & 373 & -0.086 & 0.020 & -1.168$^{***}$ & -0.668$^{*}$\\
-t(coef) &  &  & (-0.19) & (0.05) & (-2.62) & (-1.66)\\
-Passive & 280 & 373 & -0.232 & 0.048 & -0.642$^{**}$ & -0.059\\
-t(coef) &  &  & (-0.85) & (0.28) & (-2.36) & (-0.35)\\
+Active & 2,619 & 373 & -0.086 & 0.020 & -1.230$^{***}$ & -0.668$^{*}$\\
+t(coef) &  &  & (-0.19) & (0.05) & (-2.79) & (-1.66)\\
+Passive & 282 & 373 & -0.232 & 0.048 & -0.647$^{**}$ & -0.059\\
+t(coef) &  &  & (-0.85) & (0.28) & (-2.38) & (-0.35)\\
 \midrule
-Active + Passive & 2,851 & 373 & -0.096 & 0.024 & -1.116$^{***}$ & -0.540\\
-t(coef) &  &  & (-0.22) & (0.07) & (-2.63) & (-1.57)\\
+Active + Passive & 2,901 & 373 & -0.096 & 0.024 & -1.174$^{***}$ & -0.540\\
+t(coef) &  &  & (-0.22) & (0.07) & (-2.80) & (-1.57)\\
 \bottomrule
 \end{tabular}%
 }
@@ -30,7 +30,7 @@ t(coef) &  &  & (-0.22) & (0.07) & (-2.63) & (-1.57)\\
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Annualised \textcite{Carhart1997} four-factor alpha (\%) from regressing the monthly aggregate portfolio return of each group on the market, size, value, and momentum factors, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio (each fund alive in month $t$ contributes $1/N_t$). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $N$: unique funds contributing to the portfolio series; $T$: number of monthly observations in the regression. The Active + Passive row aggregates only the two classified groups. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+Annualised \textcite{Carhart1997} four-factor alpha (\%) from regressing the monthly aggregate portfolio return of each group on the market, size, value, and momentum factors, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio (each fund alive in month $t$ contributes $1/N_t$). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1} / \sum_j \text{TNA}_{j,t-1}$. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Funds without a reported expense ratio have no gross return: they enter the net series and $N$ but not the gross series. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $N$: unique funds contributing to the portfolio series; $T$: number of monthly observations in the regression. The Active + Passive row aggregates only the two classified groups. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

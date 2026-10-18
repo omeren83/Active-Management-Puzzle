@@ -60,7 +60,7 @@ cat("Regimes:", vapply(SP, `[[`, "", "window"), "\n")
 
 # --- 2. Fixed samples -----------------------------------------------------------
 base <- panel_incubation %>%
-  filter(!excluded_perf, ap_group == "Active", !is.na(ret_gross), !is.na(MKT_RF),
+  filter(!excluded_perf, ap_group == "Active", !is.na(ret_net), !is.na(MKT_RF),
          !is.na(SMB), !is.na(HML), !is.na(MOM), !is.na(RF))
 regime_of <- function(d) ifelse(d <= SP$P1$date_hi, "P1", ifelse(d <= SP$P2$date_hi, "P2", "P3"))
 cnt <- base %>% mutate(reg = regime_of(date)) %>% count(Ticker, reg) %>%
@@ -108,7 +108,7 @@ port_of <- function(tk = NULL) {
   d <- base %>% filter(date >= SP$P2$date_lo, date <= SP$P3$date_hi)
   if (!is.null(tk)) d <- d %>% filter(Ticker %in% tk)
   d %>% group_by(date) %>%
-    summarise(ew_gross = mean(ret_gross), ew_net = mean(ret_net, na.rm = TRUE),
+    summarise(ew_gross = mean(ret_gross, na.rm = TRUE), ew_net = mean(ret_net, na.rm = TRUE),
               vw_gross = spe$wm_alpha(ret_gross, tna_lag),
               vw_net   = spe$wm_alpha(ret_net, tna_lag),
               MKT_RF = first(MKT_RF), SMB = first(SMB), HML = first(HML),
@@ -200,8 +200,8 @@ table_wrap <- function(caption, label, colspec, body, note) {
 SLBL <- c(Full = "All active funds", S23 = "Same funds, P2 and P3",
           S123 = "Same funds, P1--P3")
 RLBL <- c(ew_gross = "EW gross", ew_net = "EW net", vw_gross = "VW gross", vw_net = "VW net")
-N_LBL <- c(Full = "", S23 = sprintf(" ($N=%s$)", formatC(length(S23), big.mark = ",")),
-           S123 = sprintf(" ($N=%s$)", formatC(length(S123), big.mark = ",")))
+N_LBL <- c(Full = "", S23 = sprintf(" ($N=%s$)", formatC(length(S23), big.mark = "{,}")),
+           S123 = sprintf(" ($N=%s$)", formatC(length(S123), big.mark = "{,}")))
 get_alpha <- function(s, r, col) {
   x <- regime_tab %>% filter(sample == s, regime == r)
   if (!nrow(x)) return("--")
@@ -238,7 +238,7 @@ COMMON <- paste0(
 note_a <- paste0(
   "Aggregate-portfolio \\textcite{Carhart1997} alpha (\\% p.a.) of the equal-weighted (EW) and ",
   "value-weighted (VW, lagged TNA) portfolio of the listed funds, estimated separately in each ",
-  "regime as in Table~\\ref{tab:subperiod_port_agg_alpha}; stars from Newey--West $t$-statistics ",
+  "regime as in Table~\\ref{tab:subperiod_perf_aggregate}; stars from Newey--West $t$-statistics ",
   "(6 lags). P3 $-$ P2: difference of the two regime alphas from one stacked regression with ",
   "regime-specific intercepts and factor loadings, Newey--West standard errors with 12 lags. ",
   "Decomposition: full change = P3 $-$ P2 change of all active funds; within = the same change ",

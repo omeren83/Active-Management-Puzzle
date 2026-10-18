@@ -60,6 +60,8 @@ stopifnot(sum(substr(cpi$ym, 1, 4) == as.character(CPI_BASE_YEAR)) == 12L)
 cpi$defl <- cpi_base / cpi$cpi
 
 # --- 2. Panel and full-sample Carhart loadings --------------------------------
+# Gross by design (Berk-van Binsbergen V needs gross returns): funds without an
+# expense ratio are excluded so the gross and net series share one sample.
 d <- panel_incubation %>%
   filter(!excluded_perf, ap_group == "Active", !is.na(ret_gross), !is.na(MKT_RF),
          !is.na(SMB), !is.na(HML), !is.na(MOM), !is.na(RF)) %>%

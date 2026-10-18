@@ -305,7 +305,7 @@ t9_tex <- c(
   paste0(
     "\\item Bootstrap procedure follows \\textcite{FamaFrench2010}. ",
     "Sample: actively managed funds, ",
-    SAMPLE_LABEL, ", minimum 24 monthly observations ($N = ", n_active_bs,
+    SAMPLE_LABEL, ", minimum 24 monthly observations ($N = ", formatC(n_active_bs, format = "d", big.mark = "{,}"),
     "$ funds). For each fund, estimated monthly alpha is subtracted from ",
     "the gross excess return series to construct a zero-alpha null return. ",
     "In each of $B = 10{,}000$ bootstrap iterations, calendar months are ",
@@ -374,8 +374,8 @@ t10_tex <- c(
     "\\textcite{Storey2002}. Funds with p-values exceeding $\\lambda$ are unlikely to ",
     "have non-zero true alpha; the density of p-values in $(\\lambda, 1]$ ",
     "provides a conservative estimate of the zero-alpha proportion, bounded ",
-    "above at 1. Sample: actively managed funds ($N = ", total_n, "$), ",
-    SAMPLE_LABEL, ". Passive and Unknown-classified funds are excluded. ",
+    "above at 1. Sample: actively managed funds ($N = ", formatC(total_n, format = "d", big.mark = "{,}"), "$), ",
+    SAMPLE_LABEL, ". Passive funds are excluded. ",
     "Compare with \\textcite{FamaFrench2010}, ",
     "Table~III, which reports an analogous bootstrap-based assessment over ",
     "Jan 1984--Sep 2006."
@@ -443,8 +443,8 @@ t11_tex <- c(
     "pre-set 0.35 or 0.45 match their MSE-based choice). ",
     "Negative $T^+_\\gamma$ entries indicate right-tail significance does ",
     "not exceed the false-discovery rate at that threshold. Sample: $N = ",
-    total_n, "$ actively managed funds, ", SAMPLE_LABEL,
-    "; Passive and Unknown funds excluded."
+    formatC(total_n, format = "d", big.mark = "{,}"), "$ actively managed funds, ", SAMPLE_LABEL,
+    "; Passive funds are excluded."
   ),
   "\\end{tablenotes}",
   "\\end{threeparttable}",

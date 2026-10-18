@@ -401,12 +401,12 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
                  sprintf("%.2f (%s)", t2$joint_chi2, fmt_p(t2$joint_p)),
                  sprintf("%.2f (%s)", t3$joint_chi2, fmt_p(t3$joint_p)),
                  sprintf("%.2f (%s)", t4$joint_chi2, fmt_p(t4$joint_p)))
-  main_row  <- c("Loser-end test ($z$, 1-sided $p$)",
+  main_row  <- c("Loser-end test ($z$; 1-sided $p$ for $\\delta_{\\text{LOW}}<0$)",
                  "--",
                  sprintf("z=%+.2f (p=%s)", t2$d1_z, fmt_p(t2$main_p_1sd)),
                  sprintf("z=%+.2f (p=%s)", t3$d1_z, fmt_p(t3$main_p_1sd)),
                  sprintf("z=%+.2f (p=%s)", t4$d1_z, fmt_p(t4$main_p_1sd)))
-  asym_row  <- c("Asymmetry ($z$, 1-sided $p$)",
+  asym_row  <- c("Asymmetry ($z$; 1-sided $p$ for $\\delta_{\\text{HIGH}}-\\delta_{\\text{LOW}}>0$)",
                  "--",
                  sprintf("z=%+.2f (p=%s)", t2$asym_z, fmt_p(t2$asym_p_1sd)),
                  sprintf("z=%+.2f (p=%s)", t3$asym_z, fmt_p(t3$asym_p_1sd)),
@@ -436,6 +436,15 @@ build_h2_table <- function(samp_md, samp_pcr, fe_string,
              threeparttable = TRUE, escape = FALSE)
 
   tex <- as.character(ktab)
+  # Keep the footer rows (Fund FE ... Asymmetry) on one page: no page break
+  # inside them (a lone last row on a new page otherwise).
+  .lines <- strsplit(tex, "\n", fixed = TRUE)[[1]]
+  .ff <- grep("^Fund FE &", .lines)
+  if (length(.ff)) {
+    .idx <- seq(.ff[1] - 1L, length(.lines))
+    .lines[.idx] <- sub("\\\\$", "\\\\*", .lines[.idx])
+    tex <- paste(.lines, collapse = "\n")
+  }
   # Defensive: longtable does not emit \begin{table}[!h]; gsub is a no-op.
   tex <- gsub("\\begin{table}[!h]", "\\begin{table}[H]", tex, fixed = TRUE)
   # No-op for longtable output (CamelCase \begin{TableNotes}). Retained.

@@ -270,11 +270,20 @@ table_wrap <- function(caption, label, colspec, body, note) {
 LBL <- setNames(vapply(SPECS, `[[`, "", "lbl"), vapply(SPECS, `[[`, "", "id"))
 HEAD_TXT <- paste0(
   "Headline: H1, $\\delta_{\\text{HIGH}}-\\delta_{\\text{LOW}}$; H2, $\\delta_{\\text{LOW}}$; ",
-  "H3, the MAX12 $\\times D^{\\text{SENT}}$ coefficient; H4, $\\delta_F$ (ExpRatio $\\times$ state); ",
+  "H3, the MAX12 $\\times D^{\\text{SENT}}$ coefficient; ",
   "$z$-statistics in parentheses. ")
 COMMON <- paste0(
   "Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for ",
   "H1--H3, Lipper category $\\times$ month fixed effects for H4; standard errors two-way ",
+  "clustered on fund and calendar month); December excluded; active funds, ",
+  "\\textcite{Evans2010}-corrected panel.")
+# H1--H3 only (regime and stepwise tables have no H4 rows)
+COMMON_H13 <- paste0(
+  "Samples, controls and clustering as in the primary H1--H3 tables (fund fixed effects; ",
+  "standard errors two-way clustered on fund and calendar month); December excluded; active funds, ",
+  "\\textcite{Evans2010}-corrected panel.")
+COMMON_NOFE <- paste0(
+  "Samples, controls and clustering as in the primary H1--H3 tables (standard errors two-way ",
   "clustered on fund and calendar month); December excluded; active funds, ",
   "\\textcite{Evans2010}-corrected panel.")
 brk <- format(as.Date(paste0(SUBPERIOD_BREAKS[2], "-01")), "%B %Y")
@@ -297,7 +306,8 @@ pooled_table <- function(fe, label, caption, extra) {
     "terms (H1, H2: the three $R^q\\times S$ interactions; H3: MAX12 and MAX12 $\\times ",
     "D^{\\text{SENT}}$) are zero before ", brk, ", zero after (sum of the base and ",
     "$\\times\\text{Post}$ coefficients), and unchanged (the $\\times\\text{Post}$ terms, ",
-    "$\\delta_{\\text{post}}$). ", HEAD_TXT, extra, COMMON)
+    "$\\delta_{\\text{post}}$). ", HEAD_TXT, extra,
+    if (fe == "Ticker") COMMON_H13 else COMMON_NOFE)
   writeLines(table_wrap(caption, label, "llcccccc", body, note), paste0("table_", label, ".tex"))
 }
 pooled_table("Ticker", "regime_pooled",
@@ -325,7 +335,7 @@ writeLines(table_wrap("Behavioral Flow Tests Estimated Separately by Regime", "r
   "\\textit{Months}: sample months in the regime; \\textit{State months}: months in which the ",
   "state dummy equals one (cont.: continuous index). n.e.: not estimable because the state ",
   "does not vary within the regime. $^{\\dagger}$: fewer than ", LOW_POWER_MONTHS,
-  " state months (low power). ", HEAD_TXT, COMMON)), "table_regime_separate.tex")
+  " state months (low power). ", HEAD_TXT, COMMON_H13)), "table_regime_separate.tex")
 
 st_body <- c(paste0("Hyp. & State & & ", paste(sprintf("(%d) %s", 1:5, STEP_LBL), collapse = " & "), " \\\\"),
              "\\midrule")
@@ -345,7 +355,7 @@ writeLines(table_wrap("Stepwise Specifications of the Behavioral Flow Tests", "s
   "Regressors added in a fixed order: (1) rank segments $R^{\\text{LOW}}$, $R^{\\text{MID}}$, ",
   "$R^{\\text{HIGH}}$; (2) state main effect (H3: also MAX12); (3) tested interactions; ",
   "(4) controls; (5) fund fixed effects (= primary specification). Same estimation sample in ",
-  "all columns. $R^2$: within $R^2$ in column (5), $R^2$ otherwise. ", HEAD_TXT, COMMON)),
+  "all columns. $R^2$: within $R^2$ in column (5), $R^2$ otherwise. ", HEAD_TXT, COMMON_H13)),
   "table_stepwise.tex")
 
 fl_body <- c(paste0("Hyp. & State & ", paste(sprintf("\\multicolumn{2}{c}{%s}",

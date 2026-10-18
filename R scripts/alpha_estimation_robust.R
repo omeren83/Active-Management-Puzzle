@@ -10,7 +10,8 @@
 #       per spec), so results do not depend on the number of cores.
 #   (c) BSW: pi0 and S-/S+ from the Student-t NW p-values (alpha_p_nw);
 #       population estimates at GAMMA_STAR = 0.45 (BSW 2010, eq. 8).
-#   Gross and net portfolios use the same fund-months (rows need ret_gross).
+#   [v-audit 17 Oct: portfolios now built from ap_robust_port (rows need
+#   ret_net); gross means use the funds with an expense ratio.]
 #
 # v1.4 changes vs v1.3
 # --------------------
@@ -258,6 +259,13 @@ ap_robust <- panel_incubation %>%
                 ~ ifelse(. == -99, NA_real_, .))) %>%
   filter(!is.na(excess_ret)) %>%
   arrange(Ticker, date)
+# v-audit 17 Oct: aggregate portfolios on net-return rows, so funds without an
+# expense ratio (no gross return, absent from ap_robust) enter the net series
+ap_robust_port <- panel_incubation %>%
+  filter(!excluded_perf) %>%
+  rename(rf = all_of(FACTOR_RF)) %>%
+  mutate(across(all_of(ALL_FACTORS_NEEDED), ~ ifelse(. == -99, NA_real_, .))) %>%
+  filter(!is.na(ret_net), !is.na(rf))
 # ret_gross, ret_net, tna_lag are passed through from panel_incubation and are
 # available in ap_robust for the portfolio regression helpers (step 5e).
 
@@ -490,12 +498,14 @@ for (spec_name in names(SPECS)) {
   # 5e. Aggregate portfolio regressions (Table I.1 inputs).
   # Runs for ALL three specs. Produces Active and Passive rows.
   cat("  [d2] Aggregate portfolio regressions...\n")
-  factors_ts <- ap_spec %>%
+  ap_port_spec <- ap_robust_port %>%
+    filter(if_all(all_of(factor_cols), ~ !is.na(.)))
+  factors_ts <- ap_port_spec %>%
     distinct(date, rf, !!!syms(factor_cols)) %>%
     arrange(date)
   port_alpha <- bind_rows(
-    port_alpha_row("Active",  ap_spec %>% filter(ap_group == "Active"),  factors_ts, factor_cols),
-    port_alpha_row("Passive", ap_spec %>% filter(ap_group == "Passive"), factors_ts, factor_cols)
+    port_alpha_row("Active",  ap_port_spec %>% filter(ap_group == "Active"),  factors_ts, factor_cols),
+    port_alpha_row("Passive", ap_port_spec %>% filter(ap_group == "Passive"), factors_ts, factor_cols)
   )
   cat(sprintf("      Active  N=%d T=%d | Passive N=%d T=%d\n",
               port_alpha$n_funds[1], port_alpha$t_months[1],

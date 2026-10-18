@@ -14,7 +14,8 @@
 #       with fmt_prob(); footnote states draw-order resampling.
 #   (e) Table C.1 N column counts portfolio constituents (funds with at least
 #       one return in the window), not funds with >= 24 months.
-#   Gross and net portfolios use the same fund-months (rows need ret_gross).
+#   [v-audit 17 Oct: portfolios now built from ap_port (rows need ret_net);
+#   gross means use the funds with an expense ratio.]
 #
 # v1.5 changes vs v1.4 (panel source fix):
 #   Panel source switched from panel_trimmed to panel_incubation. panel_trimmed
@@ -173,6 +174,14 @@ ap <- panel_incubation %>%
   filter(!is.na(excess_ret), !is.na(mkt_rf), !is.na(smb),
          !is.na(hml), !is.na(mom)) %>%
   arrange(Ticker, date)
+# v-audit: aggregate portfolios on net-return rows, so funds without an
+# expense ratio (no gross return, absent from ap) enter the net series
+ap_port <- panel_incubation %>%
+  filter(!excluded_perf, date >= DATE_MIN_FF, date <= DATE_MAX_FF) %>%
+  rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF) %>%
+  mutate(ap_group = gsub("Agtive", "Active", ap_group)) %>%
+  filter(!is.na(ret_net), !is.na(rf), !is.na(mkt_rf), !is.na(smb),
+         !is.na(hml), !is.na(mom))
 
 cat("Subperiod fund-months:", nrow(ap), "\n")
 cat("Distinct funds in subperiod:", n_distinct(ap$Ticker), "\n")
@@ -591,7 +600,7 @@ cat("=== 6. Aggregate portfolio regressions ===\n")
 # downstream).
 build_port_for <- function(data, grp_label) {
   data %>%
-    filter(!is.na(ret_gross)) %>%
+    filter(!is.na(ret_net)) %>%   # net incl. funds w/o ER; gross means na.rm
     group_by(date) %>%
     summarise(
       ret_ew_gross = mean(ret_gross, na.rm = TRUE),
@@ -604,14 +613,14 @@ build_port_for <- function(data, grp_label) {
 }
 
 port_agg <- bind_rows(
-  build_port_for(ap %>% filter(ap_group == "Active"),                "Active"),
-  build_port_for(ap %>% filter(ap_group == "Passive"),               "Passive"),
-  build_port_for(ap %>% filter(ap_group == "Unknown"),               "Unknown"),
-  build_port_for(ap %>% filter(ap_group %in% c("Active","Passive")), "Active + Passive"),
-  build_port_for(ap,                                                  "Full Sample")
+  build_port_for(ap_port %>% filter(ap_group == "Active"),                "Active"),
+  build_port_for(ap_port %>% filter(ap_group == "Passive"),               "Passive"),
+  build_port_for(ap_port %>% filter(ap_group == "Unknown"),               "Unknown"),
+  build_port_for(ap_port %>% filter(ap_group %in% c("Active","Passive")), "Active + Passive"),
+  build_port_for(ap_port,                                                "Full Sample")
 )
 
-factors_ts <- ap %>%
+factors_ts <- ap_port %>%
   distinct(date, mkt_rf, smb, hml, mom, rf) %>%
   rename(MKT_RF = mkt_rf, SMB = smb, HML = hml, MOM = mom, RF = rf) %>%
   arrange(date)
@@ -670,13 +679,13 @@ alpha_agg <- bind_rows(
 
 # Fund counts per group (N column): portfolio constituents, i.e. funds with
 # at least one non-missing return in the window (same rows as port_agg).
-n_port <- function(rows) n_distinct(ap$Ticker[rows & !is.na(ap$ret_gross)])
+n_port <- function(rows) n_distinct(ap_port$Ticker[rows])
 n_funds_by_group <- list(
-  "Active"           = n_port(ap$ap_group == "Active"),
-  "Passive"          = n_port(ap$ap_group == "Passive"),
-  "Unknown"          = n_port(ap$ap_group == "Unknown"),
-  "Active + Passive" = n_port(ap$ap_group %in% c("Active", "Passive")),
-  "Full Sample"      = n_port(rep(TRUE, nrow(ap)))
+  "Active"           = n_port(ap_port$ap_group == "Active"),
+  "Passive"          = n_port(ap_port$ap_group == "Passive"),
+  "Unknown"          = n_port(ap_port$ap_group == "Unknown"),
+  "Active + Passive" = n_port(ap_port$ap_group %in% c("Active", "Passive")),
+  "Full Sample"      = n_port(rep(TRUE, nrow(ap_port)))
 )
 
 alpha_agg$n_funds <- unlist(n_funds_by_group[alpha_agg$ap_group])   # read by build_ff_tables_manual.R
@@ -759,6 +768,8 @@ fn_t7 <- paste(
   "Net returns are the funds' NAV-based total returns (net of expenses);",
   "gross returns add back one-twelfth of the static annual expense ratio each month,",
   "following \\\\textcite{FamaFrench2010}.",
+  "Funds without a reported expense ratio have no gross return: they enter",
+  "the net series and $N$ but not the gross series.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
@@ -820,7 +831,7 @@ fn_t9 <- paste(
   "Bootstrap procedure follows Fama and French (2010,",
   "\\\\textit{Journal of Finance}).",
   paste0("Sample: actively managed funds, ", SAMPLE_LABEL, ","),
-  paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
+  paste0("minimum 24 monthly observations ($N = ", formatC(n_active_bs, format = "d", big.mark = "{,}"), "$ funds)."),
   "For each fund, estimated monthly alpha is subtracted from the gross excess return",
   "series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled",
@@ -903,8 +914,8 @@ fn_t10 <- paste(
   "Funds with p-values exceeding $\\\\lambda$ are unlikely to have non-zero true alpha;",
   "the density of p-values in $(\\\\lambda, 1]$ provides a conservative estimate",
   "of the zero-alpha proportion, bounded above at 1.",
-  paste0("Sample: actively managed funds ($N = ", total_n, "$), ", SAMPLE_LABEL, "."),
-  "Passive and Unknown-classified funds are excluded.",
+  paste0("Sample: actively managed funds ($N = ", formatC(total_n, format = "d", big.mark = "{,}"), "$), ", SAMPLE_LABEL, "."),
+  "Passive funds are excluded.",
   "Compare with Fama and French (2010, \\\\textit{Journal of Finance}),",
   "Table III, which reports an analogous bootstrap-based assessment over",
   "Jan 1984--Sep 2006."
@@ -969,8 +980,8 @@ fn_t10b <- paste(
   "their MSE-based choice).",
   "Negative $T^+_\\\\gamma$ entries indicate right-tail significance does not",
   "exceed the false-discovery rate at that threshold.",
-  paste0("Sample: $N = ", total_n, "$ actively managed funds, ", SAMPLE_LABEL, ";"),
-  "Passive and Unknown funds excluded."
+  paste0("Sample: $N = ", formatC(total_n, format = "d", big.mark = "{,}"), "$ actively managed funds, ", SAMPLE_LABEL, ";"),
+  "Passive and"
 )
 
 
@@ -1139,4 +1150,4 @@ cat("  table_bootstrap_tails_FF.tex       Table 9  (FF)\n")
 cat("  table_pi0_estimate_FF.tex          Table 10 (FF)\n")
 cat("  table10b_bsw_decomposition_FF.tex  Table 11 (FF)\n")
 cat("  table_port_agg_alpha_FF.tex        Table 13 (FF)\n")
-cat("  fig_luck_vs_skill_combined_FF.png  Figure 3 (FF)\n")
+cat("  fig_luck_vs_skill_combined_FF.png  Figure 3 (FF)\n")

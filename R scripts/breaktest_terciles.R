@@ -186,7 +186,7 @@ mon <- function(d) format(d, "%b %Y")
 note_block <- function(txt) paste0("\\begin{singlespace}\\footnotesize\\noindent\n", txt,
                                    "\n\\end{singlespace}\n")
 table_wrap <- function(caption, label, colspec, body, note) {
-  c("\\begin{table}[H]", "\\centering", "\\footnotesize",
+  c("\\begin{table}[H]", "\\centering", "\\footnotesize", "\\setstretch{1}",
     paste0("\\caption{", caption, "}"), paste0("\\label{tab:", label, "}"),
     "\\resizebox{\\linewidth}{!}{%", paste0("\\begin{tabular}{", colspec, "}"),
     "\\toprule", body, "\\bottomrule", "\\end{tabular}", "}", "\\end{table}",

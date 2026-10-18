@@ -4,9 +4,9 @@
 # v1.3 changes vs v1.2 (pipeline audit, Oct 2026):
 #   No code change. Inputs changed upstream (data_import_and_cleaning.R v1.4):
 #   ret_net is the NAV-based index return and ret_gross = ret_net + ER/12;
-#   neither is winsorised. ap_agg keeps rows with non-missing ret_gross, so
-#   the gross and net portfolios are built on exactly the same fund-months
-#   (funds without an expense ratio are excluded from both). Comment on the
+#   neither is winsorised. [v-audit 17 Oct: ap_agg now keeps rows with
+#   non-missing ret_net; funds without an expense ratio enter the net series
+#   and are absent from the gross means.] Comment on the
 #   weighting scheme corrected.
 #
 # v1.2 changes vs v1.1 (Family B audit):
@@ -88,7 +88,7 @@ ap_agg <- panel_incubation %>%
   filter(!excluded_perf) %>%      # v1.2: performance-comparison subsample
   rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF,
          lipper = Lipper_Category) %>%
-  filter(!is.na(ret_gross), !is.na(mkt_rf), !is.na(rf)) %>%
+  filter(!is.na(ret_net), !is.na(mkt_rf), !is.na(rf), !is.na(smb), !is.na(hml), !is.na(mom)) %>%
   mutate(ap_group = gsub("Agtive", "Active", ap_group)) %>%
   arrange(Ticker, date)
 
@@ -151,7 +151,7 @@ wm_panel <- function(x, w) {
 run_port_carhart <- function(port_df) {
   d <- port_df %>%
     inner_join(factors_ts, by = "date") %>%
-    filter(!is.na(ret), !is.na(mkt_rf), !is.na(rf))
+    filter(!is.na(ret), !is.na(mkt_rf), !is.na(rf), !is.na(smb), !is.na(hml), !is.na(mom))
   n <- nrow(d)
   if (n < MIN_OBS_FULL) {
     return(list(alpha_ann = NA_real_, t_nw = NA_real_, n_months = n))
@@ -183,7 +183,7 @@ build_port_returns <- function(data) {
       ret_ew_net   = mean(ret_net,            na.rm = TRUE),
       ret_vw_gross = wm_panel(ret_gross, tna_lag),
       ret_vw_net   = wm_panel(ret_net,   tna_lag),
-      n_funds      = sum(!is.na(ret_gross)),
+      n_funds      = sum(!is.na(ret_net)),
       .groups      = "drop"
     ) %>%
     arrange(date)
@@ -246,7 +246,8 @@ t8_rows <- lapply(seq_len(nrow(t8_combos)), function(i) {
   lp <- t8_combos$lipper[i]
   gp <- t8_combos$ap_group[i]
   sub <- lipper_base %>% filter(lipper == lp, ap_group == gp)
-  n_funds <- n_distinct(sub$Ticker)
+  # Table B.1 reports gross alphas: N counts funds with a gross return
+  n_funds <- n_distinct(sub$Ticker[!is.na(sub$ret_gross)])
   if (n_funds < MIN_FUNDS_LIP) return(NULL)
   pr <- build_port_returns(sub)
   # Compute both gross and net to give the downstream script a choice.
@@ -284,7 +285,7 @@ build_rolling_agg <- function(group_name) {
   if (nrow(sub) == 0L) return(data.frame())
   pr <- build_port_returns(sub) %>%
     inner_join(factors_ts, by = "date") %>%
-    filter(!is.na(ret_ew_gross), !is.na(mkt_rf), !is.na(rf)) %>%
+    filter(!is.na(ret_ew_gross), !is.na(mkt_rf), !is.na(rf), !is.na(smb), !is.na(hml), !is.na(mom)) %>%
     arrange(date)
   n <- nrow(pr)
   if (n < ROLL_WINDOW) return(data.frame())
@@ -322,4 +323,4 @@ write_xlsx(
 )
 cat("\n[SUCCESS] aggregate_alphas.xlsx written. ")
 
-cat("aggregate_alphas.R v1.3 complete.\n")
+cat("aggregate_alphas.R v1.3 complete.\n")

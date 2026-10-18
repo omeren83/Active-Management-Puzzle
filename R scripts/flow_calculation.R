@@ -93,13 +93,17 @@ compute_flow_core <- function(panel) {
     group_by(Ticker) %>%
     arrange(date) %>%
     mutate(
-      tna_lag       = lag(tna),
+      # v-audit: no lag across an internal gap (calendar step > 1 month)
+      .step         = (as.integer(format(date, "%Y")) * 12L + as.integer(format(date, "%m"))) -
+                      lag(as.integer(format(date, "%Y")) * 12L + as.integer(format(date, "%m"))),
+      tna_lag       = if_else(.step == 1L, lag(tna), NA_real_),
       # Net (NAV-based) return; no flow across a class/total TNA switch
       flow_calc     = if_else(tna_source == lag(tna_source),
                               tna - tna_lag * (1 + ret_net_raw), NA_real_),
       flow_calc_pct = if_else(!is.na(tna_lag) & tna_lag > 0,
                               flow_calc / tna_lag, NA_real_)
     ) %>%
+    select(-.step) %>%
     ungroup()
 }
 

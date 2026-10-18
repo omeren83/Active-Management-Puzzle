@@ -249,6 +249,8 @@ e1_tex <- c(
     "Net returns are the funds' NAV-based total returns (net of expenses); ",
     "gross returns add back one-twelfth of the static annual expense ratio ",
     "each month, following \\textcite{FamaFrench2010}. ",
+    "Funds without a reported expense ratio have no gross return: they enter ",
+    "the net series and $N$ but not the gross series. ",
     "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; ",
     "$^{*}$, $^{**}$, $^{***}$: significant at 10\\%, 5\\%, 1\\%. ",
     "$\\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. ",
@@ -287,7 +289,7 @@ n_active_boot <- tryCatch(as.integer(car$bsw_meta$n_active[1]),
 n_active_str  <- if (is.na(n_active_boot)) {
   "$N$"
 } else {
-  paste0("$N = ", formatC(n_active_boot, format="d", big.mark=","), "$")
+  paste0("$N = ", formatC(n_active_boot, format="d", big.mark="{,}"), "$")
 }
 
 bt_car <- car$boot_summary %>% filter(percentile %in% PERCENTILES_TO_SHOW) %>% arrange(percentile)
@@ -450,7 +452,7 @@ e3_tex <- c(
     "\\textit{FF 6-Factor}: \\citealt{FamaFrench2015} five-factor plus momentum. ",
     "\\textit{Carhart + PSL}: Carhart plus \\textcite{PastorStambaugh2003} traded liquidity. ",
     "Sample: Incubation-corrected panel (\\citealt{Evans2010}), no date cap; ",
-    "performance-comparison subsample per flagged\\_funds.xlsx; Passive and Unknown funds excluded; ",
+    "performance-comparison subsample per flagged\\_funds.xlsx; passive funds excluded; ",
     "minimum 24 monthly observations. Window: ", WIN_CAR, " for Carhart and FF6; ",
     WIN_C5, " for C+PSL."
   ),

@@ -414,7 +414,7 @@ rownames(ppf_df) <- NULL
 RANK_CAL_FILE <- file.path(WORKING_DIR, "rank_calibration.xlsx")
 NW_LAG_CAL    <- 6L   # as the portfolio sorts
 if (exists("panel_incubation")) {
-  .r <- panel_reg %>% filter(!is.na(rank_lag)) %>%
+  .r <- panel_reg %>% filter(!excluded_h3, !is.na(rank_lag)) %>%   # v-audit: H3 sample
     select(Ticker, date, rank_lag) %>%
     inner_join(panel_incubation %>%
                  select(Ticker, date, ret_net, MKT_RF, SMB, HML, MOM, RF),
@@ -495,7 +495,7 @@ fn <- paste0(
   "two-way on fund and calendar month. ",
   "The 1-sided $p$ tests Diff $<0$ (a larger premium under high sentiment); ",
   "stars refer to it: $^{*}\\\\,p<0.10$, $^{**}\\\\,p<0.05$, $^{***}\\\\,p<0.01$. ",
-  "\\\\smallskip ",
+  "\\\\par\\\\smallskip\\\\noindent ",
   "\\\\textit{Conversion to alpha basis points.} To express the premium ",
   "in welfare-relevant units, the rank-to-alpha mapping is calibrated ",
   "in the rank space of the flow regressions: each month, active funds are ",
@@ -522,7 +522,7 @@ fn <- paste0(
   if (abs(NATIVE_SPREAD_T) < 1.645)
     "The calibrating spread is itself not statistically significant, which reinforces this caution. "
   else "",
-  "\\\\smallskip ",
+  "\\\\par\\\\smallskip\\\\noindent ",
   "Sample: actively managed funds, \\\\textcite{Evans2010}-corrected panel, ",
   "no date cap; H3 / activeness subsample per flagged\\\\_funds.xlsx."
 )

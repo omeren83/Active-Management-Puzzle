@@ -610,8 +610,7 @@ latex_t3 <- t3 %>%
       "$(\\\\bar{x}-\\\\tilde{x})/s$ (mean minus median over the standard",
       "deviation; bounded by $\\\\pm 1$), one third of Pearson's second",
       "skewness coefficient. It is not the third standardised moment.",
-      "Excess kurtosis is the fourth standardised central moment minus 3.",
-      "Unknown funds are excluded."
+      "Excess kurtosis is the fourth standardised central moment minus 3."
     ),
     general_title  = "",
     escape         = FALSE,
@@ -667,7 +666,7 @@ latex_t4 <- t4_wide %>%
   pack_rows("Trimmed (1995--2023)", 5, 6, bold = FALSE, italic = FALSE,
             hline_before = FALSE, hline_after = FALSE) %>%
   footnote(
-    general        = "Distribution of monthly observation counts per fund. Unknown funds excluded.",
+    general        = "Distribution of monthly observation counts per fund.",
     general_title  = "",
     escape         = FALSE,
     threeparttable = TRUE
@@ -756,4 +755,4 @@ ggsave("fig_fund_flows.pdf", plot = p_flows, width = 7.5, height = 4.2,
 ggsave("fig_fund_flows.png", plot = p_flows, width = 7.5, height = 4.2,
        dpi = 300)
 
-cat("Done. All outputs written to working directory.\n")
+cat("Done. All outputs written to working directory.\n")

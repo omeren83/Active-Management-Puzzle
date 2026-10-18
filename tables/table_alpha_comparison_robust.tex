@@ -8,20 +8,20 @@
 \cmidrule(lr){5-6} \cmidrule(lr){7-8}
 Model & Group & $N$ & $T$ & EW & VW & EW & VW & $\bar{R}^2$ \\
 \midrule
-Carhart 4-Factor & Active & 2,571 & 373 & -0.086 & 0.020 & -1.168$^{***}$ & -0.668$^{*}$ & 0.983 \\
-t(coef) &  &  &  & (-0.19) & (0.05) & (-2.62) & (-1.66) &  \\
- & Passive & 280 & 373 & -0.232 & 0.048 & -0.642$^{**}$ & -0.059 & 0.991 \\
-t(coef) &  &  &  & (-0.85) & (0.28) & (-2.36) & (-0.35) &  \\
+Carhart 4-Factor & Active & 2,619 & 373 & -0.086 & 0.020 & -1.230$^{***}$ & -0.668$^{*}$ & 0.983 \\
+t(coef) &  &  &  & (-0.19) & (0.05) & (-2.79) & (-1.66) &  \\
+ & Passive & 282 & 373 & -0.232 & 0.048 & -0.647$^{**}$ & -0.059 & 0.991 \\
+t(coef) &  &  &  & (-0.85) & (0.28) & (-2.38) & (-0.35) &  \\
 \addlinespace
-FF 6-Factor & Active & 2,571 & 373 & -0.285 & -0.106 & -1.366$^{***}$ & -0.794$^{**}$ & 0.984 \\
-t(coef) &  &  &  & (-0.66) & (-0.26) & (-3.18) & (-1.97) &  \\
- & Passive & 280 & 373 & -0.586$^{**}$ & -0.267$^{*}$ & -0.996$^{***}$ & -0.374$^{**}$ & 0.992 \\
-t(coef) &  &  &  & (-2.39) & (-1.69) & (-4.08) & (-2.37) &  \\
+FF 6-Factor & Active & 2,619 & 373 & -0.285 & -0.106 & -1.419$^{***}$ & -0.794$^{**}$ & 0.984 \\
+t(coef) &  &  &  & (-0.66) & (-0.26) & (-3.33) & (-1.97) &  \\
+ & Passive & 282 & 373 & -0.586$^{**}$ & -0.267$^{*}$ & -1.000$^{***}$ & -0.374$^{**}$ & 0.992 \\
+t(coef) &  &  &  & (-2.39) & (-1.69) & (-4.09) & (-2.37) &  \\
 \addlinespace
-Carhart + PSL & Active & 2,533 & 360 & -0.107 & -0.062 & -1.190$^{***}$ & -0.752$^{*}$ & 0.984 \\
-t(coef) &  &  &  & (-0.23) & (-0.15) & (-2.61) & (-1.82) &  \\
- & Passive & 277 & 360 & -0.228 & 0.072 & -0.640$^{**}$ & -0.036 & 0.992 \\
-t(coef) &  &  &  & (-0.84) & (0.42) & (-2.38) & (-0.21) &  \\
+Carhart + PSL & Active & 2,580 & 360 & -0.107 & -0.062 & -1.254$^{***}$ & -0.752$^{*}$ & 0.984 \\
+t(coef) &  &  &  & (-0.23) & (-0.15) & (-2.79) & (-1.82) &  \\
+ & Passive & 279 & 360 & -0.228 & 0.072 & -0.645$^{**}$ & -0.036 & 0.992 \\
+t(coef) &  &  &  & (-0.84) & (0.42) & (-2.40) & (-0.21) &  \\
 \bottomrule
 \end{tabular}%
 }
@@ -37,7 +37,7 @@ t(coef) &  &  &  & (-0.84) & (0.42) & (-2.38) & (-0.21) &  \\
 \fi
 \par\medskip
 \begin{singlespace}\footnotesize\noindent
-Annualised alpha (\%) from regressing the monthly aggregate portfolio return of each group on the specified factor model, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio ($1/N_t$ weight per fund per month). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1}/\sum_j \text{TNA}_{j,t-1}$. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. $N$: unique funds contributing to the portfolio; $T$: monthly observations in the regression. \textit{Carhart 4-Factor}: MKT-RF, SMB, HML, MOM (\citealt{Carhart1997}; main-text baseline). \textit{FF 6-Factor}: MKT-RF, SMB, HML, RMW, CMA, MOM (\citealt{FamaFrench2015} five-factor model plus momentum). \textit{Carhart + PSL}: Carhart four-factor augmented with the \textcite{PastorStambaugh2003} traded liquidity factor. SMB is held constant at the \textcite{FamaFrench1993} construction (single $2\times3$ size--BM sort) across all specifications. Carhart and FF 6-Factor: Jan 1995--Jan 2026. Carhart + PSL: Jan 1995--Dec 2024 (constrained by the Pastor--Stambaugh liquidity data release). Sample: Incubation-corrected panel (\citealt{Evans2010}), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+Annualised alpha (\%) from regressing the monthly aggregate portfolio return of each group on the specified factor model, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio ($1/N_t$ weight per fund per month). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1}/\sum_j \text{TNA}_{j,t-1}$. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Funds without a reported expense ratio have no gross return: they enter the net series and $N$ but not the gross series. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. $N$: unique funds contributing to the portfolio; $T$: monthly observations in the regression. \textit{Carhart 4-Factor}: MKT-RF, SMB, HML, MOM (\citealt{Carhart1997}; main-text baseline). \textit{FF 6-Factor}: MKT-RF, SMB, HML, RMW, CMA, MOM (\citealt{FamaFrench2015} five-factor model plus momentum). \textit{Carhart + PSL}: Carhart four-factor augmented with the \textcite{PastorStambaugh2003} traded liquidity factor. SMB is held constant at the \textcite{FamaFrench1993} construction (single $2\times3$ size--BM sort) across all specifications. Carhart and FF 6-Factor: Jan 1995--Jan 2026. Carhart + PSL: Jan 1995--Dec 2024 (constrained by the Pastor--Stambaugh liquidity data release). Sample: Incubation-corrected panel (\citealt{Evans2010}), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

@@ -35,7 +35,8 @@ p <- panel_incubation %>%
   mutate(ER         = suppressWarnings(as.numeric(Expense_Ratio)),
          net_pool   = pw(ret_net_raw), gross_pool = pw(ret_gross_raw),
          oldnet_raw = ret_net_raw - ER / 1200)        # fees deducted twice
-d <- p %>% filter(!excluded_perf, ap_group == "Active", !is.na(ret_gross),
+# v-audit 17 Oct: net-return rows, as Table 4.5 (gross rows: funds with an ER)
+d <- p %>% filter(!excluded_perf, ap_group == "Active", !is.na(ret_net),
                   !is.na(MKT_RF), !is.na(RF))
 
 # Share of fund-months clipped by pooled winsorisation, by month

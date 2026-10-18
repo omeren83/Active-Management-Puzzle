@@ -15,7 +15,8 @@
 #       estimates at GAMMA_STAR = 0.45 (BSW 2010, eq. 8).
 #   (d) Table D.3 labels follow the numbers in both tails; fmt_prob().
 #   (e) Table D.2 N column counts portfolio constituents.
-#   Gross and net portfolios use the same fund-months (rows need ret_gross).
+#   [v-audit 17 Oct: portfolios now built from ap_port (rows need ret_net);
+#   gross means use the funds with an expense ratio.]
 #
 # v1.5 changes vs v1.4 (Family C audit):
 #   (a) filter(!excluded_perf) added to the panel-prep stage of
@@ -395,6 +396,14 @@ estimate_subperiod <- function(sp, panel_source) {
   
   cat("  Fund-months: ", nrow(ap),
       " | Distinct funds: ", n_distinct(ap$Ticker), "\n", sep = "")
+  # v-audit: aggregate portfolios on net-return rows, so funds without an
+  # expense ratio (no gross return, absent from ap) enter the net series
+  ap_port <- panel_source %>%
+    filter(!excluded_perf, date >= sp$date_lo, date <= sp$date_hi) %>%
+    rename(mkt_rf = MKT_RF, smb = SMB, hml = HML, mom = MOM, rf = RF) %>%
+    mutate(ap_group = gsub("Agtive", "Active", ap_group)) %>%
+    filter(!is.na(ret_net), !is.na(rf), !is.na(mkt_rf), !is.na(smb),
+           !is.na(hml), !is.na(mom))
   
   ap_split <- split(ap, ap$Ticker)
   
@@ -569,7 +578,7 @@ estimate_subperiod <- function(sp, panel_source) {
   # Passive model comparison; filtered at point of use).
   build_port_for <- function(data, grp_label) {
     data %>%
-      filter(!is.na(ret_gross)) %>%
+      filter(!is.na(ret_net)) %>%   # net incl. funds w/o ER; gross means na.rm
       group_by(date) %>%
       summarise(
         ret_ew_gross = mean(ret_gross, na.rm = TRUE),
@@ -581,13 +590,13 @@ estimate_subperiod <- function(sp, panel_source) {
       mutate(ap_group = grp_label)
   }
   port_agg <- bind_rows(
-    build_port_for(ap %>% filter(ap_group == "Active"),                "Active"),
-    build_port_for(ap %>% filter(ap_group == "Passive"),               "Passive"),
-    build_port_for(ap %>% filter(ap_group == "Unknown"),               "Unknown"),
-    build_port_for(ap %>% filter(ap_group %in% c("Active","Passive")), "Active + Passive"),
-    build_port_for(ap,                                                  "Full Sample")
+    build_port_for(ap_port %>% filter(ap_group == "Active"),                "Active"),
+    build_port_for(ap_port %>% filter(ap_group == "Passive"),               "Passive"),
+    build_port_for(ap_port %>% filter(ap_group == "Unknown"),               "Unknown"),
+    build_port_for(ap_port %>% filter(ap_group %in% c("Active","Passive")), "Active + Passive"),
+    build_port_for(ap_port,                                                "Full Sample")
   )
-  factors_ts <- ap %>%
+  factors_ts <- ap_port %>%
     distinct(date, mkt_rf, smb, hml, mom, rf) %>%
     rename(MKT_RF = mkt_rf, SMB = smb, HML = hml, MOM = mom, RF = rf) %>%
     arrange(date)
@@ -644,13 +653,13 @@ estimate_subperiod <- function(sp, panel_source) {
     mutate(across(c(alpha_capm, alpha_ff3, alpha_car, alpha_car_net), ~ .x * 100))
   
   # Portfolio constituents per group (N column of Table D.2)
-  n_port <- function(rows) n_distinct(ap$Ticker[rows & !is.na(ap$ret_gross)])
+  n_port <- function(rows) n_distinct(ap_port$Ticker[rows])
   n_funds <- c(
-    "Active"           = n_port(ap$ap_group == "Active"),
-    "Passive"          = n_port(ap$ap_group == "Passive"),
-    "Unknown"          = n_port(ap$ap_group == "Unknown"),
-    "Active + Passive" = n_port(ap$ap_group %in% c("Active", "Passive")),
-    "Full Sample"      = n_port(rep(TRUE, nrow(ap)))
+    "Active"           = n_port(ap_port$ap_group == "Active"),
+    "Passive"          = n_port(ap_port$ap_group == "Passive"),
+    "Unknown"          = n_port(ap_port$ap_group == "Unknown"),
+    "Active + Passive" = n_port(ap_port$ap_group %in% c("Active", "Passive")),
+    "Full Sample"      = n_port(rep(TRUE, nrow(ap_port)))
   )
 
   list(
@@ -689,7 +698,7 @@ stopifnot(length(SUBPERIOD_BREAKS) == 2L, SUBPERIOD_BREAKS[1] < SUBPERIOD_BREAKS
 
 # Months with returns and all four factors define the sample span
 .months <- panel_incubation %>%
-  filter(!excluded_perf, !is.na(ret_gross), !is.na(MKT_RF), !is.na(SMB),
+  filter(!excluded_perf, !is.na(ret_net), !is.na(MKT_RF), !is.na(SMB),
          !is.na(HML), !is.na(MOM), !is.na(RF)) %>%
   distinct(date) %>% arrange(date) %>% pull(date)
 .ym     <- format(.months, "%Y-%m")
@@ -813,6 +822,8 @@ fn_d2 <- paste(
   "$w_{i,t-1} = \\\\text{TNA}_{i,t-1} / \\\\sum_j \\\\text{TNA}_{j,t-1}$.",
   "Net returns are NAV-based (net of expenses); gross returns add back one-twelfth",
   "of the annual expense ratio each month \\\\parencite{FamaFrench2010}.",
+  "Funds without a reported expense ratio have no gross return: they enter",
+  "the net series and $N$ but not the gross series.",
   "Newey-West $t$-stats (6-month lag) in parentheses;",
   "$^{*}$, $^{**}$, $^{***}$: 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds; $T$: months in the regression.",
@@ -909,9 +920,9 @@ fn_d3 <- paste(
   "indicate that the actual percentile is worse (better) than zero-alpha luck",
   "would produce; 0.0\\\\% means no iteration and $<$0.1\\\\% means 1 to 9 of 10,000 (and $>$99.9\\\\% means 9,991 to 9,999).",
   "Newey-West standard errors with a 6-month lag are used throughout.",
-  paste0("Active fund counts: P1 $N = ", formatC(n_active_bs_vec[1], format = "d", big.mark = ","),
-         "$; P2 $N = ", formatC(n_active_bs_vec[2], format = "d", big.mark = ","),
-         "$; P3 $N = ", formatC(n_active_bs_vec[3], format = "d", big.mark = ","), "$."),
+  paste0("Active fund counts: P1 $N = ", formatC(n_active_bs_vec[1], format = "d", big.mark = "{,}"),
+         "$; P2 $N = ", formatC(n_active_bs_vec[2], format = "d", big.mark = "{,}"),
+         "$; P3 $N = ", formatC(n_active_bs_vec[3], format = "d", big.mark = "{,}"), "$."),
   "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx."
 )
 
@@ -984,7 +995,7 @@ fn_d4 <- paste(
   "The estimator is $\\\\hat{\\\\pi}_0 = |\\\\{p_i > \\\\lambda\\\\}| \\\\,/\\\\, [N(1-\\\\lambda)]$,",
   "where $\\\\lambda = 0.5$ is the standard tuning parameter.",
   "$N$: number of active funds with $\\\\geq 24$ monthly observations within the",
-  "sub-period. Passive and Unknown-classified funds are excluded.",
+  "sub-period. Passive funds are excluded.",
   "Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
   "implied by these estimates is reported in",

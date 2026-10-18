@@ -420,14 +420,14 @@ cat("=== 3. Portfolio construction ===\n")
 
 build_port <- function(data, q_col, sort_name) {
   data %>%
-    filter(!is.na(.data[[q_col]]), !is.na(ret_gross)) %>%
+    filter(!is.na(.data[[q_col]]), !is.na(ret_net)) %>%   # net incl. funds w/o ER
     group_by(date, ap_group, quintile = .data[[q_col]]) %>%
     summarise(
       ret_ew_gross = mean(ret_gross,         na.rm = TRUE),
       ret_ew_net   = mean(ret_net,           na.rm = TRUE),
       ret_vw_gross = wm(ret_gross,           tna_lag),
       ret_vw_net   = wm(ret_net,             tna_lag),
-      n_funds      = n(),
+      n_funds      = sum(!is.na(ret_net)),
       mean_tna     = mean(tna_lag,           na.rm = TRUE),
       mean_er      = mean(fee_sort,          na.rm = TRUE),
       mean_turn    = mean(suppressWarnings(as.numeric(Turnover)), na.rm = TRUE),
@@ -441,7 +441,7 @@ port_mom  <- build_port(port_base, "q_mom",  "Momentum")
 port_fee  <- build_port(port_base, "q_fee",  "Fee")
 
 port_agg <- port_base %>%
-  filter(!is.na(ret_gross)) %>%
+  filter(!is.na(ret_net)) %>%
   group_by(date, ap_group) %>%
   summarise(
     ret_ew_gross = mean(ret_gross, na.rm = TRUE),

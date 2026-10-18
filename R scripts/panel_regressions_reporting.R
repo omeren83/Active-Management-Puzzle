@@ -81,11 +81,11 @@ fmt_p <- function(p) {
 }
 fmt_chi2 <- function(chi, p, df) {
   if (is.null(chi) || is.na(chi)) return("--")
-  sprintf("%.2f (df=%d, p=%s)", chi, df, fmt_p(p))
+  sprintf("%.2f (df=%d, p%s)", chi, df, if (!is.na(p) && p < 0.001) fmt_p(p) else paste0("=", fmt_p(p)))
 }
 fmt_z <- function(z, p) {
   if (is.null(z) || is.na(z)) return("--")
-  sprintf("%+.2f (p=%s)", z, fmt_p(p))
+  sprintf("%+.2f (p%s)", z, if (!is.na(p) && p < 0.001) fmt_p(p) else paste0("=", fmt_p(p)))
 }
 fmt_n <- function(n) {
   if (is.null(n) || is.na(n)) return("--")

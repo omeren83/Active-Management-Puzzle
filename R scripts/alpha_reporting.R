@@ -529,6 +529,8 @@ fn_t7 <- paste(
   "Net returns are the funds' NAV-based total returns (net of expenses);",
   "gross returns add back one-twelfth of the static annual expense ratio each month,",
   "following \\\\textcite{FamaFrench2010}.",
+  "Funds without a reported expense ratio have no gross return: they enter",
+  "the net series and $N$ but not the gross series.",
   "Newey-West $t$-statistics (6-month lag) in parentheses below each alpha;",
   "$^{*}$, $^{**}$, $^{***}$: significant at 10\\\\%, 5\\\\%, 1\\\\%.",
   "$N$: unique funds contributing to the portfolio series;",
@@ -729,7 +731,7 @@ boot_tab <- boot_summary %>%
 fn_t9 <- paste(
   "Bootstrap procedure follows \\\\textcite{FamaFrench2010}.",
   "Sample: actively managed funds, Incubation-corrected (Evans 2010) panel (no date cap), performance-comparison subsample per flagged\\\\_funds.xlsx,",
-  paste0("minimum 24 monthly observations ($N = ", n_active_bs, "$ funds)."),
+  paste0("minimum 24 monthly observations ($N = ", formatC(n_active_bs, format = "d", big.mark = "{,}"), "$ funds)."),
   "For each fund, estimated monthly alpha is subtracted from the gross excess return",
   "series to construct a zero-alpha null return.",
   "In each of $B = 10{,}000$ bootstrap iterations, calendar months are resampled",
@@ -832,9 +834,9 @@ fn_t10 <- paste(
   "Funds with p-values exceeding $\\\\lambda$ are unlikely to have non-zero true alpha;",
   "the density of p-values in $(\\\\lambda, 1]$ provides a conservative estimate",
   "of the zero-alpha proportion, bounded above at 1.",
-  paste0("Sample: actively managed funds ($N = ", formatC(total_n, format = "d", big.mark = ","), "$),"),
+  paste0("Sample: actively managed funds ($N = ", formatC(total_n, format = "d", big.mark = "{,}"), "$),"),
   "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx.",
-  "Passive and Unknown-classified funds are excluded.",
+  "Passive funds are excluded.",
   "The four-way decomposition of skilled, unskilled, and lucky fund proportions",
   "implied by this estimate is reported in Table~\\\\ref{tab:bsw_decomposition}."
 )
@@ -931,8 +933,8 @@ fn_t10b <- paste(
   "The Storey estimator is conservative: it overestimates $\\\\hat{\\\\pi}_0$",
   "when truly skilled funds exist, so $T^+_\\\\gamma$ values are lower bounds.",
   "All quantities are percentages of the active-fund universe.",
-  paste0("Sample: $N = ", formatC(total_n, format = "d", big.mark = ","), "$ actively managed funds,"),
-  "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx; Passive and Unknown funds excluded."
+  paste0("Sample: $N = ", formatC(total_n, format = "d", big.mark = "{,}"), "$ actively managed funds,"),
+  "Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\\\\_funds.xlsx; Passive funds are excluded."
 )
 
 

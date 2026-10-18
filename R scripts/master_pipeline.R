@@ -144,15 +144,15 @@ WORKING_DIR <- "D:/TEZ/data/R import"
 
 # Phase toggles - set to FALSE to skip a phase
 RUN_PHASE_A_DATA          <- TRUE    # data_import + flow_calculation
-RUN_PHASE_B_ALPHA         <- TRUE    # alpha_estimation + aggregate_alphas
-RUN_PHASE_C_REPORTING     <- TRUE    # alpha_reporting + descriptive_statistics
-RUN_PHASE_D_FF_BENCHMARK  <- TRUE    # FF_comparison + build_ff_tables_manual
-RUN_PHASE_E_SUBPERIODS    <- TRUE    # structural_break_test + subperiod_analysis
-RUN_PHASE_F_SORTS_PERSIST <- TRUE    # portfolio_sorts + persistence + activeness persistence
+RUN_PHASE_B_ALPHA         <- FALSE    # alpha_estimation + aggregate_alphas
+RUN_PHASE_C_REPORTING     <- FALSE    # alpha_reporting + descriptive_statistics
+RUN_PHASE_D_FF_BENCHMARK  <- FALSE    # FF_comparison + build_ff_tables_manual
+RUN_PHASE_E_SUBPERIODS    <- FALSE    # structural_break_test + subperiod_analysis
+RUN_PHASE_F_SORTS_PERSIST <- FALSE    # portfolio_sorts + persistence + activeness persistence
 RUN_PHASE_G_ACTIVENESS    <- TRUE    # activeness_analysis
-RUN_PHASE_H_FACTOR_ROBUST <- TRUE    # alpha_estimation_robust + build_robust_tables
-RUN_PHASE_I_BEHAVIORAL    <- TRUE    # behavioral_state_variables
-RUN_PHASE_J_PANEL_REG     <- TRUE    # panel_regressions_setup + H1..H4 + reporting + PPF
+RUN_PHASE_H_FACTOR_ROBUST <- FALSE    # alpha_estimation_robust + build_robust_tables
+RUN_PHASE_I_BEHAVIORAL    <- FALSE    # behavioral_state_variables
+RUN_PHASE_J_PANEL_REG     <- FALSE    # panel_regressions_setup + H1..H4 + reporting + PPF
 RUN_UTILITY_LIPPER        <- FALSE   # build_lipper_category (rarely re-run)
 RUN_UTILITY_CLASSIFY      <- FALSE   # classify_unknown_funds (after Phase A; rarely re-run)
 
@@ -165,6 +165,15 @@ FORCE_PANEL_SETUP         <- TRUE
 
 # Stop on first error (TRUE) or keep going and report failures at end (FALSE)
 STOP_ON_ERROR <- TRUE
+
+# Fund classification used by data_import_and_cleaning.R: "reclassified"
+# (main text) or "bloomberg" (flag-only baseline for the robustness table).
+# Set explicitly so a value left in the session cannot leak into a run.
+AP_CLASSIFICATION <- "reclassified"
+# Test-mode leftovers that would silently change outputs (lower bootstrap B,
+# other output folders, manual FF build): removed at the start of every run.
+rm(list = intersect(c("TEST_B_RUNS", "OUT_DIR", "ALLOW_MANUAL_FF_BUILD"),
+                    ls(globalenv())), envir = globalenv())
 
 
 # =============================================================================
@@ -482,6 +491,9 @@ panel_reg_stamp <- function() {
 }
 
 if (RUN_PHASE_J_PANEL_REG) {
+  # Models from an earlier run must not be reused by the reporting script
+  rm(list = intersect(c("H1_models", "H2_models", "H3_models", "H4_models"),
+                      ls(globalenv())), envir = globalenv())
   panel_reg_rds <- file.path(WORKING_DIR, "panel_reg.rds")
   setup_required <- TRUE
   

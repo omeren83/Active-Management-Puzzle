@@ -180,12 +180,11 @@ parse_col_dates <- function(x) {
 # =============================================================================
 parse_inception_date <- function(x) {
   x[grepl("^#|^\\s*$", x)] <- NA
-  # Try ISO first - preserves real dates if Excel writes them as text
-  parsed <- suppressWarnings(as.Date(as.character(x), format = "%Y-%m-%d"))
-  if (any(!is.na(parsed))) return(parsed)
-  # Fall back to Excel serial number
-  nums <- suppressWarnings(as.numeric(x))
-  as.Date(nums, origin = "1899-12-30")
+  # v-audit: element-wise - ISO strings first, Excel serials for the rest
+  # (the old any()-switch dropped serials whenever one ISO string was present)
+  iso <- suppressWarnings(as.Date(as.character(x), format = "%Y-%m-%d"))
+  ser <- suppressWarnings(as.Date(as.numeric(as.character(x)), origin = "1899-12-30"))
+  dplyr::coalesce(iso, ser)
 }
 
 # =============================================================================
@@ -672,10 +671,14 @@ compute_returns <- function(panel) {
     arrange(date) %>%
     mutate(
       fee_monthly   = suppressWarnings(as.numeric(Expense_Ratio)) / 1200,
-      ret_net_raw   = gross_return / lag(gross_return) - 1,  # NAV-based: net
+      # v-audit: NA after an internal gap (calendar step > 1 month)
+      .step         = (as.integer(format(date, "%Y")) * 12L + as.integer(format(date, "%m"))) -
+                      lag(as.integer(format(date, "%Y")) * 12L + as.integer(format(date, "%m"))),
+      ret_net_raw   = if_else(.step == 1L, gross_return / lag(gross_return) - 1,
+                              NA_real_),                    # NAV-based: net
       ret_gross_raw = ret_net_raw + fee_monthly               # add back ER/12
     ) %>%
-    select(-fee_monthly) %>%
+    select(-fee_monthly, -.step) %>%
     ungroup()
 }
 

@@ -23,8 +23,10 @@
 # Name matches that are fund-family names, and sector/mandate funds the name
 # patterns miss, are handled in the explicit lists below (reviewed 16 Oct).
 #
-# Run once after Phase A (needs panel_master in the session, any
-# classification) whenever fund_data.xlsx or the ledger changes. Output is
+# Run once after Phase A (needs panel_master, panel_master_pre8c and
+# flagged_entire in the session; either
+# classification, since unflagged funds are selected by the Bloomberg flag)
+# whenever fund_data.xlsx or the ledger changes. Output is
 # read by data_import_and_cleaning.R (v1.8): unknown_classification.xlsx.
 # =============================================================================
 
@@ -63,7 +65,25 @@ bench <- bench %>%
   mutate(bret = lvl / lag(lvl) - 1) %>% ungroup() %>%
   filter(!is.na(bret)) %>% transmute(Benchmark_Code, ym = format(date, "%Y-%m"), bret)
 
-fund <- panel_master %>%
+# Fund base: panel BEFORE the Step 8c drop, less the flagged_funds.xlsx
+# entire-analysis list. After a reclassified Phase A, panel_master has already
+# lost the unflagged funds this file itself excludes (GLOBAL/LONG_SHORT); built
+# from it, the file would omit them and they would return as "Unknown".
+# Same fund set under either classification.
+if (exists("panel_master_pre8c") && exists("flagged_entire")) {
+  .ent  <- flagged_entire[[intersect(c("Bloomberg Ticker", "Ticker"), names(flagged_entire))[1]]]
+  .base <- panel_master_pre8c %>% filter(!Ticker %in% .ent) %>%
+    select(-any_of("ret_net")) %>%
+    left_join(panel_master %>% select(Ticker, date, ret_net), by = c("Ticker", "date")) %>%
+    group_by(Ticker) %>% arrange(date, .by_group = TRUE) %>%
+    mutate(.m = as.integer(format(date, "%Y")) * 12L + as.integer(format(date, "%m")),
+           # funds dropped at Step 8c have no screened return: raw index return
+           ret_net = coalesce(ret_net, if_else(.m - lag(.m) == 1L,
+                                               gross_return / lag(gross_return) - 1, NA_real_))) %>%
+    ungroup() %>% select(-.m)
+} else stop("panel_master_pre8c / flagged_entire not in session: run Phase A first.")
+
+fund <- .base %>%
   group_by(Ticker) %>%
   summarise(Name = first(Name), Lipper_Category = first(Lipper_Category),
             Benchmark_Code = first(Benchmark_Code), flag = first(Actively_Managed_New),
@@ -71,9 +91,11 @@ fund <- panel_master %>%
             first_month = format(min(date), "%Y-%m"),
             last_return = format(suppressWarnings(max(date[!is.na(ret_net)])), "%Y-%m"),
             .groups = "drop")
-fit <- panel_master %>%
-  filter(!is.na(ret_gross)) %>%
-  transmute(Ticker, Benchmark_Code, ym = format(date, "%Y-%m"), r = ret_gross) %>%
+fit <- .base %>%
+  # v-audit: net returns, so funds without an expense ratio are fitted too; ER is a
+  # static constant, so R^2 and TE equal their gross-return values exactly
+  filter(!is.na(ret_net)) %>%
+  transmute(Ticker, Benchmark_Code, ym = format(date, "%Y-%m"), r = ret_net) %>%
   inner_join(bench, by = c("Benchmark_Code", "ym")) %>%
   group_by(Ticker) %>%
   summarise(joint = n(),
@@ -96,7 +118,10 @@ ledger <- read_excel(LEDGER_FILE, sheet = "Ledger") %>%
   mutate(Omer_decision = trimws(coalesce(as.character(Omer_decision), "")),
          reviewed = ifelse(Omer_decision %in% c("Active", "Passive"), Omer_decision, Proposed_class)) %>%
   select(Ticker, reviewed, review_reason = Reason)
-unk <- fund %>% filter(ap_group == "Unknown") %>%
+# Unflagged funds selected by the Bloomberg flag itself, so the result does
+# not depend on the classification already applied to panel_master (after a
+# reclassified Phase A almost no fund is still "Unknown").
+unk <- fund %>% filter(!flag %in% c("Y", "N")) %>%
   left_join(ledger, by = "Ticker") %>%
   mutate(final_class = coalesce(reviewed, rule_class),
          class_source = ifelse(is.na(reviewed), "rule",

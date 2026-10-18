@@ -465,7 +465,7 @@ mr_test <- function(port_df, factors_df, ret_col, B = MR_B, seed = MR_SEED,
     p_min     = NA_real_, B = B
   )
   
-  # 1. Per-quintile excess return series + full-sample Carhart alphas.
+  # 1. Per-quintile excess return series (alphas: step 2, on common dates).
   q_excess <- list()  # date -> excess return per quintile
   alphas   <- numeric(N_QUINT)
   for (q in qs) {
@@ -480,9 +480,7 @@ mr_test <- function(port_df, factors_df, ret_col, B = MR_B, seed = MR_SEED,
     y <- d$excess
     X <- cbind(1, d$MKT_RF, d$SMB, d$HML, d$MOM)
     fit <- fast_ols(y, X)
-    if (is.null(fit)) return(na_out)
-    alphas[q] <- fit$beta[1]
-    
+    if (is.null(fit)) return(na_out)   # early fail on a singular quintile
     q_excess[[q]] <- d %>% select(date, excess)
   }
   
@@ -497,14 +495,20 @@ mr_test <- function(port_df, factors_df, ret_col, B = MR_B, seed = MR_SEED,
     arrange(date) %>%
     select(date, MKT_RF, SMB, HML, MOM, RF)
   
-  ex_mat <- matrix(NA_real_, nrow = nrow(fac), ncol = N_QUINT)  # rows = dates, cols = quintiles
-  for (q in qs) {
-    qd <- q_excess[[q]] %>% filter(date %in% common_dates) %>% arrange(date)
-    ex_mat[, q] <- qd$excess - alphas[q]   # recentered to alpha = 0
-  }
-  
   T <- nrow(fac)
   X_full <- cbind(1, fac$MKT_RF, fac$SMB, fac$HML, fac$MOM)
+  
+  # v-audit: observed alphas re-estimated on the common dates, the sample the
+  # bootstrap resamples (Patton & Timmermann 2010); recentring is then exact
+  ex_mat <- matrix(NA_real_, nrow = T, ncol = N_QUINT)  # rows = dates, cols = quintiles
+  for (q in qs) {
+    qd <- q_excess[[q]] %>% filter(date %in% common_dates) %>% arrange(date)
+    stopifnot(nrow(qd) == T, all(qd$date == fac$date))
+    fit_c <- fast_ols(qd$excess, X_full)
+    if (is.null(fit_c)) return(na_out)
+    alphas[q]   <- fit_c$beta[1]
+    ex_mat[, q] <- qd$excess - alphas[q]   # recentered to alpha = 0
+  }
   
   # 3. Observed test statistics (annualised, % units for table display).
   diffs_obs <- diff(alphas) * 12 * 100  # alpha_2-alpha_1, ..., alpha_5-alpha_4
@@ -671,13 +675,13 @@ r2_lag <- alpha_roll %>%
 # (b) Tracking error: monthly active return, trailing 36-month SD, shift
 te_input <- panel_incubation %>%
   filter(!excluded_h3) %>%
-  filter(ap_group == "Active", !is.na(ret_gross),
+  filter(ap_group == "Active", !is.na(ret_net),     # v-audit: net, keeps funds w/o ER
          !is.na(Benchmark_Code), Benchmark_Code != "",
          !grepl("^#|^N/A", Benchmark_Code)) %>%
-  transmute(Ticker, Benchmark_Code, ym = ym(date), ret_gross) %>%
+  transmute(Ticker, Benchmark_Code, ym = ym(date), ret_net) %>%
   inner_join(bench_long %>% transmute(Benchmark_Code, ym = ym(date), bench_ret),
              by = c("Benchmark_Code", "ym")) %>%          # v1.4: join on year-month
-  mutate(active_return = ret_gross - bench_ret)
+  mutate(active_return = ret_net - bench_ret)   # TE of net = TE of gross up to ER variation
 
 te_lag <- te_input %>%
   group_by(Ticker) %>%
@@ -737,7 +741,7 @@ cat("=== 6. Building quintile portfolios ===\n")
 # cross-sectional means of TNA, ER, Turnover, and the activeness measure.
 build_port <- function(data, q_col, sort_name, value_col) {
   data %>%
-    filter(!is.na(.data[[q_col]]), !is.na(ret_gross)) %>%
+    filter(!is.na(.data[[q_col]]), !is.na(ret_net)) %>%   # net incl. funds w/o ER
     group_by(date, quintile = .data[[q_col]]) %>%
     summarise(
       ret_ew_gross = mean(ret_gross, na.rm = TRUE),
@@ -1129,7 +1133,8 @@ fn_r2 <- paste(fn_base_alpha,
 fn_te <- paste(fn_base_alpha,
   "Activeness measured as annualised Tracking Error against the fund's assigned",
   "benchmark index over the 36 months ending in $t-1$ (at least 24 observations),",
-  "$\\sqrt{12}\\cdot\\mathrm{sd}(r_{i,s}^{\\text{gross}}-r_{b(i),s})$,",
+  "$\\sqrt{12}\\cdot\\mathrm{sd}(r_{i,s}^{\\text{net}}-r_{b(i),s})$",
+  "(equal to the gross-return value, the expense ratio being constant),",
   "where $b(i)$ is the benchmark code recorded for fund $i$ in the static",
   "metadata. Following the interpretation of \\textcite{CremersPetajisto2009},",
   "higher tracking error indicates greater portfolio deviation from the",
@@ -1207,7 +1212,7 @@ fn_mr <- paste(
   paste0("$B = ", MR_B, "$"), "stationary-bootstrap resamples of calendar months",
   paste0("(stationary bootstrap of Politis and Romano 1994, mean block length ", MR_BLOCK, ")"), "under the",
   "least-favorable null configuration (each quintile's excess return series",
-  "recentered by subtracting its full-sample Carhart alpha, imposing",
+  "recentered by subtracting its Carhart alpha over the months common to all quintiles, imposing",
   "$\\\\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern",
   "when the corresponding p-value is small.",
   "$\\\\alpha_{\\\\text{Q1}}$, $\\\\alpha_{\\\\text{Q5}}$, and",
