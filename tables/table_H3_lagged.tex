@@ -1,27 +1,16 @@
-\begingroup\fontsize{9}{11}\selectfont
-
-\begin{ThreePartTable}
-\begin{TableNotes}
-\item Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{\text{SENT}}_{t-1}$ replaces $D^{\text{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{TableNotes}
-\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
-\caption{\label{tab:H3_lagged}H3 Robustness --- Lagged Sentiment}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular}{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-\endfirsthead
-\caption[]{H3 Robustness --- Lagged Sentiment \textit{(continued)}}\\
-\toprule
-Variable & (1) & (2) & (3) & (4)\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\insertTableNotes
-\endlastfoot
 $R^{\text{LOW}}$ & 0.0381*** & 0.0377*** & 0.0382*** & 0.0375***\\
  & (10.15) & (10.12) & (10.18) & (9.94)\\
 $R^{\text{MID}}$ & 0.0153*** & 0.0153*** & 0.0153*** & 0.0152***\\
@@ -48,7 +37,66 @@ Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 273,486 & 273,486 & 273,486 & 273,486\\
 $R^2$ (within) & 0.038 & 0.038 & 0.038 & 0.038\\
 Joint test ($\chi^2_2$, $p$) & -- & 1.43 (0.489) & 1.73 (0.421) & 6.87 (0.032)\\
-Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=-0.55 (p=0.707) & z=+0.62 (p=0.268) & z=+1.95 (p=0.026)\\*
-\end{longtable}
-\end{ThreePartTable}
-\endgroup{}
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.55 (0.707) & +0.62 (0.268) & +1.95 (0.026)\\
+\bottomrule
+\end{tabular}%
+}
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+$R^{\text{LOW}}$ & 0.0381*** & 0.0377*** & 0.0382*** & 0.0375***\\
+ & (10.15) & (10.12) & (10.18) & (9.94)\\
+$R^{\text{MID}}$ & 0.0153*** & 0.0153*** & 0.0153*** & 0.0152***\\
+ & (17.55) & (17.51) & (17.60) & (17.30)\\
+$R^{\text{HIGH}}$ & 0.0830*** & 0.0835*** & 0.0831*** & 0.0825***\\
+ & (15.91) & (15.86) & (15.94) & (15.88)\\
+Lottery measure &  & -0.0003 & 0.0003 & 0.0002\\
+ &  & (-0.67) & (0.56) & (0.45)\\
+Sentiment &  & 0.0019** & 0.0020** & 0.0017*\\
+ &  & (2.03) & (2.01) & (1.84)\\
+Lottery $\times$ Sent. &  & -0.0002 & 0.0004 & 0.0013*\\
+ &  & (-0.55) & (0.62) & (1.95)\\
+$\log(\text{TNA})$ & -0.0023*** & -0.0024*** & -0.0024*** & -0.0024***\\
+ & (-6.55) & (-6.66) & (-6.73) & (-6.70)\\
+$\log(\text{Age})$ & -0.0132*** & -0.0134*** & -0.0133*** & -0.0138***\\
+ & (-10.98) & (-11.24) & (-11.43) & (-11.43)\\
+Return volatility & 0.0069 & -0.0033 & 0.0082 & -0.0250\\
+ & (0.25) & (-0.12) & (0.30) & (-0.76)\\
+Style flow & 0.1060** & 0.1028** & 0.1029** & 0.1010**\\
+ & (2.40) & (2.34) & (2.35) & (2.29)\\
+\midrule
+Fund FE & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
+$N$ & 273,486 & 273,486 & 273,486 & 273,486\\
+$R^2$ (within) & 0.038 & 0.038 & 0.038 & 0.038\\
+Joint test ($\chi^2_2$, $p$) & -- & 1.43 (0.489) & 1.73 (0.421) & 6.87 (0.032)\\
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.55 (0.707) & +0.62 (0.268) & +1.95 (0.026)\\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{H3 Robustness --- Lagged Sentiment}\label{tab:H3_lagged}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{\text{SENT}}_{t-1}$ replaces $D^{\text{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{singlespace}
+\end{minipage}
+\end{table}
+

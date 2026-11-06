@@ -1,27 +1,16 @@
-\begingroup\fontsize{9}{11}\selectfont
-
-\begin{ThreePartTable}
-\begin{TableNotes}
-\item Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{\text{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ year-month fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{TableNotes}
-\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
-\caption{\label{tab:H3_robustness}H3 Robustness --- Style $\times$ Time Fixed Effects}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular}{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-\endfirsthead
-\caption[]{H3 Robustness --- Style $\times$ Time Fixed Effects \textit{(continued)}}\\
-\toprule
-Variable & (1) & (2) & (3) & (4)\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\insertTableNotes
-\endlastfoot
 $R^{\text{LOW}}$ & 0.0341*** & 0.0344*** & 0.0343*** & 0.0332***\\
  & (9.37) & (9.46) & (9.42) & (9.03)\\
 $R^{\text{MID}}$ & 0.0165*** & 0.0165*** & 0.0166*** & 0.0162***\\
@@ -52,7 +41,70 @@ Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 273,467 & 273,467 & 273,467 & 273,467\\
 $R^2$ (within) & 0.036 & 0.036 & 0.037 & 0.036\\
 Joint test ($\chi^2_2$, $p$) & -- & 0.16 (0.923) & 40.00 ($<\!0.001$) & 6.90 (0.032)\\
-Sent.\ amp.\ ($z$, 1-sided $p$) & -- & z=+0.26 (p=0.399) & z=+2.52 (p=0.006) & z=+0.00 (p=0.499)\\*
-\end{longtable}
-\end{ThreePartTable}
-\endgroup{}
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & +0.26 (0.399) & +2.52 (0.006) & +0.00 (0.499)\\
+\bottomrule
+\end{tabular}%
+}
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{ActR2} & \multicolumn{1}{c}{ActSkew} & \multicolumn{1}{c}{MAX12} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+$R^{\text{LOW}}$ & 0.0341*** & 0.0344*** & 0.0343*** & 0.0332***\\
+ & (9.37) & (9.46) & (9.42) & (9.03)\\
+$R^{\text{MID}}$ & 0.0165*** & 0.0165*** & 0.0166*** & 0.0162***\\
+ & (18.13) & (18.13) & (18.35) & (17.88)\\
+$R^{\text{HIGH}}$ & 0.0843*** & 0.0840*** & 0.0839*** & 0.0832***\\
+ & (16.41) & (16.38) & (16.40) & (16.27)\\
+Lottery measure &  & 0.0001 & 0.0014*** & 0.0010**\\
+ &  & (0.20) & (3.91) & (2.37)\\
+Lottery $\times$ Sent. &  & 0.0001 & 0.0015** & 0.0000\\
+ &  & (0.26) & (2.52) & (0.00)\\
+$\log(\text{TNA})$ & -0.0002 & -0.0002 & -0.0002 & -0.0002\\
+ & (-1.45) & (-1.44) & (-1.58) & (-1.46)\\
+$\log(\text{Age})$ & -0.0039*** & -0.0039*** & -0.0039*** & -0.0039***\\
+ & (-10.46) & (-10.46) & (-10.51) & (-10.46)\\
+Expense ratio & -0.0033*** & -0.0034*** & -0.0034*** & -0.0033***\\
+ & (-4.45) & (-4.37) & (-4.67) & (-4.48)\\
+Load dummy & 0.0007 & 0.0007 & 0.0008* & 0.0007\\
+ & (1.63) & (1.63) & (1.80) & (1.64)\\
+Return volatility & -0.1580*** & -0.1583*** & -0.1694*** & -0.1965***\\
+ & (-5.76) & (-5.79) & (-6.12) & (-6.22)\\
+Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
+ & (-1.13) & (-1.14) & (-1.07) & (-1.12)\\
+Style flow & -2.2535*** & -2.2534*** & -2.2336*** & -2.2494***\\
+ & (-4.20) & (-4.20) & (-4.18) & (-4.19)\\
+\midrule
+FE: Lipper $\times$ year-month & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
+$N$ & 273,467 & 273,467 & 273,467 & 273,467\\
+$R^2$ (within) & 0.036 & 0.036 & 0.037 & 0.036\\
+Joint test ($\chi^2_2$, $p$) & -- & 0.16 (0.923) & 40.00 ($<\!0.001$) & 6.90 (0.032)\\
+Sent.\ amp.\ ($z$, 1-sided $p$) & -- & +0.26 (0.399) & +2.52 (0.006) & +0.00 (0.499)\\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{H3 Robustness --- Style $\times$ Time Fixed Effects}\label{tab:H3_robustness}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{\text{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ year-month fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\end{singlespace}
+\end{minipage}
+\end{table}
+

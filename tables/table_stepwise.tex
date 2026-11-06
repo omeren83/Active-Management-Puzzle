@@ -1,12 +1,12 @@
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
+\sbox{\tabletempbox}{%
 \footnotesize
-\caption{Stepwise Specifications of the Behavioral Flow Tests}
-\label{tab:stepwise}
-\resizebox{\linewidth}{!}{%
+\setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lllccccc}
 \toprule
-Hyp. & State & & (1) Rank segments & (2) + State main effect & (3) + Interactions & (4) + Controls & (5) + Fund FE \\
+Hyp. & State & & \makecell{(1) Rank\\segments} & \makecell{(2) + State\\main effect} & \makecell{(3) +\\Interactions} & \makecell{(4) +\\Controls} & \makecell{(5) +\\Fund FE} \\
 \midrule
 H1 & $D^{\text{SENT}}$ & Joint $\chi^2$ ($p$) & -- & -- & 5.21 (0.157) & 4.83 (0.185) & 6.15 (0.105) \\
  & & Headline ($z$) & -- & -- & $-$0.0085 ($-$0.81) & $-$0.0082 ($-$0.79) & $-$0.0074 ($-$0.71) \\
@@ -29,10 +29,22 @@ H3 & MAX12 $\times D^{\text{SENT}}$ & Joint $\chi^2$ ($p$) & -- & -- & 1.78 (0.4
  & & $R^2$ & 0.027 & 0.028 & 0.028 & 0.034 & 0.038 \\
  & & $N$ & 273,497 & 273,497 & 273,497 & 273,497 & 273,486 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\end{table}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Stepwise Specifications of the Behavioral Flow Tests}\label{tab:stepwise}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
 Regressors added in a fixed order: (1) rank segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$; (2) state main effect (H3: also MAX12); (3) tested interactions; (4) controls; (5) fund fixed effects (= primary specification). Same estimation sample in all columns. $R^2$: within $R^2$ in column (5), $R^2$ otherwise. Headline: H1, $\delta_{\text{HIGH}}-\delta_{\text{LOW}}$; H2, $\delta_{\text{LOW}}$; H3, the MAX12 $\times D^{\text{SENT}}$ coefficient; $z$-statistics in parentheses. Samples, controls and clustering as in the primary H1--H3 tables (fund fixed effects; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
 \end{singlespace}
+\end{minipage}
+\end{table}
 

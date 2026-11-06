@@ -1,5 +1,8 @@
 # =============================================================================
-# MASTER PIPELINE ORCHESTRATOR                                             v1.9
+# MASTER PIPELINE ORCHESTRATOR                                             v2.0
+#
+# v2.0 (Nov 2026): before the sync, table_*.tex files written in the run are
+#   rewritten into the SBE table layout by sbe_table_format.R.
 #
 # v1.9 (Oct 2026; pre-committed 16 Oct 2026):
 #   - Unflagged ("Unknown") funds are classified in Phase A from
@@ -304,7 +307,8 @@ SCRIPT_INTEGRITY <- c(
   "value_added.R"                 = "DOLLAR VALUE ADDED",
   "panel_regime_stepwise.R"       = "panel_regime_stepwise",
   "classify_unknown_funds.R"      = "UNKNOWN-FUND CLASSIFICATION",
-  "classification_robustness.R"   = "CLASSIFICATION ROBUSTNESS"
+  "classification_robustness.R"   = "CLASSIFICATION ROBUSTNESS",
+  "sbe_table_format.R"            = "SBE TABLE FORMAT"
 )
 
 verify_pipeline_integrity <- function(scripts_dir = SCRIPTS_DIR,
@@ -567,6 +571,28 @@ if (RUN_UTILITY_CLASSIFY) {
 if (RUN_UTILITY_LIPPER) {
   run_script("build_lipper_category.R", "Utility")
 }
+
+# =============================================================================
+# FORMAT - SBE TABLE LAYOUT (v2.0, Nov 2026)
+# sbe_table_format.R rewrites the table_*.tex files written during THIS run
+# into the SBE layout (one non-breaking float, title left-aligned above the
+# table, note inside the float, >= 8pt). Files not regenerated in this run
+# are left alone, so they cannot overwrite the formatted copies in tables/.
+# =============================================================================
+.fmt_env <- new.env()
+sys.source(file.path(SCRIPTS_DIR, "sbe_table_format.R"), envir = .fmt_env)
+.new_tex <- local({
+  f  <- list.files(WORKING_DIR, pattern = "^table[_0-9].*\\.tex$")
+  mt <- file.info(file.path(WORKING_DIR, f))$mtime
+  f[is.na(tex_snapshot_before[f]) | mt > tex_snapshot_before[f]]
+})
+for (.f in .new_tex) {
+  .p <- file.path(WORKING_DIR, .f)
+  .s <- paste(readLines(.p, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  .o <- .fmt_env$sbe_format_string(.s, sub("\\.tex$", "", .f))
+  if (!identical(.o, .s)) writeLines(.o, .p, useBytes = TRUE)
+}
+cat(sprintf("SBE table format applied to %d table file(s) written in this run.\n", length(.new_tex)))
 
 # SYNC - COPY UPDATED ARTIFACTS TO TABLES_OUT_DIR (GitHub / Overleaf)
 # This step copies every table_*.tex AND fig_*.png file that is new or has

@@ -1,27 +1,16 @@
-\begingroup\fontsize{9}{11}\selectfont
-
-\begin{ThreePartTable}
-\begin{TableNotes}
-\item The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month net returns ending in $t-1$. Sentiment in column (2) is the regime dummy $D^{\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler 2007); column (3) is the standardised Baker-Wurgler orthogonalised sentiment index; column (4) is the AAII bull-bear regime dummy. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{TableNotes}
-\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
-\caption{\label{tab:H1_regression}H1: Sentiment-Convexity Hypothesis}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular}{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-\endfirsthead
-\caption[]{H1: Sentiment-Convexity Hypothesis \textit{(continued)}}\\
-\toprule
-Variable & (1) & (2) & (3) & (4)\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\insertTableNotes
-\endlastfoot
 $R^{\text{LOW}}$ & 0.0380*** & 0.0410*** & 0.0381*** & 0.0406***\\
  & (10.51) & (9.93) & (10.66) & (10.66)\\
 $R^{\text{MID}}$ & 0.0156*** & 0.0158*** & 0.0157*** & 0.0147***\\
@@ -50,7 +39,68 @@ Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 322,150 & 322,150 & 322,150 & 322,150\\
 $R^2$ (within) & 0.036 & 0.037 & 0.037 & 0.037\\
 Joint test ($\chi^2_3$, $p$) & -- & 6.15 (0.105) & 7.68 (0.053) & 14.08 (0.003)\\
-Asymmetry ($z$, 1-sided $p$) & -- & z=-0.71 (p=0.763) & z=+0.00 (p=0.499) & z=+2.69 (p=0.004)\\*
-\end{longtable}
-\end{ThreePartTable}
-\endgroup{}
+Asymmetry ($z$, 1-sided $p$) & -- & -0.71 (0.763) & +0.00 (0.499) & +2.69 (0.004)\\
+\bottomrule
+\end{tabular}%
+}
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+$R^{\text{LOW}}$ & 0.0380*** & 0.0410*** & 0.0381*** & 0.0406***\\
+ & (10.51) & (9.93) & (10.66) & (10.66)\\
+$R^{\text{MID}}$ & 0.0156*** & 0.0158*** & 0.0157*** & 0.0147***\\
+ & (17.87) & (17.34) & (17.92) & (15.64)\\
+$R^{\text{HIGH}}$ & 0.0865*** & 0.0910*** & 0.0866*** & 0.0823***\\
+ & (16.90) & (15.95) & (16.99) & (15.00)\\
+Sentiment &  & 0.0040** & 0.0023*** & 0.0004\\
+ &  & (2.10) & (3.64) & (0.25)\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0121* & -0.0059** & -0.0109\\
+ &  & (-1.65) & (-2.08) & (-1.41)\\
+$R^{\text{MID}}\times$ Sent. &  & -0.0006 & -0.0006 & 0.0042**\\
+ &  & (-0.30) & (-0.77) & (2.34)\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0194** & -0.0059 & 0.0179**\\
+ &  & (-2.09) & (-1.49) & (2.03)\\
+$\log(\text{TNA})$ & -0.0029*** & -0.0029*** & -0.0029*** & -0.0029***\\
+ & (-7.86) & (-7.90) & (-8.02) & (-7.85)\\
+$\log(\text{Age})$ & -0.0129*** & -0.0129*** & -0.0131*** & -0.0128***\\
+ & (-13.01) & (-13.11) & (-13.43) & (-12.95)\\
+Return volatility & -0.0092 & -0.0114 & -0.0128 & -0.0093\\
+ & (-0.36) & (-0.44) & (-0.50) & (-0.36)\\
+Style flow & 0.0753*** & 0.0744*** & 0.0727*** & 0.0754***\\
+ & (2.67) & (2.65) & (2.61) & (2.68)\\
+\midrule
+Fund FE & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
+$N$ & 322,150 & 322,150 & 322,150 & 322,150\\
+$R^2$ (within) & 0.036 & 0.037 & 0.037 & 0.037\\
+Joint test ($\chi^2_3$, $p$) & -- & 6.15 (0.105) & 7.68 (0.053) & 14.08 (0.003)\\
+Asymmetry ($z$, 1-sided $p$) & -- & -0.71 (0.763) & +0.00 (0.499) & +2.69 (0.004)\\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{H1: Sentiment-Convexity Hypothesis}\label{tab:H1_regression}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ are constructed from the lagged within-Lipper-category fractional rank of cumulative 12-month net returns ending in $t-1$. Sentiment in column (2) is the regime dummy $D^{\text{SENT}}_t$ (= 1 if Baker-Wurgler orthogonalised sentiment exceeds its 66th in-sample percentile, following Baker-Wurgler 2007); column (3) is the standardised Baker-Wurgler orthogonalised sentiment index; column (4) is the AAII bull-bear regime dummy. All controls lagged one period; time-invariant fund characteristics (expense ratio, load dummy, turnover ratio) are included in the specification but absorbed by the fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{singlespace}
+\end{minipage}
+\end{table}
+

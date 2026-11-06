@@ -1,12 +1,12 @@
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
+\sbox{\tabletempbox}{%
 \footnotesize
-\caption{Behavioral Flow Tests Estimated Separately by Regime}
-\label{tab:regime_separate}
-\resizebox{\linewidth}{!}{%
+\setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lllcccccc}
 \toprule
-Hyp. & State & Regime & Months & State months & Joint $\chi^2$ ($p$) & Headline ($z$) & $N$ \\
+Hyp. & State & Regime & Months & \makecell{State\\months} & \makecell{Joint $\chi^2$\\($p$)} & \makecell{Headline\\($z$)} & $N$ \\
 \midrule
 H1 & $D^{\text{SENT}}$ & P1 & 91 & 41 & 3.30 (0.347) & $-$0.0130 ($-$0.49) & 37,459 \\
  &  & P2 & 49 & 18 & 3.65 (0.302) & $-$0.0361 ($-$1.71) & 56,338 \\
@@ -24,10 +24,22 @@ H3 & MAX12 $\times D^{\text{SENT}}$ & P1 & 91 & 41 & 16.42 ($<$0.001) & 0.0020 (
  &  & P2 & 49 & 18 & 2.36 (0.307) & $-$0.0017 ($-$0.54) & 46,428 \\
  &  & P3 & 166 & 32 & 1.69 (0.429) & 0.0008 (1.25) & 198,320 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\end{table}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Behavioral Flow Tests Estimated Separately by Regime}\label{tab:regime_separate}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
 Primary specification estimated within each regime (P1 to Mar 2006, P2 to Aug 2010, P3 after). \textit{Months}: sample months in the regime; \textit{State months}: months in which the state dummy equals one (cont.: continuous index). n.e.: not estimable because the state does not vary within the regime. $^{\dagger}$: fewer than 12 state months (low power). Headline: H1, $\delta_{\text{HIGH}}-\delta_{\text{LOW}}$; H2, $\delta_{\text{LOW}}$; H3, the MAX12 $\times D^{\text{SENT}}$ coefficient; $z$-statistics in parentheses. Samples, controls and clustering as in the primary H1--H3 tables (fund fixed effects; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
 \end{singlespace}
+\end{minipage}
+\end{table}
 

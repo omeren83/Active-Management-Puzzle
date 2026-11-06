@@ -1,8 +1,9 @@
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
+\sbox{\tabletempbox}{%
 \footnotesize
-\caption{Headline Results Under the Two Fund Classifications}
-\label{tab:classification_robustness}
+\setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lcc}
 \toprule
  & Bloomberg flag only & Reclassified \\
@@ -36,9 +37,22 @@ H4, $D^{\text{SENT}}$ & 0.416 & 0.157 \\
 H4, $\text{SENT}^\perp$ & 0.566 & 0.555 \\
 H4, $D^{\text{AAII}}$ & 0.549 & 0.547 \\
 \bottomrule
-\end{tabular}
-\end{table}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Headline Results Under the Two Fund Classifications}\label{tab:classification_robustness}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
 \textit{Bloomberg flag only}: funds without a Bloomberg active/passive flag are left out; because the flag is missing for almost every fund that closed before 2012, the pre-2012 active sample then consists of survivors only. \textit{Reclassified}: those funds are classified by name, Lipper category and benchmark tracking, with manual review of boundary cases (Section~\ref{sec:a_unflagged}); this is the classification used in the main text. Panel A as Table~\ref{tab:perf_aggregate}; Panel B as Table~\ref{tab:bsw_decomposition} ($\gamma^*=0.45$); Panel C as Table~\ref{tab:subperiod_port_agg_alpha}, with P3 $-$ P2 from the stacked regression of Table~\ref{tab:same_sample_alpha}; Panel D as Table~\ref{tab:tna_floor} (USD 5 million floor). The Bai--Perron break dates, and hence the sub-period boundaries, are the same under both classifications. $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 \end{singlespace}
+\end{minipage}
+\end{table}
 

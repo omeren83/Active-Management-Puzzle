@@ -430,6 +430,23 @@
 % longtable title and below the longtable body for tables that span
 % multiple pages (kableExtra produces these for the H1--H4, J series,
 % activeness_*, and persistence tables).
+% Nov 2026: float placement. Tables are floats now; let them sit on text
+% pages (no near-empty float pages), and put float-only pages' floats at
+% the top of the page instead of centring them vertically (which left a
+% wide gap above the table).
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.8}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{36pt plus 1fil}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+
 \setlength{\LTpre}{24pt plus 4pt minus 4pt}
 \setlength{\LTpost}{36pt plus 4pt minus 4pt}
 
@@ -451,8 +468,15 @@
 % longtable environment; per-file size declarations have been stripped.
 % Caption labels remain 12 pt via \captionsetup font=normalsize.
 \usepackage{etoolbox}
-\AtBeginEnvironment{table}{\footnotesize}
-\AtBeginEnvironment{longtable}{\footnotesize}
+\AtBeginEnvironment{table}{\setstretch{1}\footnotesize}
+\AtBeginEnvironment{longtable}{\setstretch{1}\footnotesize}
+% Nov 2026: tables single-spaced (SBE Part 3: "Single-spacing is usually
+% better"). With the body's \doublespacing inside tables, every row and the
+% caption-to-table gap were doubled, so tables ran over two or three pages.
+% Table title to table: one single space (caption skip = 12pt below).
+% Table files are rewritten by sbe_table_format.R into one non-breaking
+% float with the note inside it (SBE: a table starts and finishes on one
+% page; the double space below the table, \intextsep, follows the note).
 
 % Table notes: SBE p.18 prescribes single-spacing for footnotes and (by
 % convention) for table notes, regardless of body double-spacing. Without
@@ -519,6 +543,19 @@
 % Mirror SBE rules onto longtable so floats and longtables look identical.
 % Longtables get the SBE single-line gap below caption via `\\[12pt]` after
 % the caption row (applied per-file by phase2_2.py), not via skip=.
+% Figure captions (SBE): below the figure, "Figure N.  Caption" with a
+% period and two spaces, left-aligned, single-spaced when longer than one line.
+\captionsetup[figure]{
+  labelsep        = periodtwospace,
+  font            = {normalsize, stretch=1},
+  labelfont       = normalfont,
+  textfont        = normalfont,
+  skip            = 12pt,
+  position        = bottom,
+  singlelinecheck = false,
+  justification   = raggedright
+}
+
 \captionsetup[longtable]{font={normalsize, stretch=1}, labelfont=normalfont, textfont=normalfont, justification=raggedright, singlelinecheck=false, position=top}
 
 % ---- Mathematics ------------------------------------------------------------
@@ -2190,10 +2227,10 @@ applied at the portfolio level. The right- and left-tail bootstrap
 $p$-values,
 \begin{equation}
   p_{\mathrm{RB}}(d) = \frac{1}{B}\sum_{b=1}^{B}
-    \mathbf{1}\!\left[t(\hat{\alpha}^{d,b}) \geq t(\hat{\alpha}^{d})\right],
+    \mathbb{1}\!\left[t(\hat{\alpha}^{d,b}) \geq t(\hat{\alpha}^{d})\right],
   \qquad
   p_{\mathrm{LB}}(d) = \frac{1}{B}\sum_{b=1}^{B}
-    \mathbf{1}\!\left[t(\hat{\alpha}^{d,b}) \leq t(\hat{\alpha}^{d})\right],
+    \mathbb{1}\!\left[t(\hat{\alpha}^{d,b}) \leq t(\hat{\alpha}^{d})\right],
   \label{eq:boot_pval_persist}
 \end{equation}
 test for persistent outperformance and persistent underperformance
@@ -2211,7 +2248,7 @@ results are reported for comparability only.
 
 The sub-period panels restrict the pooled sample to cohorts whose
 formation and holding windows both lie inside one of the regimes of
-Appendix~\ref{app:subperiod}. Panel~C of Table~\ref{tab:persistence}
+Appendix~\ref{app:subperiod}. Panel~C of Table~\ref{tab:persistence_regime}
 pools cohorts 1 and 2, which lie inside P1 (to March 2006); Panel~E pools
 cohorts 5, 6 and 7, which lie inside P3 (from September 2010). No cohort
 lies entirely inside P2 (April 2006--August 2010), so no P2 panel is
@@ -2472,7 +2509,7 @@ sentiment regime indicator:
 + \phi_{\text{MID}}\, R^{\text{MID}}_{i,t-1} \cdot \text{ExpRatio}_i
 + \phi_{\text{HIGH}}\, R^{\text{HIGH}}_{i,t-1} \cdot \text{ExpRatio}_i \\
 + \delta^F_{\text{LOW}}\, R^{\text{LOW}}_{i,t-1} \cdot \text{ExpRatio}_i \cdot D^{\text{SENT}}_t
-+ \delta^F_{\text{MID}}\, R^{\text{MID}}_{i,t-1} \cdot \text{ExpRatio}_i \cdot D^{\text{SENT}}_t
++ \delta^F_{\text{MID}}\, R^{\text{MID}}_{i,t-1} \cdot \text{ExpRatio}_i \cdot D^{\text{SENT}}_t \\
 + \delta^F_{\text{HIGH}}\, R^{\text{HIGH}}_{i,t-1} \cdot \text{ExpRatio}_i \cdot D^{\text{SENT}}_t \\
 + \theta\, \text{ExpRatio}_i
 + \eta\, \text{ExpRatio}_i \cdot D^{\text{SENT}}_t
@@ -2630,7 +2667,7 @@ unbalanced panel structure is standard in the mutual fund literature and
 is handled by the estimators of
 Sections~\ref{sec:aggregate_performance}--\ref{sec:portfolio_sorts}.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\textwidth]{tables/fig_fund_flows.png}
   \caption[Average monthly proportional fund flows: active vs.\ passive]{%
@@ -2724,7 +2761,7 @@ order of magnitude of the survivorship bias documented by
 \textcite{CarhartCarpenterLynchMusto2002}, and it accounts for part of the
 gap between the equal- and value-weighted net alphas.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\textwidth]{tables/fig_rolling_alphas.png}
   \caption[Rolling aggregate gross alpha: active vs.\ passive]{%
@@ -2813,7 +2850,7 @@ proportion when non-zero-alpha funds have large $p$-values.
 
 \input{tables/table_pi0_estimate}
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.85\textwidth]{tables/fig_luck_vs_skill_combined.png}
   \caption[CDF and PDF of empirical vs.\ simulated alpha $t$-statistics]{%
@@ -2887,7 +2924,7 @@ variation across sub-periods (Section~\ref{sec:subperiod}).
 \label{sec:portfolio_sorts}
 
 \noindent Tables~\ref{tab:port_characteristics} through
-\ref{tab:port_fee_alpha} report characteristics and gross alphas of
+\ref{tab:port_fee_alpha_passive} report characteristics and gross alphas of
 quintile portfolios sorted on three fund characteristics: log lagged TNA
 (size), the cumulative 11-month net return ending in month $t-2$,
 skipping $t-1$ (momentum, following \textcite{JegadeeshTitman1993}), and
@@ -2929,7 +2966,7 @@ the lowest Sharpe ratio in its panel.
 
 \input{tables/table_port_size_alpha}
 
-Table~\ref{tab:port_size_alpha} reports the size-quintile alphas. Among
+Tables~\ref{tab:port_size_alpha} (active funds) and~\ref{tab:port_size_alpha_passive} (passive funds) report the size-quintile alphas. Among
 active funds the Carhart gross alpha shows no size gradient. It is
 $-0.108\%$ per annum in the smallest quintile and $-0.273\%$ in the
 largest (EW), $+0.130\%$ and $-0.052\%$ (VW), and the highest alpha is in
@@ -2946,7 +2983,7 @@ net alphas of Section~\ref{sec:aggregate_performance}.
 
 \input{tables/table_port_mom_alpha}
 
-Table~\ref{tab:port_mom_alpha} reports the momentum-quintile alphas. Under
+Tables~\ref{tab:port_mom_alpha} (active funds) and~\ref{tab:port_mom_alpha_passive} (passive funds) report the momentum-quintile alphas. Under
 the CAPM and the three-factor model the active Q5$-$Q1 spread is large and
 significant ($+5.291\%$ and $+6.075\%$ per annum EW, significant at 5\%
 and 1\%). Under the Carhart model it shrinks to $+2.278\%$ (EW) and
@@ -2958,7 +2995,7 @@ remains is a positive but statistically weak residual spread.
 
 \input{tables/table_port_fee_alpha}
 
-Table~\ref{tab:port_fee_alpha} reports the fee-quintile alphas. Among
+Tables~\ref{tab:port_fee_alpha} (active funds) and~\ref{tab:port_fee_alpha_passive} (passive funds) report the fee-quintile alphas. Among
 active funds the EW gross alpha is lower in the high-fee quintiles: it is $+0.115\%$ per
 annum in the lowest-fee quintile and $-0.704\%$ in the highest, and the
 Q5$-$Q1 spread of $-0.819\%$ is significant at 5\% ($-1.062\%$ and
@@ -3006,7 +3043,7 @@ smaller and charge higher fees than closet indexers.
 
 \input{tables/table_activeness_alpha_r2}
 
-Table~\ref{tab:activeness_alpha_r2} reports the factor-model alphas by
+Tables~\ref{tab:activeness_alpha_r2} (gross returns) and~\ref{tab:activeness_alpha_r2_net} (net returns) report the factor-model alphas by
 $1-R^2$ quintile. The headline result concerns the closet indexers. The
 lowest-activeness quintile earns a Carhart gross alpha of $-0.763\%$ per
 annum EW ($t = -1.90$) and $-0.938\%$ VW ($t = -2.18$), and net alphas of
@@ -3034,7 +3071,7 @@ spread, which is not significant.
 
 \input{tables/table_activeness_alpha_te}
 
-Table~\ref{tab:activeness_alpha_te} reports the corresponding sort on
+Tables~\ref{tab:activeness_alpha_te} (gross returns) and~\ref{tab:activeness_alpha_te_net} (net returns) report the corresponding sort on
 tracking error. Here the pattern is different. The EW gross alphas are
 flat across quintiles (Q5$-$Q1 spread $-0.300\%$, $t = -0.51$), and the
 value-weighted results are dominated by the highest-tracking-error
@@ -3092,15 +3129,9 @@ The test design --- formation and holding windows, cohort structure,
 decile construction, and the bootstrap null --- is described in
 Section~\ref{sec:persistence_design}.
 
-\begin{landscape}
-\lscapenumtrue
-\pagestyle{lscapeblank}%
 \input{tables/table_persistence}
-\end{landscape}
-\lscapenumfalse
-\pagestyle{plain}%
 
-Table~\ref{tab:persistence} reports the results. In the full sample
+Tables~\ref{tab:persistence} (full sample, Panels~A and~B) and~\ref{tab:persistence_regime} (regimes, Panels~C to~F) report the results. In the full sample
 (Panel~A), the bottom decile of formation-period $t(\hat{\alpha})$ (D10)
 earns a holding-period Carhart gross alpha of $-0.136\%$ per month
 (about $-1.6\%$ per annum; $t = -2.09$, parametric one-sided $p = 0.018$,
@@ -3723,10 +3754,7 @@ interaction $\eta$ and the three triple interactions $\delta^F_q$ of
 Equation~\ref{eq:H4} are jointly zero; the behavioral prediction is a
 non-zero joint $\chi^2$.
 
-\begingroup
-\captionsetup{font=footnotesize, justification=raggedright, singlelinecheck=false}  % T2.11: match caption size to longtable body (\fontsize{9}{11}) and left-align
 \input{tables/table_H4_regression}
-\endgroup
 
 \noindent Table~\ref{tab:H4_regression} reports the H4 regression under
 three sentiment proxies. In the baseline column (1) the expense ratio has
@@ -4781,7 +4809,9 @@ funds, and Lipper analytics fields return no data for dead funds, so the
 funds are classified from the information in the panel by a rule fixed
 before any result was computed with it.
 
-\paragraph{Rule.} A fund is classified as passive if any of three
+\subsection{Rule}
+
+\noindent A fund is classified as passive if any of three
 conditions holds, and as active otherwise:
 \begin{enumerate}
 \item its name contains an index keyword (INDEX, INDX, IDX, S\&P 500, 400
@@ -4799,7 +4829,9 @@ constant) has $R^2 \ge 0.98$ and the annualised tracking error is at most
 A fund with no keyword, no index category and fewer than 24 joint
 months (231 funds) is classified as active by default.
 
-\paragraph{Validation.} Applied to the funds that Bloomberg does flag,
+\subsection{Validation}
+
+\noindent Applied to the funds that Bloomberg does flag,
 the rule gives the confusion matrix of Table~\ref{tab:a_unflagged_validation}.
 It agrees with the flag for 96.4\% of funds and classifies only 8 of
 2{,}263 flagged active funds as passive (0.4\%), meeting the criterion
@@ -4815,11 +4847,11 @@ recall is 87.8\%, and on those that closed before 2016 it is 94.6\%. The
 failure of the second criterion was reported before any change was
 made, and the thresholds were not tuned.
 
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
+\sbox{\tabletempbox}{%
 \footnotesize
-\caption{Validation of the Classification Rule on Bloomberg-Flagged Funds}
-\label{tab:a_unflagged_validation}
 \begin{tabular}{lrrr}
 \toprule
 Bloomberg flag & Rule: active & Rule: passive & Total \\
@@ -4829,16 +4861,31 @@ Passive (N) & 84 & 236 & 320 \\
 \midrule
 Agreement & \multicolumn{3}{r}{96.4\%} \\
 \bottomrule
-\end{tabular}
-\end{table}
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Validation of the Classification Rule on Bloomberg-Flagged Funds}\label{tab:a_unflagged_validation}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
 Rule as described in the text, applied to all funds of the master panel
 that carry a Bloomberg Actively\_Managed flag, after the exclusions of
 Steps 1--6; the MOJAX and GENDX overrides are not applied, so the
 comparison is with the flag as Bloomberg reports it.
 \end{singlespace}
+\end{minipage}
+\end{table}
 
-\paragraph{Manual review.} Because the rule is imperfect at the passive
+\subsection{Manual review}
+
+\noindent Because the rule is imperfect at the passive
 boundary, the unflagged funds closest to it were reviewed by hand: the 19
 funds the rule calls passive, and 80 funds it calls active whose returns
 track their benchmark closely ($R^2 \ge 0.95$ or tracking error at most
@@ -4854,7 +4901,9 @@ the keyword list (the abbreviation ``IND'', as in ``Tot Mkt Ind''),
 handled case by case rather than by changing the rule. The decisions and
 their reasons are recorded in \texttt{unknown\_classification\_ledger.xlsx}.
 
-\paragraph{Result and exclusions.} Of the 969 unflagged funds, 950 are
+\subsection{Result and exclusions}
+
+\noindent Of the 969 unflagged funds, 950 are
 classified as active and 19 as passive. The exclusion criteria of
 \texttt{flagged\_funds.xlsx} (Appendix~\ref{app:benchmark}) are applied
 to them in the same way as to flagged funds, detected from the Lipper
@@ -4868,7 +4917,9 @@ Fifty-nine unflagged share classes that fall under the entire-analysis
 exclusions at source are left unclassified and appear only in the fund
 counts of Table~\ref{tab:fund_counts}.
 
-\paragraph{Effect on the results.} Table~\ref{tab:classification_robustness}
+\subsection{Effect on the results}
+
+\noindent Table~\ref{tab:classification_robustness}
 compares the headline results under the Bloomberg flag alone (unflagged
 funds excluded) and under the reclassification. Because the rule assigns
 every unflagged fund that is not identified as an index fund to the
@@ -5202,11 +5253,11 @@ the uncapped MSCI U.S.\ IMI sector indices, the closest series available
 to the 25/50 versions that the Fidelity Select funds declare
 (Section~\ref{sec:special_treatment}).
 
-\begin{table}[htbp]
-\captionsetup{justification=raggedright, singlelinecheck=false}
-\caption{LSEG Total-Return Series Used as Fund Benchmarks}
-\label{tab:ric_series}
-\singlespacing\small
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}{llr}
 \toprule
 Index & LSEG RIC & Funds \\
@@ -5238,15 +5289,26 @@ Alerian MLP                               & .AMZX          & 22 \\
 \midrule
 Total & & 3{,}708 \\
 \bottomrule
-\end{tabular}
-\par\smallskip
-\begin{minipage}{0.9\linewidth}\footnotesize
+\end{tabular}%
+}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{LSEG Total-Return Series Used as Fund Benchmarks}\label{tab:ric_series}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
 $^{a}$~Includes 31 funds benchmarked to the S\&P MidCap 400.
 $^{b}$~Includes 10 funds benchmarked to the Russell 2500 Value.
 $^{c}$~Substitute for the MSCI U.S.\ REIT Index.
 See Section~\ref{sec:substitutions}.
+\end{singlespace}
 \end{minipage}
-\par\vspace{24pt}
 \end{table}
 
 \section{Data-availability benchmark substitutions}
@@ -5530,7 +5592,8 @@ decomposition serves as a robustness check on the headline aggregate
 finding: if the near-zero aggregate gross alpha concealed large and
 offsetting style-specific alphas, or were driven by a small number of
 poorly classified styles, its interpretation would require
-qualification.
+qualification. Tables~\ref{tab:perf_by_lipper} and~\ref{tab:perf_by_lipper_2}
+report the style-class alphas.
 
 \input{tables/table_perf_by_lipper}
 
@@ -5671,7 +5734,7 @@ estimates (dashed red verticals), 95\,\% HAC confidence intervals
 Table~\ref{tab:breaktest} reports break dates, confidence intervals,
 the regime means, and the test statistics.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\textwidth]{tables/fig_breaktest.png}
   \caption[Bai--Perron structural break test --- active fund rolling gross alpha]{%
@@ -5695,7 +5758,8 @@ the regime means, and the test statistics.
   \label{fig:breaktest}
 \end{figure}
 
-\begin{table}[htbp]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
 % Phase 2.4: savebox+minipage pattern — caption left-aligns to table edge.
 \sbox{\tabletempbox}{%
@@ -5857,7 +5921,7 @@ break of March 2000 lies at the edge of the testable range.
 
 \input{tables/table_breaktest_terciles_dates}
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
   \centering
   \includegraphics[width=\textwidth]{tables/fig_breaktest_terciles.png}
   \caption[Rolling alpha by past-performance tercile]{%
@@ -6012,10 +6076,7 @@ endogenous flow response into the regime-indicator coefficient.
 
 \input{tables/table_H3_lagged}
 
-\begingroup
-\captionsetup{font=footnotesize, justification=raggedright, singlelinecheck=false}  % T2.11: match caption size to longtable body (\fontsize{9}{11}) and left-align
 \input{tables/table_H4_lagged}
-\endgroup
 
 \noindent The qualitative findings of the headline specifications are
 largely preserved under the one-month-lagged state variables. H1's joint
@@ -6063,10 +6124,7 @@ alternative identification.
 
 \input{tables/table_H3_robustness}
 
-\begingroup
-\captionsetup{font=footnotesize, justification=raggedright, singlelinecheck=false}  % T2.11: match caption size to longtable body (\fontsize{9}{11}) and left-align
 \input{tables/table_H4_robustness}
-\endgroup
 
 \noindent Under the Lipper $\times$ year-month fixed-effect structure,
 H1's joint test rejects under $\text{SENT}^{\perp}$ ($\chi^2_3 = 8.79$,
@@ -6117,11 +6175,11 @@ AAII
 series is unchanged between vintages, so the changes in the AAII rows
 reflect the sample extension alone.
 
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
-\caption{Primary-Specification Test Statistics under the Previous and Current Sentiment Vintages (Previous Data Construction)}
-\label{tab:sent_vintage}
-{\footnotesize
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}{llcccc}
 \toprule
  & & \multicolumn{2}{c}{Joint $\chi^2$ ($p$)} & \multicolumn{2}{c}{Headline $z$ (1-sided $p$)} \\
@@ -6145,13 +6203,23 @@ H4 & $D^{\text{AAII}}$ & 5.17 (0.270) & 2.84 (0.585) & +1.36 (0.087) & +1.19 (0.
 \multicolumn{2}{l}{$N$ (H3)} & \multicolumn{2}{c}{212,033 $\rightarrow$ 236,263} & & \\
 \multicolumn{2}{l}{$N$ (H4)} & \multicolumn{2}{c}{232,168 $\rightarrow$ 258,372} & & \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\par\smallskip
-{\raggedright\footnotesize
-\begin{singlespace}
-\noindent Headline $z$: asymmetry test $\delta_{\text{HIGH}} - \delta_{\text{LOW}}$ (H1); loser-segment interaction $\delta_{\text{LOW}}$ (H2, reported without $p$ because the two competing predictions are one-sided in opposite directions); sentiment amplification of the lottery proxy (H3); unconditional fee--sentiment interaction $\eta$ (H4). The H2 put--call column does not use the sentiment series and is unchanged. The H2 $N$ refers to the margin-debt columns.
-\end{singlespace}\par}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Primary-Specification Test Statistics under the Previous and Current Sentiment Vintages (Previous Data Construction)}\label{tab:sent_vintage}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Headline $z$: asymmetry test $\delta_{\text{HIGH}} - \delta_{\text{LOW}}$ (H1); loser-segment interaction $\delta_{\text{LOW}}$ (H2, reported without $p$ because the two competing predictions are one-sided in opposite directions); sentiment amplification of the lottery proxy (H3); unconditional fee--sentiment interaction $\eta$ (H4). The H2 put--call column does not use the sentiment series and is unchanged. The H2 $N$ refers to the margin-debt columns.
+\end{singlespace}
+\end{minipage}
 \end{table}
 
 \noindent Under the March 2026 vintage the Baker--Wurgler-based H1
@@ -6333,11 +6401,11 @@ different expense ratios (MTCBX, TEMTX and HSLAX) and the five years
 returns would exceed the published returns by approximately the expense
 ratio, 1.4 to 1.9 percentage points, in every year.
 
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
-\caption{Calendar-Year Returns of the Bloomberg Index and Published NAV Returns (\%)}
-\label{tab:k_aaii}
-{\footnotesize
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}{llrrrrr}
 \toprule
 Fund (expense ratio) & Source & 2021 & 2022 & 2023 & 2024 & 2025 \\
@@ -6351,19 +6419,28 @@ TEMTX (1.75\%) & Bloomberg index & 18.13 & $-8.04$  & 12.84 & 10.42 & 10.62 \\
 HSLAX (1.38\%) & Bloomberg index & 3.31  & $-29.10$ & 17.69 & 12.22 & 6.30 \\
                & Published NAV   & 3.3   & $-29.1$  & 17.7  & 12.2  & 6.3 \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\par\smallskip
-{\raggedright\footnotesize
-\begin{singlespace}
-\noindent Bloomberg index: December-to-December change in the fund's total-return
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Calendar-Year Returns of the Bloomberg Index and Published NAV Returns (\%)}\label{tab:k_aaii}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Bloomberg index: December-to-December change in the fund's total-return
 index used in this dissertation. Published NAV: calendar-year NAV-based total return
 reported in the fund reports of the American Association of Individual Investors
 (AAII), accessed October 2026. Expense ratios are the static Bloomberg values used in
 the pipeline. A gross-of-fee index would exceed the published return by about the
 expense ratio in every year.
 \end{singlespace}
-}
+\end{minipage}
 \end{table}
 
 The second check uses passive funds, whose returns before fees should
@@ -6383,11 +6460,11 @@ slope is close to $-1$. It is: the median-regression slope is $-1.005$
 for the index return (and therefore $-0.005$ for the reconstructed gross
 return).
 
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
-\caption{Passive Fund Tracking Difference and the Expense Ratio}
-\label{tab:k_td}
-{\footnotesize
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}{lccc}
 \toprule
 Return series & Median TD & Median-regression & OLS \\
@@ -6396,17 +6473,27 @@ Return series & Median TD & Median-regression & OLS \\
 Index return (net) & $-0.204$ & $-1.005$ (0.159) & $-1.123$ (0.401) \\
 Index $+$ ER/12 (gross) & $\phantom{-}0.007$ & $-0.005$ (0.149) & $-0.123$ (0.401) \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\par\smallskip
-{\raggedright\footnotesize
-\begin{singlespace}
-\noindent Cross-sectional regressions across 231 passive funds (performance-comparison
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Passive Fund Tracking Difference and the Expense Ratio}\label{tab:k_td}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Cross-sectional regressions across 231 passive funds (performance-comparison
 subsample, incubation-corrected panel) with at least 36 monthly returns matched to the
 fund's benchmark total-return index. Dependent variable: the fund's mean monthly return
 minus the benchmark return, annualised ($\times 12$, \%). Regressor: annual expense ratio
 (\%). TD: tracking difference. Median-regression standard errors by bootstrap (500 replications).
-\end{singlespace}\par}
+\end{singlespace}
+\end{minipage}
 \end{table}
 
 The defense draft treated the index as a gross series and constructed
@@ -6442,11 +6529,11 @@ Section~\ref{sec:k_netindex}, which lowers net alphas by about 0.7
 (VW) to 1.0 (EW) percentage points. The two errors in the defense draft therefore worked in
 opposite directions, but did not cancel, and the double deduction was larger.
 
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
-\caption{Aggregate Active Alpha under Alternative Return Treatments (\%, Annualised)}
-\label{tab:k_returns}
-{\footnotesize
+\sbox{\tabletempbox}{%
+\footnotesize
 \begin{tabular}{lrrrr}
 \toprule
 Return treatment & EW $\alpha$ & $t$ & VW $\alpha$ & $t$ \\
@@ -6462,12 +6549,21 @@ Net, pooled winsorisation & $-0.684$ & ($-1.64$) & $-0.178$ & ($-0.46$) \\
 \addlinespace
 Net, fees deducted twice & $-2.250$ & ($-5.05$) & $-1.355$ & ($-3.38$) \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\par\smallskip
-{\raggedright\footnotesize
-\begin{singlespace}
-\noindent Carhart four-factor alphas of the equal- and lagged-TNA-weighted
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Aggregate Active Alpha under Alternative Return Treatments (\%, Annualised)}\label{tab:k_returns}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Carhart four-factor alphas of the equal- and lagged-TNA-weighted
 portfolios of active funds (performance-comparison subsample, incubation-corrected
 panel, 373 months; 2{,}619 funds in the net-return rows, 2{,}571 in the
 gross-return rows and in the fees-deducted-twice row, which require an expense
@@ -6477,7 +6573,8 @@ each month's cross-section; pooled winsorisation clips at the 1st and 99th perce
 of all fund-months together. ``Fees deducted twice'' subtracts one-twelfth of the
 expense ratio from the net index return, reproducing the net-return construction of
 the defense draft without its winsorisation.
-\end{singlespace}\par}
+\end{singlespace}
+\end{minipage}
 \end{table}
 
 \section{Returns removed by the data-error screen}
@@ -6497,11 +6594,12 @@ that belong to funds without a Bloomberg flag are counted among the
 active funds, as these funds are classified in
 Appendix~\ref{sec:a_unflagged}.
 
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
-\caption{Active and Passive Fund Returns Removed by the Data-Error Screen}
-\label{tab:k_screen}
-{\footnotesize\setstretch{1}\setlength{\tabcolsep}{4pt}
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{4pt}%
 \begin{tabular}{llllrrc}
 \toprule
 Ticker & Fund & Group & Month & Return (\%) & Median (\%) & Rule \\
@@ -6544,16 +6642,26 @@ GMEYX & GuideStone Impact Equity & Active & Jul 2025 & $-26.4$ & 1.5 & B \\
 SBQAX & DSS AmericaFirst & Active & Aug 2025 & $-42.1$ & 2.8 & B \\
 MSVSX & MassMutual Small Co Value & Active & Sep 2025 & $-30.8$ & 1.7 & B \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\par\smallskip
-{\raggedright\footnotesize
-\begin{singlespace}
-\noindent Median: cross-sectional median monthly net return of all funds in the same
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Active and Passive Fund Returns Removed by the Data-Error Screen}\label{tab:k_screen}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Median: cross-sectional median monthly net return of all funds in the same
 month. Rule A: $(1+r_{i,t})/(1+\tilde{r}_t) \notin [1/2, 2]$. Rule B: final return of a
 fund that disappears before the end of the sample, with
 $|\log[(1+r_{i,t})/(1+\tilde{r}_t)]| > 0.30$. Fund names abbreviated.
-\end{singlespace}\par}
+\end{singlespace}
+\end{minipage}
 \end{table}
 
 \section{Summary of construction changes}

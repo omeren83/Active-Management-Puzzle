@@ -1,22 +1,15 @@
-
-{\setlength{\tabcolsep}{3pt}\setlength{\LTpost}{0pt}\footnotesize
-\begin{longtable}[t]{lrrrr}
-\caption{\label{tab:perf_by_lipper}Aggregate Portfolio Gross Alpha by Lipper Style Class (\%, Annualised)}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\begin{tabular}{lrrrr}
 \toprule
 \multicolumn{3}{c}{ } & \multicolumn{2}{c}{Gross Alpha} \\
 \cmidrule(l{3pt}r{3pt}){4-5}
 Group & $N$ & $T$ & EW & VW\\
 \midrule
-\endfirsthead
-\caption[]{Aggregate Portfolio Gross Alpha by Lipper Style Class (\%, Annualised) \textit{(continued)}}\\
-\toprule
-Group & $N$ & $T$ & EW & VW\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\endlastfoot
 \addlinespace[0.25em]
 \multicolumn{5}{l}{\textit{Equity Income Funds}}\\
 \hspace{1em}Active & 82 & 373 & 0.412 & -0.202\\
@@ -53,6 +46,88 @@ Group & $N$ & $T$ & EW & VW\\
 \hspace{1em}Passive & 3 & 198 & -0.688 & -0.493\\
 \addlinespace[0.25em]
 \hline
+\bottomrule
+\end{tabular}%
+}
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
+\toprule
+\multicolumn{3}{c}{ } & \multicolumn{2}{c}{Gross Alpha} \\
+\cmidrule(l{3pt}r{3pt}){4-5}
+Group & $N$ & $T$ & EW & VW\\
+\midrule
+\addlinespace[0.25em]
+\multicolumn{5}{l}{\textit{Equity Income Funds}}\\
+\hspace{1em}Active & 82 & 373 & 0.412 & -0.202\\
+\hspace{1em}Passive & 3 & 110 & 0.981 & 0.064\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Large-Cap Core Funds}}\\
+\hspace{1em}Active & 259 & 373 & 0.180 & 0.595\\
+\hspace{1em}Passive & 65 & 373 & -0.292 & 0.043\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Large-Cap Growth Funds}}\\
+\hspace{1em}Active & 270 & 373 & 0.411 & 0.868\\
+\hspace{1em}Passive & 23 & 363 & 1.786$^{***}$ & 1.251$^{**}$\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Large-Cap Value Funds}}\\
+\hspace{1em}Active & 205 & 373 & -0.361 & 0.046\\
+\hspace{1em}Passive & 8 & 373 & -0.117 & -0.011\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Mid-Cap Core Funds}}\\
+\hspace{1em}Active & 130 & 373 & -0.466 & -0.646\\
+\hspace{1em}Passive & 20 & 329 & 2.543 & 2.689\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Mid-Cap Growth Funds}}\\
+\hspace{1em}Active & 116 & 373 & -0.025 & -0.086\\
+\hspace{1em}Passive & 4 & 198 & -1.456 & -1.375\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Mid-Cap Value Funds}}\\
+\hspace{1em}Active & 75 & 373 & 0.605 & 1.327\\
+\hspace{1em}Passive & 3 & 198 & -0.688 & -0.493\\
+\addlinespace[0.25em]
+\hline
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Aggregate Portfolio Gross Alpha by Lipper Style Class: Equity Income, Large-Cap and Mid-Cap (\%, Annualised)}\label{tab:perf_by_lipper}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Annualised \textcite{Carhart1997} four-factor gross alpha (\%) from regressing the monthly aggregate portfolio gross return of each (Lipper class $\times$ group) cell on the market, size, value, and momentum factors, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio; VW: lagged-TNA-weighted portfolio. Significance stars based on Newey-West $t$-statistics (6-month lag): $^{*}$, $^{**}$, $^{***}$ denote 10\%, 5\%, 1\% significance. $N$: unique funds contributing to the cell's portfolio series; $T$: number of monthly observations in the regression. Cells with fewer than 3 funds are suppressed. Gross returns are reported because gross alpha measures managerial skill before fees; fee levels differ systematically across style classes and would otherwise confound the comparison. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\end{singlespace}
+\end{minipage}
+\end{table}
+
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\begin{tabular}{lrrrr}
+\toprule
+\multicolumn{3}{c}{ } & \multicolumn{2}{c}{Gross Alpha} \\
+\cmidrule(l{3pt}r{3pt}){4-5}
+Group & $N$ & $T$ & EW & VW\\
+\midrule
 \multicolumn{5}{l}{\textit{Multi-Cap Core Funds}}\\
 \hspace{1em}Active & 329 & 373 & 0.057 & 1.785$^{*}$\\
 \hspace{1em}Passive & 32 & 373 & -0.838$^{**}$ & -0.184$^{*}$\\
@@ -91,11 +166,77 @@ Group & $N$ & $T$ & EW & VW\\
 \addlinespace[0.25em]
 \hline
 \multicolumn{5}{l}{\textit{Specialty Diversified Equity Funds}}\\
-\hspace{1em}Active & 4 & 373 & 1.691 & 3.221\\*
-\end{longtable}
+\hspace{1em}Active & 4 & 373 & 1.691 & 3.221\\
+\bottomrule
+\end{tabular}%
 }
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
+\toprule
+\multicolumn{3}{c}{ } & \multicolumn{2}{c}{Gross Alpha} \\
+\cmidrule(l{3pt}r{3pt}){4-5}
+Group & $N$ & $T$ & EW & VW\\
+\midrule
+\multicolumn{5}{l}{\textit{Multi-Cap Core Funds}}\\
+\hspace{1em}Active & 329 & 373 & 0.057 & 1.785$^{*}$\\
+\hspace{1em}Passive & 32 & 373 & -0.838$^{**}$ & -0.184$^{*}$\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Multi-Cap Growth Funds}}\\
+\hspace{1em}Active & 230 & 373 & 0.116 & -1.048\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Multi-Cap Value Funds}}\\
+\hspace{1em}Active & 227 & 373 & 0.132 & 0.165\\
+\hspace{1em}Passive & 17 & 363 & -0.508 & -0.830\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{S\&P 500 Index Funds}}\\
+\hspace{1em}Passive & 33 & 373 & 0.114 & 0.160\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{S\&P Midcap 400 Index Funds}}\\
+\hspace{1em}Passive & 10 & 373 & 0.147 & 0.046\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Small-Cap Core Funds}}\\
+\hspace{1em}Active & 289 & 373 & 0.068 & -0.200\\
+\hspace{1em}Passive & 42 & 373 & -1.182$^{**}$ & -1.444$^{***}$\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Small-Cap Growth Funds}}\\
+\hspace{1em}Active & 224 & 373 & -0.406 & -0.128\\
+\hspace{1em}Passive & 9 & 297 & -0.444 & -0.579\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Small-Cap Value Funds}}\\
+\hspace{1em}Active & 120 & 373 & 0.458 & 0.008\\
+\hspace{1em}Passive & 5 & 228 & -0.084 & -0.445\\
+\addlinespace[0.25em]
+\hline
+\multicolumn{5}{l}{\textit{Specialty Diversified Equity Funds}}\\
+\hspace{1em}Active & 4 & 373 & 1.691 & 3.221\\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Aggregate Portfolio Gross Alpha by Lipper Style Class: Multi-Cap, Small-Cap, Index and Specialty (\%, Annualised)}\label{tab:perf_by_lipper_2}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
-Annualised \textcite{Carhart1997} four-factor gross alpha (\%) from regressing the monthly aggregate portfolio gross return of each (Lipper class $\times$ group) cell on the market, size, value, and momentum factors, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio; VW: lagged-TNA-weighted portfolio. Significance stars based on Newey-West $t$-statistics (6-month lag): $^{*}$, $^{**}$, $^{***}$ denote 10\%, 5\%, 1\% significance. $N$: unique funds contributing to the cell's portfolio series; $T$: number of monthly observations in the regression. Cells with fewer than 3 funds are suppressed. Gross returns are reported because gross alpha measures managerial skill before fees; fee levels differ systematically across style classes and would otherwise confound the comparison. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+Construction, columns and notation as in Table~\ref{tab:perf_by_lipper}.
 \end{singlespace}
-\vspace*{36pt}
+\end{minipage}
+\end{table}
 

@@ -1,20 +1,13 @@
-
-{\setlength{\tabcolsep}{2pt}\setlength{\LTpost}{0pt}\footnotesize
-\captionsetup{font=normalsize}\begin{longtable}[t]{lrrrrrrrr}
-\caption{\label{tab:port_size_alpha}Alpha and Factor Loadings by Size Quintile (\%, Annualised)}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular}{lrrrrrrrr}
 \toprule
 Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
 \midrule
-\endfirsthead
-\caption[]{Alpha and Factor Loadings by Size Quintile (\%, Annualised) \textit{(continued)}}\\
-\toprule
-Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\endlastfoot
 \addlinespace[0.3em]
 \multicolumn{9}{l}{Active --- EW}\\
 \hspace{1em}Q1 (Small) & 0.047 & -0.310 & -0.108 & 0.934$^{***}$ & 0.131$^{**}$ & 0.213$^{***}$ & -0.024 & 0.959\\
@@ -46,6 +39,79 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}t(coef) & (-0.27) & (-0.02) & (-0.32) & (3.11) & (-3.43) & (-6.48) & (1.09) & \\
 \addlinespace[0.3em]
 \hline
+\bottomrule
+\end{tabular}%
+}
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{9}{l}{Active --- EW}\\
+\hspace{1em}Q1 (Small) & 0.047 & -0.310 & -0.108 & 0.934$^{***}$ & 0.131$^{**}$ & 0.213$^{***}$ & -0.024 & 0.959\\
+\hspace{1em}t(coef) & (0.05) & (-0.55) & (-0.17) & (61.91) & (2.27) & (5.83) & (-0.81) & \\
+\hspace{1em}Q2 & 0.025 & -0.113 & -0.187 & 0.969$^{***}$ & 0.186$^{***}$ & 0.165$^{***}$ & 0.009 & 0.971\\
+\hspace{1em}t(coef) & (0.03) & (-0.22) & (-0.33) & (68.05) & (5.95) & (5.18) & (0.38) & \\
+\hspace{1em}Q3 & 0.534 & 0.475 & 0.316 & 0.983$^{***}$ & 0.190$^{***}$ & 0.139$^{***}$ & 0.019 & 0.976\\
+\hspace{1em}t(coef) & (0.70) & (0.99) & (0.59) & (80.09) & (7.95) & (5.48) & (1.01) & \\
+\hspace{1em}Q4 & -0.078 & -0.021 & -0.055 & 1.006$^{***}$ & 0.159$^{***}$ & 0.068$^{***}$ & 0.004 & 0.976\\
+\hspace{1em}t(coef) & (-0.13) & (-0.04) & (-0.11) & (85.87) & (6.01) & (3.53) & (0.27) & \\
+\hspace{1em}Q5 (Large) & -0.210 & -0.299 & -0.273 & 0.987$^{***}$ & 0.050$^{***}$ & 0.064$^{***}$ & -0.003 & 0.984\\
+\hspace{1em}t(coef) & (-0.51) & (-0.82) & (-0.67) & (99.11) & (3.31) & (4.31) & (-0.24) & \\
+\hspace{1em}Q5$-$Q1 & -0.258 & 0.011 & -0.165 & 0.053$^{***}$ & -0.081$^{*}$ & -0.149$^{***}$ & 0.021 & 0.428\\
+\hspace{1em}t(coef) & (-0.37) & (0.02) & (-0.38) & (5.30) & (-1.71) & (-6.09) & (1.00) & \\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Active --- VW}\\
+\hspace{1em}Q1 (Small) & 0.323 & 0.003 & 0.130 & 0.940$^{***}$ & 0.147$^{***}$ & 0.210$^{***}$ & -0.015 & 0.961\\
+\hspace{1em}t(coef) & (0.32) & (0.01) & (0.20) & (62.60) & (2.93) & (5.38) & (-0.56) & \\
+\hspace{1em}Q2 & 0.068 & -0.073 & -0.112 & 0.972$^{***}$ & 0.179$^{***}$ & 0.161$^{***}$ & 0.005 & 0.971\\
+\hspace{1em}t(coef) & (0.08) & (-0.15) & (-0.19) & (63.24) & (5.38) & (5.34) & (0.21) & \\
+\hspace{1em}Q3 & 0.520 & 0.441 & 0.369 & 0.979$^{***}$ & 0.181$^{***}$ & 0.138$^{***}$ & 0.009 & 0.976\\
+\hspace{1em}t(coef) & (0.68) & (0.93) & (0.71) & (79.74) & (7.61) & (5.78) & (0.52) & \\
+\hspace{1em}Q4 & -0.220 & -0.160 & -0.166 & 1.007$^{***}$ & 0.150$^{***}$ & 0.060$^{***}$ & 0.001 & 0.975\\
+\hspace{1em}t(coef) & (-0.37) & (-0.32) & (-0.32) & (85.16) & (5.91) & (3.03) & (0.05) & \\
+\hspace{1em}Q5 (Large) & 0.081 & -0.006 & -0.052 & 0.978$^{***}$ & 0.001 & 0.039$^{***}$ & 0.005 & 0.984\\
+\hspace{1em}t(coef) & (0.19) & (-0.02) & (-0.12) & (94.64) & (0.09) & (2.60) & (0.39) & \\
+\hspace{1em}Q5$-$Q1 & -0.242 & -0.010 & -0.182 & 0.038$^{***}$ & -0.146$^{***}$ & -0.171$^{***}$ & 0.021 & 0.466\\
+\hspace{1em}t(coef) & (-0.27) & (-0.02) & (-0.32) & (3.11) & (-3.43) & (-6.48) & (1.09) & \\
+\addlinespace[0.3em]
+\hline
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Alpha and Factor Loadings by Size Quintile, Active Funds (\%, Annualised)}\label{tab:port_size_alpha}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualised ($\times 12$, \%). Q5$-$Q1: long-short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx. Size sorted monthly on $\log(\text{TNA}_{t-1})$; Q1 = smallest.
+\end{singlespace}
+\end{minipage}
+\end{table}
+
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
 \multicolumn{9}{l}{Passive --- EW}\\
 \hspace{1em}Q1 (Small) & 0.984 & 0.655 & 1.108 & 1.004$^{***}$ & 0.155$^{***}$ & 0.203$^{***}$ & -0.054$^{***}$ & 0.957\\
 \hspace{1em}t(coef) & (0.84) & (0.93) & (1.47) & (65.29) & (2.58) & (8.15) & (-2.89) & \\
@@ -73,11 +139,64 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}Q5 (Large) & 0.193 & -0.099 & 0.129 & 0.994$^{***}$ & -0.121$^{***}$ & 0.042$^{***}$ & -0.027$^{***}$ & 0.993\\
 \hspace{1em}t(coef) & (0.61) & (-0.53) & (0.64) & (157.82) & (-6.41) & (5.40) & (-2.60) & \\
 \hspace{1em}Q5$-$Q1 & -0.572 & -0.566 & -0.514 & -0.022 & -0.243$^{***}$ & -0.142$^{***}$ & -0.006 & 0.502\\
-\hspace{1em}t(coef) & (-0.60) & (-0.98) & (-0.93) & (-1.59) & (-6.03) & (-7.10) & (-0.43) & \\*
-\end{longtable}
+\hspace{1em}t(coef) & (-0.60) & (-0.98) & (-0.93) & (-1.59) & (-6.03) & (-7.10) & (-0.43) & \\
+\bottomrule
+\end{tabular}%
 }
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
+\multicolumn{9}{l}{Passive --- EW}\\
+\hspace{1em}Q1 (Small) & 0.984 & 0.655 & 1.108 & 1.004$^{***}$ & 0.155$^{***}$ & 0.203$^{***}$ & -0.054$^{***}$ & 0.957\\
+\hspace{1em}t(coef) & (0.84) & (0.93) & (1.47) & (65.29) & (2.58) & (8.15) & (-2.89) & \\
+\hspace{1em}Q2 & -0.516 & -0.746$^{*}$ & -0.530 & 0.985$^{***}$ & 0.122$^{***}$ & 0.154$^{***}$ & -0.026 & 0.971\\
+\hspace{1em}t(coef) & (-0.69) & (-1.66) & (-1.08) & (68.23) & (3.68) & (8.90) & (-1.32) & \\
+\hspace{1em}Q3 & -0.531 & -0.372 & -0.408 & 1.006$^{***}$ & 0.208$^{***}$ & 0.053$^{***}$ & 0.004 & 0.977\\
+\hspace{1em}t(coef) & (-1.00) & (-0.93) & (-1.03) & (74.25) & (7.03) & (3.31) & (0.43) & \\
+\hspace{1em}Q4 & -0.217 & -0.382 & -0.271 & 1.014$^{***}$ & 0.039 & 0.085$^{***}$ & -0.013 & 0.987\\
+\hspace{1em}t(coef) & (-0.55) & (-1.00) & (-0.76) & (148.75) & (1.37) & (4.98) & (-1.29) & \\
+\hspace{1em}Q5 (Large) & -0.004 & -0.305 & -0.110 & 1.007$^{***}$ & -0.075$^{***}$ & 0.073$^{***}$ & -0.023$^{**}$ & 0.988\\
+\hspace{1em}t(coef) & (-0.01) & (-1.16) & (-0.43) & (122.91) & (-2.72) & (7.09) & (-1.99) & \\
+\hspace{1em}Q5$-$Q1 & -0.988 & -0.960 & -1.219$^{*}$ & 0.003 & -0.230$^{***}$ & -0.130$^{***}$ & 0.031$^{**}$ & 0.426\\
+\hspace{1em}t(coef) & (-0.93) & (-1.40) & (-1.76) & (0.19) & (-5.89) & (-5.76) & (2.12) & \\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Passive --- VW}\\
+\hspace{1em}Q1 (Small) & 0.764 & 0.467 & 0.643 & 1.016$^{***}$ & 0.122$^{**}$ & 0.184$^{***}$ & -0.021 & 0.963\\
+\hspace{1em}t(coef) & (0.76) & (0.72) & (1.00) & (72.33) & (2.20) & (7.86) & (-1.20) & \\
+\hspace{1em}Q2 & -0.559 & -0.785 & -0.602 & 0.982$^{***}$ & 0.122$^{***}$ & 0.154$^{***}$ & -0.022 & 0.968\\
+\hspace{1em}t(coef) & (-0.71) & (-1.60) & (-1.14) & (60.35) & (3.82) & (8.21) & (-1.11) & \\
+\hspace{1em}Q3 & -0.543 & -0.435 & -0.447 & 1.009$^{***}$ & 0.172$^{***}$ & 0.053$^{***}$ & 0.001 & 0.972\\
+\hspace{1em}t(coef) & (-1.08) & (-1.06) & (-1.10) & (68.57) & (4.36) & (3.09) & (0.13) & \\
+\hspace{1em}Q4 & -0.089 & -0.253 & -0.160 & 1.016$^{***}$ & 0.031 & 0.081$^{***}$ & -0.011 & 0.987\\
+\hspace{1em}t(coef) & (-0.24) & (-0.72) & (-0.50) & (150.00) & (1.12) & (5.08) & (-1.07) & \\
+\hspace{1em}Q5 (Large) & 0.193 & -0.099 & 0.129 & 0.994$^{***}$ & -0.121$^{***}$ & 0.042$^{***}$ & -0.027$^{***}$ & 0.993\\
+\hspace{1em}t(coef) & (0.61) & (-0.53) & (0.64) & (157.82) & (-6.41) & (5.40) & (-2.60) & \\
+\hspace{1em}Q5$-$Q1 & -0.572 & -0.566 & -0.514 & -0.022 & -0.243$^{***}$ & -0.142$^{***}$ & -0.006 & 0.502\\
+\hspace{1em}t(coef) & (-0.60) & (-0.98) & (-0.93) & (-1.59) & (-6.03) & (-7.10) & (-0.43) & \\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Alpha and Factor Loadings by Size Quintile, Passive Funds (\%, Annualised)}\label{tab:port_size_alpha_passive}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
-Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualised ($\times 12$, \%). Q5$-$Q1: long-short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx. Size sorted monthly on $\log(\text{TNA}_{t-1})$; Q1 = smallest.
-\end{singlespace}\par\vspace{24pt}
-
+Construction, columns and notation as in Table~\ref{tab:port_size_alpha}.
+\end{singlespace}
+\end{minipage}
+\end{table}
 

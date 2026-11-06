@@ -1,20 +1,13 @@
-
-{\setlength{\tabcolsep}{4pt}\setlength{\LTpost}{0pt}\footnotesize
-\begin{longtable}[t]{lrrrrrrrrr}
-\caption{\label{tab:activeness_persistence}Activeness-Conditioned Persistence Test}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{4pt}%
+\begin{tabular}{lrrrrrrrrr}
 \toprule
 Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p_B$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$ & ExpR\\
 \midrule
-\endfirsthead
-\caption[]{Activeness-Conditioned Persistence Test \textit{(continued)}}\\
-\toprule
-Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p_B$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$ & ExpR\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\endlastfoot
 \addlinespace[0.3em]
 \multicolumn{10}{l}{\textit{Panel T1: Lowest activeness tercile (lowest formation $1-R^2$)}}\\
 \hspace{1em}D1 (High) & -0.192$^{**}$ & (-2.55) & 0.016 & 0.989$^{***}$ & 0.241$^{***}$ & -0.001 & -0.097$^{***}$ & 0.988 & 0.97\\
@@ -55,11 +48,77 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p_B$ & $\beta_{\text{MKT}}$ & $\b
 \hspace{1em}D8 & -0.012 & (-0.16) & 0.418 & 0.929$^{***}$ & 0.318$^{***}$ & 0.054$^{**}$ & 0.091$^{***}$ & 0.980 & 1.20\\
 \hspace{1em}D9 & -0.025 & (-0.24) & 0.436 & 0.936$^{***}$ & 0.313$^{***}$ & 0.072 & 0.086$^{***}$ & 0.967 & 1.30\\
 \hspace{1em}D10 (Low) & -0.221$^{*}$ & (-1.90) & 0.056 & 0.943$^{***}$ & 0.197$^{***}$ & 0.143$^{**}$ & 0.104$^{***}$ & 0.961 & 1.23\\
-\hspace{1em}D1$-$D10 & 0.259$^{*}$ & (1.71) & 0.083 & -0.043 & 0.109$^{***}$ & -0.125 & -0.148$^{**}$ & 0.181 & --\\*
-\end{longtable}
+\hspace{1em}D1$-$D10 & 0.259$^{*}$ & (1.71) & 0.083 & -0.043 & 0.109$^{***}$ & -0.125 & -0.148$^{**}$ & 0.181 & --\\
+\bottomrule
+\end{tabular}%
 }
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{4pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrrr}
+\toprule
+Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p_B$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$ & ExpR\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{10}{l}{\textit{Panel T1: Lowest activeness tercile (lowest formation $1-R^2$)}}\\
+\hspace{1em}D1 (High) & -0.192$^{**}$ & (-2.55) & 0.016 & 0.989$^{***}$ & 0.241$^{***}$ & -0.001 & -0.097$^{***}$ & 0.988 & 0.97\\
+\hspace{1em}D2 & -0.059 & (-0.93) & 0.202 & 1.009$^{***}$ & 0.124$^{***}$ & 0.022 & 0.002 & 0.992 & 0.90\\
+\hspace{1em}D3 & -0.148$^{**}$ & (-2.25) & 0.024 & 0.979$^{***}$ & 0.169$^{***}$ & 0.073$^{***}$ & -0.040 & 0.989 & 0.91\\
+\hspace{1em}D4 & -0.116$^{*}$ & (-1.96) & 0.049 & 0.980$^{***}$ & 0.208$^{***}$ & 0.115$^{***}$ & -0.010 & 0.993 & 0.92\\
+\hspace{1em}D5 & -0.080 & (-1.25) & 0.132 & 1.009$^{***}$ & 0.142$^{***}$ & 0.129$^{**}$ & 0.004 & 0.986 & 0.93\\
+\hspace{1em}D6 & -0.079 & (-1.42) & 0.119 & 0.984$^{***}$ & 0.186$^{***}$ & 0.220$^{***}$ & 0.015 & 0.992 & 0.87\\
+\hspace{1em}D7 & -0.048 & (-0.59) & 0.302 & 1.016$^{***}$ & 0.088$^{*}$ & 0.152$^{**}$ & 0.013 & 0.981 & 0.90\\
+\hspace{1em}D8 & -0.049 & (-0.58) & 0.283 & 0.989$^{***}$ & 0.095$^{***}$ & 0.181$^{***}$ & 0.010 & 0.985 & 0.90\\
+\hspace{1em}D9 & -0.079 & (-0.98) & 0.170 & 1.005$^{***}$ & 0.111$^{**}$ & 0.181$^{***}$ & 0.026 & 0.986 & 0.90\\
+\hspace{1em}D10 (Low) & -0.113 & (-1.61) & 0.069 & 0.962$^{***}$ & 0.094$^{***}$ & 0.213$^{***}$ & 0.031 & 0.987 & 0.98\\
+\hspace{1em}D1$-$D10 & -0.079 & (-1.55) & 0.095 & 0.027 & 0.147$^{***}$ & -0.214$^{***}$ & -0.128$^{***}$ & 0.618 & --\\
+\addlinespace[0.3em]
+\hline
+\multicolumn{10}{l}{\textit{Panel T2: Middle activeness tercile}}\\
+\hspace{1em}D1 (High) & -0.024 & (-0.42) & 0.399 & 0.972$^{***}$ & 0.263$^{***}$ & 0.015 & -0.074$^{***}$ & 0.982 & 1.04\\
+\hspace{1em}D2 & -0.110 & (-1.49) & 0.102 & 0.964$^{***}$ & 0.250$^{***}$ & 0.040 & -0.039$^{*}$ & 0.982 & 1.06\\
+\hspace{1em}D3 & -0.040 & (-0.60) & 0.310 & 0.958$^{***}$ & 0.289$^{***}$ & 0.132$^{***}$ & -0.036$^{*}$ & 0.984 & 1.04\\
+\hspace{1em}D4 & -0.104 & (-1.22) & 0.147 & 0.942$^{***}$ & 0.221$^{***}$ & 0.098$^{**}$ & 0.033 & 0.983 & 1.04\\
+\hspace{1em}D5 & 0.023 & (0.33) & 0.350 & 0.958$^{***}$ & 0.252$^{***}$ & 0.131$^{***}$ & 0.006 & 0.979 & 1.10\\
+\hspace{1em}D6 & -0.036 & (-0.48) & 0.329 & 0.964$^{***}$ & 0.259$^{***}$ & 0.163$^{***}$ & 0.058$^{***}$ & 0.989 & 1.09\\
+\hspace{1em}D7 & -0.007 & (-0.17) & 0.448 & 0.962$^{***}$ & 0.249$^{***}$ & 0.110$^{***}$ & 0.036$^{**}$ & 0.987 & 1.06\\
+\hspace{1em}D8 & -0.061 & (-1.24) & 0.167 & 0.969$^{***}$ & 0.215$^{***}$ & 0.114$^{***}$ & 0.055$^{***}$ & 0.986 & 1.03\\
+\hspace{1em}D9 & -0.021 & (-0.40) & 0.352 & 0.980$^{***}$ & 0.210$^{***}$ & 0.108$^{**}$ & 0.057$^{***}$ & 0.985 & 1.06\\
+\hspace{1em}D10 (Low) & -0.136$^{*}$ & (-1.74) & 0.067 & 1.014$^{***}$ & 0.235$^{***}$ & 0.121$^{*}$ & 0.035 & 0.978 & 1.19\\
+\hspace{1em}D1$-$D10 & 0.113 & (1.27) & 0.125 & -0.042 & 0.028 & -0.106 & -0.109$^{***}$ & 0.167 & --\\
+\addlinespace[0.3em]
+\hline
+\multicolumn{10}{l}{\textit{Panel T3: Highest activeness tercile (highest formation $1-R^2$)}}\\
+\hspace{1em}D1 (High) & 0.039 & (0.62) & 0.297 & 0.899$^{***}$ & 0.306$^{***}$ & 0.018 & -0.043$^{*}$ & 0.977 & 1.23\\
+\hspace{1em}D2 & 0.018 & (0.31) & 0.388 & 0.930$^{***}$ & 0.352$^{***}$ & 0.022 & 0.039$^{***}$ & 0.976 & 1.23\\
+\hspace{1em}D3 & 0.097 & (1.52) & 0.098 & 0.968$^{***}$ & 0.277$^{***}$ & -0.002 & 0.075$^{***}$ & 0.973 & 1.16\\
+\hspace{1em}D4 & -0.047 & (-0.44) & 0.365 & 0.937$^{***}$ & 0.334$^{***}$ & -0.063 & 0.093$^{***}$ & 0.975 & 1.18\\
+\hspace{1em}D5 & -0.141$^{**}$ & (-2.10) & 0.034 & 0.899$^{***}$ & 0.379$^{***}$ & -0.051 & 0.084$^{**}$ & 0.967 & 1.26\\
+\hspace{1em}D6 & -0.097 & (-1.29) & 0.122 & 0.911$^{***}$ & 0.338$^{***}$ & 0.053 & 0.063$^{**}$ & 0.972 & 1.15\\
+\hspace{1em}D7 & -0.074 & (-0.83) & 0.254 & 0.894$^{***}$ & 0.325$^{***}$ & -0.016 & 0.108$^{***}$ & 0.961 & 1.26\\
+\hspace{1em}D8 & -0.012 & (-0.16) & 0.418 & 0.929$^{***}$ & 0.318$^{***}$ & 0.054$^{**}$ & 0.091$^{***}$ & 0.980 & 1.20\\
+\hspace{1em}D9 & -0.025 & (-0.24) & 0.436 & 0.936$^{***}$ & 0.313$^{***}$ & 0.072 & 0.086$^{***}$ & 0.967 & 1.30\\
+\hspace{1em}D10 (Low) & -0.221$^{*}$ & (-1.90) & 0.056 & 0.943$^{***}$ & 0.197$^{***}$ & 0.143$^{**}$ & 0.104$^{***}$ & 0.961 & 1.23\\
+\hspace{1em}D1$-$D10 & 0.259$^{*}$ & (1.71) & 0.083 & -0.043 & 0.109$^{***}$ & -0.125 & -0.148$^{**}$ & 0.181 & --\\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Activeness-Conditioned Persistence Test}\label{tab:activeness_persistence}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
 Activeness-conditioned persistence test: $10 \times 3$ bivariate sort. At each cohort ranking date, active funds that report a return in the ranking month are sorted into three terciles by formation-period $1 - R^2$ from a 36-month \textcite{Carhart1997} four-factor regression (T1 = lowest activeness, T3 = highest), and within each tercile into ten deciles by formation-period alpha $t$-statistic (Newey-West, 3-month lag). D1 contains the highest-ranked funds, D10 the lowest. Equal-weighted holding-period (12-month) gross excess returns are pooled across the seven non-overlapping cohorts of Table~\ref{tab:persistence} (holding years 1998, 2002, 2006, 2010, 2014, 2018, 2022) and regressed on the \textcite{Carhart1997} four factors with Newey-West $t$-statistics (12-month lag). $\hat{\alpha}$: monthly, \%. $p_B$: one-tailed bootstrap $p$-value in the direction of the observed $t$-statistic, from the residual bootstrap of \textcite{FamaFrench2010} applied to the pooled cell regressions as in Table~\ref{tab:persistence}: each series has its estimated alpha removed, pooled months are resampled jointly across all 33 series (10,000 draws), and the Newey-West $t$ is re-estimated. ExpR: mean expense ratio (\%) of cell constituents, averaged across cohorts. D1$-$D10 is the within-tercile long-short spread. Significance stars on $\hat{\alpha}$ and factor loadings reflect Newey-West $t$-statistics: $^{*}$, $^{**}$, $^{***}$ at 10\%, 5\%, 1\%. The activeness measure is the formation-window $1 - R^2$ following \textcite{AmihudGoyenko2013}; tercile breakpoints are computed within each cohort to avoid look-ahead contamination. Sample: active funds in the \textcite{Evans2010}-corrected panel\_incubation, formation and holding windows Jan 1995--Dec 2022; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{singlespace}\par\vspace{24pt}
-
+\end{singlespace}
+\end{minipage}
+\end{table}
 

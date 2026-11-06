@@ -1,27 +1,16 @@
-\begingroup\fontsize{9}{11}\selectfont
-
-\begin{ThreePartTable}
-\begin{TableNotes}
-\item Same sample, dependent variable, and rank construction as Table~\ref{tab:H4_regression}. Year-month fixed effects absorb all time-aggregate variation (including sentiment main effects, market-wide flow waves, and risk-on/risk-off cycles) but leave both within- and between-style cross-fund variation in expense ratios available for identification. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
-\end{TableNotes}
-\setlength{\tabcolsep}{3pt}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrr}
-\caption{\label{tab:H4_robustness}H4 Robustness --- Year-Month-Only Fixed Effects}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular}{lrrrr}
 \toprule
 \multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
 \cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
 Variable & (1) & (2) & (3) & (4)\\
 \midrule
-\endfirsthead
-\caption[]{H4 Robustness --- Year-Month-Only Fixed Effects \textit{(continued)}}\\
-\toprule
-Variable & (1) & (2) & (3) & (4)\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\insertTableNotes
-\endlastfoot
 $R^{\text{LOW}}$ & 0.0373*** & 0.0483*** & 0.0408*** & 0.0437***\\
  & (10.25) & (4.09) & (3.97) & (4.00)\\
 $R^{\text{MID}}$ & 0.0174*** & 0.0192*** & 0.0197*** & 0.0186***\\
@@ -68,7 +57,86 @@ Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 321,089 & 321,089 & 321,089 & 321,089\\
 $R^2$ (within) & 0.031 & 0.031 & 0.031 & 0.031\\
 Joint test ($\chi^2_4$, $p$) & -- & 6.18 (0.186) & 3.43 (0.489) & 2.78 (0.595)\\
-Headline ($z$, 1-sided $p$) & -- & z=-1.66 (p=0.952) & z=-0.93 (p=0.825) & z=-0.30 (p=0.617)\\*
-\end{longtable}
-\end{ThreePartTable}
-\endgroup{}
+Headline ($z$, 1-sided $p$) & -- & -1.66 (0.952) & -0.93 (0.825) & -0.30 (0.617)\\
+\bottomrule
+\end{tabular}%
+}
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\renewcommand{\arraystretch}{0.87}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
+\toprule
+\multicolumn{1}{c}{ } & \multicolumn{1}{c}{Baseline} & \multicolumn{1}{c}{$D^{\text{SENT}}$} & \multicolumn{1}{c}{$\text{SENT}^\perp$} & \multicolumn{1}{c}{$D^{\text{AAII}}$} \\
+\cmidrule(l{3pt}r{3pt}){2-2} \cmidrule(l{3pt}r{3pt}){3-3} \cmidrule(l{3pt}r{3pt}){4-4} \cmidrule(l{3pt}r{3pt}){5-5}
+Variable & (1) & (2) & (3) & (4)\\
+\midrule
+$R^{\text{LOW}}$ & 0.0373*** & 0.0483*** & 0.0408*** & 0.0437***\\
+ & (10.25) & (4.09) & (3.97) & (4.00)\\
+$R^{\text{MID}}$ & 0.0174*** & 0.0192*** & 0.0197*** & 0.0186***\\
+ & (18.65) & (8.29) & (9.01) & (8.10)\\
+$R^{\text{HIGH}}$ & 0.0886*** & 0.0680*** & 0.0561*** & 0.0596***\\
+ & (17.36) & (5.21) & (4.72) & (4.76)\\
+Expense ratio & -0.0039*** & -0.0026 & -0.0035** & -0.0034**\\
+ & (-5.58) & (-1.58) & (-2.28) & (-2.11)\\
+$R^{\text{LOW}}\times$ Exp.\ ratio &  & -0.0071 & -0.0029 & -0.0029\\
+ &  & (-0.75) & (-0.35) & (-0.33)\\
+$R^{\text{MID}}\times$ Exp.\ ratio &  & -0.0015 & -0.0022 & -0.0025\\
+ &  & (-0.74) & (-1.15) & (-1.21)\\
+$R^{\text{HIGH}}\times$ Exp.\ ratio &  & 0.0228* & 0.0302*** & 0.0239**\\
+ &  & (1.96) & (2.86) & (2.18)\\
+$R^{\text{LOW}}\times$ Sent. &  & -0.0333* & -0.0139* & -0.0133\\
+ &  & (-1.88) & (-1.82) & (-0.97)\\
+$R^{\text{MID}}\times$ Sent. &  & 0.0022 & 0.0009 & 0.0039\\
+ &  & (0.58) & (0.56) & (1.07)\\
+$R^{\text{HIGH}}\times$ Sent. &  & -0.0521** & -0.0201** & -0.0091\\
+ &  & (-2.43) & (-1.96) & (-0.47)\\
+Exp.\ ratio $\times$ Sent. &  & -0.0039* & -0.0010 & -0.0005\\
+ &  & (-1.66) & (-0.93) & (-0.30)\\
+$R^{\text{LOW}}\times$ Exp.\ $\times$ Sent. &  & 0.0188 & 0.0071 & 0.0005\\
+ &  & (1.27) & (1.12) & (0.05)\\
+$R^{\text{MID}}\times$ Exp.\ $\times$ Sent. &  & -0.0030 & -0.0015 & 0.0015\\
+ &  & (-0.94) & (-1.05) & (0.44)\\
+$R^{\text{HIGH}}\times$ Exp.\ $\times$ Sent. &  & 0.0326* & 0.0135 & 0.0213\\
+ &  & (1.68) & (1.43) & (1.15)\\
+$\log(\text{TNA})$ & -0.0002* & -0.0003** & -0.0003** & -0.0003**\\
+ & (-1.92) & (-2.06) & (-2.06) & (-2.05)\\
+$\log(\text{Age})$ & -0.0051*** & -0.0050*** & -0.0050*** & -0.0050***\\
+ & (-15.06) & (-14.99) & (-15.00) & (-14.98)\\
+Load dummy & 0.0006 & 0.0006 & 0.0006 & 0.0006\\
+ & (1.29) & (1.39) & (1.37) & (1.39)\\
+Return volatility & -0.1096*** & -0.1112*** & -0.1120*** & -0.1125***\\
+ & (-5.37) & (-5.47) & (-5.49) & (-5.52)\\
+Turnover & -0.0000 & -0.0000 & -0.0000 & -0.0000\\
+ & (-1.51) & (-1.55) & (-1.55) & (-1.53)\\
+Style flow & 0.0995*** & 0.0995*** & 0.0994*** & 0.0996***\\
+ & (4.40) & (4.40) & (4.40) & (4.40)\\
+\midrule
+FE: year-month & Yes & Yes & Yes & Yes\\
+Cluster (fund, month) & Yes & Yes & Yes & Yes\\
+$N$ & 321,089 & 321,089 & 321,089 & 321,089\\
+$R^2$ (within) & 0.031 & 0.031 & 0.031 & 0.031\\
+Joint test ($\chi^2_4$, $p$) & -- & 6.18 (0.186) & 3.43 (0.489) & 2.78 (0.595)\\
+Headline ($z$, 1-sided $p$) & -- & -1.66 (0.952) & -0.93 (0.825) & -0.30 (0.617)\\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{H4 Robustness --- Year-Month-Only Fixed Effects}\label{tab:H4_robustness}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Same sample, dependent variable, and rank construction as Table~\ref{tab:H4_regression}. Year-month fixed effects absorb all time-aggregate variation (including sentiment main effects, market-wide flow waves, and risk-on/risk-off cycles) but leave both within- and between-style cross-fund variation in expense ratios available for identification. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\end{singlespace}
+\end{minipage}
+\end{table}
+

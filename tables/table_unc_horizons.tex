@@ -1,9 +1,9 @@
-\begin{table}[H]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
 \centering
+\sbox{\tabletempbox}{%
 \footnotesize
-\caption{Uncertainty Horse Race Across Forecast Horizons}
-\label{tab:unc_horizons}
-\resizebox{\linewidth}{!}{%
+\setlength{\tabcolsep}{4pt}%
 \begin{tabular}{llccccc}
 \toprule
 Hyp. & State & $h$ & $S$ terms, with $U$ & $U$ terms, with $S$ & $U$ terms, alone & Headline $z$, with $U$ \\
@@ -21,10 +21,22 @@ H2 & $D^{\text{MD,Det}}$ & 1 & 16.38 ($<$0.001) & 4.95 (0.176) & 7.74 (0.052) & 
  &  & 3 & 16.82 ($<$0.001) & 3.54 (0.316) & 6.17 (0.104) & +2.07 (0.981) \\
  &  & 12 & 15.63 (0.001) & 6.75 (0.080) & 10.36 (0.016) & +2.00 (0.977) \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
 }
-\end{table}
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Uncertainty Horse Race Across Forecast Horizons}\label{tab:unc_horizons}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
 $h$: forecast horizon (months) of the uncertainty index. Columns report joint $\chi^2_3$ tests ($p$-values in parentheses) of the behavioral interactions $R^q\times S$ and of the uncertainty interactions $R^q\times U$ in the joint model, of $R^q\times U$ in a model without $S$, and the headline statistic in the joint model (see Table~\ref{tab:unc_summary}). Sample: active funds, \textcite{Evans2010}-corrected panel, December excluded, lagged TNA of at least USD 5 million; one common sample of 323,623 fund-months (2,313 funds, 307 months) in which all state variables and all uncertainty horizons are available. Uncertainty: \textcite{JuradoLudvigsonNg2015} macroeconomic uncertainty (FRED JLNUM1M, JLNUM3M, JLNUM12M); $D^{\text{UNC}}$ is 1 when the index is in its top 34\%, and the continuous index is standardised within the sample. Specification as the H1/H2 primary tables: contemporaneous states, fund fixed effects, controls as in Table~\ref{tab:H1_regression}, standard errors two-way clustered on fund and calendar month.
 \end{singlespace}
+\end{minipage}
+\end{table}
 

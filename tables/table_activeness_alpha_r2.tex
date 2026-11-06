@@ -1,20 +1,13 @@
-
-{\setlength{\tabcolsep}{2pt}\setlength{\LTpost}{0pt}\footnotesize
-\captionsetup{font=normalsize}\begin{longtable}[t]{lrrrrrrrr}
-\caption{\label{tab:activeness_alpha_r2}Alpha and Factor Loadings by Activeness Quintile ($1-R^2$, \%, Annualised)}\\
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular}{lrrrrrrrr}
 \toprule
 Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
 \midrule
-\endfirsthead
-\caption[]{Alpha and Factor Loadings by Activeness Quintile ($1-R^2$, \%, Annualised) \textit{(continued)}}\\
-\toprule
-Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\endlastfoot
 \addlinespace[0.3em]
 \multicolumn{9}{l}{Panel A: Active --- EW Gross}\\
 \hspace{1em}Q1 (Closet Indexer) & -0.774 & -0.943$^{**}$ & -0.763$^{*}$ & 0.997$^{***}$ & 0.069$^{***}$ & 0.101$^{***}$ & -0.023$^{**}$ & 0.989\\
@@ -46,6 +39,79 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}t(coef) & (1.19) & (1.28) & (1.00) & (-2.22) & (1.50) & (0.66) & (1.26) & \\
 \addlinespace[0.3em]
 \hline
+\bottomrule
+\end{tabular}%
+}
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{9}{l}{Panel A: Active --- EW Gross}\\
+\hspace{1em}Q1 (Closet Indexer) & -0.774 & -0.943$^{**}$ & -0.763$^{*}$ & 0.997$^{***}$ & 0.069$^{***}$ & 0.101$^{***}$ & -0.023$^{**}$ & 0.989\\
+\hspace{1em}t(coef) & (-1.41) & (-2.40) & (-1.90) & (105.72) & (3.52) & (5.96) & (-2.11) & \\
+\hspace{1em}Q2 & -0.423 & -0.546 & -0.472 & 0.993$^{***}$ & 0.175$^{***}$ & 0.129$^{***}$ & -0.010 & 0.982\\
+\hspace{1em}t(coef) & (-0.61) & (-1.19) & (-0.98) & (82.15) & (8.08) & (6.43) & (-0.75) & \\
+\hspace{1em}Q3 & 0.391 & 0.253 & 0.267 & 0.972$^{***}$ & 0.202$^{***}$ & 0.151$^{***}$ & -0.002 & 0.975\\
+\hspace{1em}t(coef) & (0.48) & (0.50) & (0.51) & (74.45) & (7.40) & (5.51) & (-0.10) & \\
+\hspace{1em}Q4 & 0.521 & 0.474 & 0.403 & 0.974$^{***}$ & 0.229$^{***}$ & 0.122$^{***}$ & 0.009 & 0.966\\
+\hspace{1em}t(coef) & (0.53) & (0.73) & (0.59) & (68.41) & (6.68) & (3.49) & (0.46) & \\
+\hspace{1em}Q5 (Most Active) & 1.035 & 0.964 & 0.846 & 0.902$^{***}$ & 0.241$^{***}$ & 0.142$^{***}$ & 0.015 & 0.957\\
+\hspace{1em}t(coef) & (0.89) & (1.26) & (1.11) & (57.09) & (7.11) & (3.28) & (0.65) & \\
+\hspace{1em}Q5$-$Q1 & 1.810$^{*}$ & 1.906$^{**}$ & 1.609$^{**}$ & -0.095$^{***}$ & 0.172$^{***}$ & 0.040 & 0.039$^{*}$ & 0.337\\
+\hspace{1em}t(coef) & (1.73) & (2.21) & (2.00) & (-5.99) & (7.72) & (0.87) & (1.66) & \\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Panel B: Active --- VW Gross}\\
+\hspace{1em}Q1 (Closet Indexer) & -0.881 & -1.124$^{***}$ & -0.938$^{**}$ & 0.986$^{***}$ & -0.024 & 0.098$^{***}$ & -0.024$^{**}$ & 0.987\\
+\hspace{1em}t(coef) & (-1.59) & (-2.61) & (-2.18) & (90.52) & (-1.58) & (4.77) & (-2.51) & \\
+\hspace{1em}Q2 & 0.282 & 0.277 & 0.146 & 0.992$^{***}$ & 0.042$^{***}$ & 0.027$^{*}$ & 0.017 & 0.978\\
+\hspace{1em}t(coef) & (0.63) & (0.62) & (0.29) & (61.68) & (2.83) & (1.69) & (0.94) & \\
+\hspace{1em}Q3 & 1.566$^{**}$ & 1.586$^{**}$ & 1.396$^{*}$ & 0.963$^{***}$ & 0.102$^{***}$ & 0.042 & 0.025 & 0.967\\
+\hspace{1em}t(coef) & (2.03) & (2.20) & (1.92) & (62.69) & (5.96) & (1.37) & (1.18) & \\
+\hspace{1em}Q4 & 0.508 & 0.741 & 0.713 & 1.008$^{***}$ & 0.156$^{***}$ & -0.046$^{*}$ & 0.004 & 0.953\\
+\hspace{1em}t(coef) & (0.63) & (0.97) & (0.95) & (62.08) & (4.69) & (-1.72) & (0.16) & \\
+\hspace{1em}Q5 (Most Active) & 1.035 & 0.767 & 0.455 & 0.902$^{***}$ & 0.032 & 0.158$^{*}$ & 0.041 & 0.848\\
+\hspace{1em}t(coef) & (0.62) & (0.55) & (0.34) & (23.61) & (0.73) & (1.80) & (0.79) & \\
+\hspace{1em}Q5$-$Q1 & 1.916 & 1.891 & 1.392 & -0.084$^{**}$ & 0.056 & 0.060 & 0.065 & 0.097\\
+\hspace{1em}t(coef) & (1.19) & (1.28) & (1.00) & (-2.22) & (1.50) & (0.66) & (1.26) & \\
+\addlinespace[0.3em]
+\hline
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Alpha and Factor Loadings by Activeness Quintile ($1-R^2$), Gross Returns (\%, Annualised)}\label{tab:activeness_alpha_r2}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
+\begin{singlespace}\footnotesize\noindent
+Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualised ($\times 12$, \%). Q5$-$Q1: long- short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx. Active funds only. Quintiles are formed every month from the cross-section of active funds, using the activeness measure available at the end of the previous month. Activeness measured as $1-R^2$ from the 36-month rolling Carhart regression of fund excess gross returns on the four factors, following \textcite{AmihudGoyenko2013}. A higher $1-R^2$ indicates returns less explained by systematic factor exposures and therefore more idiosyncratic, indicative of greater active deviation.
+\end{singlespace}
+\end{minipage}
+\end{table}
+
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
 \multicolumn{9}{l}{Panel C: Active --- EW Net}\\
 \hspace{1em}Q1 (Closet Indexer) & -1.641$^{***}$ & -1.810$^{***}$ & -1.630$^{***}$ & 0.998$^{***}$ & 0.069$^{***}$ & 0.101$^{***}$ & -0.023$^{**}$ & 0.989\\
 \hspace{1em}t(coef) & (-2.99) & (-4.61) & (-4.05) & (105.70) & (3.52) & (5.96) & (-2.10) & \\
@@ -73,11 +139,64 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}Q5 (Most Active) & 0.228 & -0.041 & -0.358 & 0.902$^{***}$ & 0.032 & 0.158$^{*}$ & 0.042 & 0.848\\
 \hspace{1em}t(coef) & (0.14) & (-0.03) & (-0.26) & (23.55) & (0.73) & (1.80) & (0.80) & \\
 \hspace{1em}Q5$-$Q1 & 1.703 & 1.678 & 1.176 & -0.084$^{**}$ & 0.056 & 0.060 & 0.066 & 0.097\\
-\hspace{1em}t(coef) & (1.05) & (1.13) & (0.84) & (-2.22) & (1.51) & (0.66) & (1.28) & \\*
-\end{longtable}
+\hspace{1em}t(coef) & (1.05) & (1.13) & (0.84) & (-2.22) & (1.51) & (0.66) & (1.28) & \\
+\bottomrule
+\end{tabular}%
 }
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{2pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
+\toprule
+Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$ & $\beta_{\text{MKT}}$ & $\beta_{\text{SMB}}$ & $\beta_{\text{HML}}$ & $\beta_{\text{MOM}}$ & $\bar{R}^2$\\
+\midrule
+\multicolumn{9}{l}{Panel C: Active --- EW Net}\\
+\hspace{1em}Q1 (Closet Indexer) & -1.641$^{***}$ & -1.810$^{***}$ & -1.630$^{***}$ & 0.998$^{***}$ & 0.069$^{***}$ & 0.101$^{***}$ & -0.023$^{**}$ & 0.989\\
+\hspace{1em}t(coef) & (-2.99) & (-4.61) & (-4.05) & (105.70) & (3.52) & (5.96) & (-2.10) & \\
+\hspace{1em}Q2 & -1.428$^{**}$ & -1.551$^{***}$ & -1.477$^{***}$ & 0.993$^{***}$ & 0.175$^{***}$ & 0.129$^{***}$ & -0.010 & 0.982\\
+\hspace{1em}t(coef) & (-2.07) & (-3.39) & (-3.08) & (82.18) & (8.09) & (6.44) & (-0.75) & \\
+\hspace{1em}Q3 & -0.669 & -0.807 & -0.793 & 0.972$^{***}$ & 0.202$^{***}$ & 0.151$^{***}$ & -0.002 & 0.975\\
+\hspace{1em}t(coef) & (-0.82) & (-1.60) & (-1.51) & (74.40) & (7.40) & (5.51) & (-0.10) & \\
+\hspace{1em}Q4 & -0.615 & -0.662 & -0.733 & 0.974$^{***}$ & 0.229$^{***}$ & 0.122$^{***}$ & 0.009 & 0.966\\
+\hspace{1em}t(coef) & (-0.63) & (-1.02) & (-1.08) & (68.42) & (6.67) & (3.49) & (0.46) & \\
+\hspace{1em}Q5 (Most Active) & -0.265 & -0.337 & -0.456 & 0.902$^{***}$ & 0.241$^{***}$ & 0.142$^{***}$ & 0.016 & 0.957\\
+\hspace{1em}t(coef) & (-0.23) & (-0.44) & (-0.60) & (57.06) & (7.11) & (3.29) & (0.65) & \\
+\hspace{1em}Q5$-$Q1 & 1.376 & 1.473$^{*}$ & 1.174 & -0.095$^{***}$ & 0.172$^{***}$ & 0.040 & 0.039$^{*}$ & 0.337\\
+\hspace{1em}t(coef) & (1.31) & (1.70) & (1.46) & (-5.98) & (7.72) & (0.88) & (1.67) & \\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Panel D: Active --- VW Net}\\
+\hspace{1em}Q1 (Closet Indexer) & -1.476$^{***}$ & -1.719$^{***}$ & -1.534$^{***}$ & 0.986$^{***}$ & -0.024 & 0.098$^{***}$ & -0.024$^{**}$ & 0.987\\
+\hspace{1em}t(coef) & (-2.67) & (-4.02) & (-3.58) & (90.58) & (-1.60) & (4.77) & (-2.48) & \\
+\hspace{1em}Q2 & -0.404 & -0.409 & -0.542 & 0.992$^{***}$ & 0.042$^{***}$ & 0.027$^{*}$ & 0.017 & 0.978\\
+\hspace{1em}t(coef) & (-0.90) & (-0.92) & (-1.09) & (61.66) & (2.82) & (1.70) & (0.95) & \\
+\hspace{1em}Q3 & 0.837 & 0.857 & 0.665 & 0.963$^{***}$ & 0.102$^{***}$ & 0.042 & 0.025 & 0.967\\
+\hspace{1em}t(coef) & (1.08) & (1.19) & (0.91) & (62.67) & (5.94) & (1.38) & (1.21) & \\
+\hspace{1em}Q4 & -0.318 & -0.085 & -0.114 & 1.008$^{***}$ & 0.156$^{***}$ & -0.046$^{*}$ & 0.004 & 0.953\\
+\hspace{1em}t(coef) & (-0.39) & (-0.11) & (-0.15) & (62.09) & (4.69) & (-1.71) & (0.17) & \\
+\hspace{1em}Q5 (Most Active) & 0.228 & -0.041 & -0.358 & 0.902$^{***}$ & 0.032 & 0.158$^{*}$ & 0.042 & 0.848\\
+\hspace{1em}t(coef) & (0.14) & (-0.03) & (-0.26) & (23.55) & (0.73) & (1.80) & (0.80) & \\
+\hspace{1em}Q5$-$Q1 & 1.703 & 1.678 & 1.176 & -0.084$^{**}$ & 0.056 & 0.060 & 0.066 & 0.097\\
+\hspace{1em}t(coef) & (1.05) & (1.13) & (0.84) & (-2.22) & (1.51) & (0.66) & (1.28) & \\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Alpha and Factor Loadings by Activeness Quintile ($1-R^2$), Net Returns (\%, Annualised)}\label{tab:activeness_alpha_r2_net}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
-Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualised ($\times 12$, \%). Q5$-$Q1: long- short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx. Active funds only. Quintiles are formed every month from the cross-section of active funds, using the activeness measure available at the end of the previous month. Activeness measured as $1-R^2$ from the 36-month rolling Carhart regression of fund excess gross returns on the four factors, following \textcite{AmihudGoyenko2013}. A higher $1-R^2$ indicates returns less explained by systematic factor exposures and therefore more idiosyncratic, indicative of greater active deviation.
-\end{singlespace}\par\vspace{24pt}
-
+Construction, columns and notation as in Table~\ref{tab:activeness_alpha_r2}.
+\end{singlespace}
+\end{minipage}
+\end{table}
 

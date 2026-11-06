@@ -1,20 +1,13 @@
-
-{\setlength{\tabcolsep}{3pt}\setlength{\LTpost}{0pt}\footnotesize
-\captionsetup{font=normalsize}\begin{longtable}[t]{@{\extracolsep{\fill}}lrrrrrrrr}
-\caption{\label{tab:activeness_chars}Activeness Quintile Portfolios: Characteristics}\\[12pt]
+% sbe_table_format v1.0
+\begin{table}[!htbp]
+\centering
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\begin{tabular}{lrrrrrrrr}
 \toprule
 Quintile & Mean Act. & $N$ Avg. & Mean TNA & Mean ER & Mean Turn & EW Gross & VW Gross & EW Sharpe\\
 \midrule
-\endfirsthead
-\caption[]{Activeness Quintile Portfolios: Characteristics \textit{(continued)}}\\[12pt]
-\toprule
-Quintile & Mean Act. & $N$ Avg. & Mean TNA & Mean ER & Mean Turn & EW Gross & VW Gross & EW Sharpe\\
-\midrule
-\endhead
-
-\endfoot
-\bottomrule
-\endlastfoot
 \addlinespace[0.3em]
 \multicolumn{9}{l}{Panel A: $1-R^2$ Activeness}\\
 \hspace{1em}Q1 & 0.027 & 210 & 4,136 & 0.87 & 55.4 & 0.850 & 0.819 & 0.50\\
@@ -29,11 +22,51 @@ Quintile & Mean Act. & $N$ Avg. & Mean TNA & Mean ER & Mean Turn & EW Gross & VW
 \hspace{1em}Q2 & 0.045 & 209 & 3,296 & 0.97 & 52.0 & 0.918 & 0.921 & 0.56\\
 \hspace{1em}Q3 & 0.058 & 209 & 3,451 & 1.07 & 53.3 & 0.910 & 0.999 & 0.54\\
 \hspace{1em}Q4 & 0.075 & 209 & 1,962 & 1.14 & 57.5 & 0.934 & 1.020 & 0.54\\
-\hspace{1em}Q5 & 0.126 & 208 & 1,236 & 1.33 & 82.5 & 0.921 & 0.791 & 0.51\\*
-\end{longtable}
+\hspace{1em}Q5 & 0.126 & 208 & 1,236 & 1.33 & 82.5 & 0.921 & 0.791 & 0.51\\
+\bottomrule
+\end{tabular}%
 }
+\ifdim\wd\tabletempbox<\linewidth
+\sbox{\tabletempbox}{%
+\footnotesize
+\setlength{\tabcolsep}{3pt}%
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
+\toprule
+Quintile & Mean Act. & $N$ Avg. & Mean TNA & Mean ER & Mean Turn & EW Gross & VW Gross & EW Sharpe\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{9}{l}{Panel A: $1-R^2$ Activeness}\\
+\hspace{1em}Q1 & 0.027 & 210 & 4,136 & 0.87 & 55.4 & 0.850 & 0.819 & 0.50\\
+\hspace{1em}Q2 & 0.052 & 209 & 3,395 & 1.00 & 54.8 & 0.888 & 0.924 & 0.51\\
+\hspace{1em}Q3 & 0.075 & 209 & 2,379 & 1.06 & 53.8 & 0.944 & 1.018 & 0.56\\
+\hspace{1em}Q4 & 0.106 & 209 & 2,196 & 1.14 & 57.8 & 0.957 & 0.981 & 0.57\\
+\hspace{1em}Q5 & 0.246 & 209 & 1,533 & 1.30 & 75.9 & 0.949 & 0.913 & 0.60\\
+\addlinespace[0.3em]
+\hline
+\multicolumn{9}{l}{Panel B: Tracking Error Activeness}\\
+\hspace{1em}Q1 & 0.029 & 209 & 3,854 & 0.85 & 52.4 & 0.901 & 0.876 & 0.56\\
+\hspace{1em}Q2 & 0.045 & 209 & 3,296 & 0.97 & 52.0 & 0.918 & 0.921 & 0.56\\
+\hspace{1em}Q3 & 0.058 & 209 & 3,451 & 1.07 & 53.3 & 0.910 & 0.999 & 0.54\\
+\hspace{1em}Q4 & 0.075 & 209 & 1,962 & 1.14 & 57.5 & 0.934 & 1.020 & 0.54\\
+\hspace{1em}Q5 & 0.126 & 208 & 1,236 & 1.33 & 82.5 & 0.921 & 0.791 & 0.51\\
+\bottomrule
+\end{tabular*}%
+}
+\fi
+\setlength{\tabletempwidth}{\wd\tabletempbox}
+\ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
+\begin{minipage}{\tabletempwidth}
+\captionsetup{width=\linewidth}
+\caption{Activeness Quintile Portfolios: Characteristics}\label{tab:activeness_chars}
+\ifdim\wd\tabletempbox>\linewidth
+  \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
+\else
+  \usebox{\tabletempbox}
+\fi
+\par\medskip
 \begin{singlespace}\footnotesize\noindent
 Cross-sectional means of monthly fund characteristics by activeness quintile, actively managed funds only. Q1 = lowest activeness; Q5 = highest activeness. Funds are sorted every month on information up to the previous month: $1-R^2$ from the 36-month rolling \textcite{Carhart1997} regression ending in $t-1$ (Panel A; \citealt{AmihudGoyenko2013}), or annualised Tracking Error against the fund's assigned benchmark index over the 36 months ending in $t-1$ (Panel B; following \citealt{CremersPetajisto2009}). Mean Act.: cross-sectional mean of the activeness measure within the quintile (decimal for $1-R^2$; annualised decimal for Tracking Error). $N$ Avg.: average number of funds in the quintile portfolio per month. Mean TNA: average lagged fund total net assets (USD millions). Mean ER: average static annual expense ratio (\%). Mean Turn: average annual turnover (\%). EW Gross / VW Gross: time-series mean of monthly equal-weighted / lagged-TNA-weighted gross returns (\%, monthly). EW Sharpe: annualised Sharpe ratio of the equal-weighted gross excess return. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
-\end{singlespace}\par\vspace{24pt}
-
+\end{singlespace}
+\end{minipage}
+\end{table}
 

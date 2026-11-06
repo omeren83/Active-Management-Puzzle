@@ -81,11 +81,12 @@ fmt_p <- function(p) {
 }
 fmt_chi2 <- function(chi, p, df) {
   if (is.null(chi) || is.na(chi)) return("--")
-  sprintf("%.2f (df=%d, p%s)", chi, df, if (!is.na(p) && p < 0.001) fmt_p(p) else paste0("=", fmt_p(p)))
+  # Nov 2026: "(p)" only, df stated in the note (table fits the text width at >= 8pt)
+  sprintf("%.2f (%s)", chi, fmt_p(p))
 }
 fmt_z <- function(z, p) {
   if (is.null(z) || is.na(z)) return("--")
-  sprintf("%+.2f (p%s)", z, if (!is.na(p) && p < 0.001) fmt_p(p) else paste0("=", fmt_p(p)))
+  sprintf("%+.2f (%s)", z, fmt_p(p))
 }
 fmt_n <- function(n) {
   if (is.null(n) || is.na(n)) return("--")
@@ -163,7 +164,7 @@ if (!is.null(H3_models)) {
   for (key in c("t2", "t3", "t4")) {
     tt <- pri$tests[[key]]
     state_lbl <- switch(key,
-      "t2" = "ActR2 (rational-null control)",
+      "t2" = "ActR2",   # Nov 2026: role stated in the note (table >= 8pt)
       "t3" = "ActSkew",
       "t4" = "MAX12")
     rows[[length(rows) + 1L]] <- add_row(
@@ -197,8 +198,8 @@ if (length(rows) == 0L) {
 }
 
 summary_df <- as.data.frame(do.call(rbind, rows), stringsAsFactors = FALSE)
-colnames(summary_df) <- c("Hypothesis", "State proxy", "Joint $\\chi^2$",
-                          "Headline $z$ ($p$, predicted sign)", "$N$",
+colnames(summary_df) <- c("Hypothesis", "State proxy", "Joint $\\chi^2$ ($p$)",
+                          "Headline $z$ ($p$)", "$N$",
                           "Joint test", "Headline direction")
 rownames(summary_df) <- NULL
 
@@ -210,7 +211,8 @@ fn <- paste0(
   "interactions; H2, the three rank-segment $\\\\times$ margin-debt (or put--call) ",
   "interactions, with the $D^{\\\\text{SENT}}$ interactions as controls in the ",
   "discriminant row; H3, the lottery measure and its interaction with ",
-  "$D^{\\\\text{SENT}}$; H4, the four fee $\\\\times$ sentiment terms. ``Joint test'' ",
+  "$D^{\\\\text{SENT}}$; H4, the four fee $\\\\times$ sentiment terms (degrees of ",
+  "freedom 3, 3, 2 and 4); $p$-values in parentheses. ``Joint test'' ",
   "reports whether it is rejected at 10\\\\%. A rejection shows that flows depend ",
   "on the state; it does not by itself identify a psychological cause. Headline $z$: hypothesis-specific statistic (H1: ",
   "$\\\\delta_{\\\\text{HIGH}}-\\\\delta_{\\\\text{LOW}}$; H2: $\\\\delta_{\\\\text{LOW}}$; H3: lottery $\\\\times$ ",
