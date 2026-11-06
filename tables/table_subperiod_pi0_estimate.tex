@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}[t]{>{\raggedright\arraybackslash}p{13em}rrr>{\raggedright\arraybackslash}p{14em}}
 \toprule
@@ -13,7 +13,7 @@ P2 (Apr 2006--Aug 2010) & 80.1\% & 1,231 & 0.5 & Heterogeneous skill; majority z
 P3 (Sep 2010--Jan 2026) & 79.7\% & 1,878 & 0.5 & Heterogeneous skill; majority zero-alpha\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -25,7 +25,7 @@ P3 (Sep 2010--Jan 2026) & 79.7\% & 1,878 & 0.5 & Heterogeneous skill; majority z
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 The proportion of true zero-alpha active funds ($\hat{\pi}_0$) estimated separately within each sub-period, following \textcite{Storey2002} and \textcite{BarrasScailletWermers2010}, using $p$-values from Newey-West $t$-tests on sub-period \textcite{Carhart1997} four-factor alphas on gross returns. The estimator is $\hat{\pi}_0 = |\{p_i > \lambda\}| \,/\, [N(1-\lambda)]$, where $\lambda = 0.5$ is the standard tuning parameter. $N$: number of active funds with $\geq 24$ monthly observations within the sub-period. Passive funds are excluded. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx. The four-way decomposition of skilled, unskilled, and lucky fund proportions implied by these estimates is reported in Table~\ref{tab:subperiod_bsw_decomposition}.
 \end{singlespace}
 \end{minipage}

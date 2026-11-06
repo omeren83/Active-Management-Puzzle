@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}[t]{>{\raggedright\arraybackslash}p{16em}rrr>{\raggedright\arraybackslash}p{14em}}
 \toprule
 Metric & Estimate & $N$ & $\lambda$ & Interpretation\\
@@ -10,7 +10,7 @@ Metric & Estimate & $N$ & $\lambda$ & Interpretation\\
 $\hat{\pi}_0$: Proportion of True Zero-Alpha Active Funds & 83.4\% & 2,255 & 0.5 & Heterogeneous skill; majority zero-alpha\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -22,7 +22,7 @@ $\hat{\pi}_0$: Proportion of True Zero-Alpha Active Funds & 83.4\% & 2,255 & 0.5
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 The proportion of true zero-alpha funds ($\hat{\pi}_0$) is estimated following \textcite{Storey2002} and \textcite{BarrasScailletWermers2010}, using p-values from Newey-West $t$-tests on full-period \textcite{Carhart1997} four-factor alphas on gross returns. The estimator is $\hat{\pi}_0 = |\{p_i > \lambda\}| \,/\, [N(1-\lambda)]$, where $\lambda = 0.5$ is the standard tuning parameter following \textcite{Storey2002}. Funds with p-values exceeding $\lambda$ are unlikely to have non-zero true alpha; the density of p-values in $(\lambda, 1]$ provides a conservative estimate of the zero-alpha proportion, bounded above at 1. Sample: actively managed funds ($N = 2{,}255$), Incubation-corrected (Evans 2010) panel, no date cap; performance-comparison subsample per flagged\_funds.xlsx. Passive funds are excluded. The four-way decomposition of skilled, unskilled, and lucky fund proportions implied by this estimate is reported in Table~\ref{tab:bsw_decomposition}.
 \end{singlespace}
 \end{minipage}

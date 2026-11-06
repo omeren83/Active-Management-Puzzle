@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}{llrrrrrrr}
 \toprule
  & & & & \multicolumn{2}{c}{Gross Alpha} & \multicolumn{2}{c}{Net Alpha} & \\
@@ -25,20 +25,20 @@ t(coef) &  &  &  & (-0.23) & (-0.15) & (-2.79) & (-1.82) &  \\
 t(coef) &  &  &  & (-0.84) & (0.42) & (-2.40) & (-0.21) &  \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{\label{tab:alpha_comparison_robust}Aggregate Portfolio Alpha Comparison Across Factor Models (\%, Annualised)}
+\caption{\label{tab:alpha_comparison_robust}Aggregate Portfolio Alpha Comparison Across Factor Models (\%, Annualized)}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Annualised alpha (\%) from regressing the monthly aggregate portfolio return of each group on the specified factor model, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio ($1/N_t$ weight per fund per month). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1}/\sum_j \text{TNA}_{j,t-1}$. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Funds without a reported expense ratio have no gross return: they enter the net series and $N$ but not the gross series. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. $N$: unique funds contributing to the portfolio; $T$: monthly observations in the regression. \textit{Carhart 4-Factor}: MKT-RF, SMB, HML, MOM (\citealt{Carhart1997}; main-text baseline). \textit{FF 6-Factor}: MKT-RF, SMB, HML, RMW, CMA, MOM (\citealt{FamaFrench2015} five-factor model plus momentum). \textit{Carhart + PSL}: Carhart four-factor augmented with the \textcite{PastorStambaugh2003} traded liquidity factor. SMB is held constant at the \textcite{FamaFrench1993} construction (single $2\times3$ size--BM sort) across all specifications. Carhart and FF 6-Factor: Jan 1995--Jan 2026. Carhart + PSL: Jan 1995--Dec 2024 (constrained by the Pastor--Stambaugh liquidity data release). Sample: Incubation-corrected panel (\citealt{Evans2010}), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+Annualized alpha (\%) from regressing the monthly aggregate portfolio return of each group on the specified factor model, following \textcite{FamaFrench2010}. EW: equal-weighted portfolio ($1/N_t$ weight per fund per month). VW: value-weighted portfolio with lagged TNA weights $w_{i,t-1} = \text{TNA}_{i,t-1}/\sum_j \text{TNA}_{j,t-1}$. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Funds without a reported expense ratio have no gross return: they enter the net series and $N$ but not the gross series. Newey-West $t$-statistics (6-month lag) in parentheses below each alpha; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. $\bar{R}^2$: adjusted $R^2$ from the EW gross portfolio regression. $N$: unique funds contributing to the portfolio; $T$: monthly observations in the regression. \textit{Carhart 4-Factor}: MKT-RF, SMB, HML, MOM (\citealt{Carhart1997}; main-text baseline). \textit{FF 6-Factor}: MKT-RF, SMB, HML, RMW, CMA, MOM (\citealt{FamaFrench2015} five-factor model plus momentum). \textit{Carhart + PSL}: Carhart four-factor augmented with the \textcite{PastorStambaugh2003} traded liquidity factor. SMB is held constant at the \textcite{FamaFrench1993} construction (single $2\times3$ size--BM sort) across all specifications. Carhart and FF 6-Factor: Jan 1995--Jan 2026. Carhart + PSL: Jan 1995--Dec 2024 (constrained by the Pastor--Stambaugh liquidity data release). Sample: Incubation-corrected panel (\citealt{Evans2010}), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

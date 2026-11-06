@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lllccccc}
 \toprule
@@ -30,7 +30,7 @@ H3 & MAX12 $\times D^{\text{SENT}}$ & Joint $\chi^2$ ($p$) & -- & -- & 1.78 (0.4
  & & $N$ & 273,497 & 273,497 & 273,497 & 273,497 & 273,486 \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -42,7 +42,7 @@ H3 & MAX12 $\times D^{\text{SENT}}$ & Joint $\chi^2$ ($p$) & -- & -- & 1.78 (0.4
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Regressors added in a fixed order: (1) rank segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$; (2) state main effect (H3: also MAX12); (3) tested interactions; (4) controls; (5) fund fixed effects (= primary specification). Same estimation sample in all columns. $R^2$: within $R^2$ in column (5), $R^2$ otherwise. Headline: H1, $\delta_{\text{HIGH}}-\delta_{\text{LOW}}$; H2, $\delta_{\text{LOW}}$; H3, the MAX12 $\times D^{\text{SENT}}$ coefficient; $z$-statistics in parentheses. Samples, controls and clustering as in the primary H1--H3 tables (fund fixed effects; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
 \end{singlespace}
 \end{minipage}

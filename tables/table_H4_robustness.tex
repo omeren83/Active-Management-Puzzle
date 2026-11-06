@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -60,10 +60,10 @@ Joint test ($\chi^2_4$, $p$) & -- & 6.18 (0.186) & 3.43 (0.489) & 2.78 (0.595)\\
 Headline ($z$, 1-sided $p$) & -- & -1.66 (0.952) & -0.93 (0.825) & -0.30 (0.617)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -121,7 +121,7 @@ Joint test ($\chi^2_4$, $p$) & -- & 6.18 (0.186) & 3.43 (0.489) & 2.78 (0.595)\\
 Headline ($z$, 1-sided $p$) & -- & -1.66 (0.952) & -0.93 (0.825) & -0.30 (0.617)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -134,7 +134,7 @@ Headline ($z$, 1-sided $p$) & -- & -1.66 (0.952) & -0.93 (0.825) & -0.30 (0.617)
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Same sample, dependent variable, and rank construction as Table~\ref{tab:H4_regression}. Year-month fixed effects absorb all time-aggregate variation (including sentiment main effects, market-wide flow waves, and risk-on/risk-off cycles) but leave both within- and between-style cross-fund variation in expense ratios available for identification. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{singlespace}
 \end{minipage}

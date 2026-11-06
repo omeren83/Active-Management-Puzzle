@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}[t]{lrrr}
 \toprule
 Portfolio & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}$\\
@@ -17,20 +17,20 @@ Passive (VW) & 0.087 & -0.138 & 0.048\\
 t(coef) & (0.35) & (-0.88) & (0.28)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{\label{tab:port_agg_alpha}Active vs.\ Passive Aggregate Portfolio Alpha (\%, Annualised)}
+\caption{\label{tab:port_agg_alpha}Active vs.\ Passive Aggregate Portfolio Alpha (\%, Annualized)}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Monthly EW and VW aggregate portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Alphas annualised ($\times 12$) and expressed as \%. Newey-West $t$-statistics (6-month lag) in parentheses. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+Monthly EW and VW aggregate portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Alphas annualized ($\times 12$) and expressed as \%. Newey-West $t$-statistics (6-month lag) in parentheses. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

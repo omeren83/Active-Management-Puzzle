@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -40,10 +40,10 @@ Joint test ($\chi^2_2$, $p$) & -- & 1.36 (0.508) & 1.48 (0.477) & 7.57 (0.023)\\
 Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.52 (0.697) & +0.54 (0.295) & +2.06 (0.020)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -81,7 +81,7 @@ Joint test ($\chi^2_2$, $p$) & -- & 1.36 (0.508) & 1.48 (0.477) & 7.57 (0.023)\\
 Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.52 (0.697) & +0.54 (0.295) & +2.06 (0.020)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -94,8 +94,8 @@ Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.52 (0.697) & +0.54 (0.295) & +2.06 (0.
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Dependent variable is the Sirri--Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorised at the 1st/99th percentiles of the pooled distribution (ActR2 naturally bounded), then standardised to mean zero and unit standard deviation in the estimation sample, so coefficients are flow responses per one-SD change. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+Dependent variable is the Sirri--Tufano (1998) winsorized proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. All lottery proxies lagged one period and winsorized at the first and 99th percentiles of the pooled distribution (ActR2 naturally bounded), then standardized to mean zero and unit standard deviation in the estimation sample, so coefficients are flow responses per one-SD change. Performance segments $R^{\text{LOW}}$, $R^{\text{MID}}$, $R^{\text{HIGH}}$ retained as nuisance controls so H3 conditions on the H1 channel. Time-invariant fund characteristics (expense ratio, load dummy, turnover) absorbed by fund fixed effects. Standard errors two-way clustered on Ticker and calendar month (\textcite{Petersen2009}). The joint $\chi^2_2$ test is $\beta=\delta=0$ for the focal lottery measure in each column. The headline $z$ tests $\delta>0$ (1-sided): sentiment amplifies investor response to the lottery proxy. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

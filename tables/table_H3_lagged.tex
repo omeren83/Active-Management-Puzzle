@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -40,10 +40,10 @@ Joint test ($\chi^2_2$, $p$) & -- & 1.43 (0.489) & 1.73 (0.421) & 6.87 (0.032)\\
 Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.55 (0.707) & +0.62 (0.268) & +1.95 (0.026)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -81,7 +81,7 @@ Joint test ($\chi^2_2$, $p$) & -- & 1.43 (0.489) & 1.73 (0.421) & 6.87 (0.032)\\
 Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.55 (0.707) & +0.62 (0.268) & +1.95 (0.026)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -94,7 +94,7 @@ Sent.\ amp.\ ($z$, 1-sided $p$) & -- & -0.55 (0.707) & +0.62 (0.268) & +1.95 (0.
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Same sample, dependent variable, lottery measures, and identification strategy as Table~\ref{tab:H3_regression}. $D^{\text{SENT}}_{t-1}$ replaces $D^{\text{SENT}}_{t}$ in columns (2)--(4). Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}

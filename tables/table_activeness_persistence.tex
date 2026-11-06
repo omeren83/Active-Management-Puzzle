@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lrrrrrrrrr}
 \toprule
@@ -51,10 +51,10 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p_B$ & $\beta_{\text{MKT}}$ & $\b
 \hspace{1em}D1$-$D10 & 0.259$^{*}$ & (1.71) & 0.083 & -0.043 & 0.109$^{***}$ & -0.125 & -0.148$^{**}$ & 0.181 & --\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrrr}
 \toprule
@@ -103,7 +103,7 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p_B$ & $\beta_{\text{MKT}}$ & $\b
 \hspace{1em}D1$-$D10 & 0.259$^{*}$ & (1.71) & 0.083 & -0.043 & 0.109$^{***}$ & -0.125 & -0.148$^{**}$ & 0.181 & --\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -116,7 +116,7 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p_B$ & $\beta_{\text{MKT}}$ & $\b
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Activeness-conditioned persistence test: $10 \times 3$ bivariate sort. At each cohort ranking date, active funds that report a return in the ranking month are sorted into three terciles by formation-period $1 - R^2$ from a 36-month \textcite{Carhart1997} four-factor regression (T1 = lowest activeness, T3 = highest), and within each tercile into ten deciles by formation-period alpha $t$-statistic (Newey-West, 3-month lag). D1 contains the highest-ranked funds, D10 the lowest. Equal-weighted holding-period (12-month) gross excess returns are pooled across the seven non-overlapping cohorts of Table~\ref{tab:persistence} (holding years 1998, 2002, 2006, 2010, 2014, 2018, 2022) and regressed on the \textcite{Carhart1997} four factors with Newey-West $t$-statistics (12-month lag). $\hat{\alpha}$: monthly, \%. $p_B$: one-tailed bootstrap $p$-value in the direction of the observed $t$-statistic, from the residual bootstrap of \textcite{FamaFrench2010} applied to the pooled cell regressions as in Table~\ref{tab:persistence}: each series has its estimated alpha removed, pooled months are resampled jointly across all 33 series (10,000 draws), and the Newey-West $t$ is re-estimated. ExpR: mean expense ratio (\%) of cell constituents, averaged across cohorts. D1$-$D10 is the within-tercile long-short spread. Significance stars on $\hat{\alpha}$ and factor loadings reflect Newey-West $t$-statistics: $^{*}$, $^{**}$, $^{***}$ at 10\%, 5\%, 1\%. The activeness measure is the formation-window $1 - R^2$ following \textcite{AmihudGoyenko2013}; tercile breakpoints are computed within each cohort to avoid look-ahead contamination. Sample: active funds in the \textcite{Evans2010}-corrected panel\_incubation, formation and holding windows Jan 1995--Dec 2022; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}

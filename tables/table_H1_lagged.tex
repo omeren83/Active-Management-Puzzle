@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -42,10 +42,10 @@ Joint test ($\chi^2_3$, $p$) & -- & 7.19 (0.066) & 7.82 (0.050) & 2.13 (0.546)\\
 Asymmetry ($z$, 1-sided $p$) & -- & -0.03 (0.513) & -0.16 (0.563) & +1.31 (0.095)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -85,7 +85,7 @@ Joint test ($\chi^2_3$, $p$) & -- & 7.19 (0.066) & 7.82 (0.050) & 2.13 (0.546)\\
 Asymmetry ($z$, 1-sided $p$) & -- & -0.03 (0.513) & -0.16 (0.563) & +1.31 (0.095)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -98,8 +98,8 @@ Asymmetry ($z$, 1-sided $p$) & -- & -0.03 (0.513) & -0.16 (0.563) & +1.31 (0.095
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{\text{SENT}}_{t-1}$, column (3) uses the standardised Baker-Wurgler orthogonalised sentiment index at $t-1$, column (4) uses $D^{\text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\begin{singlespace}\tablefont\noindent
+Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H1_regression}. Sentiment proxies are lagged one period: column (2) uses $D^{\text{SENT}}_{t-1}$, column (3) uses the standardized Baker-Wurgler orthogonalized sentiment index at $t-1$, column (4) uses $D^{\text{AAII}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{singlespace}
 \end{minipage}
 \end{table}

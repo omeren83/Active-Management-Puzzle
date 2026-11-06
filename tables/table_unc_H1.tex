@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lcccccc}
 \toprule
@@ -39,7 +39,7 @@ $N$ & 323,610 & 323,610 & 323,610 & 323,610 & 323,610 & 323,610 \\
 Within $R^2$ & 0.0368 & 0.0367 & 0.0368 & 0.0370 & 0.0366 & 0.0370 \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -51,8 +51,8 @@ Within $R^2$ & 0.0368 & 0.0367 & 0.0368 & 0.0370 & 0.0366 & 0.0370 \\
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Uncertainty horizon: 1 month. $S$: behavioral state variable; $U$: matched uncertainty measure ($D^{\text{UNC}}$ for dummy states, standardised index for the continuous sentiment index). $t$-statistics in parentheses; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. Sample: active funds, \textcite{Evans2010}-corrected panel, December excluded, lagged TNA of at least USD 5 million; one common sample of 323,623 fund-months (2,313 funds, 307 months) in which all state variables and all uncertainty horizons are available. Uncertainty: \textcite{JuradoLudvigsonNg2015} macroeconomic uncertainty (FRED JLNUM1M, JLNUM3M, JLNUM12M); $D^{\text{UNC}}$ is 1 when the index is in its top 34\%, and the continuous index is standardised within the sample. Specification as the H1/H2 primary tables: contemporaneous states, fund fixed effects, controls as in Table~\ref{tab:H1_regression}, standard errors two-way clustered on fund and calendar month.
+\begin{singlespace}\tablefont\noindent
+Uncertainty horizon: 1 month. $S$: behavioral state variable; $U$: matched uncertainty measure ($D^{\text{UNC}}$ for dummy states, standardized index for the continuous sentiment index). $t$-statistics in parentheses; $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\%. Sample: active funds, \textcite{Evans2010}-corrected panel, December excluded, lagged TNA of at least USD 5 million; one common sample of 323,623 fund-months (2,313 funds, 307 months) in which all state variables and all uncertainty horizons are available. Uncertainty: \textcite{JuradoLudvigsonNg2015} macroeconomic uncertainty (FRED JLNUM1M, JLNUM3M, JLNUM12M); $D^{\text{UNC}}$ is 1 when the index is in its top 34\%, and the continuous index is standardized within the sample. Specification as the H1/H2 primary tables: contemporaneous states, fund fixed effects, controls as in Table~\ref{tab:H1_regression}, standard errors two-way clustered on fund and calendar month.
 \end{singlespace}
 \end{minipage}
 \end{table}

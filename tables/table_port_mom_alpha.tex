@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular}{lrrrrrrrr}
 \toprule
@@ -41,10 +41,10 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hline
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
 \toprule
@@ -83,21 +83,21 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hline
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{Alpha and Factor Loadings by Momentum Quintile, Active Funds (\%, Annualised)}\label{tab:port_mom_alpha}
+\caption{Alpha and Factor Loadings by Momentum Quintile, Active Funds (\%, Annualized)}\label{tab:port_mom_alpha}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualised ($\times 12$, \%). Q5$-$Q1: long-short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx. Momentum sorted monthly on cumulative net return over $t-12$ to $t-2$, skipping $t-1$ (\citealt{JegadeeshTitman1993}); Q1 = past losers.
+\begin{singlespace}\tablefont\noindent
+Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualized ($\times 12$, \%). Q5$-$Q1: long-short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx. Momentum sorted monthly on cumulative net return over $t-12$ to $t-2$, skipping $t-1$ (\citealt{JegadeeshTitman1993}); Q1 = past losers.
 \end{singlespace}
 \end{minipage}
 \end{table}
@@ -105,8 +105,8 @@ Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor,
 % sbe_table_format v1.0
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular}{lrrrrrrrr}
 \toprule
@@ -142,10 +142,10 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}t(coef) & (0.39) & (0.62) & (-0.57) & (1.49) & (0.76) & (-0.72) & (6.92) & \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
 \toprule
@@ -181,20 +181,20 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}t(coef) & (0.39) & (0.62) & (-0.57) & (1.49) & (0.76) & (-0.72) & (6.92) & \\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{Alpha and Factor Loadings by Momentum Quintile, Passive Funds (\%, Annualised)}\label{tab:port_mom_alpha_passive}
+\caption{Alpha and Factor Loadings by Momentum Quintile, Passive Funds (\%, Annualized)}\label{tab:port_mom_alpha_passive}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Construction, columns and notation as in Table~\ref{tab:port_mom_alpha}.
 \end{singlespace}
 \end{minipage}

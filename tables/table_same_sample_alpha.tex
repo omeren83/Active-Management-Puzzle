@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{llccccc}
 \toprule
@@ -32,7 +32,7 @@ Same funds, P1--P3 & EW net & $-$1.10 & $-$1.44 & 0.34 & 1.31 & \\
  & EW gross & $-$1.21 & $-$1.45 & 0.24 & 1.20 & \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -44,7 +44,7 @@ Same funds, P1--P3 & EW net & $-$1.10 & $-$1.44 & 0.34 & 1.31 & \\
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Aggregate-portfolio \textcite{Carhart1997} alpha (\% p.a.) of the equal-weighted (EW) and value-weighted (VW, lagged TNA) portfolio of the listed funds, estimated separately in each regime as in Table~\ref{tab:subperiod_perf_aggregate}; stars from Newey--West $t$-statistics (6 lags). P3 $-$ P2: difference of the two regime alphas from one stacked regression with regime-specific intercepts and factor loadings, Newey--West standard errors with 12 lags. Decomposition: full change = P3 $-$ P2 change of all active funds; within = the same change for the fixed sample; composition = full $-$ within; within share = within / full. $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$. Regimes: P1 Jan 1995--Mar 2006, P2 Apr 2006--Aug 2010, P3 Sep 2010--Jan 2026 (Table~\ref{tab:breaktest}). Same funds: active funds with at least 24 monthly returns in each listed regime; these funds survived across the regime boundary, so their alpha levels are biased upward relative to the full cross-section, and the change, not the level, is the object of interest. Sample: active funds, \textcite{Evans2010}-corrected panel, performance-comparison subsample.
 \end{singlespace}
 \end{minipage}

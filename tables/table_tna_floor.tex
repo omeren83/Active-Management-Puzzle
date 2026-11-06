@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{llcccccc}
 \toprule
@@ -20,7 +20,7 @@ H4 & $\text{SENT}^\perp$ & 3.02 (0.555) & 321,086 & 4.60 (0.331) & 337,718 & 5.5
 H4 & $D^{\text{AAII}}$ & 3.07 (0.547) & 321,086 & 5.38 (0.250) & 337,718 & 4.07 (0.397) & 343,662 \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -32,8 +32,8 @@ H4 & $D^{\text{AAII}}$ & 3.07 (0.547) & 321,086 & 5.38 (0.250) & 337,718 & 4.07 
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Headline joint tests of the primary H1--H4 specifications when fund-months are kept if lagged TNA is at least USD 5 million (baseline, as in the main tables), at least USD 1 million, or positive. Tested terms: H1, H2 the three $R^q\times S$ interactions ($\chi^2_3$); H3 MAX12 and MAX12 $\times D^{\text{SENT}}$ ($\chi^2_2$); H4 ExpRatio $\times S$ and the three $R^q\times$ExpRatio$\times S$ terms ($\chi^2_4$). Standardisation and winsorisation are redone within each sample. Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for H1--H3, Lipper category $\times$ month fixed effects for H4; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
+\begin{singlespace}\tablefont\noindent
+Headline joint tests of the primary H1--H4 specifications when fund-months are kept if lagged TNA is at least USD 5 million (baseline, as in the main tables), at least USD 1 million, or positive. Tested terms: H1, H2 the three $R^q\times S$ interactions ($\chi^2_3$); H3 MAX12 and MAX12 $\times D^{\text{SENT}}$ ($\chi^2_2$); H4 ExpRatio $\times S$ and the three $R^q\times$ExpRatio$\times S$ terms ($\chi^2_4$). Standardization and winsorization are redone within each sample. Samples, controls and clustering as in the primary H1--H4 tables (fund fixed effects for H1--H3, Lipper category $\times$ month fixed effects for H4; standard errors two-way clustered on fund and calendar month); December excluded; active funds, \textcite{Evans2010}-corrected panel.
 \end{singlespace}
 \end{minipage}
 \end{table}

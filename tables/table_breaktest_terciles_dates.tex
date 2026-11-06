@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lcccc}
 \toprule
@@ -36,7 +36,7 @@ T1 $-$ T3 & 1 & Dec 2001 & Jul 2002 & Feb 2003 \\
  & 7 & Nov 2022 & Jan 2023 & Mar 2023 \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -48,7 +48,7 @@ T1 $-$ T3 & 1 & Dec 2001 & Jul 2002 & Feb 2003 \\
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Break dates selected by BIC for each series of Table~\ref{tab:breaktest_terciles}, dated at the end of the 36-month window; 95\% confidence intervals use one full-sample Newey--West variance with 35 lags. Each month $m$, active funds are sorted into terciles on the $t$-statistic of their 36-month rolling \textcite{Carhart1997} alpha ending in $m-1$ (at least 24 observations; the persistence-test signal); equal-weighted tercile portfolios of gross returns are held in $m$. Series: 36-calendar-month rolling Carhart alpha of each portfolio (at least 24 observations, \% p.a.), Dec 1998--Jan 2026 ($T=326$). \textit{All funds}: the same construction without the sort. Sample: active funds, \textcite{Evans2010}-corrected panel, performance-comparison subsample.
 \end{singlespace}
 \end{minipage}

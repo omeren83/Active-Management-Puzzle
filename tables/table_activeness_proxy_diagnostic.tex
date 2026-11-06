@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{lrrrrrr}
 \toprule
@@ -14,7 +14,7 @@ MAX12 & 99.7 & -0.069 & 3.01 & 4.05 & 1.27 & -0.04\\
 UpSkew & 98.7 & -0.047 & 2.11 & 2.13 & 0.13 & -1.77\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -26,7 +26,7 @@ UpSkew & 98.7 & -0.047 & 2.11 & 2.13 & 0.13 & -1.77\\
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Aligned sample restricted to fund-month observations with all four measures and core controls non-NA. Two-way clustered standard errors on Ticker and calendar month. Coverage in column 2 reports the fraction of H3-subsample, non-December fund-months with the measure non-NA (before alignment). All ActSkew, UpSkew (36-month windows) and MAX12 (12 months) are computed on full fund histories.\\ The ``winning'' proxy is identified by (i) high univariate $|t|$ under the FE structure that preserves its dominant variation source, (ii) survival in the horse race conditional on the others, and (iii) consistency with Amihud--Goyenko's (2013) future-alpha prediction. Future alpha: 36-month rolling Carhart alpha over months $t+1$ to $t+36$, which does not overlap the window used for the measures.
 \end{singlespace}
 \end{minipage}

@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}{llrrrr}
 \toprule
@@ -21,7 +21,7 @@ MAX12 & $R^{\text{MID}}$ & -0.011 [0.028] & -0.133 [0.048] & -0.123 [0.052] & 0.
 MAX12 & $R^{\text{HIGH}}$ & -0.002 [0.005] & -0.026 [0.009] & -0.024 [0.010] & 0.011**\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -33,8 +33,8 @@ MAX12 & $R^{\text{HIGH}}$ & -0.002 [0.005] & -0.026 [0.009] & -0.024 [0.010] & 0
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Each row is computed from a separate joint regression of the form $\text{flow}=\beta_q R^q + \gamma D^{\text{SENT}} + \delta_q R^q D^{\text{SENT}} + \eta\,\text{AS}^z + \phi\,\text{AS}^z D^{\text{SENT}} + \text{controls} + \mu_i$ (fund fixed effects), with $\text{AS}^z$ standardised within sample. Shadow Price units are rank points per standard deviation of the lottery measure. Standard errors via the delta method using the joint coefficient covariance from the underlying regression; clustered two-way on fund and calendar month. The 1-sided $p$ tests Diff $<0$ (a larger premium under high sentiment); stars refer to it: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.     \textit{Conversion to alpha basis points.} To express the premium in welfare-relevant units, the rank-to-alpha mapping is calibrated in the rank space of the flow regressions: each month, active funds are sorted into quintiles of their within-Lipper-category trailing 12-month return rank (the $R$ of the H1--H4 regressions; bins of width 0.2) and the equal-weighted portfolios are held for the month. The net-return Carhart alpha spread is $Q5-Q1=2.363\%$ p.a. ($t=2.40$); with a midpoint-to-midpoint rank distance of $0.8$, this implies approximately 295 basis points of annual Carhart alpha per rank-point. Applying this conversion at the middle rank segment, the MAX12 premium is approximately 3 basis points of annual alpha per standard deviation at low-sentiment regimes ($|\text{SP}_{\text{low}}|\times 295\approx 0.011\times 295$) and approximately 39 basis points per standard deviation at high-sentiment regimes ($|\text{SP}_{\text{high}}|\times 295\approx 0.133\times 295$). For comparison, the Jegadeesh--Titman momentum quintile spread (Table~\ref{tab:port_mom_alpha}; $2.278\%$, $t=1.36$) implies 285 basis points per rank point. The quoted basis-point figures should be read as orders of magnitude rather than precise estimates.     Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+Each row is computed from a separate joint regression of the form $\text{flow}=\beta_q R^q + \gamma D^{\text{SENT}} + \delta_q R^q D^{\text{SENT}} + \eta\,\text{AS}^z + \phi\,\text{AS}^z D^{\text{SENT}} + \text{controls} + \mu_i$ (fund fixed effects), with $\text{AS}^z$ standardized within sample. Shadow Price units are rank points per standard deviation of the lottery measure. Standard errors via the delta method using the joint coefficient covariance from the underlying regression; clustered two-way on fund and calendar month. The 1-sided $p$ tests Diff $<0$ (a larger premium under high sentiment); stars refer to it: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$.     \textit{Conversion to alpha basis points.} To express the premium in welfare-relevant units, the rank-to-alpha mapping is calibrated in the rank space of the flow regressions: each month, active funds are sorted into quintiles of their within-Lipper-category trailing 12-month return rank (the $R$ of the H1--H4 regressions; bins of width 0.2) and the equal-weighted portfolios are held for the month. The net-return Carhart alpha spread is $Q5-Q1=2.363\%$ p.a. ($t=2.40$); with a midpoint-to-midpoint rank distance of $0.8$, this implies approximately 295 basis points of annual Carhart alpha per rank-point. Applying this conversion at the middle rank segment, the MAX12 premium is approximately 3 basis points of annual alpha per standard deviation at low-sentiment regimes ($|\text{SP}_{\text{low}}|\times 295\approx 0.011\times 295$) and approximately 39 basis points per standard deviation at high-sentiment regimes ($|\text{SP}_{\text{high}}|\times 295\approx 0.133\times 295$). For comparison, the Jegadeesh--Titman momentum quintile spread (Table~\ref{tab:port_mom_alpha}; $2.278\%$, $t=1.36$) implies 285 basis points per rank point. The quoted basis-point figures should be read as orders of magnitude rather than precise estimates.     Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

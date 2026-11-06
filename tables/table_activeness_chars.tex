@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \begin{tabular}{lrrrrrrrr}
 \toprule
@@ -25,10 +25,10 @@ Quintile & Mean Act. & $N$ Avg. & Mean TNA & Mean ER & Mean Turn & EW Gross & VW
 \hspace{1em}Q5 & 0.126 & 208 & 1,236 & 1.33 & 82.5 & 0.921 & 0.791 & 0.51\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
 \toprule
@@ -51,7 +51,7 @@ Quintile & Mean Act. & $N$ Avg. & Mean TNA & Mean ER & Mean Turn & EW Gross & VW
 \hspace{1em}Q5 & 0.126 & 208 & 1,236 & 1.33 & 82.5 & 0.921 & 0.791 & 0.51\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -64,8 +64,8 @@ Quintile & Mean Act. & $N$ Avg. & Mean TNA & Mean ER & Mean Turn & EW Gross & VW
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Cross-sectional means of monthly fund characteristics by activeness quintile, actively managed funds only. Q1 = lowest activeness; Q5 = highest activeness. Funds are sorted every month on information up to the previous month: $1-R^2$ from the 36-month rolling \textcite{Carhart1997} regression ending in $t-1$ (Panel A; \citealt{AmihudGoyenko2013}), or annualised Tracking Error against the fund's assigned benchmark index over the 36 months ending in $t-1$ (Panel B; following \citealt{CremersPetajisto2009}). Mean Act.: cross-sectional mean of the activeness measure within the quintile (decimal for $1-R^2$; annualised decimal for Tracking Error). $N$ Avg.: average number of funds in the quintile portfolio per month. Mean TNA: average lagged fund total net assets (USD millions). Mean ER: average static annual expense ratio (\%). Mean Turn: average annual turnover (\%). EW Gross / VW Gross: time-series mean of monthly equal-weighted / lagged-TNA-weighted gross returns (\%, monthly). EW Sharpe: annualised Sharpe ratio of the equal-weighted gross excess return. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+Cross-sectional means of monthly fund characteristics by activeness quintile, actively managed funds only. Q1 = lowest activeness; Q5 = highest activeness. Funds are sorted every month on information up to the previous month: $1-R^2$ from the 36-month rolling \textcite{Carhart1997} regression ending in $t-1$ (Panel A; \citealt{AmihudGoyenko2013}), or annualized Tracking Error against the fund's assigned benchmark index over the 36 months ending in $t-1$ (Panel B; following \citealt{CremersPetajisto2009}). Mean Act.: cross-sectional mean of the activeness measure within the quintile (decimal for $1-R^2$; annualized decimal for Tracking Error). $N$ Avg.: average number of funds in the quintile portfolio per month. Mean TNA: average lagged fund total net assets (USD millions). Mean ER: average static annual expense ratio (\%). Mean Turn: average annual turnover (\%). EW Gross / VW Gross: time-series mean of monthly equal-weighted / lagged-TNA-weighted gross returns (\%, monthly). EW Sharpe: annualized Sharpe ratio of the equal-weighted gross excess return. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

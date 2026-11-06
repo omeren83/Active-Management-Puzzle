@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}{rrrrl}
 \toprule
 Percentile & Actual $t(\hat{\alpha})$ & Simulated Mean & Prob.\ Luck & Interpretation \\
@@ -16,7 +16,7 @@ Percentile & Actual $t(\hat{\alpha})$ & Simulated Mean & Prob.\ Luck & Interpret
 99 & XXX & XXX & XX.X\% & Evidence of genuine skill \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}

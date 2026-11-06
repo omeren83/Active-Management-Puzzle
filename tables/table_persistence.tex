@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular}{lrrrrrrrrrrrr}
 \toprule
@@ -39,10 +39,10 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p^C$ & $p^R_B$ & $p^L_B$ & $\beta
 \hline
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrrrrrr}
 \toprule
@@ -79,20 +79,20 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p^C$ & $p^R_B$ & $p^L_B$ & $\beta
 \hline
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{Persistence in Active Mutual Fund Performance, Full Sample: Carhart Test with Bootstrap Inference}\label{tab:persistence}
+\caption{Persistence in Active Mutual Fund Performance, Full Sample: Carhart Test With Bootstrap Inference}\label{tab:persistence}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 \textcite{Carhart1997} persistence test with bootstrap inference in the spirit of \textcite{KosowskiTimmermannWermersWhite2006}, on 36-month formation, 12-month holding non-overlapping cohorts, ranked by formation-period \textcite{Carhart1997} four-factor alpha $t$-statistic (Newey-West, 3-month lag) except Panel B, which ranks by raw alpha as a robustness check. Equal-weighted decile portfolios of gross excess returns (net return plus one-twelfth of the annual expense ratio) pooled across cohorts; alpha and factor loadings estimated jointly on pooled holding-period returns by OLS with Newey-West $t$-statistics (12-month lag). $\hat{\alpha}$: monthly, \%. $p^C$: one-tailed parametric $p$-value from the holding-period alpha $t$-statistic under normality. $p^R_B$, $p^L_B$: right- and left-tail bootstrap $p$-values ($B = 10{,}000$), computed as the fraction of simulated decile $t(\hat{\alpha})$ under the zero-true-alpha null that exceed (fall below) the observed $t$-statistic. The null is imposed on each decile regression by subtracting its estimated alpha; pooled holding months are then resampled with replacement (one draw shared by all deciles) and the regression re-estimated (the residual bootstrap of \textcite{FamaFrench2010} applied to the decile regressions). $\text{JB}_p$: Jarque-Bera $p$-value for the decile-portfolio holding- period excess return distribution. Where $\text{JB}_p < 0.05$, the bootstrap $p$-values are the valid inferential basis. ExpR: mean expense ratio (\%) of decile constituents, averaged across cohorts. D1 $-$ D10 is the long-short spread. Significance stars on $\hat{\alpha}$ and factor loadings reflect Newey-West $t$-statistics: $^{*}$, $^{**}$, $^{***}$ at 10\%, 5\%, 1\%. Sample: Active funds in the \textcite{Evans2010}-corrected panel\_incubation, Jan 1995--Dec 2022; performance-comparison subsample per flagged\_funds.xlsx. Regime panels contain only cohorts whose formation and holding windows lie inside one regime; Panel F contains the cohorts that cross a regime boundary. No panel is reported for P2, which contains fewer than two complete cohorts.
 \end{singlespace}
 \end{minipage}
@@ -101,8 +101,8 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p^C$ & $p^R_B$ & $p^L_B$ & $\beta
 % sbe_table_format v1.0
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular}{lrrrrrrrrrrrr}
 \toprule
@@ -150,10 +150,10 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p^C$ & $p^R_B$ & $p^L_B$ & $\beta
 \hspace{1em}D1$-$D10 & 0.217$^{***}$ & (3.03) & 0.001 & 0.049 & 0.951 & -0.016 & -0.105$^{***}$ & -0.078 & 0.141$^{***}$ & 0.162 & -- & 0.418\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrrrrrr}
 \toprule
@@ -201,20 +201,20 @@ Decile & $\hat{\alpha}$ & $t(\hat{\alpha})$ & $p^C$ & $p^R_B$ & $p^L_B$ & $\beta
 \hspace{1em}D1$-$D10 & 0.217$^{***}$ & (3.03) & 0.001 & 0.049 & 0.951 & -0.016 & -0.105$^{***}$ & -0.078 & 0.141$^{***}$ & 0.162 & -- & 0.418\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{Persistence in Active Mutual Fund Performance by Regime: Carhart Test with Bootstrap Inference}\label{tab:persistence_regime}
+\caption{Persistence in Active Mutual Fund Performance by Regime: Carhart Test With Bootstrap Inference}\label{tab:persistence_regime}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Construction, columns and notation as in Table~\ref{tab:persistence}.
 \end{singlespace}
 \end{minipage}

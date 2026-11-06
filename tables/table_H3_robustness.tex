@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -40,14 +40,14 @@ FE: Lipper $\times$ year-month & Yes & Yes & Yes & Yes\\
 Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 273,467 & 273,467 & 273,467 & 273,467\\
 $R^2$ (within) & 0.036 & 0.036 & 0.037 & 0.036\\
-Joint test ($\chi^2_2$, $p$) & -- & 0.16 (0.923) & 40.00 ($<\!0.001$) & 6.90 (0.032)\\
+Joint test ($\chi^2_2$, $p$) & -- & 0.16 (0.923) & 40.00 ($<0.001$) & 6.90 (0.032)\\
 Sent.\ amp.\ ($z$, 1-sided $p$) & -- & +0.26 (0.399) & +2.52 (0.006) & +0.00 (0.499)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -85,11 +85,11 @@ FE: Lipper $\times$ year-month & Yes & Yes & Yes & Yes\\
 Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 273,467 & 273,467 & 273,467 & 273,467\\
 $R^2$ (within) & 0.036 & 0.036 & 0.037 & 0.036\\
-Joint test ($\chi^2_2$, $p$) & -- & 0.16 (0.923) & 40.00 ($<\!0.001$) & 6.90 (0.032)\\
+Joint test ($\chi^2_2$, $p$) & -- & 0.16 (0.923) & 40.00 ($<0.001$) & 6.90 (0.032)\\
 Sent.\ amp.\ ($z$, 1-sided $p$) & -- & +0.26 (0.399) & +2.52 (0.006) & +0.00 (0.499)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -102,7 +102,7 @@ Sent.\ amp.\ ($z$, 1-sided $p$) & -- & +0.26 (0.399) & +2.52 (0.006) & +0.00 (0.
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Same sample, dependent variable, and lottery measure construction as Table~\ref{tab:H3_regression}. Sentiment regime $D^{\text{SENT}}$ remains contemporaneous. The state main effect ($\gamma$) is absorbed by the Lipper $\times$ year-month fixed effects and so does not appear in the table. Time-invariant controls (expense ratio, load dummy, turnover) are now identified because there is no fund FE. Standard errors two-way clustered on Ticker and calendar month. Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}

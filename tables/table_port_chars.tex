@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \begin{tabular}{lrrrrrrr}
 \toprule
@@ -57,10 +57,10 @@ $Q$ & $N_{\text{avg}}$ & TNA & ER & Turn. & EW Gross & VW Gross & EW Sharpe\\
 \hspace{1em}Q5 & 24 & 225 & 1.09 & 260.3 & 0.985 & 1.190 & 0.56\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrr}
 \toprule
@@ -115,7 +115,7 @@ $Q$ & $N_{\text{avg}}$ & TNA & ER & Turn. & EW Gross & VW Gross & EW Sharpe\\
 \hspace{1em}Q5 & 24 & 225 & 1.09 & 260.3 & 0.985 & 1.190 & 0.56\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -128,8 +128,8 @@ $Q$ & $N_{\text{avg}}$ & TNA & ER & Turn. & EW Gross & VW Gross & EW Sharpe\\
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Quintile portfolios sorted monthly within group on $\log(\text{TNA}_{t-1})$ (Size), cumulative 11-month net return ending $t-2$ skipping $t-1$ (Momentum; \citealt{JegadeeshTitman1993}; net returns), and annual Expense Ratio (Fee; a static end-of-sample Bloomberg value, so the fee sort uses information not available in real time). EW: equal-weighted; VW: lagged-TNA-weighted. Returns in monthly \%. EW Sharpe is the annualised Sharpe ratio of the quintile portfolio's equal-weighted \textit{gross} excess return, $\sqrt{12}\cdot\overline{r^{\text{EW,g}}_{q,t}-r^{f}_{t}}/\sigma(r^{\text{EW,g}}_{q,t}-r^{f}_{t})$. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+Quintile portfolios sorted monthly within group on $\log(\text{TNA}_{t-1})$ (Size), cumulative 11-month net return ending $t-2$ skipping $t-1$ (Momentum; \citealt{JegadeeshTitman1993}; net returns), and annual Expense Ratio (Fee; a static end-of-sample Bloomberg value, so the fee sort uses information not available in real time). EW: equal-weighted; VW: lagged-TNA-weighted. Returns in monthly \%. EW Sharpe is the annualized Sharpe ratio of the quintile portfolio's equal-weighted \textit{gross} excess return, $\sqrt{12}\cdot\overline{r^{\text{EW,g}}_{q,t}-r^{f}_{t}}/\sigma(r^{\text{EW,g}}_{q,t}-r^{f}_{t})$. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

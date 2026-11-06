@@ -1,5 +1,5 @@
 # =============================================================================
-# SBE TABLE FORMAT POST-PROCESSOR                                          v1.0
+# SBE TABLE FORMAT POST-PROCESSOR                                          v1.1
 # sbe_table_format.R  (Nov 2026)
 #
 # Rewrites every table_*.tex in a folder into one SBE-compliant layout:
@@ -7,15 +7,21 @@
 #     kableExtra longtables are converted to floats);
 #   - title immediately above the table, left-aligned to the table edge
 #     (savebox + minipage, as clean_latex() in the estimation scripts);
-#   - table body at the uniform table size (\footnotesize, set by the
-#     preamble); per-file font sizes (\fontsize{9}{11}) removed;
+#   - table body and note at the uniform table size (\tablefont, 9pt,
+#     defined in the preamble); per-file font sizes removed;
 #   - shrunk only if wider than the text block (former longtables are set
 #     at full width); wide tables get two-line headings to stay >= 8pt;
 #   - the note immediately below the table, inside the float, so it cannot
 #     be separated from the table and the double space after the float
 #     (\intextsep) applies after the note;
-#   - longtable-style "z=+2.43 (p=0.993)" cells shortened to "+2.43 (0.993)".
-# Files already in the target layout are left unchanged (idempotent).
+#   - longtable-style "z=+2.43 (p=0.993)" cells shortened to "+2.43 (0.993)";
+#   - if wider than the text block, the column padding is first reduced
+#     (\sbefit, preamble) so the table keeps the 9pt table font; only a
+#     residual overflow is scaled;
+#   - text conventions (v1.1): American spelling, title case in titles,
+#     ordinals below ten in words, no negative space around "<".
+# Files already in the target layout are left unchanged (idempotent);
+# v1.0 files are upgraded in place (text conventions and font macro only).
 #
 # Tables listed in SPLIT_TABLES are too tall for one page: they are split at
 # the given panel row into two numbered tables (second caption and label as
@@ -25,7 +31,8 @@
 # sync step; can also be run on its own.
 # =============================================================================
 
-SBE_MARK <- "% sbe_table_format v1.0"
+SBE_MARK <- "% sbe_table_format v1.1"
+SBE_MARK_OLD <- "% sbe_table_format v1.0"
 
 # Tables too tall for one page, split into two numbered tables at a panel
 # row: `at` = fixed string starting the first row of the second part;
@@ -34,8 +41,8 @@ SBE_MARK <- "% sbe_table_format v1.0"
 SPLIT_TABLES <- list(
   table_persistence = list(
     at = "\\multicolumn{13}{l}{\\textit{Panel C:",
-    caption1 = "Persistence in Active Mutual Fund Performance, Full Sample: Carhart Test with Bootstrap Inference",
-    caption  = "Persistence in Active Mutual Fund Performance by Regime: Carhart Test with Bootstrap Inference",
+    caption1 = "Persistence in Active Mutual Fund Performance, Full Sample: Carhart Test With Bootstrap Inference",
+    caption  = "Persistence in Active Mutual Fund Performance by Regime: Carhart Test With Bootstrap Inference",
     label    = "tab:persistence_regime"),
   table_activeness_alpha_r2 = list(
     at = "\\multicolumn{9}{l}{Panel C:",
@@ -130,13 +137,13 @@ DEFAULT_TABCOLSEP <- "4pt"   # as clean_latex() in the estimation scripts
   # the natural table is narrower (former longtables were full width)
   widen <- if (is.null(full)) "" else paste0(
     "\\ifdim\\wd\\tabletempbox<\\linewidth\n",
-    "\\sbox{\\tabletempbox}{%\n\\footnotesize\n", tcs, full, "%\n}\n\\fi\n")
+    "\\sbox{\\tabletempbox}{%\n\\tablefont\n", tcs, full, "%\n}\n\\fi\n")
   out <- paste0(
     SBE_MARK, "\n",
     "\\begin{table}[!htbp]\n",
     "\\centering\n",
     "\\sbox{\\tabletempbox}{%\n",
-    "\\footnotesize\n", tcs,
+    "\\tablefont\n", tcs,
     trimws(tabular), "%\n",
     "}\n", widen,
     "\\setlength{\\tabletempwidth}{\\wd\\tabletempbox}\n",
@@ -151,7 +158,7 @@ DEFAULT_TABCOLSEP <- "4pt"   # as clean_latex() in the estimation scripts
     "\\fi\n")
   if (nzchar(note))
     out <- paste0(out, "\\par\\medskip\n",
-                  "\\begin{singlespace}\\footnotesize\\noindent\n",
+                  "\\begin{singlespace}\\tablefont\\noindent\n",
                   note, "\n\\end{singlespace}\n")
   paste0(out, "\\end{minipage}\n\\end{table}\n")
 }
@@ -243,9 +250,82 @@ DEFAULT_TABCOLSEP <- "4pt"   # as clean_latex() in the estimation scripts
        tabcolsep = if (length(tcs)) tcs else NULL)
 }
 
+# --- text conventions (SBE Part 5 / APA) ----------------------------------------
+US_STEMS <- strsplit(paste(
+  "summar emphas character organ recogn real standard normal minim maxim penal winsor",
+  "orthogonal annual synchron synthes hypothes incentiv operational capital util general",
+  "stabil priorit final optim critic categor parameter special rational visual internal",
+  "random harmon scrutin apolog monet item local material neutral sensit social subsid",
+  "symbol theor custom energ econom equal formal global ideal modern polar privat regular",
+  "author colon"), " ")[[1]]
+US_RX <- paste0("(?i)\\b(", paste(US_STEMS[order(-nchar(US_STEMS))], collapse = "|"),
+                ")is(e|es|ed|ing|ation|ations|er|ers|able)\\b")
+US_FIX <- c(behaviour = "behavior", behaviours = "behaviors", behavioural = "behavioral",
+            favour = "favor", favours = "favors", favourable = "favorable", favoured = "favored",
+            centre = "center", centred = "centered", centres = "centers", labelled = "labeled",
+            labelling = "labeling", modelling = "modeling", programme = "program",
+            analyse = "analyze", analysed = "analyzed")
+ORD <- c("1st" = "first", "2nd" = "second", "3rd" = "third", "4th" = "fourth", "5th" = "fifth",
+         "6th" = "sixth", "7th" = "seventh", "8th" = "eighth", "9th" = "ninth")
+
+# APA title case: words of four or more letters capitalized (text outside math)
+.title_case <- function(x) {
+  parts <- strsplit(x, "(?=\\$)|(?<=\\$)", perl = TRUE)[[1]]
+  inm <- FALSE
+  for (i in seq_along(parts)) {
+    if (parts[i] == "$") { inm <- !inm; next }
+    if (!inm) parts[i] <- gsub("(?<=[ (])([a-z])(?=[a-z]{3,}\\b)", "\\U\\1", parts[i], perl = TRUE)
+  }
+  paste(parts, collapse = "")
+}
+.caption_case <- function(s) {
+  m <- gregexpr("(?<=\\\\caption\\{)[^{}]*(\\{[^{}]*\\}[^{}]*)*(?=\\})", s, perl = TRUE)
+  regmatches(s, m) <- lapply(regmatches(s, m), function(v) vapply(v, .title_case, ""))
+  s
+}
+.sbe_text <- function(s) {
+  s <- gsub(US_RX, "\\1iz\\2", s, perl = TRUE)
+  for (w in names(US_FIX)) {
+    s <- gsub(paste0("\\b", w, "\\b"), US_FIX[[w]], s, perl = TRUE)
+    W <- paste0(toupper(substring(w, 1, 1)), substring(w, 2))
+    V <- paste0(toupper(substring(US_FIX[[w]], 1, 1)), substring(US_FIX[[w]], 2))
+    s <- gsub(paste0("\\b", W, "\\b"), V, s, perl = TRUE)
+  }
+  s <- gsub("\\b1st/99th\\b", "first and 99th", s, perl = TRUE)
+  for (o in names(ORD)) s <- gsub(paste0("(?<![\\d.])\\b", o, "\\b"), ORD[[o]], s, perl = TRUE)
+  s <- gsub("<\\\\!", "<", s, fixed = FALSE)
+  .caption_case(s)
+}
+
+# Wrap every table box in \def\sbetab{...}\sbefit (idempotent: none remain)
+.fit_wrap <- function(s) {
+  key <- "\\sbox{\\tabletempbox}{"
+  repeat {
+    a <- regexpr(key, s, fixed = TRUE)
+    if (a < 0) return(s)
+    open <- a + nchar(key) - 1L
+    e <- .brace_end(s, open)
+    if (is.na(e)) return(s)
+    s <- paste0(substring(s, 1L, a - 1L), "\\def\\sbetab{", substring(s, open + 1L, e - 1L),
+                "}\\sbefit", substring(s, e + 1L))
+  }
+}
+
 # --- main ----------------------------------------------------------------------
 sbe_format_string <- function(s, name = "") {
-  if (startsWith(s, SBE_MARK)) return(s)                      # already done
+  if (startsWith(s, SBE_MARK)) return(.fit_wrap(s))           # already done
+  if (startsWith(s, SBE_MARK_OLD)) {                          # v1.0 -> v1.1 upgrade
+    s <- sub(paste0("^", SBE_MARK_OLD, "\n"), "", s, fixed = FALSE)
+    s <- gsub("\\footnotesize", "\\tablefont", s, fixed = TRUE)
+    return(.fit_wrap(paste0(SBE_MARK, "\n", .sbe_text(s))))
+  }
+  out <- .sbe_layout(s, name)
+  if (identical(out, s)) return(s)
+  out <- paste0(SBE_MARK, "\n", .sbe_text(sub(paste0("^", SBE_MARK, "\n"), "", out)))
+  .fit_wrap(gsub("\\footnotesize", "\\tablefont", out, fixed = TRUE))
+}
+
+.sbe_layout <- function(s, name = "") {
   s <- gsub("\\\\begingroup\\\\fontsize\\{[^}]*\\}\\{[^}]*\\}\\\\selectfont", "", s)
   s <- gsub("\\\\endgroup\\{\\}", "", s)
   s <- gsub("\\\\captionsetup\\{font=normalsize\\}", "", s)

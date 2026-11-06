@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -60,10 +60,10 @@ Joint test ($\chi^2_4$, $p$) & -- & 6.63 (0.157) & 3.02 (0.555) & 3.07 (0.547)\\
 Headline ($z$, 1-sided $p$) & -- & -1.52 (0.936) & -0.93 (0.824) & -0.13 (0.551)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -121,7 +121,7 @@ Joint test ($\chi^2_4$, $p$) & -- & 6.63 (0.157) & 3.02 (0.555) & 3.07 (0.547)\\
 Headline ($z$, 1-sided $p$) & -- & -1.52 (0.936) & -0.93 (0.824) & -0.13 (0.551)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -134,8 +134,8 @@ Headline ($z$, 1-sided $p$) & -- & -1.52 (0.936) & -0.93 (0.824) & -0.13 (0.551)
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-The dependent variable is the Sirri-Tufano (1998) winsorised proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. $D^{\text{SENT}}_t$ is the top-34\% indicator for orthogonalised sentiment; column (3) substitutes the standardised continuous index; column (4) substitutes the AAII bull-bear regime dummy. ExpRatio: annual expense ratio in percent (static end-of-sample Bloomberg value; non-positive values excluded). Lipper-category $\times$ year-month fixed effects absorb both sentiment main effects ($\lambda$) and any style-month aggregate flow shocks; cross-fund expense-ratio variation within each (style, month) cell identifies $\theta$ and the fee interactions. Standard errors two-way clustered on fund and calendar month. The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms ($\eta$ and the three $\delta^F_q$). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
+\begin{singlespace}\tablefont\noindent
+The dependent variable is the Sirri-Tufano (1998) winsorized proportional fund flow (decimal). $t$-statistics in parentheses below each coefficient. $D^{\text{SENT}}_t$ is the top-34\% indicator for orthogonalized sentiment; column (3) substitutes the standardized continuous index; column (4) substitutes the AAII bull-bear regime dummy. ExpRatio: annual expense ratio in percent (static end-of-sample Bloomberg value; non-positive values excluded). Lipper-category $\times$ year-month fixed effects absorb both sentiment main effects ($\lambda$) and any style-month aggregate flow shocks; cross-fund expense-ratio variation within each (style, month) cell identifies $\theta$ and the fee interactions. Standard errors two-way clustered on fund and calendar month. The joint $\chi^2_4$ test covers all four fee-amplified-sentiment terms ($\eta$ and the three $\delta^F_q$). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{singlespace}
 \end{minipage}
 \end{table}

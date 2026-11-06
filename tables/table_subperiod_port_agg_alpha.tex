@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{4pt}%
 \begin{tabular}[t]{lrrr}
 \toprule
@@ -42,20 +42,20 @@ Portfolio & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}
 \hspace{1em}t(coef) & (-0.40) & (-0.94) & (-1.17)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{\label{tab:subperiod_port_agg_alpha}Active vs.\ Passive Aggregate Portfolio Alpha by Sub-Period (\%, Annualised)}
+\caption{\label{tab:subperiod_port_agg_alpha}Active vs.\ Passive Aggregate Portfolio Alpha by Sub-Period (\%, Annualized)}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Monthly EW and VW aggregate portfolio gross returns (net plus one-twelfth of the expense ratio) regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models, estimated separately within each sub-period. Alphas annualised ($\times 12$) and expressed as \%. Newey-West $t$-statistics (6-month lag) in parentheses. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+Monthly EW and VW aggregate portfolio gross returns (net plus one-twelfth of the expense ratio) regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models, estimated separately within each sub-period. Alphas annualized ($\times 12$) and expressed as \%. Newey-West $t$-statistics (6-month lag) in parentheses. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; performance-comparison subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}

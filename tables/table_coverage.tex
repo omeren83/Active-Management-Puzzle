@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}[t]{lrrrrrr}
 \toprule
 Group & Funds & Min & P25 & Median & P75 & Max\\
@@ -23,7 +23,7 @@ Group & Funds & Min & P25 & Median & P75 & Max\\
 \hspace{1em}Passive & 294 & 1 & 48 & 121 & 241 & 349\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -35,7 +35,7 @@ Group & Funds & Min & P25 & Median & P75 & Max\\
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Distribution of monthly observation counts per fund.
 \end{singlespace}
 \end{minipage}

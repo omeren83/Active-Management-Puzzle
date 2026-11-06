@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -46,15 +46,15 @@ Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 322,150 & 322,150 & 217,313 & 322,150\\
 $R^2$ (within) & 0.036 & 0.037 & 0.039 & 0.037\\
-Joint test ($\chi^2_3$, $p$) & -- & 18.82 ($<\!0.001$) & 1.69 (0.639) & 17.77 ($<\!0.001$)\\
+Joint test ($\chi^2_3$, $p$) & -- & 18.82 ($<0.001$) & 1.69 (0.639) & 17.77 ($<0.001$)\\
 Loser-end test ($z$; 1-sided $p$ for $\delta_{\text{LOW}}<0$) & -- & +2.20 (0.986) & -0.51 (0.307) & +1.69 (0.955)\\
 Asymmetry ($z$; 1-sided $p$ for $\delta_{\text{HIGH}}-\delta_{\text{LOW}}>0$) & -- & +1.07 (0.143) & -0.24 (0.594) & +1.12 (0.131)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -98,12 +98,12 @@ Fund FE & Yes & Yes & Yes & Yes\\
 Cluster (fund, month) & Yes & Yes & Yes & Yes\\
 $N$ & 322,150 & 322,150 & 217,313 & 322,150\\
 $R^2$ (within) & 0.036 & 0.037 & 0.039 & 0.037\\
-Joint test ($\chi^2_3$, $p$) & -- & 18.82 ($<\!0.001$) & 1.69 (0.639) & 17.77 ($<\!0.001$)\\
+Joint test ($\chi^2_3$, $p$) & -- & 18.82 ($<0.001$) & 1.69 (0.639) & 17.77 ($<0.001$)\\
 Loser-end test ($z$; 1-sided $p$ for $\delta_{\text{LOW}}<0$) & -- & +2.20 (0.986) & -0.51 (0.307) & +1.69 (0.955)\\
 Asymmetry ($z$; 1-sided $p$ for $\delta_{\text{HIGH}}-\delta_{\text{LOW}}>0$) & -- & +1.07 (0.143) & -0.24 (0.594) & +1.12 (0.131)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -116,7 +116,7 @@ Asymmetry ($z$; 1-sided $p$ for $\delta_{\text{HIGH}}-\delta_{\text{LOW}}>0$) & 
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Same sample, dependent variable, controls, and identification strategy as Table~\ref{tab:H2_regression}. State variables are lagged one period: column (2) uses $D^{\text{MD,Det}}_{t-1}$, column (3) uses $D^{\text{INV-PCR}}_{t-1}$, column (4) is the discriminant with $D^{\text{MD,Det}}_{t-1}$ and $D^{\text{SENT}}_{t-1}$. Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{singlespace}
 \end{minipage}

@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}[t]{llrrrrrr}
 \toprule
 Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
@@ -53,10 +53,10 @@ Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
 
  & Passive & 253 & 0.516 & 0.521 & 0.298 & 0.217 & 0.776\\
 
-\multirow{-3}{*}{\raggedright\arraybackslash Gross Sharpe Ratio (annualised)} & Full & 2,590 & 0.475 & 0.512 & 0.308 & 0.124 & 0.764\\
+\multirow{-3}{*}{\raggedright\arraybackslash Gross Sharpe Ratio (annualized)} & Full & 2,590 & 0.475 & 0.512 & 0.308 & 0.124 & 0.764\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -68,8 +68,8 @@ Variable & Group & $N$ & Mean & Median & SD & $P_{10}$ & $P_{90}$\\
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Fund-level time-series means are computed first; cross-sectional statistics are then computed across fund-level means. $N$ is the number of funds with at least one valid observation. Expense Ratio and Turnover are point-in-time Bloomberg static values; Turnover is winsorised at the 1st/99th percentiles cross-sectionally. Flow is the \textcite{SirriTufano1998} measure scaled by lagged TNA (\%), winsorised at 1st/99th percentiles, with December excluded. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Returns and flows are in \%. Gross Sharpe ratio is the fund-level annualised Sharpe on excess gross returns, $\sqrt{12}\cdot\overline{r^{g}_{i,t}-r^{f}_{t}}/\sigma(r^{g}_{i,t}-r^{f}_{t})$, computed only for funds with at least 24 monthly excess-return observations. \textcite{Evans2010} 36-month incubation correction applied and sample restricted to 1995--2023. It is used for robustness only; the main analyses, including the panel regressions (H1--H4), use the incubation-corrected panel.
+\begin{singlespace}\tablefont\noindent
+Fund-level time-series means are computed first; cross-sectional statistics are then computed across fund-level means. $N$ is the number of funds with at least one valid observation. Expense Ratio and Turnover are point-in-time Bloomberg static values; Turnover is winsorized at the first and 99th percentiles cross-sectionally. Flow is the \textcite{SirriTufano1998} measure scaled by lagged TNA (\%), winsorized at first and 99th percentiles, with December excluded. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Returns and flows are in \%. Gross Sharpe ratio is the fund-level annualized Sharpe on excess gross returns, $\sqrt{12}\cdot\overline{r^{g}_{i,t}-r^{f}_{t}}/\sigma(r^{g}_{i,t}-r^{f}_{t})$, computed only for funds with at least 24 monthly excess-return observations. \textcite{Evans2010} 36-month incubation correction applied and sample restricted to 1995--2023. It is used for robustness only; the main analyses, including the panel regressions (H1--H4), use the incubation-corrected panel.
 \end{singlespace}
 \end{minipage}
 \end{table}

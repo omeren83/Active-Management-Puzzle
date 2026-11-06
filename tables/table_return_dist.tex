@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}[t]{llrrrrrrrrr}
 \toprule
 Panel & Group & $N$ & Mean & \makecell{VW\\Mean} & Median & SD & $P_{10}$ & $P_{90}$ & \makecell{Nonpar.\\Skew} & \makecell{Ex.\\Kurtosis} \\
@@ -20,7 +20,7 @@ Panel & Group & $N$ & Mean & \makecell{VW\\Mean} & Median & SD & $P_{10}$ & $P_{
 \multirow{-2}{*}{\raggedright\arraybackslash Trimmed (1995--2023)} & Passive & 43,122 & 0.883 & 0.944 & 1.344 & 5.066 & -5.739 & 6.640 & -0.091 & 2.2273\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -32,8 +32,8 @@ Panel & Group & $N$ & Mean & \makecell{VW\\Mean} & Median & SD & $P_{10}$ & $P_{
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the time-series average of the monthly lagged-TNA-weighted cross-sectional mean return, i.e.\ the average monthly return earned by a representative invested dollar. Nonpar.\ Skew is the nonparametric skew $(\bar{x}-\tilde{x})/s$ (mean minus median over the standard deviation; bounded by $\pm 1$), one third of Pearson's second skewness coefficient. It is not the third standardised moment. Excess kurtosis is the fourth standardised central moment minus 3.
+\begin{singlespace}\tablefont\noindent
+Statistics computed at the fund-month level across all valid gross return observations, expressed as percentages. $N$ is the number of fund-month observations. VW Mean is the time-series average of the monthly lagged-TNA-weighted cross-sectional mean return, i.e.\ the average monthly return earned by a representative invested dollar. Nonpar.\ Skew is the nonparametric skew $(\bar{x}-\tilde{x})/s$ (mean minus median over the standard deviation; bounded by $\pm 1$), one third of Pearson's second skewness coefficient. It is not the third standardized moment. Excess kurtosis is the fourth standardized central moment minus 3.
 \end{singlespace}
 \end{minipage}
 \end{table}

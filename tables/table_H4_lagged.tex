@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular}{lrrrr}
@@ -60,10 +60,10 @@ Joint test ($\chi^2_4$, $p$) & -- & 3.89 (0.421) & 1.99 (0.738) & 0.57 (0.967)\\
 Headline ($z$, 1-sided $p$) & -- & -1.15 (0.875) & -0.92 (0.820) & -0.23 (0.590)\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{3pt}%
 \renewcommand{\arraystretch}{0.87}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr}
@@ -121,7 +121,7 @@ Joint test ($\chi^2_4$, $p$) & -- & 3.89 (0.421) & 1.99 (0.738) & 0.57 (0.967)\\
 Headline ($z$, 1-sided $p$) & -- & -1.15 (0.875) & -0.92 (0.820) & -0.23 (0.590)\\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
@@ -134,7 +134,7 @@ Headline ($z$, 1-sided $p$) & -- & -1.15 (0.875) & -0.92 (0.820) & -0.23 (0.590)
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Same sample, dependent variable, controls, identification strategy, and FE structure as Table~\ref{tab:H4_regression}. State variables in columns (2)--(4) are lagged one period. ExpRatio enters at $t$ (= $t-1$ = constant). Standard errors two-way clustered on Ticker and calendar month (Petersen 2009). Stars: $^{*}\,p<0.10$, $^{**}\,p<0.05$, $^{***}\,p<0.01$. Sample: actively managed funds, \textcite{Evans2010}-corrected panel, no date cap; Entire-Analysis exclusions per flagged\_funds.xlsx applied at source.
 \end{singlespace}
 \end{minipage}

@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular}{lrrrrrrrr}
 \toprule
@@ -41,10 +41,10 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hline
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
 \toprule
@@ -83,21 +83,21 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hline
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{Alpha and Factor Loadings by Activeness Quintile (Tracking Error), Gross Returns (\%, Annualised)}\label{tab:activeness_alpha_te}
+\caption{Alpha and Factor Loadings by Activeness Quintile (Tracking Error), Gross Returns (\%, Annualized)}\label{tab:activeness_alpha_te}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualised ($\times 12$, \%). Q5$-$Q1: long- short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx. Active funds only. Quintiles are formed every month from the cross-section of active funds, using the activeness measure available at the end of the previous month. Activeness measured as annualised Tracking Error against the fund's assigned benchmark index over the 36 months ending in $t-1$ (at least 24 observations), $\sqrt{12}\cdot\mathrm{sd}(r_{i,s}^{\text{net}}-r_{b(i),s})$ (equal to the gross-return value, the expense ratio being constant), where $b(i)$ is the benchmark code recorded for fund $i$ in the static metadata. Following the interpretation of \textcite{CremersPetajisto2009}, higher tracking error indicates greater portfolio deviation from the assigned benchmark. Funds with missing or unmatched benchmark codes are excluded from this sort only.
+\begin{singlespace}\tablefont\noindent
+Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor, and \textcite{Carhart1997} four-factor models. Alphas annualized ($\times 12$, \%). Q5$-$Q1: long- short spread; the risk-free rate is omitted from the spread return because it cancels in the self-financing construction: $(r_5 - R_f) - (r_1 - R_f) = r_5 - r_1$. EW: equal-weighted; VW: lagged-TNA-weighted. Net returns are the funds' NAV-based total returns (net of expenses); gross returns add back one-twelfth of the static annual expense ratio each month, following \textcite{FamaFrench2010}. Newey-West $t$-statistics (6-month lag) in parentheses below each coefficient. $^{*}$, $^{**}$, $^{***}$: significant at 10\%, 5\%, 1\% respectively. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx. Active funds only. Quintiles are formed every month from the cross-section of active funds, using the activeness measure available at the end of the previous month. Activeness measured as annualized Tracking Error against the fund's assigned benchmark index over the 36 months ending in $t-1$ (at least 24 observations), $\sqrt{12}\cdot\mathrm{sd}(r_{i,s}^{\text{net}}-r_{b(i),s})$ (equal to the gross-return value, the expense ratio being constant), where $b(i)$ is the benchmark code recorded for fund $i$ in the static metadata. Following the interpretation of \textcite{CremersPetajisto2009}, higher tracking error indicates greater portfolio deviation from the assigned benchmark. Funds with missing or unmatched benchmark codes are excluded from this sort only.
 \end{singlespace}
 \end{minipage}
 \end{table}
@@ -105,8 +105,8 @@ Monthly EW and VW portfolio returns regressed on CAPM, Fama-French three-factor,
 % sbe_table_format v1.0
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular}{lrrrrrrrr}
 \toprule
@@ -142,10 +142,10 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}t(coef) & (-1.83) & (-1.91) & (-2.44) & (3.83) & (11.46) & (-4.89) & (0.73) & \\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \ifdim\wd\tabletempbox<\linewidth
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \setlength{\tabcolsep}{2pt}%
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrrrrrr}
 \toprule
@@ -181,20 +181,20 @@ Quintile & $\alpha_{\text{CAPM}}$ & $\alpha_{\text{FF3}}$ & $\alpha_{\text{Car}}
 \hspace{1em}t(coef) & (-1.83) & (-1.91) & (-2.44) & (3.83) & (11.46) & (-4.89) & (0.73) & \\
 \bottomrule
 \end{tabular*}%
-}
+}\sbefit
 \fi
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
 \captionsetup{width=\linewidth}
-\caption{Alpha and Factor Loadings by Activeness Quintile (Tracking Error), Net Returns (\%, Annualised)}\label{tab:activeness_alpha_te_net}
+\caption{Alpha and Factor Loadings by Activeness Quintile (Tracking Error), Net Returns (\%, Annualized)}\label{tab:activeness_alpha_te_net}
 \ifdim\wd\tabletempbox>\linewidth
   \resizebox{\linewidth}{!}{\usebox{\tabletempbox}}
 \else
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
+\begin{singlespace}\tablefont\noindent
 Construction, columns and notation as in Table~\ref{tab:activeness_alpha_te}.
 \end{singlespace}
 \end{minipage}

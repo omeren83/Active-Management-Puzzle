@@ -1,8 +1,8 @@
-% sbe_table_format v1.0
+% sbe_table_format v1.1
 \begin{table}[!htbp]
 \centering
-\sbox{\tabletempbox}{%
-\footnotesize
+\def\sbetab{%
+\tablefont
 \begin{tabular}[t]{lrrrrrrr}
 \toprule
 Panel & $\alpha_{\text{Q1}}$ & $\alpha_{\text{Q5}}$ & $\alpha_{\text{Q5}}-\alpha_{\text{Q1}}$ & $J_{\uparrow}$ & $p_{\uparrow}$ & $J_{\downarrow}$ & $p_{\downarrow}$\\
@@ -22,7 +22,7 @@ Panel & $\alpha_{\text{Q1}}$ & $\alpha_{\text{Q5}}$ & $\alpha_{\text{Q5}}-\alpha
 \hspace{1em}VW Net & -0.789 & -3.221 & -2.432 & -3.422 & 0.999 & -1.058 & 0.700\\
 \bottomrule
 \end{tabular}%
-}
+}\sbefit
 \setlength{\tabletempwidth}{\wd\tabletempbox}
 \ifdim\tabletempwidth>\linewidth\setlength{\tabletempwidth}{\linewidth}\fi
 \begin{minipage}{\tabletempwidth}
@@ -34,8 +34,8 @@ Panel & $\alpha_{\text{Q1}}$ & $\alpha_{\text{Q5}}$ & $\alpha_{\text{Q5}}-\alpha
   \usebox{\tabletempbox}
 \fi
 \par\medskip
-\begin{singlespace}\footnotesize\noindent
-\textcite{PattonTimmermann2010} monotonic relation (MR) bootstrap test for the Carhart alpha gradient across the five activeness quintiles, separately for each activeness measure and for each weighting $\times$ return-type combination (Active funds only). Test statistics: $J_{\uparrow} = \min_{q \geq 2}(\alpha_q - \alpha_{q-1})$ for the increasing-pattern alternative, $J_{\downarrow} = \min_{q \geq 2}(\alpha_{q-1} - \alpha_q)$ for the decreasing-pattern alternative. $p_{\uparrow}$ and $p_{\downarrow}$ are bootstrap p-values from $B = 1000$ stationary-bootstrap resamples of calendar months (stationary bootstrap of Politis and Romano 1994, mean block length 6) under the least-favorable null configuration (each quintile's excess return series recentered by subtracting its Carhart alpha over the months common to all quintiles, imposing $\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern when the corresponding p-value is small. $\alpha_{\text{Q1}}$, $\alpha_{\text{Q5}}$, and $\alpha_{\text{Q5}}-\alpha_{\text{Q1}}$ are annualised Carhart alphas (\%). $J_{\uparrow}$ and $J_{\downarrow}$ are reported in annualised \% terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\%, 5\%, 1\%. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
+\begin{singlespace}\tablefont\noindent
+\textcite{PattonTimmermann2010} monotonic relation (MR) bootstrap test for the Carhart alpha gradient across the five activeness quintiles, separately for each activeness measure and for each weighting $\times$ return-type combination (Active funds only). Test statistics: $J_{\uparrow} = \min_{q \geq 2}(\alpha_q - \alpha_{q-1})$ for the increasing-pattern alternative, $J_{\downarrow} = \min_{q \geq 2}(\alpha_{q-1} - \alpha_q)$ for the decreasing-pattern alternative. $p_{\uparrow}$ and $p_{\downarrow}$ are bootstrap p-values from $B = 1000$ stationary-bootstrap resamples of calendar months (stationary bootstrap of Politis and Romano 1994, mean block length 6) under the least-favorable null configuration (each quintile's excess return series recentered by subtracting its Carhart alpha over the months common to all quintiles, imposing $\alpha_q = 0$ for all $q$). Reject the null of no monotone pattern when the corresponding p-value is small. $\alpha_{\text{Q1}}$, $\alpha_{\text{Q5}}$, and $\alpha_{\text{Q5}}-\alpha_{\text{Q1}}$ are annualized Carhart alphas (\%). $J_{\uparrow}$ and $J_{\downarrow}$ are reported in annualized \% terms. $^{*}$, $^{**}$, $^{***}$ on the p-values: significant at 10\%, 5\%, 1\%. Sample: Incubation-corrected panel (Evans 2010), no date cap; H3 / activeness subsample per flagged\_funds.xlsx.
 \end{singlespace}
 \end{minipage}
 \end{table}
